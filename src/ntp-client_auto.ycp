@@ -1,0 +1,94 @@
+/**
+ * File:	clients/ntp-client_auto.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Client for autoinstallation
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ * This is a client for autoinstallation. It takes its arguments,
+ * goes through the configuration and return the setting.
+ * Does not do any changes to the configuration.
+ */
+
+/**
+ * @param function to execute
+ * @param map/list of ntp-client settings
+ * @return map edited settings, Summary or boolean on success depending on called function
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example map ret = WFM::CallFunction ("ntp-client_auto", [ "Summary", mm ]);
+ */
+
+{
+
+textdomain "ntp-client";
+
+y2milestone("----------------------------------------");
+y2milestone("NtpClient auto started");
+
+import "NtpClient";
+include "ntp-client/wizards.ycp";
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+/* Check arguments */
+if(size(Args()) > 0 && is(Args(0), string)) {
+    func = WFM::Args(0);
+    if(size(Args()) > 1 && is(Args(1), map))
+	param = WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+/* Create a summary*/
+if(func == "Summary") {
+    ret = select(NtpClient::Summary(), 0, "");
+}
+/* Reset configuration */
+else if (func == "Reset") {
+    NtpClient::Import($[]);
+    ret = $[];
+}
+/* Change configuration (run AutoSequence) */
+else if (func == "Change") {
+    ret = NtpClientAutoSequence();
+}
+/* Import configuration */
+else if (func == "Import") {
+    ret = NtpClient::Import(param);
+}
+/* Return actual state */
+else if (func == "Export") {
+    ret = NtpClient::Export();
+}
+/* Read current state */
+else if (func == "Read") {
+    import "Progress";
+    Progress::off();
+    ret = NtpClient::Read();
+    Progress::on();
+}
+/* Write givven settings */
+else if (func == "Write") {
+    import "Progress";
+    Progress::off();
+    NtpClient::write_only = true;
+    ret = NtpClient::Write();
+    Progress::on();
+}
+/* Unknown function */
+else {
+    y2error("Unknown function: %1", func);
+    ret = false;
+}
+
+y2debug("ret=%1", ret);
+y2milestone("NtpClient auto finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}

@@ -1,0 +1,96 @@
+/**
+ * File:	include/ntp-client/helps.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Help texts of all the dialogs
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+/**
+ * All helps are here
+ */
+global map HELPS = $[
+
+    /* Read dialog help 1/2 */
+    "read" : _("<p><b><big>Initializing ntp-client configuration</big></b><br>
+Please wait for a while...<br></p>") +
+
+    /* Read dialog help 2/2 */
+    _("<p><b><big>Aborting the initialization:</big></b><br>
+Safely abort the configuration utility by pressing the <b>Abort</b> now.</p>"),
+
+    /* Write dialog help 1/2 */
+    "write" : _("<p><b><big>Saving ntp-client configuration</big></b><br>
+Please wait for a while...<br></p>") +
+
+    /* Write dialog help 2/2 */
+_("<p><b><big>Aborting the saving:</big></b><br>
+You can abort the saving by pressing the <b>Abort</b> button.
+An additional dialog will inform you whether it is safe to do so or not.
+</p>"),
+
+    /* */
+    "start" : _("<p><b><big>FIXME TODO</big></b></p>"),
+
+    "overview" : _("<p><b><big>FIXME TODO</big></b></p>"),
+
+
+
+    /* Summary dialog help 1/3 */
+    "summary" : _("<p><b><big>NtpClient configuration</big></b><br>
+Configure ntp-client here.<br></p>") +
+
+    /* Summary dialog help 2/3 */
+    _("<p><b><big>Adding a ntp-client:</big></b><br>
+Choose ntp-client from the list of the detected ntp-clients.
+If your ntp-client was not autodetected, use <b>Other (not detected)</b>.
+Then press <b>Configure</b>.</p>") +
+
+    /* Summary dialog help 3/3 */
+    _("<p><b><big>Editing or deleting:</big></b><br>
+If you press <b>Edit</b>, an additional dialog in which to change
+the configuration opens.</p>"),
+
+    /* Ovreview dialog help 1/3 */
+/*    "overview" : _("<p><b><big>NtpClient configuration overview</big></b><br>
+Obtain an overview about installed ntp-clients. Additionally
+edit their configuration.<br></p>") +
+
+    /* Ovreview dialog help 2/3 */
+/*_("<p><b><big>Adding a ntp-client:</big></b><br>
+Press <b>Add</b> to configure a ntp-client.</p>") +
+
+    /* Ovreview dialog help 3/3 */
+/*_("<p><b><big>Editing or deleting:</big></b><br>
+Choose a ntp-client to change or remove.
+Then press <b>Edit</b> or <b>Delete</b> as desired.</p>"),
+
+    /* Configure1 dialog help 1/2 */
+    "c1" : _("<p><b><big>Configure, part one</big></b><br>
+Please press the <b>Next</b> button.
+<br></p>") +
+
+    /* Configure1 dialog help 2/2 */
+_("<p><b><big>Selecting something:</big></b><br>
+It is not possible, you must code it first :-)
+</p>"),
+
+    /* Configure2 dialog help 1/2 */
+    "c2" : _("<p><b><big>Configure, part two</big></b><br>
+Please press the <b>Next</b> button.
+<br></p>") +
+
+    /* Configure2 dialog help 2/2 */
+_("<p><b><big>Selecting something:</big></b><br>
+It is not possible, you must code it first :-)
+</p>"),
+
+];
+
+/* EOF */
+}

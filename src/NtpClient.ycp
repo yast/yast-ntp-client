@@ -1,0 +1,302 @@
+/**
+ * File:	modules/NtpClient.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Data for configuration of ntp-client, input and output functions.
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ * Representation of the configuration of ntp-client.
+ * Input and output routines.
+ */
+
+{
+
+module "NtpClient";
+textdomain "ntp-client";
+
+import "Progress";
+import "Report";
+import "Summary";
+import "Runlevel";
+
+include "ntp-client/routines.ycp";
+include "ntp-client/widgets.ycp";
+
+global map widgets = InitWidgets ();
+
+/**
+ * Abort function
+ * return boolean return true if abort
+ */
+global block AbortFunction = nil;
+
+/**
+ * Data was modified?
+ */
+global boolean modified = false;
+
+global boolean proposal_valid = false;
+
+/**
+ * Write only, used during autoinstallation.
+ * Don't run services and SuSEconfig, it's all done at one place.
+ */
+global boolean write_only = false;
+
+/**
+ * Read all ntp-client settings
+ * @return true on success
+ */
+
+global boolean start_at_boot = false;
+
+global list peers = [];
+
+global integer selected_item_index = -1;
+
+global list selected_item = [];
+
+list rw_order = [ "server", "fudge", "peer" ];
+
+map paths = $[
+	"server" : .etc.ntp_conf.server,
+	"peer" : .etc.ntp_conf.peer,
+	"fudge" : .etc.ntp_conf.fudge,
+];
+
+
+global define boolean Read() ``{
+
+    /* NtpClient read dialog caption */
+    string caption = _("Initializing ntp-client configuration");
+
+    integer steps = 2;
+    integer sl = 500;
+
+    // We do not set help text here, because it was set outside
+    Progress::New( caption, " ", steps, [
+	    // progress stage
+	    _("Read NTP settings"),
+	], [
+	    // progress step
+	    _("Reading NTP settings..."),
+	    // progress step
+	    _("Finished")
+	],
+	""
+    );
+
+    // read current settings
+    if(Abort()) return false;
+    Progress::NextStage();
+
+    boolean failed = false;
+
+    start_at_boot = Runlevel::ServiceEnabled ("xntpd");
+    peers = [];
+    foreach (`k, rw_order, ``{
+	path v = paths[k]:nil;
+	list l = SCR::Read (v);
+	if (l == nil)
+	{
+	    y2error ("Reading %1 returned nil", v);
+	    failed = true;
+	    l = [];
+	}
+	l = maplist (`e, l, ``(prepend (e, k)));
+	peers = merge (peers, l);
+    });
+
+    string initial_sync = SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
+    if (initial_sync == nil)
+    {
+	initial_sync = "";
+	failed = true;
+	y2error ("Failed reading .sysconfig.xntp.XNTPD_INITIAL_NTPDATE");
+    }
+
+    if (initial_sync == "AUTO")
+    {
+	peers = maplist (`p, peers, ``{
+	    p[3] = p[0]:"" == "server";
+	    return p;
+	});
+    }
+    else if (regexpmatch (initial_sync, "AUTO-[0-9]+"))
+    {
+	integer count = tointeger (
+	    regexpsub (initial_sync, "AUTO-([0-9]+)", "\\1"));
+	peers = maplist (`p, peers, ``{
+	    if (p[0]:"" == "server")
+	    {
+		count = count - 1;
+		p[3] = count >= 0;
+	    }
+	    else
+		p[3] = false;
+	    return p;
+	});
+    }
+    else
+    {
+	list listed = splitstring (initial_sync, " ");
+	peers = maplist (`p, peers, ``{
+	    p[3] = p[0]:"" == "server" && contains (listed, p[1]:"");
+	    return p;
+	});
+    }
+
+    y2milestone ("Read settings: %1", peers);
+
+    if(failed)
+    {
+	Report::Error(_("Can not read current settings!"));
+    }
+
+    if(Abort()) return false;
+    ProgressNextStage(_("Finished"));
+    sleep(sl);
+
+    if(Abort()) return false;
+    modified = false;
+    return true;
+}
+
+/**
+ * Write all ntp-client settings
+ * @return true on success
+ */
+global define boolean Write() ``{
+
+    /* NtpClient read dialog caption */
+    string caption = _("Saving ntp-client configuration");
+
+    integer steps = 2;
+
+    integer sl = 500;
+    sleep(sl);
+
+    // TODO FIXME Names of real stages
+    // We do not set help text here, because it was set outside
+    Progress::New(caption, " ", steps, [
+	    // progress stage
+	    _("Write NTP settings"),
+	    // progress stage
+	    _("Restart NTP daemon")
+	], [
+	    // progress step
+	    _("Writing the settings..."),
+	    // progress step
+	    _("Restarting NTP daemon..."),
+	    // progress step
+	    _("Finished")
+	],
+	""
+    );
+
+    // write settings
+    if(Abort()) return false;
+    Progress::NextStage();
+
+    boolean failed = false;
+    foreach (`k, rw_order, ``{
+	path v = paths[k]:nil;
+	list l = filter (`e, peers, ``(e[0]:"" == k));
+	l = maplist (`e, l, ``([e[1]:"", e[2]:""]));
+	boolean b = SCR::Write (v, l);
+	if (! b)
+	{
+	    y2error ("Reading %1 returned nil", v);
+	    failed = true;
+	    l = [];
+	}
+    });
+    failed = failed || ! SCR::Write (.etc.ntp_conf, nil);
+
+    if (failed)
+	Report::Error (_("Can not write settings to /etc/ntp.conf!"));
+
+
+    list init = maplist (`p, peers, ``(
+	p[0]:"" == "server" && p[3]:false
+	    ? p[1]:""
+	    : nil
+    ));
+    init = filter (`i, init, ``(i != nil));
+
+    string init_str = mergestring (init, " ");
+    if (! (SCR::Write (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE, init_str)
+	&& SCR::Write (.sysconfig.xntp, nil)))
+    {
+	Report::Error (_("Can not write sysconfig variables."));
+    }
+
+    sleep(sl);
+
+    // restart daemon
+    if(Abort()) return false;
+    Progress::NextStage ();
+
+    if (! Runlevel::ServiceAdjust ("xntpd",
+	start_at_boot ? "enable" : "disable"))
+    {
+	Report::Error (_("Can not adjust the service"));
+    }
+    if (start_at_boot && 0 != Runlevel::RunInitScript("xntpd", "restart"))
+	Report::Error (_("Can not restart NTP daemon!"));
+
+    sleep(sl);
+
+    if(Abort()) return false;
+    ProgressNextStage(_("Finished"));
+    sleep(sl);
+
+    if(Abort()) return false;
+    return true;
+}
+
+/**
+ * Get all ntp-client settings from the first parameter
+ * (For use by autoinstallation.)
+ * @param settings The YCP structure to be imported.
+ * @return boolean True on success
+ */
+global define boolean Import (map settings) ``{
+    // TODO FIXME: your code here (fill the above mentioned variables)...
+    sleep(3000);
+    return true;
+}
+
+/**
+ * Dump the ntp-client settings to a single map
+ * (For use by autoinstallation.)
+ * @return map Dumped settings (later acceptable by Import ())
+ */
+global define map Export () ``{
+    // TODO FIXME: your code here (return the above mentioned variables)...
+    sleep(3000);
+    return $[];
+}
+
+/**
+ * Create a textual summary and a list of unconfigured cards
+ * @param split split configured and unconfigured?
+ * @return summary of the current configuration
+ */
+global define list Summary() ``{
+    // TODO FIXME: your code here...
+    return [ _("Configuration summary ..."), [] ];
+}
+
+/**
+ * Create an overview table with all configured cards
+ * @return table items
+ */
+global define list Overview() ``{
+    // TODO FIXME: your code here...
+    return [];
+}
+
+/* EOF */
+}

@@ -1,0 +1,30 @@
+@HEADER-COMMENT@
+# neededforbuild yast2-devel-packages
+
+@HEADER@
+Requires:	yast2
+
+BuildArchitectures:	noarch
+
+Summary:	Configuration of ntp-client
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+%dir @yncludedir@/ntp-client
+@yncludedir@/ntp-client/*
+@clientdir@/ntp-client.ycp
+@clientdir@/ntp-client_*.ycp
+@moduledir@/NtpClient.ycp
+@configdir@/ntp-client.y2cc
+%doc @docdir@

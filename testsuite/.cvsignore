@@ -1,0 +1,13 @@
+Makefile
+Makefile.in
+site.exp
+*.sum
+*.log
+tmp.out*
+tmp.err*
+tmp.log*
+config
+output
+tmp
+run
+yast2-ntp-client.test

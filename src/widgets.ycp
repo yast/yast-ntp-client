@@ -1,0 +1,158 @@
+/**
+ * File:	include/ntp-client/widgets.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Widgets definitions
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+import "Wizard";
+import "Wizard_hw";
+
+import "NtpClient";
+
+include "ntp-client/helps.ycp";
+include "ntp-client/routines.ycp";
+
+
+global define void startInit (any id) ``{
+    UI::ChangeWidget (`id ("start"), `CurrentButton,
+	start_at_boot ? "boot" : "never");
+}
+
+global define void startStore (any id, any event) ``{
+    start_at_boot = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+}
+
+global define void overviewInit (any id) ``{
+    integer index = -1;
+    map types = $[
+	"server" : _("Server"),
+	"peer" : _("Peer"),
+    ];
+    list items = maplist (`i, peers, ``{
+	index = index + 1;
+	if (! haskey (types, i[0]:""))
+	    return nil;
+	return `item (`id (index), types[i[0]:""]:"", i[1]:"");
+    });
+    items = filter (`i, items, ``(i != nil));
+    UI::ChangeWidget (`id (`overview), `Items, items);
+    UI::SetFocus (`id (`overview));
+}
+
+global define any overviewHandle (any id, any event) ``{
+    map types = $[
+	"server" : `server,
+	"peer" : `peer,
+   ];
+   if (event == `add)
+    {
+	selected_item_index = -1;
+	UI::OpenDialog (`VBox (
+	    `RadioButtonGroup (`id (`rbg), `VBox (
+		`Left (`RadioButton (`id ("server"), _("&Server"), true)),
+		`Left (`RadioButton (`id ("peer"), _("&Peer")))
+	    )),
+	    `HBox (
+		`HStretch (),
+		`PushButton (`id (`ok), Label::OKButton ()),
+		`PushButton (`id (`cancel), Label::CancelButton ()),
+		`HStretch ()
+	    )
+	));
+	any ret = nil;
+	while (ret == nil)
+	    ret = UI::UserInput ();
+	string type = UI::QueryWidget (`id (`rbg), `CurrentButton);
+	UI::CloseDialog ();
+	if (ret != `ok)
+	    return nil;
+	selected_item = [type, "", ""];
+	return types[type]:nil;
+    }
+    else if (event == `edit)
+    {
+	selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
+	selected_item = peers[selected_item_index]:[];
+	string type = selected_item[0]:"";
+	return types[type]:nil;
+    }
+    else if (event == `delete)
+    {
+
+
+    }
+
+}
+
+global define void addressInit (any id) ``{
+    UI::ChangeWidget (`id ("address"), `Value, selected_item[1]:"");
+}
+
+global define void addressStore (any id, any event) ``{
+    selected_item[1] = UI::QueryWidget (`id ("address"), `Value);
+}
+
+global define void initSyncInit (any id) ``{
+    UI::ChangeWidget (`id ("init_sync"), `Value, selected_item[3]:false);
+}
+
+global define void initSyncStore (any id, any event) ``{
+    selected_item[3] = UI::QueryWidget (`id ("init_sync"), `Value);
+}
+
+
+global define map InitWidgets () ``{
+    return $[
+	"start" : $[
+	    "widget" : `radio_buttons,
+	    "label" : _("Automatically start NTP daemon"),
+	    "items" : [
+		[ "never", _("N&ever") ],
+		[ "boot", _("When booting system") ],
+	    ],
+	    "help" : HELPS["start"]:"",
+	    "init" : ``(NtpClient::startInit ()),
+	    "store" : ``(NtpClient::startStore ()),
+	],
+	"overview" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `VBox (
+		`Table (`id (`overview), `header (_("Type"), _("Address"))),
+		`HBox (
+		    `PushButton (`id (`add), Label::AddButton ()),
+		    `PushButton (`id (`edit), Label::EditButton ()),
+		    `PushButton (`id (`delete), Label::DeleteButton ()),
+		    `HStretch ()
+		)
+	    ),
+	    "help" : HELPS["overview"]:"",
+	    "init" : ``(NtpClient::overviewInit ()),
+	    "handle" : ``(NtpClient::overviewHandle ()),
+	],
+	"address" : $[
+	    "widget" : `textentry,
+	    "label" : ("A&ddress"),
+	    "init" : ``(NtpClient::addressInit ()),
+	    "store" : ``(NtpClient::addressStore ()),
+	    "help" : "FIXME TODO",
+	],
+	"init_sync" : $[
+	    "widget" : `checkbox,
+	    "label" : _("Use for &initial synchronization"),
+	    "init" : ``(NtpClient::initSyncInit ()),
+	    "store" : ``(NtpClient::initSyncStore ()),
+	    "help" : "FIXME TODO",
+	],
+    ];
+}
+
+
+
+}

@@ -1,0 +1,13 @@
+/**
+ * File:        etc_ntp.scr
+ * Summary:     Agent for rading and writing of /etc/ntp.conf file
+ * Author:      Jiri Srain <jsrain@suse.cz>
+ * Access:      read, write
+ *
+ * $Id$
+ *
+ */
+.etc.ntp_conf
+
+`ag_ntp_conf ()
+

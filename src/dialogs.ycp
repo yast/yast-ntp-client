@@ -1,0 +1,146 @@
+/**
+ * File:	include/ntp-client/dialogs.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Dialogs definitions
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+import "NtpClient";
+import "Wizard";
+import "CWM";
+
+include "ntp-client/helps.ycp";
+include "ntp-client/routines.ycp";
+
+/**
+ * Read settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+global define symbol ReadDialog() ``{
+    Wizard::RestoreHelp(HELPS["read"]:"");
+    NtpClient::AbortFunction = ``{ return PollAbort();};
+    boolean ret = NtpClient::Read();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Write settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+global define symbol WriteDialog() ``{
+    Wizard::RestoreHelp(HELPS["write"]:"");
+    NtpClient::AbortFunction = ``{ return PollAbort();};
+    boolean ret = NtpClient::Write();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Main dialog
+ * @reutrn symbol for wizard sequencer
+ */
+global define symbol MainDialog () ``{
+    term contents = `HBox (`HSpacing (1), `VBox (
+	`VSpacing (1),
+	`HBox (
+	    `HStretch (),
+	    "start",
+	    `HStretch ()
+	),
+	`VSpacing (1),
+	"overview",
+	`VSpacing (1)
+    ), `HSpacing (1));
+
+    // dialog caption
+    string caption = _("NTP client configuration");
+
+    return CWM::ShowAndRun (["start", "overview"], NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::FinishButton (), $[]);
+}
+
+global define symbol ServerDialog () ``{
+    term contents = `HBox (`HSpacing (1), `VBox (
+	`VSpacing (1),
+	"address",
+	"init_sync",
+	`VSpacing (1)
+    ), `HSpacing (1));
+
+    // dialog caption
+    string caption = _("Configure NTP server");
+
+   return CWM::ShowAndRun (["address", "init_sync"], NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (), $[]);
+}
+
+
+global define symbol PeerDialog () ``{
+    term contents = `HBox (`HSpacing (1), `VBox (
+	`VSpacing (1),
+	"address",
+	`VSpacing (1)
+    ), `HSpacing (1));
+
+    // dialog caption
+    string caption = _("Configure NTP peer");
+
+    return CWM::ShowAndRun (["address"], NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (), $[]);
+}
+
+global define symbol StoreRecord () ``{
+    if (NtpClient::selected_item_index == -1)
+	NtpClient::peers = add (NtpClient::peers, NtpClient::selected_item);
+    else
+	NtpClient::peers[NtpClient::selected_item_index]
+	    = NtpClient::selected_item;
+    return `next;
+}
+
+
+/**
+ * Configure1 dialog
+ * @return dialog result
+ */
+global define symbol Configure1Dialog () ``{
+
+    /* NtpClient configure1 dialog caption */
+    string caption = _("NtpClient configuration");
+
+    /* NtpClient configure1 dialog contents */
+    term contents = `Label (_("First part of configuration of ntp-client"));
+
+    Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
+	    BackButtonLabel(), NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+
+	ret = UI::UserInput();
+
+	/* abort? */
+	if(ret == `abort || ret == `cancel) {
+	    if(ReallyAbort()) break;
+	    else continue;
+	}
+        else if(ret == `next || ret == `back) {
+            break;
+        }
+        else {
+            y2error("unexpected retcode: %1", ret);
+            continue;
+        }
+    }
+
+    return ret;
+}
+
+
+/* EOF */
+}

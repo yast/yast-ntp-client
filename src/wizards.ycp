@@ -1,0 +1,105 @@
+/**
+ * File:	include/ntp-client/wizards.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Wizards definitions
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+import "Wizard";
+import "Label";
+
+include "wizard/sequencer.ycp";
+
+include "ntp-client/dialogs.ycp";
+
+/**
+ * Whole configuration of ntp-client
+ * @return sequence result
+ */
+global define symbol NtpClientSequence() ``{
+
+    map aliases = $[
+	"read"	: [ ``( ReadDialog() ), true ],
+	"main"	:   ``( MainSequence() ),
+	"write"	: [ ``( WriteDialog() ), true ]
+    ];
+
+    map sequence = $[
+	"ws_start" : "read",
+	"read" : $[
+	    `abort	: `abort,
+	    `next	: "main"
+	],
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: "write"
+	],
+	"write" : $[
+	    `abort	: `abort,
+	    `next	: `next
+	]
+    ];
+
+    string caption = _("NtpClient configuration");
+    term contents = `Label(_("Initializing ..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption, contents, "",
+	    Label::BackButton(), Label::NextButton());
+
+    any ret = WizardSequencer(aliases, sequence);
+
+    UI::CloseDialog();
+    return ret;
+}
+
+/**
+ * Main workflow of the ntp-client configuration
+ * @return sequence result
+ */
+global define symbol MainSequence() ``{
+
+    /* FIXME: adapt to your needs */
+    map aliases = $[
+	"main"		:   ``(MainDialog ()),
+	"server"	:   ``(ServerDialog ()),
+	"peer"		:   ``(PeerDialog ()),
+	"store_record"	: [ ``(StoreRecord ()), true],
+    ];
+
+    /* FIXME: adapt to your needs */
+    map sequence = $[
+	"ws_start" : "main",
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	    `peer	: "peer",
+	    `server	: "server",
+	],
+	"peer" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"server" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"store_record" : $[
+	    `abort	: `abort,
+	    `next	: "main",
+	],
+    ];
+
+    any ret = WizardSequencer(aliases, sequence);
+
+    return ret;
+}
+
+/* EOF */
+}

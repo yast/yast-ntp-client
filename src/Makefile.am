@@ -1,0 +1,24 @@
+#
+# Makefile.am for devtools/devtools/skeletons/config/src
+#
+
+yncludedir = @yncludedir@/ntp-client
+
+client_DATA =			\
+	ntp-client.ycp		\
+	ntp-client_auto.ycp
+
+ynclude_DATA =			\
+	helps.ycp		\
+	wizards.ycp		\
+	dialogs.ycp		\
+	routines.ycp		\
+	widgets.ycp
+
+config_DATA =			\
+	ntp-client.y2cc
+
+module_DATA =			\
+	NtpClient.ycp
+
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA)
