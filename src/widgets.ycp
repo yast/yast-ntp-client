@@ -247,6 +247,11 @@ global define void addressInit (any id) ``{
  */
 global define void addressStore (any id, map event) ``{
     NtpClient::selected_record["address"] = UI::QueryWidget (`id (id), `Value);
+    if (NtpClient::simple_dialog)
+    {
+	selected_record["type"] = "server";
+	selected_record["initial_sync"] = true;
+    }
 }
 
 /**

@@ -53,6 +53,7 @@ define symbol WriteDialog() ``{
  * @return symbol for wizard sequencer
  */
 define symbol SimpleDialog () ``{
+    NtpClient::simple_dialog = true;
     // prepare the stuff first
     list<map> peers = NtpClient::getSyncRecords ();
     list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
@@ -111,6 +112,7 @@ define symbol SimpleDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol MainDialog () ``{
+    NtpClient::simple_dialog = false;
     list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "overview"],
 	NtpClient::widgets);
     term contents = `HBox (`HSpacing (1), `VBox (

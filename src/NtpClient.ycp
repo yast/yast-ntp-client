@@ -89,7 +89,7 @@ global define boolean deleteSyncRecord (integer index);
 global define boolean selectSyncRecord (integer index);
 global define boolean Write ();
 
-
+global boolean simple_dialog = false;
 
 include "ntp-client/misc.ycp";
 include "ntp-client/widgets.ycp";
@@ -157,7 +157,7 @@ global define boolean Read() ``{
 	    "manycastclient", "fudge" ],
 	    type))
 	{
-	    list<string> l = splitstring (address, " ");
+	    list<string> l = splitstring (address, " \t");
 	    l = (list<string>)filter (string s, l, ``(s != ""));
 	    address = l[0]:"";
 	    l[0] = "";

@@ -12,7 +12,7 @@
 `ag_ini(
     `IniAgent ( "/etc/ntp.conf",
 	$[
-	    "options"	: [ "global_values", "repeat_names" ],
+	    "options"	: [ "global_values", "repeat_names", "comments_last" ],
 	    "comments"	: [ "^[ \t]*#.*$", "^[ \t]*$" ],
 	    "params"    : [
 		$[ "match" : [ "^[ \t]*([^ \t]+)[ \t]+(.*)$", "%s %s" ]],
