@@ -212,7 +212,7 @@ global define boolean Read() ``{
 
     boolean failed = false;
 
-    if (! Mode::test
+    if (! Mode::testsuite ()
 	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["xntp"])
     )
     {
@@ -334,7 +334,7 @@ global define boolean Read() ``{
 	Report::Error (Message::CannotReadCurrentSettings ());
     }
 
-    if (! Mode::test)
+    if (! Mode::testsuite ())
     {
 	Progress::off ();
 	SuSEFirewall::Read ();
