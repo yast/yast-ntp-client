@@ -37,6 +37,18 @@
     "location" : "Berlin",
     "stratum" : "1",
   ],
+  $[
+    "address" : "ptbtime1.ptb.de",
+    "country" : "DE",
+    "location" : "Braunschweig",
+//    "stratum" : "1",
+  ],
+  $[
+    "address" : "ptbtime2.ptb.de",
+    "country" : "DE",
+    "location" : "Braunschweig",
+//    "stratum" : "1",
+  ],
 // USA
   $[
     "address" : "clock.fmt.he.net",
