@@ -2,6 +2,7 @@
 Tue Mar  9 09:34:23 CET 2004 - jsrain@suse.de
 
 - Require -> Package
+- using Sequencer module
 
 -------------------------------------------------------------------
 Mon Mar  8 18:12:02 CET 2004 - jsrain@suse.de

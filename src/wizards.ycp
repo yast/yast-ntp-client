@@ -13,8 +13,7 @@ textdomain "ntp-client";
 
 import "Wizard";
 import "Label";
-
-include "wizard/sequencer.ycp";
+import "Sequencer";
 
 include "ntp-client/dialogs.ycp";
 
@@ -95,7 +94,7 @@ define symbol ComplexSequence() ``{
 	],
     ];
 
-    symbol ret = WizardSequencer(aliases, sequence);
+    symbol ret = Sequencer::Run(aliases, sequence);
 
     return ret;
 }
@@ -134,7 +133,7 @@ define symbol SimpleSequence () ``{
 	],
     ];
 
-    symbol ret = WizardSequencer (aliases, sequence);
+    symbol ret = Sequencer::Run (aliases, sequence);
 
     return ret;
 }
@@ -169,7 +168,7 @@ define symbol NtpClientSequence() ``{
 
     Wizard::CreateDialog();
     Wizard::SetDesktopIcon("ntp-client");
-    symbol ret = WizardSequencer(aliases, sequence);
+    symbol ret = Sequencer::Run(aliases, sequence);
 
     UI::CloseDialog();
     return ret;
@@ -203,7 +202,7 @@ define symbol NtpClientAutoSequence() ``{
     Wizard::SetContentsButtons(caption, contents, "",
 	    Label::BackButton(), Label::NextButton());
 
-    symbol ret = WizardSequencer(aliases, sequence);
+    symbol ret = Sequencer::Run(aliases, sequence);
 
     UI::CloseDialog();
     return ret;
