@@ -42,7 +42,7 @@ global define symbol WriteDialog() ``{
 
 /**
  * Main dialog
- * @reutrn symbol for wizard sequencer
+ * @return symbol for wizard sequencer
  */
 global define symbol MainDialog () ``{
     term contents = `HBox (`HSpacing (1), `VBox (
@@ -64,6 +64,10 @@ global define symbol MainDialog () ``{
 	contents, caption, Label::BackButton (), Label::FinishButton (), $[]);
 }
 
+/**
+ * Server editing dialog
+ * @return symbol for wizard sequencer
+ */
 global define symbol ServerDialog () ``{
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
@@ -79,7 +83,10 @@ global define symbol ServerDialog () ``{
 	contents, caption, Label::BackButton (), Label::OKButton (), $[]);
 }
 
-
+/**
+ * Peer editing dialog
+ * @return symbol for wizard sequencer
+ */
 global define symbol PeerDialog () ``{
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
@@ -94,6 +101,11 @@ global define symbol PeerDialog () ``{
 	contents, caption, Label::BackButton (), Label::OKButton (), $[]);
 }
 
+/**
+ * Pseudo-dialog to store settings to main structure
+ * @return symbol for wizard sequencer
+ */
+
 global define symbol StoreRecord () ``{
     if (NtpClient::selected_item_index == -1)
 	NtpClient::peers = add (NtpClient::peers, NtpClient::selected_item);
@@ -101,44 +113,6 @@ global define symbol StoreRecord () ``{
 	NtpClient::peers[NtpClient::selected_item_index]
 	    = NtpClient::selected_item;
     return `next;
-}
-
-
-/**
- * Configure1 dialog
- * @return dialog result
- */
-global define symbol Configure1Dialog () ``{
-
-    /* NtpClient configure1 dialog caption */
-    string caption = _("NtpClient configuration");
-
-    /* NtpClient configure1 dialog contents */
-    term contents = `Label (_("First part of configuration of ntp-client"));
-
-    Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
-	    BackButtonLabel(), NextButtonLabel());
-
-    any ret = nil;
-    while(true) {
-
-	ret = UI::UserInput();
-
-	/* abort? */
-	if(ret == `abort || ret == `cancel) {
-	    if(ReallyAbort()) break;
-	    else continue;
-	}
-        else if(ret == `next || ret == `back) {
-            break;
-        }
-        else {
-            y2error("unexpected retcode: %1", ret);
-            continue;
-        }
-    }
-
-    return ret;
 }
 
 

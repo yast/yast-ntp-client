@@ -19,21 +19,36 @@ import "NtpClient";
 include "ntp-client/helps.ycp";
 include "ntp-client/routines.ycp";
 
-
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
 global define void startInit (any id) ``{
     UI::ChangeWidget (`id ("start"), `CurrentButton,
 	start_at_boot ? "boot" : "never");
 }
 
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event any event that caused storing process
+ */
 global define void startStore (any id, any event) ``{
     start_at_boot = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
 }
 
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
 global define void overviewInit (any id) ``{
     integer index = -1;
     map types = $[
 	"server" : _("Server"),
 	"peer" : _("Peer"),
+	"radio" : _("Local radio clock"),
+	"broadcast" : "FIXME",
+	"broadcastclient" : "FIXME",
     ];
     list items = maplist (`i, peers, ``{
 	index = index + 1;
@@ -46,6 +61,12 @@ global define void overviewInit (any id) ``{
     UI::SetFocus (`id (`overview));
 }
 
+/**
+ * Handle events on the widget
+ * @param id any widget id
+ * @param event any event that caused storing process
+ * @return any event to pass to WS or nil
+ */
 global define any overviewHandle (any id, any event) ``{
     map types = $[
 	"server" : `server,
@@ -91,23 +112,44 @@ global define any overviewHandle (any id, any event) ``{
 
 }
 
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
 global define void addressInit (any id) ``{
     UI::ChangeWidget (`id ("address"), `Value, selected_item[1]:"");
 }
 
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event any event that caused storing process
+ */
 global define void addressStore (any id, any event) ``{
     selected_item[1] = UI::QueryWidget (`id ("address"), `Value);
 }
 
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
 global define void initSyncInit (any id) ``{
     UI::ChangeWidget (`id ("init_sync"), `Value, selected_item[3]:false);
 }
 
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event any event that caused storing process
+ */
 global define void initSyncStore (any id, any event) ``{
     selected_item[3] = UI::QueryWidget (`id ("init_sync"), `Value);
 }
 
-
+/**
+ * Initialize all widgets
+ * @return map of widgets
+ */
 global define map InitWidgets () ``{
     return $[
 	"start" : $[

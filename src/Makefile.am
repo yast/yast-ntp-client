@@ -13,7 +13,8 @@ ynclude_DATA =			\
 	wizards.ycp		\
 	dialogs.ycp		\
 	routines.ycp		\
-	widgets.ycp
+	widgets.ycp		\
+	misc.ycp
 
 config_DATA =			\
 	ntp-client.y2cc

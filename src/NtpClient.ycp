@@ -57,15 +57,21 @@ global integer selected_item_index = -1;
 
 global list selected_item = [];
 
-list rw_order = [ "server", "fudge", "peer" ];
+list rw_order = [ "server", "fudge", "peer", "broadcast", "broadcastclient" ];
 
 map paths = $[
-	"server" : .etc.ntp_conf.server,
-	"peer" : .etc.ntp_conf.peer,
-	"fudge" : .etc.ntp_conf.fudge,
+    "server" : .etc.ntp_conf.server,
+    "peer" : .etc.ntp_conf.peer,
+    "fudge" : .etc.ntp_conf.fudge,
+    "broadcast" : .etc.ntp_conf.broadcast,
+    "broadcastclient" : .etc.ntp_conf.broadcastclient,
 ];
 
 
+/**
+ * Read all ntp-client settings
+ * @return true on success
+ */
 global define boolean Read() ``{
 
     /* NtpClient read dialog caption */
@@ -147,6 +153,15 @@ global define boolean Read() ``{
 	});
     }
 
+    peers = maplist (`p, peers, ``{
+	if (p[0]:"" == "server"
+	    && regexpmatch (p[1]:"", "^127\.127\.[0-9]+.[0-9]+$"))
+	{
+	    p[0] = "radio";
+	}
+	return p;
+    });
+
     y2milestone ("Read settings: %1", peers);
 
     if(failed)
@@ -200,14 +215,23 @@ global define boolean Write() ``{
     Progress::NextStage();
 
     boolean failed = false;
+    list peers2 = maplist (`p, peers, ``{
+	if (p[0]:"" == "radio")
+	    p[0] = "server";
+	return p;
+    });
+y2error ("Peers2: %1", peers2);
     foreach (`k, rw_order, ``{
 	path v = paths[k]:nil;
-	list l = filter (`e, peers, ``(e[0]:"" == k));
-	l = maplist (`e, l, ``([e[1]:"", e[2]:""]));
+	list l = filter (`e, peers2, ``(e[0]:"" == k));
+	l = maplist (`e, l, ``(
+	    [e[1]:"", e[2]:""]
+	));
+y2error ("Writing %1 to %2", l, v);
 	boolean b = SCR::Write (v, l);
 	if (! b)
 	{
-	    y2error ("Reading %1 returned nil", v);
+	    y2error ("Writing %1 failed", v);
 	    failed = true;
 	    l = [];
 	}
@@ -218,7 +242,7 @@ global define boolean Write() ``{
 	Report::Error (_("Can not write settings to /etc/ntp.conf!"));
 
 
-    list init = maplist (`p, peers, ``(
+    list init = maplist (`p, peers2, ``(
 	p[0]:"" == "server" && p[3]:false
 	    ? p[1]:""
 	    : nil

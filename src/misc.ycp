@@ -1,0 +1,50 @@
+/**
+ * File:	include/ntp-client/misc.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Miscelanous functions for configuration of ntp-client.
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+global define map string2opts (string options_string) ``{
+    list l = splitstring (options_string, " ");
+    l = filter (`e, l, ``(e != ""));
+    map ret = $[];
+    foreach (`e, l, ``{
+	if (regexpmatch (e, "^[^=]+=.+"))
+	{
+	    list tokens = regexptokenize (e, "^([^=]+)=(.+)");
+	    ret[tokens[0]:""] = tokens[1]:"";
+	}
+	else
+	{
+	    ret[e] = true;
+	}
+    });
+    return ret;
+}
+
+global define string opts2string (map options) ``{
+    list(string) ret = [];
+    foreach (`k, `v, options, ``{
+	if (v == true)
+	{
+	    ret = add (ret, k);
+	}
+	else if (v != false)
+	{
+	    ret = add (ret, sformat ("%1=%2", k, v));
+	}
+    });
+    return mergestring (ret, " ");
+}
+
+
+
+/* EOF */
+}
