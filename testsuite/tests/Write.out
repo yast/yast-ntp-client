@@ -1,3 +1,18 @@
+Read	.target.size "/etc/install.inf" nil
+Read	.etc.install_inf.Sourcemounted nil
+Read	.etc.install_inf.AutoYaST nil
+Read	.etc.install_inf.Repair nil
+Read	.etc.install_inf.Demo nil
+Read	.etc.install_inf.Textmode nil
+Read	.etc.install_inf.Manual nil
+Read	.target.string "/proc/cmdline" ""
+Read	.etc.install_inf.Console nil
+Read	.etc.install_inf.Braille nil
+Read	.etc.install_inf.VNC nil
+Read	.etc.install_inf.UseSSH nil
+Read	.etc.install_inf.InstMode nil
+Read	.target.tmpdir "/tmp"
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS "no"
 Return	true
 Read	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", "type":-1, "value":[]]
 Write	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", "type":-1, "value":[$["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp1  options1"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"127.127.1.2  options_clock"], $["comment":"", "kind":"value", "name":"fudge", "type":0, "value":"127.127.1.2 "], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp2  options2"], $["comment":"", "kind":"value", "name":"peer", "type":0, "value":"peer1  options_peer"]]] true

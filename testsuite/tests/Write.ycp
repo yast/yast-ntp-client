@@ -17,13 +17,6 @@
 
 {
     include "testsuite.ycp";
-    import "Progress";
-    import "NtpClient";
-    import "Mode";
-
-    Mode::test = true;
-
-    Progress::off ();
 
     map READ = $[
 	"init" : $[
@@ -43,7 +36,30 @@
 		],
 	    ],
 	],
+	"sysconfig" : $[
+	    "xntp" : $[
+		"XNTPD_INITIAL_NTPDATE" : "AUTO-2",
+		"XNTPD_RUN_CHROOTED" : "yes",
+	    ],
+	    "personal-firewall" : $[
+		"REJECT_ALL_INCOMING_CONNECTIONS" : "no",
+	    ],
+	],
+	"target" : $[
+	    "string" : "",
+	    "tmpdir" : "/tmp",
+	],
     ];
+
+    TESTSUITE_INIT ([READ, $[], $[]], nil);
+
+    import "Progress";
+    import "NtpClient";
+    import "Mode";
+
+    Mode::test = true;
+
+    Progress::off ();
 
     TEST (``(NtpClient::Import ($[
 	"peers":[
