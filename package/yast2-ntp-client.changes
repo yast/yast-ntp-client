@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 29 09:04:09 CEST 2003 - jsrain@suse.de
+
+- improved helps (#29379)
+
+-------------------------------------------------------------------
 Mon Aug 25 17:33:19 CEST 2003 - jsrain@suse.de
 
 - not touching sysconfig/xntp:XNTPD_INITIAL_NTPDATE if containg

@@ -53,7 +53,7 @@ select the appropriate line and click <b>Edit</b>. To add a new entry, click
 
     // help text 1/1, alt. 1
     "saddress" : _("<p><b><big>Address</big></b><br>
-To set the remote host address, use the <b>Address</b> text field.
+To set the remote host name or IP address, use the <b>Address</b> text field.
 To find an NTP server, ask your Internet provider or
 see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>
 "),
@@ -73,7 +73,8 @@ and the device to which it is connected. For details, install package <i>xntp-do
 
     // help text 1/1, alt. 4
     "address" : _("<p><b><big>Address</big></b><br>
-To set the remote host address, use the <b>Address</b> text field.</p>"),
+To set the remote host name or IP address,
+use the <b>Address</b> text field.</p>"),
 
     // help text 2/4, optinal
     "init_sync" : _("<p><b><big>Initial Synchronization</big></b><br>
@@ -84,13 +85,16 @@ started. To use this host to initial synchronization, select
 
     // help text 3/4
     "options" : _("<p><b><big>Options</big></b><br>
-To specify options, write them to the <b>Options</b> text field.</p>"),
+To fine tune the synchronization source, write the options to the
+<b>Options</b> text field. For details, see
+<i>/usr/share/doc/packages/xntp-doc/html/confopt.htm</i>.</p>"),
 
     // help text 4/4, optional
-    "fudge_options" : _("<p><b><big>Fudge Factorss</big></b><br>
-To specify fudge options, write them to the <b>Fudge Factors</b> text field.
-</p>
-"),
+    "fudge_options" : _("<p><b><big>Fudge Factors</big></b><br>
+To calibrate the local radio clock driver for systematic offset bias,
+write the parameters to the <b>Fudge Factors</b> text field.
+For details, see
+<i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>"),
 
 ];
 
