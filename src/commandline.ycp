@@ -225,21 +225,75 @@ map cmdline = $[
 	    // command line help text for an action
 	    "help"	: _("Disable the NTP daemon"),
 	],
+	"add" : $[
+	    "handler"	: NtpAddHandler,
+	    // command line help text for an action
+	    "help"	: _("Add new synchronization relationship"),
+	],
+	"edit" : $[
+	    "handler"	: NtpEditHandler,
+	    // command line help text for an action
+	    "help"	: _("Edit existing synchronization relationship"),
 
+	],
+	"delete" : $[
+	    "handler"	: NtpDeleteHandler,
+	    // command line help text for an action
+	    "help"	: _("Delete a synchronization relationship"),
+	],
     ],
 
     "options"       : $[
-/*            "detected_index"    : $[
-                "help"          : _("Configure detected printer with this index"),
-                "type"          : "string",
-            ],
-*/    ],
+	"server" : $[
+	    // command line help text for an option
+	    "help"	: _("The address of the server"),
+	    "type"	: "string",
+	],
+	"peer" : $[
+	    // command line help text for an option
+	    "help"	: _("The address of the peer"),
+	    "type"	: "string",
+	],
+	"broadcast" : $[
+	    // command line help text for an option
+	    "help"	: _("The address to broadcast to"),
+	    "type"	: "string",
+	],
+	"broadcastclient" : $[
+	    // command line help text for an option
+	    "help"	: _("The address accept broadcasts from"),
+	    "type"	: "string",
+	],
+	"options" : $[
+	    // command line help text for an option
+	    "help"	: _("The options of the relationship"),
+	    "type"	: "string",
+	],
+	"fudge" : $[
+	    // command line help text for an option
+	    "help"	: _("Options for clock driver calibration"),
+	    "type"	: "string",
+	],
+	"initial" : $[
+	    // command line help text for an option
+	    "help"	: _("Use the server for initial synchronization"),
+	],
+	"no-initial" : $[
+	    // command line help text for an option
+	    "help"	: _("Do not use the server for initial synchronization"),
+	],
+    ],
 
     "mappings"      : $[
-/*            "summary"           : [],
-            "list"              : [ "detected", "configured" ],
-            "delete"            : [ "queue" ],
-*/
+	"status"	: [],
+	"list"		: [],
+	"enable"	: [],
+	"disable"	: [],
+	"add"		: ["server", "peer", "broadcast", "broadcastclient",
+	    "options", "fudge", "initial"],
+	"edit"		: ["server", "peer", "broadcast", "broadcastclient",
+	    "options", "fudge", "initial", "no-initial"],
+	"delete"	: ["server", "peer", "broadcast", "broadcastclient"],
     ],
 ];
 
