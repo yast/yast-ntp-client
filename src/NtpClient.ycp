@@ -198,9 +198,9 @@ global define boolean Read() ``{
     if(Abort()) return false;
     Progress::NextStage();
 
-    Progress::off ();
+    boolean progress_orig = Progress::set (false);
     NetworkDevices::Read ();
-    Progress::on ();
+    Progress::set (progress_orig);
     config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
     original_config_dhcp = config_dhcp;
 
@@ -336,9 +336,9 @@ global define boolean Read() ``{
 
     if (! Mode::testsuite ())
     {
-	Progress::off ();
+	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::Read ();
-	Progress::on ();
+	Progress::set (progress_orig);
     }
 
     if(Abort()) return false;
@@ -498,9 +498,9 @@ global define boolean Write() ``{
 
     if (change_firewall)
     {
-	Progress::off ();
+	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::Write ();
-	Progress::on ();
+	Progress::set (progress_orig);
     }
 
     if (! Service::Adjust ("xntpd",

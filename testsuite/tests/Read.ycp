@@ -111,7 +111,7 @@
 
     Mode::SetTest ("testsuite");
 
-    Progress::off ();
+    boolean progress_orig = Progress::set (false);
 
     TEST (``(NtpClient::Read ()), [READ, WRITE, EXEC], nil);
     TEST (``(NtpClient::Export ()), [READ, WRITE, EXEC], nil);

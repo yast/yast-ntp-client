@@ -39,9 +39,9 @@ define void restartNtpDaemon () ``{
  * Write the NTP settings without displaying progress
  */
 define void silentWrite () ``{
-    Progress::off ();
+    boolean progress_orig = Progress::set (false);
     NtpClient::Write ();
-    Progress::on ();
+    Progress::set (progress_orig);
 }
 
 /**
@@ -224,9 +224,9 @@ define list getClockTypesCombo () ``{
 
 /**
  * Propose the interface to be allowed for access in firewall
- * Sets the firewall settings inside the NtpClient module
+ * At the moment not used
  */
-define void proposeInterfacesToAllowAccess () ``{
+define list<string> proposeInterfacesToAllowAccess () ``{
     list<map<string,any> > recs = NtpClient::getSyncRecords ();
     recs = filter (map<string,any> r, recs, ``(
 	r["type"]:"" == "peer" || r["type"]:"" == "broadcastclient"
@@ -257,24 +257,9 @@ define void proposeInterfacesToAllowAccess () ``{
 	out = regexpsub (out, "dev[ ]+([^ ]+)[ ]+src", "\\1");
 	return out;
     });
-    map<string,boolean> status = $[];
-    foreach (string i, ifaces, {
-	map out = (map)SCR::Execute (.target.bash_output, sformat (
-	    "getcfg %1 |grep ^HWD_CONFIG_0= |cut -d= -f2 |cut -d\\; -f1", i
-	));
-	if (out["exit"]:0 == 0)
-	{
-	    i = out["stdout"]:"";
-	    i = mergestring (splitstring (i, " \t\n"), "");
-	    string grp = SuSEFirewall::GetGroupOfInterface (i);
-	    status[grp] = true;
-	}
-    });
-
-    UI::ChangeWidget (`id (`ext), `Value, status["EXT"]:false);
-    UI::ChangeWidget (`id (`int), `Value, status["INT"]:false);
-    UI::ChangeWidget (`id (`dmz), `Value, status["DMZ"]:false);
+    ifaces = toset (ifaces);
+    ifaces = filter (string i, ifaces, {return i != nil;});
+    return ifaces;
 }
-
 /* EOF */
 }

@@ -121,21 +121,17 @@ define symbol SimpleDialog () ``{
  */
 define symbol MainDialog () ``{
     NtpClient::simple_dialog = false;
-    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "config_dhcp", "overview"],
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "config_dhcp", "firewall", "overview"],
 	GetWidgets ());
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
 	`HBox (
 	    `HStretch (),
-	    "start",
-	    `HStretch ()
-	),
-	`VSpacing (1),
-	`HBox (
-	    `HStretch (),
 	    `VBox (
+	    "start",
 		`Left ("run_chroot"),
-		`Left ("config_dhcp")
+		`Left ("config_dhcp"),
+		"firewall"
 	    ),
 	    `HStretch ()
 	),
@@ -435,112 +431,6 @@ define symbol FudgeDialog () ``{
 	    options["parsed"]:$[],
 	    options["unknown"]:""
 	);
-    }
-    return (symbol)ret;
-}
-
-/**
- * Run the firewall settings dialog
- * @return symbol for wizadr sequencer
- */
-define symbol FirewallDialog () ``{
-    if (! SuSEFirewall::start)
-    {
-	// report message
-	Report::Message (_("The SUSE firewall is not configured."));
-	return `back;
-    }
-    // dialog caption
-    string caption = _("Firewall configuration");
-    term contents = `HBox (`HStretch (), `VBox (
-	`VStretch (),
-	`Left (`ComboBox (`id (`change_settings), `opt (`notify),
-	    // combo box
-	    _("Firewall configuration"),
-	     [
-		// item of a combo box
-		`item (`id (false), _("Preserve Current")),
-		// item of a combo box
-		`item (`id (true), _("Change"))
-	])),
-	`VStretch (),
-	// check box
-	`Left(`CheckBox(`id(`ext),_("Allow Access from &External Interfaces"))),
-	`VStretch (),
-	// check box
-	`Left(`CheckBox(`id(`int),_("Allow Access from &Internal Interfaces"))),
-	`VStretch (),
-	// check box
-	`Left(`CheckBox(`id(`dmz),_("Allow Access from &Demilitarized Zone"))),
-	`VStretch (),
-	// push button
-	`PushButton (`id (`propose), _("&Propose Configuration")),
-	`VStretch ()
-    ), `HStretch ());
-    Wizard::SetContentsButtons (caption, contents, firewallHelp (),
-            Label::BackButton (), Label::NextButton ());
-
-    UI::ChangeWidget (`id (`change_settings), `Value,
-	NtpClient::change_firewall);
-    UI::ChangeWidget (`id (`ext), `Enabled, NtpClient::change_firewall);
-    UI::ChangeWidget (`id (`int), `Enabled, NtpClient::change_firewall);
-    UI::ChangeWidget (`id (`dmz), `Enabled, NtpClient::change_firewall);
-    UI::ChangeWidget (`id (`propose), `Enabled, NtpClient::change_firewall);
-
-    map<string,map<string,boolean> > open
-	= SuSEFirewall::GetServicesInGroups (NtpClient::firewall_services);
-    map<string,boolean> status = $[];
-    foreach (string s, map<string,boolean> o, open, {
-	foreach (string cat, boolean en, o, {
-	    status[cat] = status[cat]:true && en;
-	});
-    });
-
-    UI::ChangeWidget (`id (`ext), `Value, status["EXT"]:false);
-    UI::ChangeWidget (`id (`int), `Value, status["INT"]:false);
-    UI::ChangeWidget (`id (`dmz), `Value, status["DMZ"]:false);
-    any ret = nil;
-    while (ret == nil)
-    {
-	ret = UI::UserInput ();
-	if (ret == `change_settings)
-	{
-	    boolean enabled = (boolean)
-		UI::QueryWidget (`id (`change_settings), `Value);
-	    UI::ChangeWidget (`id (`ext), `Enabled, enabled);
-	    UI::ChangeWidget (`id (`int), `Enabled, enabled);
-	    UI::ChangeWidget (`id (`dmz), `Enabled, enabled);
-	    UI::ChangeWidget (`id (`propose), `Enabled, enabled);
-	    ret = nil;
-	}
-	else if (ret == `propose)
-	{
-	    proposeInterfacesToAllowAccess ();
-	    ret = nil;
-	}
-    }
-    if (ret == `next)
-    {
-	NtpClient::change_firewall = (boolean)
-	    UI::QueryWidget (`id (`change_settings), `Value);
-	if (NtpClient::change_firewall)
-	{
-	    list<string> groups = [];
-	    if ((boolean)UI::QueryWidget (`id (`ext), `Value))
-		groups = add (groups, "EXT");
-	    if ((boolean)UI::QueryWidget (`id (`int), `Value))
-		groups = add (groups, "INT");
-	    if ((boolean)UI::QueryWidget (`id (`dmz), `Value))
-		groups = add (groups, "DMZ");
-	    SuSEFirewall::SetServicesForGroups (
-		NtpClient::firewall_services,
-		[],
-		false);
-	    SuSEFirewall::SetServicesForGroups (
-		NtpClient::firewall_services,
-		groups,
-		true);
-	}
     }
     return (symbol)ret;
 }

@@ -1,8 +1,8 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages yast2-firewall yast2-network yast2-slp yast2-country yast2-installation
+# neededforbuild yast2-devel-packages yast2-slp
 
 @HEADER@
-Requires:	yast2 yast2-firewall yast2-network yast2-slp yast2-country yast2-installation
+Requires:	yast2 yast2-slp
 
 BuildArchitectures:	noarch
 

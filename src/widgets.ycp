@@ -17,6 +17,7 @@ import "Label";
 import "LogView";
 import "SLP";
 import "NetworkDevices";
+import "CWMFirewallInterfaces";
 
 include "ntp-client/helps.ycp";
 
@@ -211,10 +212,6 @@ define any overviewHandle (string id, map event) ``{
     {
 	showLogPopup ();
 	return nil;
-    }
-    if (event["ID"]:nil == `firewall)
-    {
-	return `firewall;
     }
     NtpClient::modified = true;
     any ev_id = event["ID"]:nil;
@@ -880,13 +877,13 @@ define map<string,map<string,any> > InitWidgets () ``{
 		    `PushButton (`id (`edit), Label::EditButton ()),
 		    `PushButton (`id (`delete), Label::DeleteButton ()),
 		    `HStretch (),
+		    // push button
+		    `PushButton (`id (`display_log), _("Display &Log"))
 		    // menu button
-		    `MenuButton (`id (`advanced), _("&Advanced"), [
+//		    `MenuButton (`id (`advanced), _("&Advanced"), [
 			// item of menu button
-			`item (`id (`display_log), _("Display &Log")),
-			// item of menu button
-			`item (`id (`firewall), _("Set &Firewall"))
-		    ])
+//			`item (`id (`display_log), _("Display &Log")),
+//		    ])
 		)
 	    ),
 	    "help" : HELPS["overview"]:"",
@@ -1051,6 +1048,10 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "handle" : SelectTestHandle,
 	    "help" : HELPS["selected_test"]:"",
 	],
+	"firewall" : CWMFirewallInterfaces::CreateOpenFirewallWidget ($[
+	    "services" : [ "dns-server" ],
+	    "display_details" : true,
+	]),
     ];
 }
 

@@ -79,17 +79,17 @@ else if (func == "SetModified") {
 /* Read current state */
 else if (func == "Read") {
     import "Progress";
-    Progress::off();
+    boolean progress_orig = Progress::set (false);
     ret = NtpClient::Read();
-    Progress::on();
+    Progress::set (progress_orig);
 }
 /* Write givven settings */
 else if (func == "Write") {
     import "Progress";
-    Progress::off();
+    boolean progress_orig = Progress::set (false);
     NtpClient::write_only = true;
     ret = NtpClient::Write();
-    Progress::on();
+    Progress::set (progress_orig);
 }
 /* Unknown function */
 else {

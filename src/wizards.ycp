@@ -35,7 +35,6 @@ define symbol ComplexSequence() ``{
 	"fudge"		:   ``(FudgeDialog ()),
 	"bcast"		:   ``(BCastDialog ()),
 	"bcastclient"	:   ``(BCastClientDialog ()),
-	"firewall"	:   ``(FirewallDialog ()),
 	"store_record"	: [ ``(StoreRecord ()), true],
     ];
 
@@ -50,11 +49,6 @@ define symbol ComplexSequence() ``{
 	    `bcast	: "bcast",
 	    `bcastclient: "bcastclient",
 	    `add	: "type_select",
-	    `firewall	: "firewall",
-	],
-	"firewall" : $[
-	    `abort	: `abort,
-	    `next	: "main",
 	],
 	"type_select" : $[
 	    `abort	: `abort,
