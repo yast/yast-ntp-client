@@ -19,6 +19,9 @@ import "SLP";
 import "NetworkDevices";
 import "NtpClient";
 import "CWMFirewallInterfaces";
+import "Report";
+import "Hostname";
+import "IP";
 
 include "ntp-client/helps.ycp";
 
@@ -308,11 +311,37 @@ define void addressStore (string id, map event) ``{
  * Handle events on the widget
  * @param id string widget id
  * @param event map event that caused storing process
+ * @return boolean is successful
+ */
+define boolean serverAddressValidate (string id, map event) {
+    string server_1 = (string) UI::QueryWidget (`id (id), `Value);
+    string server_2 = server_1;
+    if (regexpmatch(server_2, "(.*)\.$")) {
+	server_2 = regexpsub (server_2, "(.*)\.$", "\\1");
+    }
+    
+    if (
+	(!Hostname::Check(server_1) && !Hostname::CheckFQ(server_1) && !IP::Check(server_1))
+	&&
+	(!Hostname::Check(server_2) && !Hostname::CheckFQ(server_2))
+    ) {
+	Report::Error(sformat(_("NTP server '%1' is neither valid hostname,
+nor fully qualified hostname, nor IPv4, nor IPv6."), server_1));
+	return false;
+    }
+
+    return true;
+}
+
+/**
+ * Handle events on the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
  * @return symbol event to pass to WS or nil
  */
 define symbol serverAddressHandle (string id, map event) {
     any ev_id = event["ID"]:nil;
-    string server = (string)UI::QueryWidget (`id (id), `Value);
+    string server = (string) UI::QueryWidget (`id (id), `Value);
     if (ev_id == "boot" || ev_id == "never")
     {
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
@@ -324,7 +353,8 @@ define symbol serverAddressHandle (string id, map event) {
     }
     if (ev_id == `test_server)
     {
-	NtpClient::TestNtpServer (server, false);
+	if (serverAddressValidate("server_address",$[]))
+	    NtpClient::TestNtpServer (server, false);
     }
     else if (ev_id == `select_server) {
 	return `select;
@@ -851,6 +881,8 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "label" : _("&NTP Server"),
 	    "help" : HELPS["server_address"]:"",
 	    "handle" : serverAddressHandle,
+	    "validate_type" : `function,
+	    "validate_function" : serverAddressValidate,
 	    "widget" : `custom,
 	    "custom_widget" : `VBox (
 		`HBox (
