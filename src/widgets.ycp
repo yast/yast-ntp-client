@@ -51,6 +51,10 @@ If you do not have permanent internet connection,
 starting of NTP daemon can take very long time, and 
 NTP daemon need not run properly.")))
 	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
+
+    if (start != start_at_boot)
+	NtpClient::modified = true;
+
     return nil;
 }
 

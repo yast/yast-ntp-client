@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Aug  6 13:52:54 CEST 2003 - jsrain@suse.de
+
+- fixed Abort button handling
+
+-------------------------------------------------------------------
 Wed Aug  6 08:48:57 CEST 2003 - jsrain@suse.de
 
 - changed internal structure (autoyast requirement)
