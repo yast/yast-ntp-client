@@ -15,7 +15,7 @@ X-SuSE-YaST-AutoInst=all
 X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
-X-SuSE-YaST-AutoinstResource= ntp-client
+X-SuSE-YaST-AutoInstResource=ntp-client
 
 Icon=ntp-client
 Exec=/sbin/yast2 ntp-client 
