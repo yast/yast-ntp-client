@@ -120,16 +120,6 @@ define boolean ReallyAbort() ``{
 }
 
 /**
- * Abort function
- * @return blah blah lahjk
- */
-define boolean Abort() ``{
-    if(NtpClient::AbortFunction != nil)
-	return NtpClient::AbortFunction() == true;
-    return false;
-}
-
-/**
  * Check for pending Abort press
  * @return true if pending abort
  */

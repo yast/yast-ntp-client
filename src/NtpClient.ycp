@@ -22,6 +22,7 @@ import "PackageSystem";
 import "Progress";
 import "Report";
 import "Service";
+import "SLP";
 import "Summary";
 import "SuSEFirewall";
 
@@ -107,23 +108,17 @@ map<string,map<string,string> > ntp_servers = nil;
  */
 map<string,string> country_names = nil;
 
-
-global define list<map<string,any> >getSyncRecords ();
-global define boolean storeSyncRecord ();
-global define boolean deleteSyncRecord (integer index);
-global define boolean selectSyncRecord (integer index);
-global define boolean Write ();
-global boolean TestNtpServer (string server, boolean silent);
-global list<string> DetectNtpServers (symbol method);
-global map<string, map<string,string> > GetNtpServers ();
-global map<string, string> GetCountryNames ();
-
 global boolean simple_dialog = false;
 
-include "ntp-client/misc.ycp";
-include "ntp-client/widgets.ycp";
-
-global map<string,map<string,any> > widgets = InitWidgets ();
+/**
+ * Abort function
+ * @return blah blah lahjk
+ */
+define boolean Abort() ``{
+    if(NtpClient::AbortFunction != nil)
+	return NtpClient::AbortFunction() == true;
+    return false;
+}
 
 /**
  * Get the list of known NTP servers

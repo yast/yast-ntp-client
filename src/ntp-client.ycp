@@ -24,7 +24,6 @@ y2milestone ("NtpClient module started");
 import "CommandLine";
 import "NtpClient";
 
-include "commandline/commandline.ycp";
 include "ntp-client/wizards.ycp";
 
 
@@ -44,7 +43,7 @@ include "ntp-client/commandline.ycp";
 
 
 /* main ui function */
-boolean ret = CommandLineRun (cmdline);
+boolean ret = CommandLine::Run (cmdline);
 y2debug("ret=%1", ret);
 
 /* Finish */

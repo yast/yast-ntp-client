@@ -16,10 +16,6 @@ import "NtpClient";
 
 textdomain "ntp-client";
 
-include "commandline/commandline.ycp";
-include "ntp-client/wizards.ycp";
-
-
 /**
  * Get the type of the synchronization record
  * @param options a map of the command line options

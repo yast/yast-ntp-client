@@ -2,6 +2,8 @@
 Mon Aug  9 12:07:05 CEST 2004 - jsrain@suse.cz
 
 - adapted to the new firewall interface
+- updated to changes in CWM
+- split the UI and backend (the border wasn't clear)
 
 -------------------------------------------------------------------
 Tue Aug  3 15:57:42 CEST 2004 - jsrain@suse.cz
