@@ -16,9 +16,9 @@ module "NtpClient";
 textdomain "ntp-client";
 
 import "Mode";
+import "Package";
 import "Progress";
 import "Report";
-import "Require";
 import "Service";
 import "Summary";
 import "SuSEFirewall";
@@ -127,13 +127,10 @@ global define boolean Read() ``{
 
     boolean failed = false;
 
-    if (! Require::AreAllPackagesInstalled (["xntp"]) || Mode::config)
+    if (! Package::Installed ("xntp") || Mode::config)
     {
-	boolean install_ok = Require::RequireAndConflictTarget (["xntp"], [],
-	    // richtext, %1 is name of package
-	    _("For network time synchronization, an NTP daemon is required.
-YaST2 will install package %1."));
-	if (! install_ok && ! Require::LastOperationCanceled ())
+	boolean install_ok = Package::Install ("xntp");
+	if (! install_ok && ! Package::LastOperationCanceled ())
 	{
 	    // error popup
 	    Report::Error (_("Installing required packages failed."));
