@@ -62,6 +62,39 @@ global define symbol NtpClientSequence() ``{
 }
 
 /**
+ * Autoyast configuration of ntp-client
+ * @return sequence result
+ */
+global define symbol NtpClientAutoSequence() ``{
+
+    map aliases = $[
+	"main"	:   ``( MainSequence() )
+    ];
+
+    map sequence = $[
+	"ws_start" : "main",
+	"main" : $[
+	    `abort	: `abort,
+		`next   : `next
+	]
+    ];
+
+    // dialog caption
+    string caption = _("NtpClient configuration");
+    // label
+    term contents = `Label(_("Initializing ..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption, contents, "",
+	    Label::BackButton(), Label::NextButton());
+
+    any ret = WizardSequencer(aliases, sequence);
+
+    UI::CloseDialog();
+    return ret;
+}
+
+/**
  * Main workflow of the ntp-client configuration
  * @return sequence result
  */

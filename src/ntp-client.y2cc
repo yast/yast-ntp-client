@@ -35,7 +35,7 @@ SortKey =
 Textdomain = ntp-client 
 
 ; Autoinstall features
-Autoinst = 
+Autoinst = all
 
 ; Resource in control file
 AutoinstResource =  ntp-client
