@@ -327,7 +327,7 @@ global define void initSyncStore (any id, map event) ``{
  * @param id any widget id
  */
 global define void optionsInit (any id) ``{
-    UI::ChangeWidget (`id ("options"), `Value, selected_record["param"]:"");
+    UI::ChangeWidget (`id ("options"), `Value, selected_record["options"]:"");
 }
 
 /**
@@ -336,7 +336,7 @@ global define void optionsInit (any id) ``{
  * @param event map event that caused storing process
  */
 global define void optionsStore (any id, map event) ``{
-    selected_record["param"] = UI::QueryWidget (`id ("options"), `Value);
+    selected_record["options"] = UI::QueryWidget (`id ("options"), `Value);
 }
 
 /**

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jun 21 07:55:25 CEST 2004 - jsrain@suse.cz
+
+- fixed saving of options to /etc/ntp.conf (#42199)
+
+-------------------------------------------------------------------
 Sun May 30 05:15:03 CEST 2004 - nashif@suse.de
 
 - Honor old syntax when importing (#41379)

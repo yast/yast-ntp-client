@@ -470,6 +470,8 @@ global define boolean Import (map settings) ``{
                 p["address"] = p["value"]:"";
 		if (haskey (p, "initial"))
 		    p["initial_sync"] = p["initial"]:false;
+		if (haskey (p, "param"))
+		    p["options"] = p["param"]:"";
                 return (p);
             } else {
                 return (p);
