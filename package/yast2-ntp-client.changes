@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 10 08:19:59 CET 2004 - jsrain@suse.de
+
+- dropped .y2cc file
+- 2.9.1
+
+-------------------------------------------------------------------
 Thu Jan 22 17:37:58 CET 2004 - jsrain@suse.de
 
 - added displaying of NTP daemon's log

@@ -19,16 +19,13 @@ ynclude_DATA =			\
 	clocktypes.ycp		\
 	commandline.ycp
 
-config_DATA =			\
-	ntp-client.y2cc
-
 desktop_DATA =			\
 	ntp-client.desktop
 
 module_DATA =			\
 	NtpClient.ycp
 
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA) $(desktop_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 
 ntp-client:
