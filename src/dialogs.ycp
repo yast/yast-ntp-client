@@ -71,6 +71,7 @@ global define symbol MainDialog () ``{
 	`PushButton (`id (`abort), Label::CancelButton ()));
 
     return CWM::Run (w,
+	// yes-no popup
 	 $[`abort : ``(! NtpClient::modified || Popup::YesNo (_("Really exit?
 All changes will be lost.")))]);
 

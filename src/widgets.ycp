@@ -69,7 +69,7 @@ global define void overviewInit (any id) ``{
  * Handle events on the widget
  * @param id any widget id
  * @param event map event that caused storing process
- * @return map event to pass to WS or nil
+ * @return any event to pass to WS or nil
  */
 global define any overviewHandle (any id, map event) ``{
     map types = $[
