@@ -80,6 +80,11 @@ global define void overviewInit (any id) ``{
 	index = index + 1;
 	if (! haskey (types, i["key"]:""))
 	    return nil;
+	if (i["key"]:"" == "radio" && i["value"]:"" == "127.127.1.0")
+	{
+	    // table cell
+	    return `item (`id (index), _("Local CMOS Clock"), i["value"]:"");
+	}
 	return `item (`id (index), types[i["key"]:""]:"", i["value"]:"");
     });
     items = filter (`i, items, ``(i != nil));
@@ -285,7 +290,7 @@ global define map InitWidgets () ``{
 	    "custom_widget" : `VBox (
 		`Table (`id (`overview), `opt (`notify), `header (
 		    // table header
-		    _("Type"),
+		    _("Source Type"),
 		    // table header
 		    _("Address"))),
 		`HBox (
