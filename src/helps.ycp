@@ -17,69 +17,80 @@ textdomain "ntp-client";
 global map HELPS = $[
 
     /* Read dialog help 1/2 */
-    "read" : _("<p><b><big>Initializing ntp-client configuration</big></b><br>
-Please wait for a while...<br></p>") +
+    "read" : _("<p><b><big>Initializing NTP Client Configuration</big></b><br>
+Please wait...<br></p>
+") +
 
     /* Read dialog help 2/2 */
-    _("<p><b><big>Aborting the initialization:</big></b><br>
-Safely abort the configuration utility by pressing the <b>Abort</b> now.</p>"),
+    _("<p><b><big>Aborting Initialization:</big></b><br>
+Safely abort the configuration utility by pressing <b>Abort</b> now.</p>
+"),
 
     /* Write dialog help 1/2 */
-    "write" : _("<p><b><big>Saving ntp-client configuration</big></b><br>
-Please wait for a while...<br></p>") +
+    "write" : _("<p><b><big>Saving NTP Client Configuration</big></b><br>
+Please wait...<br></p>
+") +
 
     /* Write dialog help 2/2 */
-_("<p><b><big>Aborting the saving:</big></b><br>
-You can abort the saving by pressing the <b>Abort</b> button.
-An additional dialog will inform you whether it is safe to do so or not.
-</p>"),
+_("<p><b><big>Aborting Saving:</big></b><br>
+Abort the save procedure by pressing  <b>Abort</b>.
+An additional dialog will inform you whether it is safe to do so.
+</p>
+"),
 
     // help text 1/2
-    "start" : _("<p><b><big>Automatically start XNTP daemon</big></b><br>
-Select if you want to start XNTP daemon when booting system, or not. Note,
-that XNTP daemon resolves hostnames when initializing. It means that your
-network connection must be brought up before XNTP daemon starts.</p>"),
+    "start" : _("<p><b><big>Automatically Start XNTP Daemon</big></b><br>
+Select whether to start XNTP daemon when booting system. The
+XNTP daemon resolves host names when initializing. Your
+network connection must be started before XNTP daemon starts.</p>
+"),
     // help text 2/2
-    "overview" : _("<p><b><big>Configured servers</big></b><br>
-To adjust NTP servers, peers, local radio clocks and NTP broadcasting,
-select appropriate line and click <b>Edit</b>. To add a new entry, click
-<b>Add</b>. To delete existing entry, select it and click <b>Delete</b>.</p>"),
+    "overview" : _("<p><b><big>Configured Servers</big></b><br>
+To adjust NTP servers, peers, local radio clocks, and NTP broadcasting,
+select the appropriate line and click <b>Edit</b>. To add a new entry, click
+<b>Add</b>. To delete existing entry, select it and click <b>Delete</b>.</p>
+"),
 
     // help text 1/1, alt. 1
     "saddress" : _("<p><b><big>Address</big></b><br>
 To set the remote host address, use the <b>Address</b> text field.
-If you do not know any NTP server, ask you internet provider, or
-see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>"),
+To find an NTP server, ask your Internet provider or
+see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>
+"),
 
     // help text 1/1, alt. 2
     "bcaddress" : _("<p><b><big>Address</big></b><br>
-To set the address to broadcast to, use the <b>Address</b> text field.</p>"),
+To set the address to which to broadcast, use the <b>Address</b> text field.</p>
+"),
 
     // help text 1/1, alt. 3
     "rcaddress" : _("<p><b><big>Address</big></b><br>
 To set the radio clock address, use the <b>Address</b> text field.
-Note, that you have to create symbolic link according to selected radio
-clock. For details, install package <i>xntp-doc</i> and see
-<i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>"),
+You must create a symbolic link, the name of which depends on the selected radio clock 
+and the device to which it is connected. For details, install package <i>xntp-doc</i> and see
+<i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i>.</p>
+"),
 
     // help text 1/1, alt. 4
     "address" : _("<p><b><big>Address</big></b><br>
 To set the remote host address, use the <b>Address</b> text field.</p>"),
 
     // help text 2/4, optinal
-    "init_sync" : _("<p><b><big>Initial synchronization</big></b><br>
-The first synchronization of the clock is performed before XNTP daemon is
+    "init_sync" : _("<p><b><big>Initial Synchronization</big></b><br>
+The first synchronization of the clock is performed before the XNTP daemon is
 started. To use this host to initial synchronization, select
-<b>Use for initial synchronization</b>.</p>"),
+<b>Use for Initial Synchronization</b>.</p>
+"),
 
     // help text 3/4
     "options" : _("<p><b><big>Options</big></b><br>
 To specify options, write them to the <b>Options</b> text field.</p>"),
 
     // help text 4/4, optional
-    "fudge_options" : _("<p><b><big>Fudge options</big></b><br>
-To specify fudge options, write them to the <b>Fudge options</b> text field.
-</p>"),
+    "fudge_options" : _("<p><b><big>Fudge Factorss</big></b><br>
+To specify fudge options, write them to the <b>Fudge Factors</b> text field.
+</p>
+"),
 
 ];
 

@@ -47,7 +47,7 @@ global define symbol NtpClientSequence() ``{
     ];
 
     // dialog caption
-    string caption = _("NtpClient configuration");
+    string caption = _("NTP Client Configuration");
     // label
     term contents = `Label(_("Initializing ..."));
 
@@ -80,7 +80,7 @@ global define symbol NtpClientAutoSequence() ``{
     ];
 
     // dialog caption
-    string caption = _("NtpClient configuration");
+    string caption = _("NTP Client Configuration");
     // label
     term contents = `Label(_("Initializing ..."));
 

@@ -7,7 +7,7 @@
 [Y2Module ntp-client]
 
 ; name of the entry, shown in y2cc
-Name = _("NTP client")
+Name = _("NTP Client")
 
 ; "raw" group name to which this module belongs
 ; see /usr/share/YaST2/config/y2cc.groups for valid values
@@ -17,7 +17,7 @@ Group = Net_advanced
 Icon = ntp-client.png
 
 ; *one* *short* descriptive line for y2cc
-Helptext = _("Configure NTP client")
+Helptext = _("Configure NTP Client")
 
 ; arguments, seperated by space
 Arguments = 

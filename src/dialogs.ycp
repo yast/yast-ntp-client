@@ -61,7 +61,7 @@ global define symbol MainDialog () ``{
     ), `HSpacing (1));
 
     // dialog caption
-    string caption = _("NTP client configuration");
+    string caption = _("NTP Client Configuration");
     string help = CWM::MergeHelps (w);
     contents = CWM::PrepareDialog (contents, w);
     Wizard::SetContentsButtons (caption, contents, help,
@@ -93,7 +93,7 @@ global define symbol ServerDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure NTP server");
+    string caption = _("Configure NTP Server");
 
    return CWM::ShowAndRun (["saddress", "init_sync", "options"],
 	NtpClient::widgets,
@@ -117,7 +117,7 @@ global define symbol PeerDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure NTP peer");
+    string caption = _("Configure NTP Peer");
 
     return CWM::ShowAndRun (["address", "init_sync", "options"],
 	NtpClient::widgets,
@@ -141,7 +141,7 @@ global define symbol RadioDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure serial reference clock");
+    string caption = _("Configure Serial Reference Clock");
 
     return CWM::ShowAndRun (["rcaddress", "options", "fudge_options"],
 	NtpClient::widgets,
@@ -163,7 +163,7 @@ global define symbol BCastDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure broadcasting");
+    string caption = _("Configure Broadcasting");
 
     return CWM::ShowAndRun (["bcaddress", "options"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
@@ -183,7 +183,7 @@ global define symbol BCastClientDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure broadcasting client");
+    string caption = _("Configure Broadcasting Client");
 
     return CWM::ShowAndRun (["address", "options"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),

@@ -75,7 +75,7 @@ map paths = $[
 global define boolean Read() ``{
 
     /* NtpClient read dialog caption */
-    string caption = _("Initializing ntp-client configuration");
+    string caption = _("Initializing NTP Client Configuration");
 
     integer steps = 2;
     integer sl = 500;
@@ -103,8 +103,9 @@ global define boolean Read() ``{
     {
 	boolean install_ok = Require::RequireAndConflictTarget (["xntp"], [],
 	    // richtext, %1 is name of package
-	    _("For network time synchronizxation NTP daemon is required.
-YaST2 will install package %1."));
+	    _("For network time synchronization, an XNTP daemon is required.
+YaST2 will install package %1.
+"));
 	if (! install_ok && ! Require::LastOperationCanceled ())
 	{
 	    // error popup
@@ -191,7 +192,7 @@ YaST2 will install package %1."));
     if(failed)
     {
 	// error report
-	Report::Error(_("Can not read current settings!"));
+	Report::Error(_("Cannot read the current settings."));
     }
 
     if(Abort()) return false;
@@ -211,7 +212,7 @@ YaST2 will install package %1."));
 global define boolean Write() ``{
 
     /* NtpClient read dialog caption */
-    string caption = _("Saving ntp-client configuration");
+    string caption = _("Saving NTP Client Configuration");
 
     integer steps = 2;
 
@@ -223,12 +224,12 @@ global define boolean Write() ``{
 	    // progress stage
 	    _("Write NTP settings"),
 	    // progress stage
-	    _("Restart NTP daemon")
+	    _("Restart XNTP daemon")
 	], [
 	    // progress step
 	    _("Writing the settings..."),
 	    // progress step
-	    _("Restarting NTP daemon..."),
+	    _("Restarting XNTP daemon..."),
 	    // progress step
 	    _("Finished")
 	],
@@ -265,7 +266,7 @@ global define boolean Write() ``{
 
     if (failed)
 	// error report
-	Report::Error (_("Can not write settings to /etc/ntp.conf!"));
+	Report::Error (_("Cannot write settings to /etc/ntp.conf."));
 
 
     list init = maplist (`p, peers2, ``(
@@ -280,7 +281,7 @@ global define boolean Write() ``{
 	&& SCR::Write (.sysconfig.xntp, nil)))
     {
 	// error report
-	Report::Error (_("Can not write sysconfig variables."));
+	Report::Error (_("Cannot write sysconfig variables."));
     }
 
     sleep(sl);
@@ -293,13 +294,13 @@ global define boolean Write() ``{
 	start_at_boot ? "enable" : "disable"))
     {
 	// error report
-	Report::Error (_("Can not adjust the service"));
+	Report::Error (_("Cannot adjust the service"));
     }
     if (start_at_boot && (! write_only)
 	&& 0 != Runlevel::RunInitScript("xntpd", "restart"))
     {
 	// error report
-	Report::Error (_("Can not restart NTP daemon!"));
+	Report::Error (_("Cannot restart the XNTP daemon."));
     }
 
     sleep(sl);
@@ -346,16 +347,16 @@ global define list Summary() ``{
     list ret = [];
     if (start_at_boot)
 	// summary string
-	ret = [_("Start XNTP daemon when starting system") ];
+	ret = [_("The XNTP daemon starts when starting the system") ];
     else
 	// summary string
-	ret = [_("Do not start XNTP daemon automatically") ];
+	ret = [_("The XNTP daemon does not start automatically") ];
 
     map types = $[
 	// summary string, %1 is list of addresses
 	"server" : _("Servers: %1"),
 	// summary string, %1 is list of addresses
-	"radio" : _("Radio clocks: %1"),
+	"radio" : _("Radio Clocks: %1"),
 	// summary string, %1 is list of addresses
 	"peer" : _("Peers: %1"),
 	// summary string, %1 is list of addresses

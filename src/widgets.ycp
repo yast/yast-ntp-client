@@ -48,8 +48,8 @@ global define any startHandle (any id, map event) ``{
     if (start && ! Popup::ContinueCancel (_("Warning!
 
 If you do not have permanent internet connection,
-starting of NTP daemon can take very long time, and 
-NTP daemon need not run properly.")))
+starting of XNTP daemon can take very long time, and 
+XNTP daemon need not run properly.")))
 	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
 
     if (start != start_at_boot)
@@ -70,11 +70,11 @@ global define void overviewInit (any id) ``{
 	// table cell
 	"peer" : _("Peer"),
 	// table cell
-	"radio" : _("Local radio clock"),
+	"radio" : _("Local Radio Clock"),
 	// table cell
 	"broadcast" : _("Broadcast"),
 	// table cell
-	"broadcastclient" : _("Accepting broadcasts"),
+	"broadcastclient" : _("Accepting Broadcasts"),
     ];
     list items = maplist (`i, peers, ``{
 	index = index + 1;
@@ -108,19 +108,19 @@ global define any overviewHandle (any id, map event) ``{
 	UI::OpenDialog (`VBox (
 	    `RadioButtonGroup (`id (`rbg), `VBox (
 		// label
-		`Left (`Label (_("Select type of entry to add"))),
+		`Left (`Label (_("Select Type of Entry to Add"))),
 		`VSpacing (1),
 		// radio button
 		`Left (`RadioButton (`id ("server"), _("&Server"), true)),
 		// radio button
 		`Left (`RadioButton (`id ("peer"), _("&Peer"))),
 		// radio button
-		`Left (`RadioButton (`id ("radio"), _("&Radio clock"))),
+		`Left (`RadioButton (`id ("radio"), _("&Radio Clock"))),
 		// radio button
 		`Left (`RadioButton (`id ("broadcast"), _("&Broadcasting"))),
 		`Left (`RadioButton (`id ("broadcastclient"),
 		    // radio button
-		    _("&Accepting broadcast packets")))
+		    _("&Accepting Broadcast Packets")))
 	    )),
 	    `VSpacing (1),
 	    `HBox (
@@ -152,7 +152,7 @@ global define any overviewHandle (any id, map event) ``{
     else if (event["ID"]:nil == `delete)
     {
 	// yes-no popup
-	if (Popup::YesNo (_("Delete selected item?")))
+	if (Popup::YesNo (_("Delete the selected item?")))
 	{
 	    peers[selected_item_index] = nil;
 	    peers = filter (`p, peers, ``(p != nil));
@@ -266,12 +266,12 @@ global define map InitWidgets () ``{
 	"start" : $[
 	    "widget" : `radio_buttons,
 	    // frame
-	    "label" : _("Automatically start NTP daemon"),
+	    "label" : _("Automatically Start NTP Daemon"),
 	    "items" : [
 		// radio button
 		[ "never", _("N&ever") ],
 		// radio button
-		[ "boot", _("When &booting system") ],
+		[ "boot", _("When &Booting System") ],
 	    ],
 	    "help" : HELPS["start"]:"",
 	    "init" : ``(NtpClient::startInit ()),
@@ -313,7 +313,7 @@ global define map InitWidgets () ``{
 	"init_sync" : $[
 	    "widget" : `checkbox,
 	    // checkbox
-	    "label" : _("Use for &initial synchronization"),
+	    "label" : _("Use for &Initial Synchronization"),
 	    "init" : ``(NtpClient::initSyncInit ()),
 	    "store" : ``(NtpClient::initSyncStore ()),
 	    "help" : HELPS["init_sync"]:"",
@@ -329,7 +329,7 @@ global define map InitWidgets () ``{
 	"fudge_options" : $[
 	    "widget" : `textentry,
 	    // text entry label
-	    "label" : _("&Fudge factors"),
+	    "label" : _("&Fudge Factors"),
 	    "init" : ``(NtpClient::fudgeInit ()),
 	    "store" : ``(NtpClient::fudgeStore ()),
 	    "help" : HELPS["fudge_options"]:"",
