@@ -14,7 +14,7 @@ textdomain "ntp-client";
 /**
  * All helps are here
  */
-global map HELPS = $[
+map HELPS = $[
 
     /* Read dialog help 1/2 */
     "read" : _("<p><b><big>Initializing NTP Client Configuration</big></b><br>
@@ -38,25 +38,43 @@ An additional dialog will inform you whether it is safe to do so.
 </p>
 "),
 
-    // help text 1/2
+    // help text 1/3
     "start" : _("<p><b><big>Automatically Start XNTP Daemon</big></b><br>
 Select whether to start XNTP daemon when booting system. The
 XNTP daemon resolves host names when initializing. Your
 network connection must be started before XNTP daemon starts.</p>
 "),
-    // help text 2/2
+
+    // help text 2/3
+    "chroot_environment" : _("<p><b><big>TODO</big></b><br>
+</p>"),
+
+    // help text 3/3
     "overview" : _("<p><b><big>Configured Servers</big></b><br>
 To adjust NTP servers, peers, local radio clocks, and NTP broadcasting,
 select the appropriate line and click <b>Edit</b>. To add a new entry, click
 <b>Add</b>. To delete existing entry, select it and click <b>Delete</b>.</p>
 "),
 
+    // help text to a button
+    "complex_button" : _("<p><b><big>Complex configuration</big></b><br>
+To configure this host to synchronize against multiple remote hosts or against
+locally connected clock, use the <b>Complex Configuration</b> button."),
+
+    "fudge_button" : _("<p><b><big>TODO</big></b><br></p>"),
+
+    "clock_type" : _("<p><b><big>Clock Type</big></b><br>
+Select the driver for the clock you want to configure.</p>"),
+
+    "unit_number" : _("<p><b><big>Unit Number</big></b><br>
+If you have multiple clocks of the same type, you must set
+<b>Unit Number</b>.</p>"),
+
     // help text 1/1, alt. 1
-    "saddress" : _("<p><b><big>Address</big></b><br>
-To set the remote host name or IP address, use the <b>Address</b> text field.
+    "server_address" : _("<p><b><big>Address of the NTP server</big></b><br>
+To select the address of NTP server, use the <b>NTP server</b> text field.
 To find an NTP server, ask your Internet provider or
-see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>
-"),
+see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>"),
 
     // help text 1/1, alt. 2
     "bcaddress" : _("<p><b><big>Address</big></b><br>
@@ -89,13 +107,6 @@ To fine tune the synchronization source, write the options to the
 <b>Options</b> text field. For details, see
 <i>/usr/share/doc/packages/xntp-doc/html/confopt.htm</i>.</p>"),
 
-    // help text 4/4, optional
-    "fudge_options" : _("<p><b><big>Fudge Factors</big></b><br>
-To calibrate the local radio clock driver for systematic offset bias,
-write the parameters to the <b>Fudge Factors</b> text field.
-For details, see
-<i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>"),
-
     // help text 1/6
     "peer_types" : _("<p><b><big>Type of Entry to Add</big></b><br>
 Select the type of the entry to add here.</p>
@@ -119,6 +130,19 @@ select <b>Radio Clock</b>.</p>
 and use them for setting local time, select <b>Accepting Broadcast Packets<b>.</p>"),
 
 ];
+
+define string fudgeHelp () ``{
+    // help text 1/2
+    return _("<p><big><b>Clock Driver Calibration</b></big><br>
+The clock driver may need to be calibrated. In this dialog various options
+can be set. The meaning of particular options depends on the particular
+driver.</p>")
+    +
+    // help text 2/2
+    _("For information about the meaning of the options, install package
+<i>xntp-doc</i> and see
+<i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>");
+}
 
 /* EOF */
 }

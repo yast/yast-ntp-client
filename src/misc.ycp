@@ -12,12 +12,15 @@
 textdomain "ntp-client";
 
 import "Popup";
+import "IP";
+
+include "ntp-client/clocktypes.ycp";
 
 /**
  * Ask user if exit without saving
  * @return boolean true if exit
  */
-global define boolean reallyExit () ``{
+define boolean reallyExit () ``{
     // yes-no popup
     return Popup::YesNo (_("Really exit?
 All changes will be lost."));
@@ -28,21 +31,42 @@ All changes will be lost."));
  * @param options_string string of options
  * @return map options as a map
  */
-global define map string2opts (string options_string) ``{
-    list l = splitstring (options_string, " ");
-    l = filter (`e, l, ``(e != ""));
-    map ret = $[];
-    foreach (`e, l, ``{
-	if (regexpmatch (e, "^[^=]+=.+"))
+define map string2opts (string options_string, list<string> with_param,
+        list<string>without_param)
+    ``{
+    list<string> l = splitstring (options_string, " ");
+    l = filter (string e, l, ``(e != ""));
+    boolean ignore_next = false;
+    integer index = -1;
+    list<string> unknown = [];
+    map<string,any> ret = (map<string,any>)listmap (string e, l, ``{
+	index = index + 1;
+	if (ignore_next)
 	{
-	    list tokens = regexptokenize (e, "^([^=]+)=(.+)");
-	    ret[tokens[0]:""] = tokens[1]:"";
+	    ignore_next = false;
+	    return $[ e : (any)nil ];
+	}
+	ignore_next = false;
+	if (contains (with_param, e))
+	{
+	    ignore_next = true;
+	    return $[ e: l[index + 1]:""];
+	}
+	else if (contains (without_param, e))
+	{
+	    return $[ e : true ];
 	}
 	else
 	{
-	    ret[e] = true;
+	    unknown = add (unknown, e);
+	    return $[ e : (any)nil];
 	}
     });
+    ret = (map<string,any>)filter (string k, any v, ret, ``(v != nil));
+    ret = $[
+	"parsed" : ret,
+	"unknown" : mergestring (unknown, " "),
+    ];
     return ret;
 }
 
@@ -51,36 +75,36 @@ global define map string2opts (string options_string) ``{
  * @param options map options represented as a map
  * @return string options represented as a string
  */
-global define string opts2string (map options) ``{
-    list(string) ret = [];
-    foreach (`k, `v, options, ``{
+define string opts2string (map options, string other) ``{
+    string ret = other;
+    foreach (string k, any v, options, ``{
 	if (v == true)
 	{
-	    ret = add (ret, k);
+	    ret = sformat ("%1 %2", ret, k);
 	}
 	else if (v != false)
 	{
-	    ret = add (ret, sformat ("%1=%2", k, v));
+	    ret = sformat ("%1 %2 %3", ret, k, v);
 	}
     });
-    return mergestring (ret, " ");
+    return ret;
 }
 
 /**
  * If modified, ask for confirmation
  * @return true if abort is confirmed
  */
-global define boolean ReallyAbort() ``{
-    return !modified || UI::ReallyAbortPopup(true);
+define boolean ReallyAbort() ``{
+    return !NtpClient::modified || Popup::ReallyAbort(true);
 }
 
 /**
  * Abort function
  * @return blah blah lahjk
  */
-global define boolean Abort() ``{
-    if(AbortFunction != nil)
-	return eval(AbortFunction) == true;
+define boolean Abort() ``{
+    if(NtpClient::AbortFunction != nil)
+	return eval(NtpClient::AbortFunction) == true;
     return false;
 }
 
@@ -88,16 +112,92 @@ global define boolean Abort() ``{
  * Check for pending Abort press
  * @return true if pending abort
  */
-global define boolean PollAbort() ``{
+define boolean PollAbort() ``{
     return UI::PollInput() == `abort;
 }
 
 /**
- * If modified, ask for confirmation
- * @return true if abort is confirmed
- */
-global define boolean ReallyAbort() ``{
-    return /*!modified ||*/ Popup::ReallyAbort(true);
+  * Get the type of the clock from the address
+  * @param address string the clock identification in the IP address form
+  * @return integer the clock type
+  */
+define integer getClockType (string address) ``{
+    if (address == "")
+	return 0;
+    if (! IP::Check4 (address))
+    {
+	y2error ("Invalid address: %1", address);
+	return nil;
+    }
+    string cl_type = regexpsub (address,
+	"[0-9]+\.[0-9]+\.([0-9]+)\.[0-9]+",
+	"\\1");
+    return tointeger (cl_type);
+}
+
+define string setClockType (string address, integer clock_type) ``{
+    if (address == "")
+	address = "127.127.0.0";
+    if (! IP::Check4 (address))
+    {
+	y2error ("Invalid address: %1", address);
+	return nil;
+    }
+    string ret = regexpsub (address,
+	"([0-9]+\.[0-9]+\.)[0-9]+(\.[0-9]+)",
+	sformat ("\\1%1\\2", clock_type));
+    y2error ("Ret: %1", ret);
+    return ret;
+}
+
+/**
+  * Get the unit number of the clock from the address
+  * @param address string the clock identification in the IP address form
+  * @return integer the unit number
+  */
+define integer getClockUnitNumber (string address) ``{
+    if (address == "")
+	return 0;
+    if (! IP::Check4 (address))
+    {
+	y2error ("Invalid address: %1", address);
+	return nil;
+    }
+    string cl_type = regexpsub (address,
+	"[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)",
+	"\\1");
+    return tointeger (cl_type);
+}
+
+define string setClockUnitNumber (string address, integer unit_number) ``{
+    if (address == "")
+	address = "127.127.0.0";
+    if (! IP::Check4 (address))
+    {
+	y2error ("Invalid address: %1", address);
+	return nil;
+    }
+    string ret = regexpsub (address,
+	"([0-9]+\.[0-9]+\.[0-9]+\.)[0-9]+",
+	sformat ("\\1%1", unit_number));
+    y2error ("Ret: %1", ret);
+    return ret;
+}
+
+
+/**
+  * Get entries for the clock type combo box
+  * @return list of items for the combo box
+  */
+define list getClockTypesCombo () ``{
+    map clock_names = mapmap (integer k, map<string,string> v, clock_types, ``(
+	    $[ k: v["name"]:"" ]
+	)
+    );
+    list ret = maplist (string k, string v, clock_names, ``(
+	`item (sformat ("%1", k), v)
+    ));
+    return ret;
 }
 
 

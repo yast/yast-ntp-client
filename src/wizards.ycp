@@ -18,15 +18,130 @@ include "wizard/sequencer.ycp";
 
 include "ntp-client/dialogs.ycp";
 
+
+
+/**
+ * Complex workflow of the ntp-client configuration
+ * @return sequence result
+ */
+define symbol ComplexSequence() ``{
+
+    map aliases = $[
+	"main"		:   ``(MainDialog ()),
+	"type_select"	:   ``(TypeSelectDialog ()),
+	"server"	:   ``(ServerDialog ()),
+	"peer"		:   ``(PeerDialog ()),
+	"clock"		:   ``(RadioDialog ()),
+	"fudge"		:   ``(FudgeDialog ()),
+	"bcast"		:   ``(BCastDialog ()),
+	"bcastclient"	:   ``(BCastClientDialog ()),
+	"store_record"	: [ ``(StoreRecord ()), true],
+    ];
+
+    map sequence = $[
+	"ws_start" : "main",
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	    `peer	: "peer",
+	    `server	: "server",
+	    `clock	: "clock",
+	    `bcast	: "bcast",
+	    `bcastclient: "bcastclient",
+	    `add	: "type_select",
+	],
+	"type_select" : $[
+	    `peer	: "peer",
+	    `server	: "server",
+	    `clock	: "clock",
+	    `bcast	: "bcast",
+	    `bcastclient: "bcastclient",
+	],
+	"peer" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"server" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"clock" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	    `fudge	: "fudge"
+	],
+	"fudge" : $[
+	    `abort	: `abort,
+	    `next	: "clock",
+	],
+	"bcast" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"bcastclient" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"store_record" : $[
+	    `abort	: `abort,
+	    `next	: "main",
+	],
+    ];
+
+    symbol ret = WizardSequencer(aliases, sequence);
+
+    return ret;
+}
+
+/**
+  * The simple workflow for the NTP client
+  * @return sequence result
+  */
+define symbol SimpleSequence () ``{
+
+    NtpClient::selected_record = $[
+	"type" : "__clock",
+	"address" : "127.127.3.2",
+    ];
+
+    map aliases = $[
+	"switcher"	:[``(SelectConfigType ()), true ],
+	"simple"	: ``(SimpleDialog ()),
+//	"simple"	: ``(RadioDialog ()),
+	"complex"	: ``(ComplexSequence ()),
+    ];
+
+    map sequence = $[
+	"ws_start" : "switcher",
+	"switcher" : $[
+	    `simple : "simple",
+	    `complex : "complex",
+	],
+	"simple" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	    `complex	: "complex",
+	],
+	"complex" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	],
+    ];
+
+    symbol ret = WizardSequencer (aliases, sequence);
+
+    return ret;
+}
+
 /**
  * Whole configuration of ntp-client
  * @return sequence result
  */
-global define symbol NtpClientSequence() ``{
+define symbol NtpClientSequence() ``{
 
     map aliases = $[
 	"read"	: [ ``( ReadDialog() ), true ],
-	"main"	:   ``( MainSequence() ),
+	"main"	:   ``( SimpleSequence() ),
 	"write"	: [ ``( WriteDialog() ), true ]
     ];
 
@@ -47,7 +162,7 @@ global define symbol NtpClientSequence() ``{
     ];
 
     Wizard::CreateDialog();
-    any ret = WizardSequencer(aliases, sequence);
+    symbol ret = WizardSequencer(aliases, sequence);
 
     UI::CloseDialog();
     return ret;
@@ -57,17 +172,17 @@ global define symbol NtpClientSequence() ``{
  * Autoyast configuration of ntp-client
  * @return sequence result
  */
-global define symbol NtpClientAutoSequence() ``{
+define symbol NtpClientAutoSequence() ``{
 
     map aliases = $[
-	"main"	:   ``( MainSequence() )
+	"main"	:   ``( ComplexSequence() )
     ];
 
     map sequence = $[
 	"ws_start" : "main",
 	"main" : $[
-	    `abort	: `abort,
-		`next   : `next
+	    `abort  : `abort,
+	    `next   : `next
 	]
     ];
 
@@ -80,78 +195,10 @@ global define symbol NtpClientAutoSequence() ``{
     Wizard::SetContentsButtons(caption, contents, "",
 	    Label::BackButton(), Label::NextButton());
 
-    any ret = WizardSequencer(aliases, sequence);
+    symbol ret = WizardSequencer(aliases, sequence);
 
     UI::CloseDialog();
     return ret;
 }
-
-/**
- * Main workflow of the ntp-client configuration
- * @return sequence result
- */
-global define symbol MainSequence() ``{
-
-    map aliases = $[
-	"main"		:   ``(MainDialog ()),
-	"type_select"	:   ``(TypeSelectDialog ()),
-	"server"	:   ``(ServerDialog ()),
-	"peer"		:   ``(PeerDialog ()),
-	"radio"		:   ``(RadioDialog ()),
-	"bcast"		:   ``(BCastDialog ()),
-	"bcastclient"	:   ``(BCastClientDialog ()),
-	"store_record"	: [ ``(StoreRecord ()), true],
-    ];
-
-    map sequence = $[
-	"ws_start" : "main",
-	"main" : $[
-	    `abort	: `abort,
-	    `next	: `next,
-	    `peer	: "peer",
-	    `server	: "server",
-	    `radio	: "radio",
-	    `bcast	: "bcast",
-	    `bcastclient: "bcastclient",
-	    `add	: "type_select",
-	],
-	"type_select" : $[
-	    `peer	: "peer",
-	    `server	: "server",
-	    `radio	: "radio",
-	    `bcast	: "bcast",
-	    `bcastclient: "bcastclient",
-	],
-	"peer" : $[
-	    `abort	: `abort,
-	    `next	: "store_record",
-	],
-	"server" : $[
-	    `abort	: `abort,
-	    `next	: "store_record",
-	],
-	"radio" : $[
-	    `abort	: `abort,
-	    `next	: "store_record",
-	],
-	"bcast" : $[
-	    `abort	: `abort,
-	    `next	: "store_record",
-	],
-	"bcastclient" : $[
-	    `abort	: `abort,
-	    `next	: "store_record",
-	],
-	"store_record" : $[
-	    `abort	: `abort,
-	    `next	: "main",
-	],
-    ];
-
-    any ret = WizardSequencer(aliases, sequence);
-
-    return ret;
-}
-
 /* EOF */
 }

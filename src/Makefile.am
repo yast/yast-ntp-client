@@ -2,6 +2,8 @@
 # Makefile.am for devtools/devtools/skeletons/config/src
 #
 
+YCPCFLAGS = -I .
+
 yncludedir = @yncludedir@/ntp-client
 
 client_DATA =			\
@@ -13,7 +15,8 @@ ynclude_DATA =			\
 	wizards.ycp		\
 	dialogs.ycp		\
 	widgets.ycp		\
-	misc.ycp
+	misc.ycp		\
+	clocktypes.ycp
 
 config_DATA =			\
 	ntp-client.y2cc
@@ -25,3 +28,13 @@ module_DATA =			\
 	NtpClient.ycp
 
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA) $(desktop_DATA)
+
+
+symlinks:
+	test -L ntp-client || ln -sf . ntp-client
+
+ycpchook = symlinks
+
+
+include $(top_srcdir)/Makefile.am.common
+

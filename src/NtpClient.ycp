@@ -22,16 +22,12 @@ import "Runlevel";
 import "Require";
 import "Mode";
 
-include "ntp-client/widgets.ycp";
-include "ntp-client/misc.ycp";
-
-global map widgets = InitWidgets ();
 
 /**
  * Abort function
  * return boolean return true if abort
  */
-global block AbortFunction = nil;
+global boolean() AbortFunction = nil;
 
 /**
  * Data was modified?
@@ -48,37 +44,45 @@ global boolean write_only = false;
  * Read all ntp-client settings
  * @return true on success
  */
-
 global list<map<string, any> >ntp_records = [];
 
 
-
-global boolean start_at_boot = false;
-
-global list peers = [];
-
-global integer selected_item_index = -1;
-
-global map selected_item = $[];
-
+/**
+  * Should the daemon be started when system boots?
+  */
+global boolean run_service = false;
 
 /**
- * Required packages
- */
+  * Should the daemon be started in chroot environment?
+  */
+global boolean run_chroot = false;
+
+/**
+  * Index of the currently sellected item
+  */
+global integer selected_index = -1;
+
+/**
+  * The currently sellected item
+  */
+global map selected_record = $[];
+
+/**
+  * Required packages
+  */
 global list required_packages = ["xntp"];
 
+global define list<map<string,any> >getSyncRecords ();
+global define boolean storeSyncRecord ();
+global define boolean deleteSyncRecord (integer index);
+global define boolean selectSyncRecord (integer index);
 
 
-list rw_order = [ "server", "fudge", "peer", "broadcast", "broadcastclient" ];
 
-map paths = $[
-    "server" : .etc.ntp_conf.server,
-    "peer" : .etc.ntp_conf.peer,
-    "fudge" : .etc.ntp_conf.fudge,
-    "broadcast" : .etc.ntp_conf.broadcast,
-    "broadcastclient" : .etc.ntp_conf.broadcastclient,
-];
+include "ntp-client/misc.ycp";
+include "ntp-client/widgets.ycp";
 
+global map<string,any> widgets = InitWidgets ();
 
 /**
  * Read all ntp-client settings
@@ -125,8 +129,7 @@ YaST2 will install package %1.
 	}
     }
 
-    start_at_boot = Runlevel::ServiceEnabled ("xntpd");
-    peers = [];
+    run_service = Runlevel::ServiceEnabled ("xntpd");
 
     map conf = (map)SCR::Read (.etc.ntp_conf.all);
     if (conf == nil)
@@ -146,13 +149,13 @@ YaST2 will install package %1.
 	    "manycastclient", "fudge" ],
 	    type))
 	{
-	    list l = splitstring (address, " ");
-	    l = filter (string s, l, ``(s != ""));
+	    list<string> l = splitstring (address, " ");
+	    l = (list<string>)filter (string s, l, ``(s != ""));
 	    address = l[0]:"";
 	    l[0] = "";
 	    options = mergestring (l, " ");
 	}
-	map entry = $[
+	map<string,any> entry = $[
 	    "type" : type,
 	    "address" : address,
 	    "options" : options,
@@ -163,7 +166,7 @@ YaST2 will install package %1.
     list<map<string, any> > fudge_records = filter (map m, ntp_records, ``(
 	m["type"]:"" == "fudge"
     ));
-    map <string, map<string, any> > fudge_map = listmap (map m, fudge_records,
+    map <string, map<string, any> > fudge_map = (map <string, map<string, any> >)listmap (map m, fudge_records,
     ``{
 	string key = m["address"]:"";
 	return $[key: m];
@@ -172,7 +175,7 @@ YaST2 will install package %1.
 	m["type"]:"" != "fudge"
     ));
 
-    ntp_records = maplist (map m, ntp_records, ``{
+    ntp_records = (list<map<string,any> >)maplist (map m, ntp_records, ``{
 	if (haskey (fudge_map, m["address"]:""))
 	{
 	    m["fudge_options"] = fudge_map[m["address"]:"", "options"]:"";
@@ -181,7 +184,9 @@ YaST2 will install package %1.
 	return m;
     });
 
-    string initial_sync = SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
+    run_chroot = SCR::Read (.sysconfig.xntp.XNTPD_RUN_CHROOTED) == "yes";
+
+    string initial_sync = (string)SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
     if (initial_sync == nil)
     {
 	initial_sync = "";
@@ -190,7 +195,7 @@ YaST2 will install package %1.
     }
 
     // mark local clock to be local clock and not real servers
-    ntp_records = maplist (`p, ntp_records, ``{
+    ntp_records = maplist (map<string,any> p, ntp_records, ``{
 	if (p["type"]:"" == "server"
 	    && regexpmatch (p["address"]:"", "^127\.127\.[0-9]+.[0-9]+$"))
 	{
@@ -202,7 +207,7 @@ YaST2 will install package %1.
     // mark those servers and peers that are used for initial syncing
     if (initial_sync == "AUTO")
     {
-	ntp_records = maplist (`p, ntp_records, ``{
+	ntp_records = maplist (map<string,any> p, ntp_records, ``{
 	    p["initial_sync"] = p["type"]:"" == "server";
 	    return p;
 	});
@@ -211,7 +216,7 @@ YaST2 will install package %1.
     {
 	integer count = tointeger (
 	    regexpsub (initial_sync, "AUTO-([0-9]+)", "\\1"));
-	ntp_records = maplist (`p, ntp_records, ``{
+	ntp_records = maplist (map<string,any> p, ntp_records, ``{
 	    if (p["type"]:"" == "server" || p["type"]:"" == "peer")
 	    {
 		count = count - 1;
@@ -225,15 +230,13 @@ YaST2 will install package %1.
     else
     {
 	list listed = splitstring (initial_sync, " ");
-	ntp_records = maplist (`p, ntp_records, ``{
+	ntp_records = maplist (map<string,any> p, ntp_records, ``{
 	    p["initial_sync"]
 		= (p["type"]:"" == "server" || p["type"]:"" == "peer")
 		    && contains (listed, p["address"]:"");
 	    return p;
 	});
     }
-
-y2error ("Read servers: %1", ntp_records);
 
     if(failed)
     {
@@ -288,7 +291,7 @@ global define boolean Write() ``{
 
     y2milestone ("Writing settings %1", ntp_records);
 
-    list<map<string, any> > save2 = flatten (maplist (
+    list<map<string, any> > save2 = (list<map<string, any> >)flatten (maplist (
 	map<string, any> r, ntp_records,
     ``{
 	map s1 = $[
@@ -334,27 +337,30 @@ global define boolean Write() ``{
 	Report::Error (_("Cannot write settings to /etc/ntp.conf."));
 
 
-    list init = maplist (`p, peers2, ``(
+    list init = maplist (map<string,any> p, save2, ``(
 	(p["type"]:"" == "server" || p["type"]:"" == "peer")
 	    && p["initial_sync"]:false
 		? p["address"]:""
 		: nil
     ));
     init = filter (`i, init, ``(i != nil));
-    string init_str = mergestring (init, " ");
+    string init_str = mergestring ((list<string>)init, " ");
 
     // Don't remove the AUTO key, something should be present for initialization
     // if there is no NTP server set explicitly
     if (size (init) == 0)
     {
-	string orig_init = SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
+	string orig_init = (string)SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
 	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-")
 	{
 	    init_str = orig_init;
 	}
     }
 
-    if (! (SCR::Write (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE, init_str)
+    if (! (SCR::Write (.sysconfig.xntp.XNTPD_RUN_CHROOTED, run_chroot
+	    ? "yes"
+	    : "no")
+	&& SCR::Write (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE, init_str)
 	&& SCR::Write (.sysconfig.xntp, nil)))
     {
 	// error report
@@ -368,18 +374,18 @@ global define boolean Write() ``{
     Progress::NextStage ();
 
     if (! Runlevel::ServiceAdjust ("xntpd",
-	start_at_boot ? "enable" : "disable"))
+	run_service ? "enable" : "disable"))
     {
 	// error report
 	Report::Error (_("Cannot adjust the service"));
     }
-    if (start_at_boot && (! write_only)
+    if (run_service && (! write_only)
 	&& 0 != Runlevel::RunInitScript("xntpd", "restart"))
     {
 	// error report
 	Report::Error (_("Cannot restart the XNTP daemon."));
     }
-    if (! start_at_boot)
+    if (! run_service)
     {
 	Runlevel::RunInitScript("xntpd", "stop");
     }
@@ -402,8 +408,8 @@ global define boolean Write() ``{
  * @return boolean True on success
  */
 global define boolean Import (map settings) ``{
-    start_at_boot = settings["start_at_boot"]:false;
-    peers = settings["peers"]:[];
+    run_service = settings["start_at_boot"]:false;
+    ntp_records = settings["peers"]:[];
     modified = true;
     return true;
 }
@@ -415,8 +421,8 @@ global define boolean Import (map settings) ``{
  */
 global define map Export () ``{
     return $[
-	"start_at_boot" : start_at_boot,
-	"peers" : peers,
+	"start_at_boot" : run_service,
+	"peers" : ntp_records,
     ];
 }
 
@@ -426,7 +432,7 @@ global define map Export () ``{
  */
 global define list Summary() ``{
     list ret = [];
-    if (start_at_boot)
+    if (run_service)
 	// summary string
 	ret = [_("The XNTP daemon starts when starting the system") ];
     else
@@ -437,7 +443,7 @@ global define list Summary() ``{
 	// summary string, %1 is list of addresses
 	"server" : _("Servers: %1"),
 	// summary string, %1 is list of addresses
-	"radio" : _("Radio Clocks: %1"),
+	"__clock" : _("Radio Clocks: %1"),
 	// summary string, %1 is list of addresses
 	"peer" : _("Peers: %1"),
 	// summary string, %1 is list of addresses
@@ -445,17 +451,91 @@ global define list Summary() ``{
 	// summary string, %1 is list of addresses
 	"broadcastclient" : _("Accept broadcasted time information from: %1"),
     ];
-    foreach (`t, ["server", "radio", "peer", "broadcast", "broadcastclient" ],
+    foreach (`t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
-	list l = filter (`p, peers, ``(p["key"]:"" == t));
-	list names = maplist (`i, l, ``(i["value"]:""));
+	list l = filter (map<string,any> p, ntp_records, ``(p["key"]:"" == t));
+	list names = maplist (map<string,any> i, l, ``(i["value"]:""));
 	names = filter (`n, names, ``(n != ""));
 	if (size (names) > 0)
-	    ret = add (ret, sformat (types[t]:"", mergestring (names, ", ")));
+	    ret = add (ret, sformat (types[t]:"", mergestring ((list<string>)names, ", ")));
     });
     return ret;
 }
 
+/**
+  * Get the list of synchronization-related records
+  * @return list of maps with keys type (eg. "server"), address and index.
+  */
+global define list<map<string,any> >getSyncRecords () ``{
+    integer index = -1;
+    list<map<string,any> > ret = maplist (map m, ntp_records, ``{
+	index = index + 1;
+	string type = m["type"]:"";
+	if (! contains (["server", "peer", "broadcast",
+	    "broadcastclient", "__clock"], type))
+	{
+	    return nil;
+	}
+	return $[
+	    "type" : type,
+	    "index" : index,
+	    "address" : m["address"]:"",
+	];
+    });
+    ret = filter (map m, ret, ``(m != nil));
+    return ret;
+}
+
+/**
+  * Select synchronization record
+  * @param index integer, -1 for creating a new record
+  * @return boolean true on success
+  */
+global define boolean selectSyncRecord (integer index) ``{
+    boolean ret = true;
+    if (index >= size (ntp_records) || index < -1)
+    {
+	y2error ("Record with index %1 doesn't exist, creating new", index);
+	index = -1;
+	ret = false;
+    }
+    if (index == -1)
+	selected_record = $[];
+    else
+	selected_record = ntp_records[index]:$[];
+    selected_index = index;
+    return ret;
+}
+
+/**
+  * Store currently sellected synchronization record
+  * @return boolean true on success
+  */
+global define boolean storeSyncRecord () ``{
+    if (selected_index == -1)
+	ntp_records = add (ntp_records, selected_record);
+    else
+	ntp_records[selected_index] = selected_record;
+    modified = true;
+    return true;
+}
+
+/**
+  * Delete specified synchronization record
+  * @param index integer index of record to delete
+  * @return boolean true on success
+  */
+global define boolean deleteSyncRecord (integer index) ``{
+    if (index >= size (ntp_records) || index <= -1)
+    {
+	y2error ("Record with index %1 doesn't exist", index);
+	return false;
+    }
+    ntp_records[index] = nil;
+    ntp_records = filter (map r, ntp_records, ``(r != nil));
+    modified = true;
+    return true;
+}
 
 /**
  * Return required packages for auto-installation
