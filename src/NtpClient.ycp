@@ -313,6 +313,10 @@ global define boolean Write() ``{
 	// error report
 	Report::Error (_("Cannot restart the XNTP daemon."));
     }
+    if (! start_at_boot)
+    {
+	Runlevel::RunInitScript("xntpd", "stop");
+    }
 
     sleep(sl);
 

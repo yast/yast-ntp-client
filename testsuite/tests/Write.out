@@ -11,4 +11,5 @@ Read	.init.scripts.exists "xntpd" true
 Read	.init.scripts.exists "xntpd" true
 Read	.init.scripts.runlevel "xntpd" nil
 Read	.init.scripts.comment "xntpd" nil
+Execute	.target.bash "/etc/init.d/xntpd stop" $["TERM":"raw"] 0
 Return	true
