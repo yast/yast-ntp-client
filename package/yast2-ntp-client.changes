@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Apr  8 14:30:30 CEST 2004 - jsrain@suse.cz
+
+- fixed texts of menu button in the log display dialog (#38522)
+
+-------------------------------------------------------------------
 Fri Apr  2 16:08:30 CEST 2004 - jsrain@suse.de
 
 - changed version to GPL

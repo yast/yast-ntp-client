@@ -30,10 +30,10 @@ define void showLogPopup () ``{
 	"save" : true,
 	"actions" : [
 	    // menubutton entry, try to keep short
-	    [ _("Restart DNS Server"),
+	    [ _("Restart NTP Daemon"),
 		restartNtpDaemon ],
 	    // menubutton entry, try to keep short
-	    [ _("Save Settings and Restart DNS Server"),
+	    [ _("Save Settings and Restart NTP Daemon"),
 		NtpClient::Write ],
 	],
     ]);
