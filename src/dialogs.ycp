@@ -24,6 +24,10 @@ include "ntp-client/widgets.ycp";
 
 map<string,map<string,any> > widgets = nil;
 
+/**
+ * Get the map of all widgets
+ * @return a map with all widgets for CWM
+ */
 define map<string,map<string,any> > GetWidgets () {
     if (widgets == nil)
 	widgets = InitWidgets ();

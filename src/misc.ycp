@@ -52,7 +52,7 @@ define void silentWrite () ``{
  * @return map options as a map
  */
 define map string2opts (string options_string, list<string> with_param,
-        list<string>without_param)
+        list<string> without_param)
     ``{
     list<string> l = splitstring (options_string, " ");
     l = filter (string e, l, ``(e != ""));
