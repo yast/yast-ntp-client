@@ -21,7 +21,10 @@ include "ntp-client/helps.ycp";
 // selected type of peer
 string peer_type_selected = nil;
 
-define symbol showLogPopup () ``{
+/**
+ * Show popup with NTP daemon's log
+ */
+define void showLogPopup () ``{
     LogView::Display ($[
 	"file" : "/var/log/ntp",
 	"save" : true,
@@ -37,6 +40,12 @@ define symbol showLogPopup () ``{
     return nil;
 }
 
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
 global define symbol ntpEnabledOrDisabled (string id, map event) ``{
     any ev_id = event["ID"]:nil;
     if (ev_id == "boot" || ev_id == "never")
@@ -67,11 +76,11 @@ global define void startStore (any id, map event) ``{
 
 /**
  * Handle function of the widget
- * @param id any widget id
+ * @param id string widget id
  * @param event map event that caused storing process
  * @return any always nil
  */
-global define any startHandle (any id, map event) ``{
+global define any startHandle (string id, map event) ``{
     boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
     list<string> devices = NetworkDevices::Locate ("STARTMODE", "onboot");
     devices = filter (string d, devices, ``(d != "lo"));
@@ -91,9 +100,9 @@ the daemon might not run properly.")))
 
 /**
  * Handle function of the widget
- * @param id any widget id
+ * @param key any widget id
  * @param event map event that caused storing process
- * @return any always `complex
+ * @return symbol always `complex
  */
 global define symbol complexButtonHandle (string key, map event) ``{
     if (event["ID"]:nil == "complex_button")
@@ -104,7 +113,7 @@ global define symbol complexButtonHandle (string key, map event) ``{
 
 /**
  * Handle function of the widget
- * @param id string widget id
+ * @param key string widget id
  * @param event map event that caused storing process
  * @return symbol always `complex
  */
@@ -264,7 +273,7 @@ global define void addressStore (any id, map event) ``{
  * Handle events on the widget
  * @param id string widget id
  * @param event map event that caused storing process
- * @return any event to pass to WS or nil
+ * @return symbol event to pass to WS or nil
  */
 global define symbol serverAddressHandle (string id, map event) {
     any ev_id = event["ID"]:nil;
@@ -346,7 +355,7 @@ global define void peerTypesInit (any id) ``{
  * Handle events on the widget
  * @param id any widget id
  * @param event map event that caused storing process
- * @return any event to pass to WS or nil
+ * @return symbol event to pass to WS or nil
  */
 global define symbol peerTypesHandle (any id, map event) ``{
     peer_type_selected = (string)UI::QueryWidget (`id ("peer_types"), `CurrentButton);
@@ -365,11 +374,21 @@ global define symbol peerTypesHandle (any id, map event) ``{
     return nil;
 }
 
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
 global define void createSymlinkInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value,
 	selected_record["create_symlink"]:false);
 }
 
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
 global define symbol createSymlinkHandle (string id, map event) ``{
     boolean active = (boolean)UI::QueryWidget (`id ("create_symlink"), `Value);
     integer current = tointeger ((string)UI::QueryWidget (`id (id), `Value));
@@ -379,11 +398,22 @@ global define symbol createSymlinkHandle (string id, map event) ``{
     return nil;
 }
 
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
 global define void createSymlinkStore (string id, map event) ``{
     NtpClient::selected_record["create_symlink"] = (boolean)
 	UI::QueryWidget (`id (id), `Value);
 }
 
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
 global define symbol clockTypeHandle (string id, map event) ``{
     integer current = tointeger ((string)UI::QueryWidget (`id (id), `Value));
     boolean hw_avail = clock_types[current, "device"]:"" != "";
@@ -391,29 +421,53 @@ global define symbol clockTypeHandle (string id, map event) ``{
     return createSymlinkHandle (id, event);
 }
 
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
 global define void clockTypeInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value, sformat ("%1",
 	getClockType (NtpClient::selected_record["address"]:"")));
     clockTypeHandle (id, $[]);
 }
 
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
 global define void clockTypeStore (string id, map event) ``{
     NtpClient::selected_record["address"] = setClockType (
 	NtpClient::selected_record["address"]:"",
 	tointeger ((string)UI::QueryWidget (`id (id), `Value)));
 }
 
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
 global define void unitNumberInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value,
 	getClockUnitNumber (NtpClient::selected_record["address"]:""));
 }
 
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
 global define void unitNumberStore (string id, map event) ``{
     NtpClient::selected_record["address"] = setClockUnitNumber (
 	NtpClient::selected_record["address"]:"",
 	(integer)UI::QueryWidget (`id (id), `Value));
 }
 
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
 global define symbol browseButtonHandle (string id, map event) ``{
     string current = (string)UI::QueryWidget (`id ("device"), `Value);
     if (current == "")
@@ -425,10 +479,19 @@ global define symbol browseButtonHandle (string id, map event) ``{
     return nil;
 }
 
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
 global define void deviceInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value, selected_record["device"]:"");
 }
 
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
 global define void deviceStore (string id, map event) ``{
     NtpClient::selected_record["device"] = (string)
 	UI::QueryWidget (`id (id), `Value);
@@ -437,7 +500,7 @@ global define void deviceStore (string id, map event) ``{
 
 /**
  * Initialize all widgets
- * @return map of widgets
+ * @return a map of widgets
  */
 global define map<string,any> InitWidgets () ``{
     map address = $[
@@ -505,6 +568,7 @@ global define map<string,any> InitWidgets () ``{
 		),
 		`VBox (
 		    `Label (" "),
+		    // push button
 		    `PushButton (`id (`lookup_address), _("&Lookup"))
 		)
 	    ),

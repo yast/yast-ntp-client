@@ -524,7 +524,7 @@ global define string Summary() ``{
 
 /**
   * Get the list of synchronization-related records
-  * @return list of maps with keys type (eg. "server"), address and index.
+  * @return a list of maps with keys type (eg. "server"), address and index.
   */
 global define list<map<string,any> >getSyncRecords () ``{
     integer index = -1;
