@@ -279,9 +279,12 @@ global define boolean Write() ``{
 	// error report
 	Report::Error (_("Can not adjust the service"));
     }
-    if (start_at_boot && 0 != Runlevel::RunInitScript("xntpd", "restart"))
+    if (start_at_boot && (! write_only)
+	&& 0 != Runlevel::RunInitScript("xntpd", "restart"))
+    {
 	// error report
 	Report::Error (_("Can not restart NTP daemon!"));
+    }
 
     sleep(sl);
 

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jul 30 07:56:30 CEST 2003 - jsrain@suse.de
+
+- not (re)starting service during autoinstallation
+
+-------------------------------------------------------------------
 Tue Jul 29 14:52:50 CEST 2003 - jsrain@suse.de
 
 - adapted to udpated CWM interface
