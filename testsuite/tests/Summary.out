@@ -1,4 +1,4 @@
-Return	["Start XNTP daemon when starting system", "Servers: 10.20.30.40, 20.40.60.80", "Peers: 1.2.3.4"]
-Return	["Do not start XNTP daemon automatically", "Servers: 10.20.30.40, 20.40.60.80", "Peers: 1.2.3.4"]
-Return	["Start XNTP daemon when starting system"]
-Return	["Start XNTP daemon when starting system", "Servers: 10.20.30.40, 20.40.60.80", "Radio clocks: 127.127.1.2", "Peers: 1.2.3.4", "Broadcast time information to: 255.255.255.255", "Accept broadcasted time information from: 10.20.3.4"]
+Return	["The XNTP daemon starts when starting the system", "Servers: 10.20.30.40, 20.40.60.80", "Peers: 1.2.3.4"]
+Return	["The XNTP daemon does not start automatically", "Servers: 10.20.30.40, 20.40.60.80", "Peers: 1.2.3.4"]
+Return	["The XNTP daemon starts when starting the system"]
+Return	["The XNTP daemon starts when starting the system", "Servers: 10.20.30.40, 20.40.60.80", "Radio Clocks: 127.127.1.2", "Peers: 1.2.3.4", "Broadcast time information to: 255.255.255.255", "Accept broadcasted time information from: 10.20.3.4"]
