@@ -99,7 +99,7 @@ global define boolean Read() ``{
 
     boolean failed = false;
 
-    if (! Require::IsPackageInstalled ("xntp") || Mode::config)
+    if (! Require::AreAllPackagesInstalled (["xntp"]) || Mode::config)
 	Require::RequireAndConflictTarget (["xntp"], [],
 	    // richtext, %1 is name of package
 	    _("For network time synchronizxation NTP daemon is required.
@@ -343,9 +343,9 @@ global define list Summary() ``{
 	// summary string, %1 is list of addresses
 	"peer" : _("Peers: %1"),
 	// summary string, %1 is list of addresses
-	"broadcast" : _("Broadcast to: %1"),
+	"broadcast" : _("Broadcast time information to: %1"),
 	// summary string, %1 is list of addresses
-	"broadcastclient" : _("Accept broadcasts from: %1"),
+	"broadcastclient" : _("Accept broadcasted time information from: %1"),
     ];
     foreach (`t, ["server", "radio", "peer", "broadcast", "broadcastclient" ],
     ``{

@@ -1,0 +1,159 @@
+YaST2 NTP client component specification
+
+Author: Jiri Srain <jsrain@suse.cz>
+
+Features
+========
+
+- Set the servers to synchronize time from
+- Set the servers for initial system time setting before xntp is started
+- Set broadcast client to configure time via listening to network broadcasts
+- Set peers to synchronize multiple hosts one to each other
+- Set broadcasting addresses to broadcast time informatio to other hosts
+- Set local serial port radio clock
+
+
+Dialogs:
+========
+
+1. Main dialog
+--------------
+
+Must provide possibility to set if start/not start NTP daemon after
+system starts. Wnen possible (in future), then possibility to start
+daemon when some interface is up should be added. User gets warned,
+that starting daemon without appropriate iface up takes ages.
+
+Below provides a table with all configured remote servers. Two columns,
+first to display relationship type (server, peer, radio clock...),
+second for the address.
+
+Below table buttons Add, Edit and Delete are to be present.
+
+TODO (in future): Add button for displaying log
+TODO (in future): Allow to start with some interface
+
+
+- Automatically start NTP daemon ------------------|
+| (x) Never                                        |
+| ( ) When booting system                          |
+---------------------------------------------------|
+
+- Type ------------|-- Address --------------------|
+| Server           | 10.20.0.20                    |
+| Server           | chimera.suse.cz               |
+| Peer             | zealot.suse.cz                |
+| Radio clock      | Type 1, device /dev/ttyS0,..  |
+| Broadcast Client | 255.255.255.255               |
+----------------------------------------------------
+[Add] [Edit] [Delete]      
+
+
+2. Server/Peer dialog
+---------------------
+
+To be edited are
+1. The address of the server/peer (IP address or host name)
+2. Options (to be edited as a string without any checking for now)
+3. If it should be used for initial synchronization - checkbox
+
+
+Configure NTP server   /   Configure NTP peer
+
+Address
+[..............]
+
+[x] Use for initial synchronization
+
+Options
+[..............]
+
+
+3. Local radio clock dialog
+---------------------------
+
+To be edited are
+1. The address of the clock (IP address 127.127.t.u)
+2. Options (to be edited as a string without any checking for now)
+3. Fudge factors
+
+Configure local radio clock
+
+Address
+[..............]
+
+Options
+[..............]
+
+Fudge factors
+[..............]
+
+
+TODO: Enhance following way:
+
+1. Clock type (as number, or a list of known clock types -- are in 
+   /usr/share/doc/packages/xntp-doc/html/refclock.htm)
+2. Clock unit number (0-3) -- integer
+3. Devivce where the clock is connected, allow to create required symlink
+   (some info is missing in doc, in this case don't allow)
+4. Options for the server statement
+5. Options for the fudge statement
+
+
+Configure local radio clock
+
+Clock type ---------------  Unit number---
+| Rockwell Jupiter GPS |v|  |      2 |v|^|  
+--------------------------  --------------
+
+Device -------------
+|  /dev/ttyS0    |v|    [x] Create symlink
+--------------------
+
+Options
+[..............................]
+
+Fudge factors
+[..............................]
+
+
+The simplier version (implemented for 8.3) merges 1st 2 lines of widgets to one 
+text entry for settings the "address" of type 127.127.t.u.
+
+4. Broadcast / Broadcastclient
+------------------------------
+
+1. The bcast address
+2. Options
+
+
+Configure broadcasting   /   Configure broadcasting client
+
+
+Address
+[....................]
+
+Options
+[....................]
+
+
+5. Adding new record
+--------------------
+
+Jsut ask about the record type, possible options are (for now)
+- server
+- peer
+- local radio clock
+- broadcast
+- broadcastclient
+
+Just a set of radio buttons
+
+
+Options in future:
+------------------
+
+The simplest version is to leave options as texts only (without any
+checking), in future versions dialogs more user-friendly setting of
+options should be added. Options are well described in documentation
+(/usr/share/doc/packages/xntp-doc/html/confopt.html)

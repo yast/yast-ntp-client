@@ -1,0 +1,11 @@
+Execute	.target.bash "rpm -q xntp" 0
+Read	.init.scripts.exists "xntpd" true
+Read	.init.scripts.runlevel "xntpd" $["xntp":$[]]
+Read	.etc.ntp_conf.server [["ntp1", "options1"], ["127.127.1.2", "options_clock"], ["ntp2", "options2"]]
+Read	.etc.ntp_conf.fudge [["127.127.1.2", "fudge_clock"]]
+Read	.etc.ntp_conf.peer [["peer1", "options_peer"]]
+Read	.etc.ntp_conf.broadcast []
+Read	.etc.ntp_conf.broadcastclient []
+Read	.sysconfig.xntp.XNTPD_INITIAL_NTPDATE "AUTO-2"
+Return	true
+Return	$["peers":[["server", "ntp1", "options1", true], ["radio", "127.127.1.2", "options_clock", false], ["server", "ntp2", "options2", true], ["fudge", "127.127.1.2", "fudge_clock", false], ["peer", "peer1", "options_peer", false]], "start_at_boot":false]

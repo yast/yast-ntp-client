@@ -1,0 +1,14 @@
+Return	true
+Write	.etc.ntp_conf.server [["ntp1", "options1"], ["127.127.1.2", "options_clock"], ["ntp2", "options2"]] true
+Write	.etc.ntp_conf.fudge [["127.127.1.2", "fudge_clock"]] true
+Write	.etc.ntp_conf.peer [["peer1", "options_peer"]] true
+Write	.etc.ntp_conf.broadcast [] true
+Write	.etc.ntp_conf.broadcastclient [] true
+Write	.etc.ntp_conf nil true
+Write	.sysconfig.xntp.XNTPD_INITIAL_NTPDATE "ntp1 ntp2" true
+Write	.sysconfig.xntp nil true
+Read	.init.scripts.exists "xntpd" true
+Read	.init.scripts.exists "xntpd" true
+Read	.init.scripts.runlevel "xntpd" nil
+Read	.init.scripts.comment "xntpd" nil
+Return	true

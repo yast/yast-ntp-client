@@ -1,0 +1,70 @@
+/**
+ * File:
+ *  Read.ycp
+ *
+ * Module:
+ *  NTP client configurator
+ *
+ * Summary:
+ *  Reading configuration testsuite
+ *
+ * Authors:
+ *  Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+    include "testsuite.ycp";
+    import "Progress";
+    import "NtpClient";
+    import "Mode";
+
+    Mode::test = true;
+
+    Progress::off ();
+
+    map READ = $[
+	"init" : $[
+	    "scripts" : $[
+		"exists" : true,
+//		"runlevel" : $["xntp" : $[]],
+	    ],
+	],
+/*	"etc" : $[
+	    "ntp_conf" : $[
+		"server" : [
+		    ["ntp1", "options1"],
+		    ["127.127.1.2", "options_clock"],
+		    ["ntp2", "options2"]
+		],
+		"fudge" : [
+		    ["127.127.1.2", "fudge_clock"],
+		],
+		"peer" : [
+		    ["peer1", "options_peer"],
+		],
+		"broadcast" : [],
+		"broadcastclient" : [],
+	    ],
+	],
+	"sysconfig" : $[
+	    "xntp" : $[
+		"XNTPD_INITIAL_NTPDATE" : "AUTO-2",
+	    ],
+	],*/
+    ];
+
+    TEST (``(NtpClient::Import ($[
+	"peers":[
+	    ["server", "ntp1", "options1", true],
+	    ["radio", "127.127.1.2", "options_clock", false],
+	    ["server", "ntp2", "options2", true],
+	    ["fudge", "127.127.1.2", "fudge_clock", false],
+	    ["peer", "peer1", "options_peer", false]
+	],
+	"start_at_boot":false])), [READ, $[], $[]], nil);
+
+    TEST (``(NtpClient::Write ()), [READ, $[], $[]], nil);
+}

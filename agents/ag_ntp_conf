@@ -3,12 +3,14 @@
 use ycp;
 use File::Temp;
 
+$filename = "/etc/ntp.conf";
+
 sub parse ()
 {
-    y2milestone ("Parsing /etc/ntp.conf");
+    y2milestone ("Parsing", $filename);
     my @ret = ();
     my $comment = "";
-    open (IN, "/etc/ntp.conf") || return @ret;
+    open (IN, $filename) || return @ret;
     while ( $line = <IN> )
     {
 	chomp ( $line );
@@ -52,10 +54,10 @@ sub parse ()
 
 sub write_file ($)
 {
-    y2milestone ("Writing /etc/ntp.conf");
+    y2milestone ("Writing", $filename);
     $data = shift;
     @data = @{$data};
-    open (OUT, ">/etc/ntp.conf");
+    open (OUT, ">$filename");
     foreach $record ( @data )
     {
 	%record = %{$record};
@@ -70,7 +72,15 @@ while ( <STDIN> )
 {
     my ($command, $path, $argument) = ycp::ParseCommand ($_);
 
-    if ( ! defined (@data))
+    # because of testsuite, where other file than real /etc/ntp.conf must be
+    # used
+    if ($command eq "Write" && $path eq ".settings.ntp_conf_filename")
+    {
+	y2milestone ("Setting filename to", $argument);
+	$filename = $argument;
+    }
+
+    if ( ! defined (@data) && ($command eq "Read" || $command eq "Write"))
     {
 	@data = parse ();
     }
@@ -156,6 +166,10 @@ while ( <STDIN> )
 		    }
 		}
 	    }
+	    ycp::Return ("true");
+	}
+	elsif ($path eq ".settings.ntp_conf_filename")
+	{
 	    ycp::Return ("true");
 	}
 	else

@@ -37,6 +37,24 @@ global define void startStore (any id, map event) ``{
 }
 
 /**
+ * Handle function of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ * @return any always nil
+ */
+global define any startHandle (any id, map event) ``{
+    boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+    // yes-no popup
+    if (start && ! Popup::ContinueCancel (_("Warning!
+
+If you do not have permanent internet connection,
+starting of NTP daemon can take very long time, and 
+NTP daemon need not run properly.")))
+	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
+    return nil;
+}
+
+/**
  * Initialize the widget
  * @param id any widget id
  */
@@ -254,6 +272,9 @@ global define map InitWidgets () ``{
 	    "help" : HELPS["start"]:"",
 	    "init" : ``(NtpClient::startInit ()),
 	    "store" : ``(NtpClient::startStore ()),
+	    "handle" : ``(NtpClient::startHandle ()),
+	    "handle_events" : [ "boot" ],
+	    "opt" : [`notify],
 	],
 	"overview" : $[
 	    "widget" : `custom,

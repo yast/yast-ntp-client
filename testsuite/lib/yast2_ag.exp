@@ -1,0 +1,104 @@
+#
+# test library for External Parser AGents
+# Martin Vidner <mvidner@suse.cz>
+# adapted from testsuite-run of yast2-testsuite
+#
+
+
+proc run_ag_tests { agent_basename } {
+    global srcdir
+
+    set test_cases [lsort [glob $srcdir/tests.ag/*.ycp]]
+
+    foreach test_case $test_cases {
+	run_case $test_case $agent_basename
+    }
+}
+
+# helper
+proc llast { alist } {
+    return [lindex $alist [expr [llength $alist]-1]]
+}
+
+proc diff_it { kind exp act base_name} {
+  # check stderr
+  if {[diff $exp $act] != 1} {
+    fail "Wrong $kind for $base_name"
+    set oops [catch { set result [exec test -f $exp] } catched ]
+    if {$oops == 0} {
+      puts "\nThe diff follows...\n"
+      puts [exec sh -c "diff -u $exp $act || true"]
+      puts ""
+      puts "Wrong $kind for $base_name"
+      puts "See the diff above."
+    }
+    return -1
+  }
+  return 0
+}
+
+# $run - the test case control file
+# $ag  - agent executable
+proc run_case { run ag } {
+    global srcdir
+
+    # extract basename and check extension
+    set path [split $run "/"]
+    set filename [llast $path]
+    set filename_l [split $filename "."]
+    # setup filenames
+    set base_name [lindex $filename_l 0]
+    # TODO better path, using srcdir
+    set tests_ag "$srcdir/tests.ag"
+    # TODO better path, using srcdir
+    set tmpdir "./tmp"
+    # $run is the name of the original testfile with absolute path
+    # tests.ag/$filename is the name of the original testfile
+    # with relative path, relative to the testsuite directory
+
+    set r_data_name "$tests_ag/$base_name.r.data"
+    set rw_ycp_name "$tests_ag/$base_name.rw.ycp"
+    set rw_ycp_tmp_name "$tmpdir/$base_name.rw.ycp.tmp"
+    set w_data_name "$tests_ag/$base_name.w.data"
+    set w_data_tmp_name "$tmpdir/$base_name.w.data.tmp"
+
+    set in_f "$tests_ag/$base_name.in"
+    set out_f "$tests_ag/$base_name.out"
+    set out_tmp_f "$tmpdir/$base_name.out.tmp"
+    set err_f "$tests_ag/$base_name.err"
+    set err_tmp_f "$tmpdir/$base_name.err.tmp"
+
+    # indented by one space
+    puts " Running $run ..."
+
+  # run the test
+
+  set result ""
+  set oops [catch {
+      set result [exec "run/runtest-ag.sh" "$run" "$in_f" "$out_tmp_f" "$err_tmp_f" "$ag" ]
+  } catched]
+
+  if {$oops != 0} {
+    fail "Test case failed for $run:\n$catched"
+    return -1
+  }
+
+  # check return code - ???
+  if {$result != ""} {
+    warning "Running $run outputs '$result'"
+    return -1
+  }
+
+  # check stderr
+  if {[diff_it "stderr" $err_f $err_tmp_f $base_name] != 0} {
+      return -1
+  }
+
+  # check stdout
+  if {[diff_it "stdout" $out_f $out_tmp_f $base_name] != 0} {
+      return -1
+  }
+
+  pass $run
+  return 0
+}

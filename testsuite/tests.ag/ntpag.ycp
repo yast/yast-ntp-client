@@ -1,0 +1,71 @@
+/**
+ * File:
+ *  ppdpatch.ycp
+ *
+ * Module:
+ *  Printer configurator
+ *
+ * Summary:
+ *  Testsuite
+ *
+ * Authors:
+ *  Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+
+    integer old = WFM::SCRGetDefault ();
+
+    integer h = WFM::SCROpen ("ag_ntp_conf", false);
+    if (h < 1)
+    {
+        return;
+    }
+
+    list server = [];
+    list peer = [];
+    list fudge = [];
+
+    WFM::SCRSetDefault (h);
+    SCR::Write (.settings.ntp_conf_filename, "ntp.conf");
+    server = SCR::Read (.server);
+    peer = SCR::Read (.peer);
+    fudge = SCR::Read (.fudge);
+
+    y2milestone ("Servers: %1", server);
+    y2milestone ("Peers: %1", peer);
+    y2milestone ("Fudge: %1", fudge);
+
+    peer = [["peer1", "opt1"], ["peer2", "opt2"]];
+    SCR::Write (.peer, peer);
+    SCR::Write (., nil);
+
+    WFM::SCRSetDefault (old);
+    y2milestone ("Current: %1", SCR::Read (.target.string, "ntp.conf"));
+
+    WFM::SCRSetDefault (h);
+    SCR::Write (.server, server);
+    SCR::Write (., nil);
+
+    WFM::SCRSetDefault (old);
+    y2milestone ("Current: %1", SCR::Read (.target.string, "ntp.conf"));
+
+    WFM::SCRSetDefault (h);
+    SCR::Write (.fudge, fudge);
+    SCR::Write (., nil);
+
+    WFM::SCRSetDefault (old);
+    y2milestone ("Current: %1", SCR::Read (.target.string, "ntp.conf"));
+
+
+//    SCR::Execute (.target.bash, "cp ntp.conf ntp.conf.bak");
+
+
+//    SCR::Execute (.target.bash, "cp tests.ag/ntp.conf ntp.conf");
+
+    WFM::SCRSetDefault (old);
+    WFM::SCRClose (h);
+}

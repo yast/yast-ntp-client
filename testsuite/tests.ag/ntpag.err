@@ -1,0 +1,36 @@
+[liby2] genericfrontend.cc(main):XXX Launched YaST2 component 'y2base'
+[liby2] genericfrontend.cc(main):XXX YAST_IS_RUNNING is yes
+[YCP] tests.ag/ntpag.ycp:38 Servers: [["ntp1", ""], ["ntp2", ""], ["ntp3", ""], ["127.127.1.2", "options"]]
+[YCP] tests.ag/ntpag.ycp:39 Peers: [["peer1", ""]]
+[YCP] tests.ag/ntpag.ycp:40 Fudge: [["127.127.1.2", "fudge_options"]]
+[YCP] tests.ag/ntpag.ycp:47 Current: server ntp1 
+server ntp2 
+server ntp3 
+peer peer1 opt1
+peer peer2 opt2
+server 127.127.1.2 options
+fudge 127.127.1.2 fudge_options
+driftfile /var/lib/ntp/ntp.drift 
+logfile /var/log/ntp 
+broadcast 5.6.7.8 
+[YCP] tests.ag/ntpag.ycp:54 Current: server ntp1 
+server ntp2 
+server ntp3 
+server 127.127.1.2 options
+peer peer1 opt1
+peer peer2 opt2
+fudge 127.127.1.2 fudge_options
+driftfile /var/lib/ntp/ntp.drift 
+logfile /var/log/ntp 
+broadcast 5.6.7.8 
+[YCP] tests.ag/ntpag.ycp:61 Current: server ntp1 
+server ntp2 
+server ntp3 
+server 127.127.1.2 options
+fudge 127.127.1.2 fudge_options
+peer peer1 opt1
+peer peer2 opt2
+driftfile /var/lib/ntp/ntp.drift 
+logfile /var/log/ntp 
+broadcast 5.6.7.8 
+[liby2] genericfrontend.cc(main):XXX Finished YaST2 component 'y2base'

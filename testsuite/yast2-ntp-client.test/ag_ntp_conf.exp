@@ -1,0 +1,6 @@
+#
+# test driver for AGents
+#
+
+load_lib "yast2_ag.exp"
+run_ag_tests "../agents/ag_ntp_conf"

@@ -34,4 +34,36 @@
 	],
     ]);
     TEST (``(NtpClient::Summary ()), [], nil);
+
+    NtpClient::Import ($[
+	"start_at_boot" : false,
+	"peers" : [
+	    [ "server", "10.20.30.40"],
+	    [ "server", "20.40.60.80"],
+	    [ "peer", "1.2.3.4"]
+	],
+    ]);
+    TEST (``(NtpClient::Summary ()), [], nil);
+
+    NtpClient::Import ($[
+	"start_at_boot" : true,
+	"peers" : [
+	],
+    ]);
+    TEST (``(NtpClient::Summary ()), [], nil);
+
+    NtpClient::Import ($[
+	"start_at_boot" : true,
+	"peers" : [
+	    [ "server", "10.20.30.40"],
+	    [ "server", "20.40.60.80"],
+	    [ "peer", "1.2.3.4"],
+	    [ "broadcast", "255.255.255.255" ],
+	    [ "broadcastclient", "10.20.3.4" ],
+	    [ "radio", "127.127.1.2" ],
+	],
+    ]);
+    TEST (``(NtpClient::Summary ()), [], nil);
+
+
 }
