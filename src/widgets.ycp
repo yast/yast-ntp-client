@@ -628,7 +628,7 @@ void ServerListInit (string id) {
 	return `item (`id (code), label);
     });
     // combo box item
-    countries = prepend (countries, `item (`id (""), _("All countries")));
+    countries = prepend (countries, `item (`id (""), _("All Countries")));
     UI::ReplaceWidget (`country_rp,
 	`ComboBox (`id (`country), `opt (`notify, `hstretch),
 	    // combo box header
@@ -958,7 +958,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 		// radio button
 		["lookup_rb", _("Loc&al Network")],
 		// radio button
-		["list_rb", _("&Public NTP server")],
+		["list_rb", _("&Public NTP Server")],
 	    ],
 	    "opt" : [`notify],
 	    "init" : ServersSourceInit,

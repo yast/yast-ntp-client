@@ -37,12 +37,11 @@ An additional dialog will inform you whether it is safe to do so.</p>"),
     "start" : _("<p><b><big>Automatically Start NTP Daemon</big></b><br>
 Select whether to start the NTP daemon when booting the system. The
 NTP daemon resolves host names when initializing. Your
-network connection must be started before the NTP daemon starts.</p>
-"),
+network connection must be started before the NTP daemon starts.</p>"),
 
     // help text 2/5
     "chroot_environment" : _("<p><b><big>Chroot Jail</big></b><br>
-To run NTP daemon in chroot jail, set
+To run the NTP daemon in chroot jail, set
 <b>Run NTP Daemon in Chroot Jail</b>. Starting any daemon in a chroot jail
 is more secure and strongly recommended.</p>"),
 
@@ -100,8 +99,8 @@ provider.</p>")
     +
     // help text 1/1, alt. 1 part 2/3
     _("<p><b><big>Selecting a Server</big></b><br>
-To select a NTP server from those found in the local network
-or from the list of known NTP sevrers, click <b>Select</b>.</p>")
+To select an NTP server from those found in the local network
+or from the list of known NTP servers, click <b>Select</b>.</p>")
     +
     // help text 1/1, alt. 1 part 3/3
     _("<p><b><big>Testing Server Accessibility</big></b><br>
@@ -167,19 +166,19 @@ Service Location Protocol (SLP), click <b>Lookup</b>.
 Then select a server from the list of found servers.</p>"),
 
     // help text 3/5
-    "servers_list" : _("<p><big><b>Selecting a Public NTP server</b></big><br>
+    "servers_list" : _("<p><big><b>Selecting a Public NTP Server</b></big><br>
 Select the NTP server to use from the <b>Public NTP Servers</b> list. To display
 NTP servers only for a particular country, select it in <b>Country</b>.</p>")
     +
     // help text 4/5
     _("<p><big><b>Note</b></big><br>
 The listed NTP servers may not be available from any country, but only
-for a particular country or region.<br>
-Before usingn any NTP server from the list ask your system administrator
-or internet service provider if there is an NTP server closer to you and
+for a particular country or region.
+Before using any NTP server from the list, ask your system administrator
+or Internet service provider if there is an NTP server closer to you and
 prefer this recommended server to any server from this list.
 You may also see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>
-to find a close NTP server.</p>"),
+to find an NTP server near you.</p>"),
 
     // help text 5/5
     "selected_test" : _("<p><big><b>Testing Server Accessibility</b></big><br>
