@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep  3 14:18:08 CEST 2004 - jsrain@suse.cz
+
+- added GerModified and SetModified functions to _auto client
+
+-------------------------------------------------------------------
 Mon Aug 30 13:08:37 CEST 2004 - jsrain@suse.cz
 
 - removed duplicated ntp_servers.ycp file

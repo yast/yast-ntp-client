@@ -67,6 +67,15 @@ else if (func == "Import") {
 else if (func == "Export") {
     ret = NtpClient::Export();
 }
+/* did configuration change */
+else if (func == "GetModified") {
+    ret = NtpClient::modified;
+}
+/* set configuration as changed */
+else if (func == "SetModified") {
+    NtpClient::modified = true;
+    ret = true;
+}
 /* Read current state */
 else if (func == "Read") {
     import "Progress";
