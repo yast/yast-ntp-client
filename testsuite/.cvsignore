@@ -7,5 +7,5 @@ tmp.out*
 tmp.err*
 tmp.log*
 config
-ntp.conf
-tmp
+run
+*.test

@@ -82,7 +82,7 @@ define string opts2string (map options, string other) ``{
 	{
 	    ret = sformat ("%1 %2", ret, k);
 	}
-	else if (v != false)
+	else if (v != false && v != "")
 	{
 	    ret = sformat ("%1 %2 %3", ret, k, v);
 	}

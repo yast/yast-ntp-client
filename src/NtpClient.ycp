@@ -18,7 +18,7 @@ textdomain "ntp-client";
 import "Progress";
 import "Report";
 import "Summary";
-import "Runlevel";
+import "Service";
 import "Require";
 import "Mode";
 
@@ -129,7 +129,7 @@ YaST2 will install package %1.
 	}
     }
 
-    run_service = Runlevel::ServiceEnabled ("xntpd");
+    run_service = Service::Enabled ("xntpd");
 
     map conf = (map)SCR::Read (.etc.ntp_conf.all);
     if (conf == nil)
@@ -294,14 +294,14 @@ global define boolean Write() ``{
     list<map<string, any> > save2 = (list<map<string, any> >)flatten (maplist (
 	map<string, any> r, ntp_records,
     ``{
-	map s1 = $[
+	map<string,any> s1 = $[
 	    "comment" : r["comment"]:"",
 	    "kind" : "value",
 	    "name" : r["type"]:"",
 	    "type" : 0,
 	    "value" : r["address"]:"" + " " + r["options"]:"",
 	];
-	map s2 = nil;
+	map<string,any> s2 = nil;
 	if (r["type"]:"" == "__clock")
 	{
 	    s2 = $[
@@ -337,7 +337,7 @@ global define boolean Write() ``{
 	Report::Error (_("Cannot write settings to /etc/ntp.conf."));
 
 
-    list init = maplist (map<string,any> p, save2, ``(
+    list init = maplist (map<string,any> p, ntp_records, ``(
 	(p["type"]:"" == "server" || p["type"]:"" == "peer")
 	    && p["initial_sync"]:false
 		? p["address"]:""
@@ -373,21 +373,21 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage ();
 
-    if (! Runlevel::ServiceAdjust ("xntpd",
+    if (! Service::Adjust ("xntpd",
 	run_service ? "enable" : "disable"))
     {
 	// error report
 	Report::Error (_("Cannot adjust the service"));
     }
     if (run_service && (! write_only)
-	&& 0 != Runlevel::RunInitScript("xntpd", "restart"))
+	&& 0 != Service::RunInitScript("xntpd", "restart"))
     {
 	// error report
 	Report::Error (_("Cannot restart the XNTP daemon."));
     }
     if (! run_service)
     {
-	Runlevel::RunInitScript("xntpd", "stop");
+	Service::RunInitScript("xntpd", "stop");
     }
 
     sleep(sl);
@@ -480,6 +480,7 @@ global define list<map<string,any> >getSyncRecords () ``{
 	    "type" : type,
 	    "index" : index,
 	    "address" : m["address"]:"",
+	    "device" : m["device"]:"",
 	];
     });
     ret = filter (map m, ret, ``(m != nil));

@@ -107,7 +107,6 @@ define symbol SimpleSequence () ``{
     map aliases = $[
 	"switcher"	:[``(SelectConfigType ()), true ],
 	"simple"	: ``(SimpleDialog ()),
-//	"simple"	: ``(RadioDialog ()),
 	"complex"	: ``(ComplexSequence ()),
     ];
 

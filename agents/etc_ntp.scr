@@ -10,7 +10,7 @@
 .etc.ntp_conf
 
 `ag_ini(
-    `IniAgent( "/etc/ntp.conf",
+    `IniAgent ( "/etc/ntp.conf",
 	$[
 	    "options"	: [ "global_values", "repeat_names" ],
 	    "comments"	: [ "^[ \t]*#.*$", "^[ \t]*$" ],

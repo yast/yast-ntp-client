@@ -28,7 +28,7 @@ Summary:	Configuration of ntp-client
 @scrconfdir@/cfg_xntp.scr
 @scrconfdir@/etc_ntp.scr
 @agentdir@/ag_ntp_conf
-@moduledir@/NtpClient.ycp
+@moduledir@/*.y*
 @configdir@/ntp-client.y2cc
 @desktopdir@/ntp-client.desktop
 %doc @docdir@

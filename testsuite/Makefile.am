@@ -5,12 +5,7 @@
 #
 
 AUTOMAKE_OPTIONS = dejagnu
-ycp_testfiles = $(wildcard tests/*.out) $(wildcard tests/*.err) $(wildcard tests/*.ycp) $(wildcard tests/*.yh)
-
-ag_misc = lib/yast2_ag.exp run/runtest-ag.sh
-ag_testfiles = $(wildcard $(RPMNAME).test/ag_*.exp tests.ag/*.out tests.ag/*.err tests.ag/*.ycp tests.ag/ntp.conf)
-EXTRA_DIST = $(ycp_testfiles) $(ag_testfiles) $(ag_misc)
-
+EXTRA_DIST = $(wildcard tests/*.out) $(wildcard tests/*.err) $(wildcard tests/*.ycp) $(wildcard tests/*.yh)
 
 testsuite_prepare = @ydatadir@/testsuite/Makefile.testsuite
 

@@ -84,6 +84,9 @@ define symbol SimpleDialog () ``{
     Wizard::ReplaceAbortButton (
 	`PushButton (`id (`abort), Label::CancelButton ()));
 
+    NtpClient::startInit (nil);
+    CWM::handleWidgets (w, $["ID" : "never"]);
+
     symbol ret = CWM::Run (w,
 	// yes-no popup
 	 $[`abort : ``(! NtpClient::modified || reallyExit ())]);
@@ -164,7 +167,7 @@ define symbol TypeSelectDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol ServerDialog () ``{
-    term contents = `HBox (`HSpacing (3), `VBox (
+    term contents = `HBox (`HStretch (), `VBox (
 	`VSpacing (3),
 	"server_address",
 	`VSpacing (1),
@@ -172,7 +175,7 @@ define symbol ServerDialog () ``{
 	`VSpacing (1),
 	"options",
 	`VSpacing (3)
-    ), `HSpacing (3));
+    ), `HStretch ());
 
     // dialog caption
     string caption = _("Configure NTP Server");
@@ -188,7 +191,7 @@ define symbol ServerDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol PeerDialog () ``{
-    term contents = `HBox (`HSpacing (3), `VBox (
+    term contents = `HBox (`HStretch (), `VBox (
 	`VSpacing (3),
 	"address",
 	`VSpacing (1),
@@ -196,7 +199,7 @@ define symbol PeerDialog () ``{
 	`VSpacing (1),
 	"options",
 	`VSpacing (3)
-    ), `HSpacing (3));
+    ), `HStretch ());
 
     // dialog caption
     string caption = _("Configure NTP Peer");
@@ -243,7 +246,7 @@ define symbol RadioDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure Serial Reference Clock");
+    string caption = _("Configure Local Reference Clock");
 
     return CWM::ShowAndRun (["clock_type", "unit_number",
 	    "create_symlink", "device", "browse",
@@ -258,13 +261,13 @@ define symbol RadioDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol BCastDialog () ``{
-    term contents = `HBox (`HSpacing (3), `VBox (
+    term contents = `HBox (`HStretch (3), `VBox (
 	`VSpacing (3),
 	"bcaddress",
 	`VSpacing (1),
 	"options",
 	`VSpacing (3)
-    ), `HSpacing (3));
+    ), `HStretch (3));
 
     // dialog caption
     string caption = _("Configure Broadcasting");
@@ -278,13 +281,13 @@ define symbol BCastDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol BCastClientDialog () ``{
-    term contents = `HBox (`HSpacing (3), `VBox (
+    term contents = `HBox (`HStretch (3), `VBox (
 	`VSpacing (3),
 	"address",
 	`VSpacing (1),
 	"options",
 	`VSpacing (3)
-    ), `HSpacing (3));
+    ), `HStretch (3));
 
     // dialog caption
     string caption = _("Configure Broadcasting Client");
@@ -394,11 +397,22 @@ define symbol SelectConfigType () ``{
     list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
     list<map> clocks = filter (map m, peers, ``(m["type"]:"" == "__clock"));
     if (size (peers) != size (servers) + size (clocks))
+    {
+	y2milestone ("Something else than server and clock present");
 	return `complex;
+    }
     if (size (servers) > 1 || size (clocks) > 1)
+    {
+	y2milestone ("More than one server or more than one clock present");
 	return `complex;
-    if ("127.127.1.0" == clocks[0, "address"]:"")
+    }
+    string clock_addr = clocks[0, "address"]:"";
+    if ("127.127.1.0" != clock_addr && "" != clock_addr)
+    {
+	y2milestone ("Non-standard clock present");
 	return `complex;
+    }
+    y2milestone ("Going simple dialog");
     return `simple;
 }
 /* EOF */
