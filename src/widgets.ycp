@@ -47,9 +47,10 @@ global define any startHandle (any id, map event) ``{
     // yes-no popup
     if (start && ! Popup::ContinueCancel (_("Warning!
 
-If you do not have permanent internet connection,
-starting of XNTP daemon can take very long time, and 
-XNTP daemon need not run properly.")))
+If you do not have a permanent Internet connection,
+starting the XNTP daemon can take a very long time and 
+XNTP daemon might not run properly.
+")))
 	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
 
     if (start != start_at_boot)
