@@ -168,6 +168,7 @@ define symbol NtpClientSequence() ``{
     ];
 
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("ntp-client");
     symbol ret = WizardSequencer(aliases, sequence);
 
     UI::CloseDialog();
@@ -198,6 +199,7 @@ define symbol NtpClientAutoSequence() ``{
     term contents = `Label(_("Initializing ..."));
 
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("ntp-client");
     Wizard::SetContentsButtons(caption, contents, "",
 	    Label::BackButton(), Label::NextButton());
 
