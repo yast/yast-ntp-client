@@ -60,7 +60,7 @@ define symbol SimpleDialog () ``{
     NtpClient::selectSyncRecord (index);
 
     // now process the dialog
-    list<map> w = CWM::CreateWidgets (["start", "server_address", "complex_button"],
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "complex_button"],
 	NtpClient::widgets);
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VStretch (),
@@ -112,7 +112,7 @@ define symbol SimpleDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol MainDialog () ``{
-    list<map> w = CWM::CreateWidgets (["start", "run_chroot", "overview"],
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "overview"],
 	NtpClient::widgets);
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
