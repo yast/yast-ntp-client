@@ -657,6 +657,11 @@ void ServerListInit (string id) {
  * @param event map event that caused storing process
  */
 void ServerListStore (string id, map event) {
+    if (UI::WidgetExists (`id ("list_rb"))
+	&& ! (boolean)UI::QueryWidget (`id ("list_rb"), `Value))
+    {
+	return;
+    }
     string address = (string)UI::QueryWidget (`id (`servers), `Value);
     NtpClient::selected_record["address"] = address;
 }
@@ -668,6 +673,11 @@ void ServerListStore (string id, map event) {
  * @return boolean true if validation succeeded
  */
 boolean ServerListValidate (string id, map event) {
+    if (UI::WidgetExists (`id ("list_rb"))
+	&& ! (boolean)UI::QueryWidget (`id ("list_rb"), `Value))
+    {
+	return true;
+    }
     string address = (string)UI::QueryWidget (`id (`servers), `Value);
     if (address == "" || address == nil)
     {
@@ -678,6 +688,10 @@ boolean ServerListValidate (string id, map event) {
     return true;
 }
 
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
 void ServersSourceInit (string id) {
     UI::ChangeWidget (`id (id), `CurrentButton, "lookup_rb");
 }
@@ -705,22 +719,43 @@ symbol FoundServersHandle (string id, map event) {
     return nil;
 }
 
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
 void FoundServersInit (string id) {
     FoundServersHandle (id, $["ID" : "list_rb"]);
 }
 
-boolean FoundServersValidate (string id, map event) {
-    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+void FoundServersStore (string id, map event) {
+    if (UI::WidgetExists (`id ("lookup_rb"))
+	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
     {
-	string server = (string)
-	    UI::QueryWidget (`id ("server_address"), `Value);
-	if (server == nil || server == "")
-	{
-	    UI::SetFocus (`id ("server_address"));
-	    // popup message
-	    Popup::Message (_("No server is selected."));
-	    return false;
-	}
+	return;
+    }
+    string address = (string)UI::QueryWidget (`id ("server_address"), `Value);
+    NtpClient::selected_record["address"] = address;
+}
+
+boolean FoundServersValidate (string id, map event) {
+    if (UI::WidgetExists (`id ("lookup_rb"))
+	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+    {
+	return true;
+    }
+    string server = (string)
+	UI::QueryWidget (`id ("server_address"), `Value);
+    if (server == nil || server == "")
+    {
+	UI::SetFocus (`id ("server_address"));
+	// popup message
+	Popup::Message (_("No server is selected."));
+	return false;
     }
     return true;
 }
@@ -983,6 +1018,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    ),
 	    "init" : FoundServersInit,
 	    "handle" : FoundServersHandle,
+	    "store" : FoundServersStore,
 	    "validate_type" : `function,
 	    "validate_function" : FoundServersValidate,
 	    "help" : HELPS["found_servers"]:"",
