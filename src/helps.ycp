@@ -105,17 +105,15 @@ Select the type of the entry to add here.</p>
 select <b>Server</b>.</p>
 ")
     // help text 3/6
-    + _("<p>To add and NTP peer to synchronize mutually, select
-<b>Peer</b>.</p>
-")
+    + _("<p>To add an NTP peer to synchronize mutually, select
+<b>Peer</b>.</p>")
     // help text 4/6
     + _("<p>To configure a local radio clock connected directly to your computer,
 select <b>Radio Clock</b>.</p>
 ")
     // help text 5/6
-    + _("<p>To broadcast time information through youe network, select
-<b>Broadcasting</b>.</p>
-")
+    + _("<p>To broadcast time information through your network, select
+<b>Broadcasting</b>.</p>")
     // help text 6/6
     + _("<p>To accepts NTP packets broadcasted by other hosts on the network
 and use them for setting local time, select <b>Accepting Broadcast Packets<b>.</p>"),

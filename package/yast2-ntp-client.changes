@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Sep 25 10:05:18 CEST 2003 - jsrain@suse.de
+
+- typos fixed (#30274)
+
+-------------------------------------------------------------------
 Thu Sep 11 06:56:31 CEST 2003 - nashif@suse.de
 
 - #30291: return list of required packages for autoinstallation
