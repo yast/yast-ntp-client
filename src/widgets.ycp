@@ -13,12 +13,29 @@ textdomain "ntp-client";
 
 import "Popup";
 import "Label";
+import "LogView";
 import "NtpClient";
 
 include "ntp-client/helps.ycp";
 
 // selected type of peer
 string peer_type_selected = nil;
+
+define symbol showLogPopup () ``{
+    LogView::Display ($[
+	"file" : "/var/log/ntp",
+	"save" : true,
+	"actions" : [
+	    // menubutton entry, try to keep short
+	    [ _("Restart DNS Server"),
+		restartNtpDaemon ],
+	    // menubutton entry, try to keep short
+	    [ _("Save Settings and Restart DNS Server"),
+		NtpClient::Write ],
+	],
+    ]);
+    return nil;
+}
 
 global define symbol ntpEnabledOrDisabled (string id, map event) ``{
     any ev_id = event["ID"]:nil;
@@ -158,6 +175,16 @@ global define void overviewInit (any id) ``{
  */
 global define any overviewHandle (string id, map event) ``{
     ntpEnabledOrDisabled (id, event);
+    if (event["ID"]:nil == `display_log)
+    {
+	showLogPopup ();
+	return nil;
+    }
+    if (event["ID"]:nil == `firewall)
+    {
+	return `firewall;
+    }
+    NtpClient::modified = true;
     any ev_id = event["ID"]:nil;
     if (ev_id == "boot" || ev_id == "never")
     {
@@ -437,13 +464,23 @@ global define map<string,any> InitWidgets () ``{
 		    `PushButton (`id (`add), Label::AddButton ()),
 		    `PushButton (`id (`edit), Label::EditButton ()),
 		    `PushButton (`id (`delete), Label::DeleteButton ()),
-		    `HStretch ()
+		    `HStretch (),
+		    // menu button
+		    `MenuButton (_("&Advanced"), [
+			// item of menu button
+			`item (`id (`display_log), _("Display &Log")),
+			// item of menu button
+			`item (`id (`firewall), _("Set &Firewall"))
+		    ])
 		)
 	    ),
 	    "help" : HELPS["overview"]:"",
 	    "init" : NtpClient::overviewInit,
 	    "handle" : NtpClient::overviewHandle,
 	],
+	"paddress" : union (address, $[
+	    "help" : HELPS["paddress"]:"",
+	]),
 	"bcaddress" : union (address, $[
 	    "help" : HELPS["bcaddress"]:"",
 	]),

@@ -11,8 +11,10 @@
 
 textdomain "ntp-client";
 
-import "Popup";
 import "IP";
+import "Popup";
+import "Progress";
+import "Service";
 
 include "ntp-client/clocktypes.ycp";
 
@@ -24,6 +26,16 @@ define boolean reallyExit () ``{
     // yes-no popup
     return Popup::YesNo (_("Really exit?
 All changes will be lost."));
+}
+
+define void restartNtpDaemon () ``{
+    Service::RunInitScript("xntpd", "restart");
+}
+
+define void silentWrite () ``{
+    Progress::off ();
+    NtpClient::Write ();
+    Progress::on ();
 }
 
 /**
@@ -200,7 +212,50 @@ define list getClockTypesCombo () ``{
     return ret;
 }
 
-
+define void proposeInterfacesToAllowAccess () ``{
+    list<map<string,any> > recs = NtpClient::getSyncRecords ();
+    recs = filter (map<string,any> r, recs, ``(
+	r["type"]:"" == "peer" || r["type"]:"" == "broadcastclient"
+    ));
+    list<string> addresses = maplist (map<string,any> r, recs, ``(
+	r["address"]:""
+    ));
+    addresses = filter (string a, addresses, ``(a != "" && a != nil));
+    addresses = maplist (string a, addresses, ``{
+	if (IP::Check4 (a))
+	    return a;
+	map m = (map)SCR::Execute (.target.bash_output,
+	    sformat ("/usr/bin/host %1 | /bin/grep address", a));
+	if (m["exit"]:0 != 0)
+	    return nil;
+	string out = m["stdout"]:"";
+	out = regexpsub (out, "has address (.*)$", "\\1");
+	return out;
+    });
+    addresses = filter (string a, addresses, ``(a != "" && a != nil));
+    list<string> ifaces = maplist (string a, addresses, ``{
+	map m = (map)SCR::Execute (.target.bash_output,
+	    sformat ("/sbin/ip route get %1", a));
+	if (m["exit"]:0 != 0)
+	    return nil;
+	string out = m["stdout"]:"";
+	out = mergestring (splitstring (out, "\n"), " ");
+	out = regexpsub (out, "dev[ ]+([^ ]+)[ ]+src", "\\1");
+	return out;
+    });
+y2error ("Ifaces: %1", ifaces);
+    foreach (string ic, ["EXT", "INT", "DMZ"], ``{
+	NtpClient::firewall_settings[ic] = false;
+	string k = sformat ("FW_DEV_%1", ic);
+	string s = SuSEFirewall::settings[k]:"";
+	list<string> l = splitstring (s, " ");
+	foreach (string i, ifaces, ``{
+	    if (contains (l, i))
+		NtpClient::firewall_settings[ic] = true;
+	});
+    });
+y2error ("FS: %1", NtpClient::firewall_settings);
+}
 
 /* EOF */
 }

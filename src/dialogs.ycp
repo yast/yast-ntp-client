@@ -11,11 +11,12 @@
 
 textdomain "ntp-client";
 
-import "NtpClient";
-import "Wizard";
 import "CWM";
 import "Label";
+import "NtpClient";
 import "Popup";
+import "SuSEFirewall";
+import "Wizard";
 
 include "ntp-client/helps.ycp";
 include "ntp-client/misc.ycp";
@@ -391,6 +392,97 @@ define symbol FudgeDialog () ``{
 	    options["parsed"]:$[],
 	    options["unknown"]:""
 	);
+    }
+    return (symbol)ret;
+}
+
+define symbol FirewallDialog () ``{
+    if (! SuSEFirewall::start)
+    {
+	// report message
+	Report::Message (_("The SuSE firewall is not configured."));
+	return `back;
+    }
+    // dialog caption
+    string caption = _("Firewall configuration");
+    term contents = `HBox (`HStretch (), `VBox (
+	`VStretch (),
+	`Left (`ComboBox (`id (`change_settings), `opt (`notify),
+	    // combo box
+	    _("Firewall configuration"),
+	     [
+		// item of a combo box
+		`item (`id (false), _("Preserve current")),
+		// item of a combo box
+		`item (`id (true), _("Change"))
+	])),
+	`VStretch (),
+	// check box
+	`Left(`CheckBox(`id(`ext),_("Allow access from &external interfaces"))),
+	`VStretch (),
+	// check box
+	`Left(`CheckBox(`id(`int),_("Allow access from &internal interfaces"))),
+	`VStretch (),
+	// check box
+	`Left(`CheckBox(`id(`dmz),_("Allow access from &demilitarized zone"))),
+	`VStretch (),
+	// push button
+	`PushButton (`id (`propose), _("&Propose Configuration")),
+	`VStretch ()
+    ), `HStretch ());
+    Wizard::SetContentsButtons (caption, contents, firewallHelp (),
+            Label::BackButton (), Label::NextButton ());
+
+
+    UI::ChangeWidget (`id (`change_settings), `Value,
+	NtpClient::change_firewall);
+    UI::ChangeWidget (`id (`ext), `Value,
+	NtpClient::firewall_settings["EXT"]:false);
+    UI::ChangeWidget (`id (`int), `Value,
+	NtpClient::firewall_settings["INT"]:false);
+    UI::ChangeWidget (`id (`dmz), `Value,
+	NtpClient::firewall_settings["DMZ"]:false);
+    UI::ChangeWidget (`id (`ext), `Enabled, NtpClient::change_firewall);
+    UI::ChangeWidget (`id (`int), `Enabled, NtpClient::change_firewall);
+    UI::ChangeWidget (`id (`dmz), `Enabled, NtpClient::change_firewall);
+    UI::ChangeWidget (`id (`propose), `Enabled, NtpClient::change_firewall);
+
+    any ret = nil;
+    while (ret == nil)
+    {
+	ret = UI::UserInput ();
+	if (ret == `change_settings)
+	{
+	    boolean enabled = (boolean)
+		UI::QueryWidget (`id (`change_settings), `Value);
+	    UI::ChangeWidget (`id (`ext), `Enabled, enabled);
+	    UI::ChangeWidget (`id (`int), `Enabled, enabled);
+	    UI::ChangeWidget (`id (`dmz), `Enabled, enabled);
+	    UI::ChangeWidget (`id (`propose), `Enabled, enabled);
+	    ret = nil;
+	}
+	else if (ret == `propose)
+	{
+	    proposeInterfacesToAllowAccess ();
+	    UI::ChangeWidget (`id (`ext), `Value,
+		NtpClient::firewall_settings["EXT"]:false);
+	    UI::ChangeWidget (`id (`int), `Value,
+		NtpClient::firewall_settings["INT"]:false);
+	    UI::ChangeWidget (`id (`dmz), `Value,
+		NtpClient::firewall_settings["DMZ"]:false);
+	    ret = nil;
+	}
+    }
+    if (ret == `next)
+    {
+	NtpClient::change_firewall = (boolean)
+	    UI::QueryWidget (`id (`change_settings), `Value);
+	NtpClient::firewall_settings["EXT"] = (boolean)
+	    UI::QueryWidget (`id (`ext), `Value);
+	NtpClient::firewall_settings["INT"] = (boolean)
+	    UI::QueryWidget (`id (`int), `Value);
+	NtpClient::firewall_settings["DMZ"] = (boolean)
+	    UI::QueryWidget (`id (`dmz), `Value);
     }
     return (symbol)ret;
 }

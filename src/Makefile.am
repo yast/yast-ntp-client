@@ -31,10 +31,10 @@ module_DATA =			\
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA) $(desktop_DATA)
 
 
-symlinks:
+ntp-client:
 	test -L ntp-client || ln -sf . ntp-client
 
-ycpchook = symlinks
+ycpchook = ntp-client
 
 
 include $(top_srcdir)/Makefile.am.common

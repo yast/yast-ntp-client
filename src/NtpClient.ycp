@@ -15,12 +15,13 @@
 module "NtpClient";
 textdomain "ntp-client";
 
+import "Mode";
 import "Progress";
 import "Report";
-import "Summary";
-import "Service";
 import "Require";
-import "Mode";
+import "Service";
+import "Summary";
+import "SuSEFirewall";
 
 
 /**
@@ -68,6 +69,16 @@ global integer selected_index = -1;
 global map selected_record = $[];
 
 /**
+  * Should the firewall settings be changed?
+  */
+global boolean change_firewall = false;
+
+/**
+  * Map containing settings of the firewall - keys INT, EXT, DMZ
+  */
+global map firewall_settings = $[];
+
+/**
   * Required packages
   */
 global list required_packages = ["xntp"];
@@ -76,6 +87,7 @@ global define list<map<string,any> >getSyncRecords ();
 global define boolean storeSyncRecord ();
 global define boolean deleteSyncRecord (integer index);
 global define boolean selectSyncRecord (integer index);
+global define boolean Write ();
 
 
 
@@ -243,6 +255,19 @@ YaST2 will install package %1.
 	// error report
 	Report::Error(_("Cannot read the current settings."));
     }
+    SuSEFirewall::Read ();
+    if (SuSEFirewall::start)
+    {
+	foreach (string i, ["INT", "EXT", "DMZ"], ``{
+	    string k1 = sformat ("FW_SERVICES_%1_TCP", i);
+	    string k2 = sformat ("FW_SERVICES_%1_UDP", i);
+	    string s = SuSEFirewall::settings[k1]:""
+		+ " " + SuSEFirewall::settings[k2]:"";
+	    list<string> l = splitstring (s, " ");
+	    firewall_settings[i] = contains (l, "123");
+	});
+	y2milestone ("Firewall settings: %1", firewall_settings);
+    }
 
     if(Abort()) return false;
     Progress::NextStage ();
@@ -373,6 +398,23 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage ();
 
+    if (change_firewall)
+    {
+	foreach (string i, ["INT", "EXT", "DMZ"], ``{
+	    foreach (string p, ["TCP", "UDP"], ``{
+		string k = sformat ("FW_SERVICES_%1_%2", i, p);
+		string s = SuSEFirewall::settings[k]:"";
+		list<string> l = splitstring (s, " ");
+		l = (list<string>)filter (string p, l, ``(p != "123"));
+		if (firewall_settings[i]:false)
+		    l = (list<string>)add (l, "123");
+		s = mergestring (l, " ");
+		SuSEFirewall::settings[k] = s;
+	    });
+	});
+	SuSEFirewall::Write ();
+    }
+
     if (! Service::Adjust ("xntpd",
 	run_service ? "enable" : "disable"))
     {
@@ -434,8 +476,8 @@ global define map Export () ``{
  * @return string summary of the current configuration
  */
 global define string Summary() ``{
-
 	string summary = "";
+	// summary string
 	summary = Summary::AddHeader(summary, _("Status"));
     if (run_service)
 	// summary string
@@ -527,8 +569,6 @@ global define boolean selectSyncRecord (integer index) ``{
   * @return integer index of the record if found, -1 otherwise
   */
 global define integer findSyncRecord (string type, string address) ``{
-y2error ("Type: %1", type);
-y2error ("Addr: %1", address);
     integer index = -1;
     integer ret = -1;
     foreach (map<string,any> m, ntp_records, ``{

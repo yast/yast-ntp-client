@@ -38,25 +38,30 @@ An additional dialog will inform you whether it is safe to do so.
 </p>
 "),
 
-    // help text 1/3
+    // help text 1/4
     "start" : _("<p><b><big>Automatically Start NTP Daemon</big></b><br>
 Select whether to start NTP daemon when booting system. The
 NTP daemon resolves host names when initializing. Your
 network connection must be started before NTP daemon starts.</p>
 "),
 
-    // help text 2/3
+    // help text 2/4
     "chroot_environment" : _("<p><b><big>Chroot jail</big></b><br>
 To run NTP daemon in chroot jail, set
 <b>Run NTP daemon in chroot jail</b>. Starting any daemon in chroot jail
 is more secure and strongly recommended."),
 
-    // help text 3/3
+    // help text 3/4
     "overview" : _("<p><b><big>Configured Servers</big></b><br>
 To adjust NTP servers, peers, local clocks, and NTP broadcasting,
 select the appropriate line and click <b>Edit</b>. To add a new synchronization
 peer, click <b>Add</b>. To delete existing synchronization peer,
-select it and click <b>Delete</b>.</p>"),
+select it and click <b>Delete</b>.</p>")
+    +
+    // help text 4/4
+    _("<p><b><big>Advanced functions</big></b><br>
+To assign NTP-related firewall settings, or display log of the NTP
+daemon, use the <b>Advanced</b> menu button</p>"),
 
     // help text to a button
     "complex_button" : _("<p><b><big>Complex configuration</big></b><br>
@@ -154,6 +159,23 @@ driver. Some drivers do not use all the options.</p>")
     _("For information about the meaning of the options, install package
 <i>xntp-doc</i> and see
 <i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>");
+}
+
+define string firewallHelp () ``{
+    // help text 1/3
+    return _("<p><big><b>Firewall Configuration</b></big><br>
+Use <b>Change Firewall Configuration</b> to set if you want to preserve
+current firewall settings, or set interfaces that can be used for remote
+accessing of the NTP daemon.</p>")
+    +
+    // help text 2/3
+    _("<p>For each interface class set if NTP daemon can be remotely accessed
+through interfaces that belong to the interface class.</p>")
+    +
+    // help text 3/3
+    _("<p><big><b>Automatic proposal</b></big><br>
+To propose firewall configuration automatically according to configured
+hosts to synchronize against, use <b>Propose configuration</b>.</p>");
 }
 
 /* EOF */
