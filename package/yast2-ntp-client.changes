@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
-Mon Mar 15 10:13:16 CET 2004 - jsrain@suse.cz
+Mon Mar 15 11:28:36 CET 2004 - jsrain@suse.cz
 
 - fixed parsing of configuration files with comments on the same
   line as option (eg. server ntp.example.com #comment) (#35818)
@@ -9,6 +9,7 @@ Mon Mar 15 10:13:16 CET 2004 - jsrain@suse.cz
 - not asking for confirmation when set NTP service on if at least
   one network interface started on boot found (#35487)
 - fixed handling of `abort event
+- 2.9.8
 
 -------------------------------------------------------------------
 Wed Mar 10 02:20:52 CET 2004 - sh@suse.de
