@@ -25,10 +25,7 @@ desktop_DATA =			\
 module_DATA =			\
 	NtpClient.ycp
 
-ydata_DATA =			\
-	ntp_servers.ycp
-
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(ydata_DATA) $(desktop_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 
 ntp-client:
