@@ -511,6 +511,23 @@ global define boolean selectSyncRecord (integer index) ``{
 }
 
 /**
+  * Find index of synchronization record
+  * @param type string record type
+  * @param address string address
+  * @return integer index of the record if found, -1 otherwise
+  */
+global define integer findSyncRecord (string type, string address) ``{
+    integer index = -1;
+    integer ret = -1;
+    foreach (map<string,any> m, ntp_records, ``{
+	index = index + 1;
+	if (type == m["type"]:"" && address == m["address"]:"")
+	    ret = index;
+    });
+    return ret;
+}
+
+/**
   * Store currently sellected synchronization record
   * @return boolean true on success
   */

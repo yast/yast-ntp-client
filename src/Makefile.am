@@ -16,7 +16,8 @@ ynclude_DATA =			\
 	dialogs.ycp		\
 	widgets.ycp		\
 	misc.ycp		\
-	clocktypes.ycp
+	clocktypes.ycp		\
+	commandline.ycp
 
 config_DATA =			\
 	ntp-client.y2cc

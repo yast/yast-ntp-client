@@ -1,0 +1,247 @@
+/**
+ * File:	clients/ntp-client.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Main file
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ * Main file for ntp-client configuration. Uses all other files.
+ */
+
+{
+
+import "CommandLine";
+import "NtpClient";
+
+include "commandline/commandline.ycp";
+include "ntp-client/wizards.ycp";
+
+
+define string getSyncRecordType (map options) ``{
+    string type = "";
+    if (haskey (options, "server"))
+	type = "server";
+    else if (haskey (options, "peer"))
+	type = "peer";
+    else if (haskey (options, "broadcast"))
+	type = "broadcast";
+    else if (haskey (options, "broadcastclient"))
+	type = "broadcastclient";
+    return type;
+}
+
+/**
+  * Find the synchronization record the map is about
+  * @param options map of command line options
+  * @return index of the found record, -1 in case of an error
+  */
+define integer findSyncRecord (map options) ``{
+    string type = getSyncRecordType (options);
+    if (type == "")
+    {
+	CommandLine::Print (_("The synchronization peer not specified"));
+	return -1;
+    }
+    string address = options["address"]:"";
+    integer index = NtpClient::findSyncRecord (type, address);
+    if (index == -1)
+    {
+	CommandLine::Print (_("Specified synchronization peer not found"));
+	return -1;
+    }
+    return index;
+}
+
+/**
+  * Update the synchronization record
+  * @param options map of command line options
+  * @return boolean true on success
+  */
+define boolean updateSyncRecord (map options) ``{
+    string type = NtpClient::selected_record["type"]:"";
+    if (type == "")
+    {
+	type = getSyncRecordType (options);
+	NtpClient::selected_record["type"] = type;
+    }
+    if (haskey (options, type))
+	NtpClient::selected_record["address"] = options[type]:"";
+    if (haskey (options, "options"))
+	NtpClient::selected_record["options"] = options["options"]:"";
+    if (haskey (options, "fudge"))
+	NtpClient::selected_record["fudge_options"] = options["fudge"]:"";
+    if (haskey (options, "initial"))
+	NtpClient::selected_record["initial_sync"] = true;
+    if (haskey (options, "no-initial"))
+	NtpClient::selected_record["initial_sync"] = false;
+    return NtpClient::storeSyncRecord ();
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpStatusHandler (map options) ``{
+    CommandLine::Print (NtpClient::run_service
+	? _("NTP daemon is enabled")
+	: _("NTP daemon is disabled")
+    );
+    return false;
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpListHandler (map options) ``{
+// FIXME there is some code duplication with the initialization handler of the
+// overview widget
+    map types = $[
+        // table cell, NTP relationship type
+        "server" : _("Server"),
+        // table cell, NTP relationship type
+        "peer" : _("Peer"),
+        // table cell, NTP relationship type
+        "broadcast" : _("Broadcast"),
+        // table cell, NTP relationship type
+        "broadcastclient" : _("Accepting Broadcasts"),
+    ];
+    foreach (map<string,any> i, NtpClient::getSyncRecords (), ``{
+        string type = i["type"]:"";
+        string address = i["address"]:"";
+        integer index = i["index"]:-1;
+        if (type == "__clock")
+        {
+            integer clock_type = getClockType (address);
+            integer unit_number = getClockUnitNumber (address);
+            string device = i["device"]:"";
+            if (device == "")
+                // table cell, %1 is integer 0-3
+                device = sformat (_("Unit number: %1"), unit_number);
+            if (clock_type == 1 && unit_number == 0)
+                device = "";
+            string clock_name = clock_types[clock_type, "name"]:"";
+            if (clock_name == "")
+                // table cell, NTP relationship type
+                clock_name = _("Local Radio Clock");
+	    CommandLine::Print (sformat ("%1 %2", clock_name, device));
+        }
+	CommandLine::Print (sformat ("%1 %2", types[type]:"", address));
+    });
+    return false;
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpEnableHandler (map options) ``{
+    NtpClient::modified = ! NtpClient::run_service;
+    NtpClient::run_service = true;
+    return true;
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpDisableHandler (map options) ``{
+    NtpClient::modified = NtpClient::run_service;
+    NtpClient::run_service = false;
+    return true;
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpAddHandler (map options) ``{
+    NtpClient::selectSyncRecord (-1);
+    return updateSyncRecord (options);
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpEditHandler (map options) ``{
+    integer index = findSyncRecord (options);
+    if (index < 0)
+	return false;
+    if (! NtpClient::selectSyncRecord (index))
+    {
+	CommandLine::Print (_("Reading the settings failed"));
+	return false;
+    }
+    return updateSyncRecord (options);
+}
+
+/**
+  * Handler for command line interface
+  * @param options map options from the command line
+  * @return boolean true if settings have been changed
+  */
+define boolean NtpDeleteHandler (map options) ``{
+    integer index = findSyncRecord (options);
+    if (index < 0)
+	return false;
+    NtpClient::deleteSyncRecord (index);
+    return true;
+}
+
+
+map cmdline = $[
+   "id"			: "printer",
+    // command line help text for NTP client module
+    "help"		: _("NTP client configuration module."),
+    "guihandler"	: GuiHandler,
+    "initialize"	: NtpClient::Read,
+    "finish"		: NtpClient::Write,
+    "actions" : $[
+	"status" : $[
+	    "handler"	: NtpStatusHandler,
+	    // command line help text for an action
+	    "help"	: _("Print the status of the NTP daemon"),
+	],
+	"list" : $[
+	    "handler"	: NtpListHandler,
+	    // command line help text for an action
+	    "help"	: _("Print all configured synchronization relationships"),
+	],
+	"enable" : $[
+	    "handler"	: NtpEnableHandler,
+	    // command line help text for an action
+	    "help"	: _("Enable the NTP daemon"),
+	],
+	"disable" : $[
+	    "handler"	: NtpDisableHandler,
+	    // command line help text for an action
+	    "help"	: _("Disable the NTP daemon"),
+	],
+
+    ],
+
+    "options"       : $[
+/*            "detected_index"    : $[
+                "help"          : _("Configure detected printer with this index"),
+                "type"          : "string",
+            ],
+*/    ],
+
+    "mappings"      : $[
+/*            "summary"           : [],
+            "list"              : [ "detected", "configured" ],
+            "delete"            : [ "queue" ],
+*/
+    ],
+];
+
+/* EOF */
+}

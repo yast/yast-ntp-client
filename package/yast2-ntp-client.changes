@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 21 17:28:47 CET 2004 - jsrain@suse.de
+
+- updated for the new interpreter
+- added support for command line interface
+
+-------------------------------------------------------------------
 Thu Sep 25 10:05:18 CEST 2003 - jsrain@suse.de
 
 - typos fixed (#30274)

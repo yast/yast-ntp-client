@@ -365,6 +365,9 @@ define symbol FudgeDialog () ``{
     UI::ChangeWidget (`id (`flag3), `Value, options["parsed", "flag3"]:"" == "1");
     UI::ChangeWidget (`id (`flag4), `Value, options["parsed", "flag4"]:"" == "1");
 
+    UI::ChangeWidget (`id (`time1), `ValidChars, "1234567890.");
+    UI::ChangeWidget (`id (`time2), `ValidChars, "1234567890.");
+
     any ret = nil;
     while (ret == nil)
     {

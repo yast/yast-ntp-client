@@ -21,12 +21,30 @@ textdomain "ntp-client";
 y2milestone ("----------------------------------------");
 y2milestone ("NtpClient module started");
 
+import "CommandLine";
+import "NtpClient";
+
+include "commandline/commandline.ycp";
 include "ntp-client/wizards.ycp";
 
-/* main ui function */
-any ret = nil;
 
-ret = NtpClientSequence();
+/**
+  * CommandLine handler for running GUI
+  * @return boolean true if settings were saved
+  */
+define boolean GuiHandler () ``{
+    symbol ret = NtpClientSequence();
+    if (ret == `abort || ret == `back || ret == `nil)
+	return false;
+    return true;
+}
+
+
+include "ntp-client/commandline.ycp";
+
+
+/* main ui function */
+boolean ret = CommandLineRun (cmdline);
 y2debug("ret=%1", ret);
 
 /* Finish */
