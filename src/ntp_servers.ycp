@@ -1,0 +1,407 @@
+[
+
+// Germany
+  $[
+    "address" : "ntp0.fau.de",
+    "country" : "DE",
+    "location" : "Erlangen",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp1.fau.de",
+    "country" : "DE",
+    "location" : "Erlangen",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp2.fau.de",
+    "country" : "DE",
+    "location" : "Erlangen",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp3.fau.de",
+    "country" : "DE",
+    "location" : "Erlangen",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntps1-0.cs.tu-berlin.de",
+    "country" : "DE",
+    "location" : "Berlin",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntps1-1.cs.tu-berlin.de",
+    "country" : "DE",
+    "location" : "Berlin",
+    "stratum" : "1",
+  ],
+// USA
+  $[
+    "address" : "clock.fmt.he.net",
+    "country" : "US",
+    "location" : "Fremont, California",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "clock.sjc.he.net",
+    "country" : "US",
+    "location" : "San Jose, California",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp1.linuxmedialabs.com",
+    "country" : "US",
+    "location" : "Colorado Springs, Colorado",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp1.tummy.com",
+    "country" : "US",
+    "location" : "Fort Collins, Colorado",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "louie.udel.edu",
+    "country" : "US",
+    "location" : "Delaware",
+    "stratum" : "2",
+  ],
+// Great Britain
+  $[
+    "address" : "a.ntp.alphazed.net",
+    "country" : "GB",
+    "location" : "London",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "bear.zoo.bt.co.uk",
+    "country" : "GB",
+    "location" : "BT Adastral Park, Ipswich, England",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp.cis.strath.ac.uk",
+    "country" : "GB",
+    "location" : "Glasgow",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp2a.mcc.ac.uk",
+    "country" : "GB",
+    "location" : "Manchester",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp2b.mcc.ac.uk",
+    "country" : "GB",
+    "location" : "Manchester",
+    "stratum" : "2",
+  ],
+// Spain
+// Italy
+  $[
+// unknown access policy
+    "address" : "ntps.net4u.it",
+    "country" : "IT",
+    "location" : "Vercelli",
+    "stratum" : "2",
+  ],
+
+// France
+  $[
+    "address" : "ntp.tuxfamily.net",
+    "country" : "FR",
+    "location" : "Paris",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp1.tuxfamily.net",
+    "country" : "FR",
+    "location" : "Paris",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp2.tuxfamily.net",
+    "country" : "FR",
+    "location" : "Paris",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp.univ-lyon1.fr",
+    "country" : "FR",
+    "location" : "Lyon",
+    "stratum" : "2",
+  ],
+// Netherlands
+  $[
+    "address" : "ntp0.nl.net",
+    "country" : "NL",
+    "location" : "Amsterdam",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp1.nl.net",
+    "country" : "NL",
+    "location" : "Amsterdam",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp2.nl.net",
+    "country" : "NL",
+    "location" : "Amsterdam",
+    "stratum" : "1",
+  ],
+// Switzerland
+  $[
+    "address" : "swisstime.ethz.ch",
+    "country" : "CH",
+    "location" : "Zurich",
+    "stratum" : "1",
+  ],
+// Austria
+// Japan
+  $[
+    "address" : "clock.nc.fukuoka-u.ac.jp",
+    "country" : "JP",
+    "location" : "Fukuoka",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "clock.tl.fukuoka-u.ac.jp",
+    "country" : "JP",
+    "location" : "Fukuoka",
+    "stratum" : "1",
+  ],
+// Sweden
+  $[
+    "address" : "ntp1.gbg.netnod.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp2.gbg.netnod.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp1.mmo.netnod.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp2.mmo.netnod.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp1.sp.se",
+    "country" : "SE",
+    "location" : "Boras",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp2.sp.se",
+    "country" : "SE",
+    "location" : "Boras",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp1.sth.netnod.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "ntp2.sth.netnod.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "time1.stupi.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "time2.stupi.se",
+    "country" : "SE",
+    "location" : "Stockholm",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "time.flygplats.net",
+    "country" : "SE",
+    "location" : "Sigtuna",
+    "stratum" : "2",
+  ],
+// Canada
+  $[
+    "address" : "ntp.cpsc.ucalgary.ca",
+    "country" : "CA",
+    "location" : "Calgary",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp1.cmc.ec.gc.ca",
+    "country" : "CA",
+    "location" : "Dorval",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp2.cmc.ec.gc.ca",
+    "country" : "CA",
+    "location" : "Dorval",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "time.chu.nrc.ca",
+    "country" : "CA",
+    "location" : "Ottawa",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "time.nrc.ca",
+    "country" : "CA",
+    "location" : "Ottawa",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "timelord.uregina.ca",
+    "country" : "CA",
+    "location" : "Regina",
+    "stratum" : "2",
+  ],
+// Brasil
+  $[
+// unknown access policy
+    "address" : "ntp1.pucpr.br",
+    "country" : "BR",
+    "location" : "Pontificia Universidade Catolica do Parana",
+    "stratum" : "2",
+  ],
+/*  $[
+// send a notify
+    "address" : "ntp.hiway.com.br",
+    "country" : "BR",
+    "location" : "Valinhos (near Sao Paulo)",
+    "stratum" : "2",
+  ],*/
+// Hungary
+// Denmark
+  $[
+// unknown access policy
+    "address" : "clock.netcetera.dk",
+    "country" : "DK",
+    "stratum" : "2",
+  ],
+  $[
+// unknown access policy
+    "address" : "clock2.netcetera.dk",
+    "country" : "DK",
+    "stratum" : "2",
+  ],
+// Australia
+  $[
+    "address" : "ntp.saard.net",
+    "country" : "AU",
+    "location" : "Adelaide",
+    "stratum" : "2",
+  ],
+// Finland
+  $[
+// unknown access policy
+    "address" : "tock.keso.fi",
+    "country" : "FI",
+    "location" : "Pieksamaki",
+    "stratum" : "2",
+  ],
+  $[
+// unknown access policy
+    "address" : "tick.keso.fi",
+    "country" : "FI",
+    "location" : "Pieksamaki",
+    "stratum" : "2",
+  ],
+// Belgium
+  $[
+    "address" : "ntp1.belbone.be",
+    "country" : "BE",
+    "location" : "Brussels",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp2.belbone.be",
+    "country" : "BE",
+    "location" : "Brussels",
+    "stratum" : "2",
+  ],
+// Czech Republic
+  $[
+    "address" : "ntp.globe.cz",
+    "country" : "CZ",
+    "location" : "Prague",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp1.contactel.cz",
+    "country" : "CZ",
+    "location" : "Prague",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp2.contactel.cz",
+    "country" : "CZ",
+    "location" : "Prague",
+    "stratum" : "2",
+  ],
+  $[
+    "address" : "ntp.cgi.cz",
+    "country" : "CZ",
+    "location" : "Prague",
+    "stratum" : "2",
+  ],
+// Poland
+  $[
+    "address" : "ntp.certum.pl",
+    "country" : "PL",
+    "location" : "Szczecin",
+    "stratum" : "1",
+  ],
+  $[
+    "address" : "vega.cbk.poznan.pl",
+    "country" : "PL",
+    "location" : "Borowiec",
+    "stratum" : "1",
+  ],
+// Russia
+  $[
+// unknown access policy
+    "address" : "ntp.psn.ru",
+    "country" : "RU",
+    "location" : "Pushchino, Moscow region",
+    "stratum" : "2",
+  ],
+// China
+  $[
+    "address" : "ntp.cuhk.edu.hk",
+    "country" : "CN",
+    "location" : "Hong Kong",
+    "stratum" : "2",
+  ],
+// Greece
+/*  $[
+// send a notify
+    "address" : "ntp.mfa.gr",
+    "country" : "GR",
+    "location" : "Athens",
+    "stratum" : "2",
+  ],*/
+
+]

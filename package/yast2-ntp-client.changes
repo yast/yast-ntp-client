@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Aug 23 10:31:56 CEST 2004 - locilka@suse.cz
+
+- added missing data: ntp_servers
+
+-------------------------------------------------------------------
 Thu Aug 19 16:31:25 CEST 2004 - visnov@suse.cz
 
 - fixed command line return type
