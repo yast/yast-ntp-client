@@ -94,7 +94,7 @@ global list required_packages = ["xntp"];
 /**
  * ports in firewall to open
  */
-global list<string> firewall_services = ["ntp-tcp", "ntp-udp"];
+global list<string> firewall_services = ["ntp-server"];
 
 
 /**
