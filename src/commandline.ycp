@@ -14,6 +14,8 @@
 import "CommandLine";
 import "NtpClient";
 
+textdomain "ntp-client";
+
 include "commandline/commandline.ycp";
 include "ntp-client/wizards.ycp";
 
@@ -40,14 +42,16 @@ define integer findSyncRecord (map options) ``{
     string type = getSyncRecordType (options);
     if (type == "")
     {
-	CommandLine::Print (_("The synchronization peer not specified"));
+	// error report for command line
+	CommandLine::Print (_("The synchronization peer not specified."));
 	return -1;
     }
     string address = options[type]:"";
     integer index = NtpClient::findSyncRecord (type, address);
     if (index == -1)
     {
-	CommandLine::Print (_("Specified synchronization peer not found"));
+	// error report for command line
+	CommandLine::Print (_("Specified synchronization peer not found."));
 	return -1;
     }
     return index;
@@ -84,9 +88,11 @@ define boolean updateSyncRecord (map options) ``{
   * @return boolean true if settings have been changed
   */
 define boolean NtpStatusHandler (map options) ``{
-    CommandLine::Print (NtpClient::run_service
-	? _("NTP daemon is enabled")
-	: _("NTP daemon is disabled")
+    CommandLine::Print (NtpClient::run_serviceA
+	// status information for command line
+	? _("NTP daemon is enabled.")
+	// status information for command line
+	: _("NTP daemon is disabled.")
     );
     return false;
 }
@@ -178,7 +184,8 @@ define boolean NtpEditHandler (map options) ``{
 	return false;
     if (! NtpClient::selectSyncRecord (index))
     {
-	CommandLine::Print (_("Reading the settings failed"));
+	// command line error message
+	CommandLine::Print (_("Reading the settings failed."));
 	return false;
     }
     return updateSyncRecord (options);

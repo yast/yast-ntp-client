@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Mar 26 14:36:57 CET 2004 - jsrain@suse.de
+
+- added missing textdomain, added missing comments for translators
+
+-------------------------------------------------------------------
 Mon Mar 15 11:28:36 CET 2004 - jsrain@suse.cz
 
 - fixed parsing of configuration files with comments on the same
