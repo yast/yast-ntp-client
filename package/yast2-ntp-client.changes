@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 20 15:18:40 CEST 2003 - jsuchome@suse.de
+
+- removed redundant "initialization dialog" (#28779)
+- 2.8.4
+
+-------------------------------------------------------------------
 Mon Aug 11 09:43:03 CEST 2003 - jsrain@suse.de
 
 - merged text from proofread

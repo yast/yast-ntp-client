@@ -46,15 +46,7 @@ global define symbol NtpClientSequence() ``{
 	]
     ];
 
-    // dialog caption
-    string caption = _("NTP Client Configuration");
-    // label
-    term contents = `Label(_("Initializing ..."));
-
     Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption, contents, "",
-	    Label::BackButton(), Label::NextButton());
-
     any ret = WizardSequencer(aliases, sequence);
 
     UI::CloseDialog();
