@@ -30,9 +30,9 @@ global define void startInit (any id) ``{
 /**
  * Store settings of the widget
  * @param id any widget id
- * @param event any event that caused storing process
+ * @param event map event that caused storing process
  */
-global define void startStore (any id, any event) ``{
+global define void startStore (any id, map event) ``{
     start_at_boot = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
 }
 
@@ -68,10 +68,10 @@ global define void overviewInit (any id) ``{
 /**
  * Handle events on the widget
  * @param id any widget id
- * @param event any event that caused storing process
- * @return any event to pass to WS or nil
+ * @param event map event that caused storing process
+ * @return map event to pass to WS or nil
  */
-global define any overviewHandle (any id, any event) ``{
+global define any overviewHandle (any id, map event) ``{
     map types = $[
 	"server" : `server,
 	"peer" : `peer,
@@ -80,7 +80,7 @@ global define any overviewHandle (any id, any event) ``{
 	"broadcastclient" : `bcastclient,
    ];
    selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
-   if (event == `add)
+   if (event["ID"]:nil == `add)
     {
 	selected_item_index = -1;
 	UI::OpenDialog (`VBox (
@@ -120,14 +120,14 @@ global define any overviewHandle (any id, any event) ``{
 	selected_item = [type, "", ""];
 	return types[type]:nil;
     }
-    else if (event == `edit)
+    else if (event["ID"]:nil == `edit)
     {
 	selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
 	selected_item = peers[selected_item_index]:[];
 	string type = selected_item[0]:"";
 	return types[type]:nil;
     }
-    else if (event == `delete)
+    else if (event["ID"]:nil == `delete)
     {
 	// yes-no popup
 	if (Popup::YesNo (_("Delete selected item?")))
@@ -153,9 +153,9 @@ global define void addressInit (any id) ``{
 /**
  * Store settings of the widget
  * @param id any widget id
- * @param event any event that caused storing process
+ * @param event map event that caused storing process
  */
-global define void addressStore (any id, any event) ``{
+global define void addressStore (any id, map event) ``{
     selected_item[1] = UI::QueryWidget (`id (id), `Value);
 }
 
@@ -170,9 +170,9 @@ global define void initSyncInit (any id) ``{
 /**
  * Store settings of the widget
  * @param id any widget id
- * @param event any event that caused storing process
+ * @param event map event that caused storing process
  */
-global define void initSyncStore (any id, any event) ``{
+global define void initSyncStore (any id, map event) ``{
     selected_item[3] = UI::QueryWidget (`id ("init_sync"), `Value);
 }
 
@@ -187,9 +187,9 @@ global define void optionsInit (any id) ``{
 /**
  * Store settings of the widget
  * @param id any widget id
- * @param event any event that caused storing process
+ * @param event map event that caused storing process
  */
-global define void optionsStore (any id, any event) ``{
+global define void optionsStore (any id, map event) ``{
     selected_item[2] = UI::QueryWidget (`id ("options"), `Value);
 }
 
@@ -210,9 +210,9 @@ global define void fudgeInit (any id) ``{
 /**
  * Store settings of the widget
  * @param id any widget id
- * @param event any event that caused storing process
+ * @param event map event that caused storing process
  */
-global define void fudgeStore (any id, any event) ``{
+global define void fudgeStore (any id, map event) ``{
     // remove old entry first
     string address = selected_item[1]:"";
     peers = maplist (`p, peers, ``{
