@@ -267,16 +267,23 @@ define void proposeInterfacesToAllowAccess () ``{
 	out = regexpsub (out, "dev[ ]+([^ ]+)[ ]+src", "\\1");
 	return out;
     });
-    foreach (string ic, ["EXT", "INT", "DMZ"], ``{
-	NtpClient::firewall_settings[ic] = false;
-	string k = sformat ("FW_DEV_%1", ic);
-	string s = SuSEFirewall::settings[k]:"";
-	list<string> l = splitstring (s, " ");
-	foreach (string i, ifaces, ``{
-	    if (contains (l, i))
-		NtpClient::firewall_settings[ic] = true;
-	});
+    map<string,boolean> status = $[];
+    foreach (string i, ifaces, {
+	map out = (map)SCR::Execute (.target.bash_output, sformat (
+	    "getcfg %1 |grep ^HWD_CONFIG_0= |cut -d= -f2 |cut -d\\; -f1", i
+	));
+	if (out["exit"]:0 == 0)
+	{
+	    i = out["stdout"]:"";
+	    i = mergestring (splitstring (i, " \t\n"), "");
+	    string grp = SuSEFirewall::GetGroupOfInterface (i);
+	    status[grp] = true;
+	}
     });
+
+    UI::ChangeWidget (`id (`ext), `Value, status["EXT"]:false);
+    UI::ChangeWidget (`id (`int), `Value, status["INT"]:false);
+    UI::ChangeWidget (`id (`dmz), `Value, status["DMZ"]:false);
 }
 
 /* EOF */

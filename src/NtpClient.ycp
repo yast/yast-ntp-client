@@ -86,14 +86,15 @@ global map<string,any> selected_record = $[];
 global boolean change_firewall = false;
 
 /**
-  * Map containing settings of the firewall - keys INT, EXT, DMZ
-  */
-global map firewall_settings = $[];
-
-/**
   * Required packages
   */
 global list required_packages = ["xntp"];
+
+/**
+ * ports in firewall to open
+ */
+global list<string> firewall_services = ["ntp-tcp", "ntp-udp"];
+
 
 /**
  * List of known NTP servers
@@ -122,7 +123,7 @@ global boolean simple_dialog = false;
 include "ntp-client/misc.ycp";
 include "ntp-client/widgets.ycp";
 
-global map<string,any> widgets = InitWidgets ();
+global map<string,map<string,any> > widgets = InitWidgets ();
 
 /**
  * Get the list of known NTP servers
@@ -336,18 +337,12 @@ global define boolean Read() ``{
 	// error report
 	Report::Error(_("Cannot read the current settings."));
     }
-    SuSEFirewall::Read ();
-    if (SuSEFirewall::start)
+
+    if (! Mode::test)
     {
-	foreach (string i, ["INT", "EXT", "DMZ"], ``{
-	    string k1 = sformat ("FW_SERVICES_%1_TCP", i);
-	    string k2 = sformat ("FW_SERVICES_%1_UDP", i);
-	    string s = SuSEFirewall::settings[k1]:""
-		+ " " + SuSEFirewall::settings[k2]:"";
-	    list<string> l = splitstring (s, " ");
-	    firewall_settings[i] = contains (l, "123");
-	});
-	y2milestone ("Firewall settings: %1", firewall_settings);
+	Progress::off ();
+	SuSEFirewall::Read ();
+	Progress::on ();
     }
 
     if(Abort()) return false;
@@ -507,19 +502,9 @@ global define boolean Write() ``{
 
     if (change_firewall)
     {
-	foreach (string i, ["INT", "EXT", "DMZ"], ``{
-	    foreach (string p, ["TCP", "UDP"], ``{
-		string k = sformat ("FW_SERVICES_%1_%2", i, p);
-		string s = SuSEFirewall::settings[k]:"";
-		list<string> l = splitstring (s, " ");
-		l = (list<string>)filter (string p, l, ``(p != "123"));
-		if (firewall_settings[i]:false)
-		    l = (list<string>)add (l, "123");
-		s = mergestring (l, " ");
-		SuSEFirewall::settings[k] = s;
-	    });
-	});
+	Progress::off ();
 	SuSEFirewall::Write ();
+	Progress::on ();
     }
 
     if (! Service::Adjust ("xntpd",

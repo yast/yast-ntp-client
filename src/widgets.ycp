@@ -742,8 +742,8 @@ global symbol SelectTestHandle (string id, map event) {
  * Initialize all widgets
  * @return a map of widgets
  */
-global define map<string,any> InitWidgets () ``{
-    map address = $[
+global define map<string,map<string,any> > InitWidgets () ``{
+    map<string,any> address = $[
 	    "widget" : `textentry,
 	    // text entry label
 	    "label" : _("A&ddress"),

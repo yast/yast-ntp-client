@@ -163,7 +163,7 @@ define symbol TypeSelectDialog () ``{
     // dialog caption
     string caption = _("Select the Synchronization Peer Type");
 
-    return CWM::ShowAndRun (["peer_types"],
+    return CWM::ShowAndRunOrig (["peer_types"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::NextButton (),
 	$[`abort : abortPopup ]);
@@ -187,7 +187,7 @@ define symbol ServerDialog () ``{
     // dialog caption
     string caption = _("Configure NTP Server");
 
-    return CWM::ShowAndRun (["server_address", "init_sync", "options"],
+    return CWM::ShowAndRunOrig (["server_address", "init_sync", "options"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : abortPopup]);
@@ -211,7 +211,7 @@ define symbol PeerDialog () ``{
     // dialog caption
     string caption = _("Configure NTP Peer");
 
-    return CWM::ShowAndRun (["paddress", "init_sync", "options"],
+    return CWM::ShowAndRunOrig (["paddress", "init_sync", "options"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : abortPopup]);
@@ -255,7 +255,7 @@ define symbol RadioDialog () ``{
     // dialog caption
     string caption = _("Configure Local Reference Clock");
 
-    return CWM::ShowAndRun (["clock_type", "unit_number",
+    return CWM::ShowAndRunOrig (["clock_type", "unit_number",
 	    "create_symlink", "device", "browse",
 	    "options", "fudge_button"],
 	NtpClient::widgets,
@@ -279,7 +279,7 @@ define symbol BCastDialog () ``{
     // dialog caption
     string caption = _("Configure Broadcasting");
 
-    return CWM::ShowAndRun (["bcaddress", "options"], NtpClient::widgets,
+    return CWM::ShowAndRunOrig (["bcaddress", "options"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : abortPopup]);
 }
@@ -298,7 +298,7 @@ define symbol BCastClientDialog () ``{
     // dialog caption
     string caption = _("Configure Broadcasting Client");
 
-    return CWM::ShowAndRun (["bccaddress"], NtpClient::widgets,
+    return CWM::ShowAndRunOrig (["bccaddress"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : abortPopup]);
 }
@@ -436,20 +436,25 @@ define symbol FirewallDialog () ``{
     Wizard::SetContentsButtons (caption, contents, firewallHelp (),
             Label::BackButton (), Label::NextButton ());
 
-
     UI::ChangeWidget (`id (`change_settings), `Value,
 	NtpClient::change_firewall);
-    UI::ChangeWidget (`id (`ext), `Value,
-	NtpClient::firewall_settings["EXT"]:false);
-    UI::ChangeWidget (`id (`int), `Value,
-	NtpClient::firewall_settings["INT"]:false);
-    UI::ChangeWidget (`id (`dmz), `Value,
-	NtpClient::firewall_settings["DMZ"]:false);
     UI::ChangeWidget (`id (`ext), `Enabled, NtpClient::change_firewall);
     UI::ChangeWidget (`id (`int), `Enabled, NtpClient::change_firewall);
     UI::ChangeWidget (`id (`dmz), `Enabled, NtpClient::change_firewall);
     UI::ChangeWidget (`id (`propose), `Enabled, NtpClient::change_firewall);
 
+    map<string,map<string,boolean> > open
+	= SuSEFirewall::GetServicesInGroups (NtpClient::firewall_services);
+    map<string,boolean> status = $[];
+    foreach (string s, map<string,boolean> o, open, {
+	foreach (string cat, boolean en, o, {
+	    status[cat] = status[cat]:true && en;
+	});
+    });
+
+    UI::ChangeWidget (`id (`ext), `Value, status["EXT"]:false);
+    UI::ChangeWidget (`id (`int), `Value, status["INT"]:false);
+    UI::ChangeWidget (`id (`dmz), `Value, status["DMZ"]:false);
     any ret = nil;
     while (ret == nil)
     {
@@ -467,12 +472,6 @@ define symbol FirewallDialog () ``{
 	else if (ret == `propose)
 	{
 	    proposeInterfacesToAllowAccess ();
-	    UI::ChangeWidget (`id (`ext), `Value,
-		NtpClient::firewall_settings["EXT"]:false);
-	    UI::ChangeWidget (`id (`int), `Value,
-		NtpClient::firewall_settings["INT"]:false);
-	    UI::ChangeWidget (`id (`dmz), `Value,
-		NtpClient::firewall_settings["DMZ"]:false);
 	    ret = nil;
 	}
     }
@@ -480,12 +479,24 @@ define symbol FirewallDialog () ``{
     {
 	NtpClient::change_firewall = (boolean)
 	    UI::QueryWidget (`id (`change_settings), `Value);
-	NtpClient::firewall_settings["EXT"] = (boolean)
-	    UI::QueryWidget (`id (`ext), `Value);
-	NtpClient::firewall_settings["INT"] = (boolean)
-	    UI::QueryWidget (`id (`int), `Value);
-	NtpClient::firewall_settings["DMZ"] = (boolean)
-	    UI::QueryWidget (`id (`dmz), `Value);
+	if (NtpClient::change_firewall)
+	{
+	    list<string> groups = [];
+	    if ((boolean)UI::QueryWidget (`id (`ext), `Value))
+		groups = add (groups, "EXT");
+	    if ((boolean)UI::QueryWidget (`id (`int), `Value))
+		groups = add (groups, "INT");
+	    if ((boolean)UI::QueryWidget (`id (`dmz), `Value))
+		groups = add (groups, "DMZ");
+	    SuSEFirewall::SetServicesForGroups (
+		NtpClient::firewall_services,
+		[],
+		false);
+	    SuSEFirewall::SetServicesForGroups (
+		NtpClient::firewall_services,
+		groups,
+		true);
+	}
     }
     return (symbol)ret;
 }
@@ -516,7 +527,7 @@ symbol ServerSelectionDialog () {
     // dialog caption
     string caption = _("Select NTP Server");
 
-    return CWM::ShowAndRun (["servers_source", "found_servers", "servers_list",
+    return CWM::ShowAndRunOrig (["servers_source", "found_servers", "servers_list",
 	"select_test"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : abortPopup]);
