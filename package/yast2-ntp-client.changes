@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan 22 17:37:58 CET 2004 - jsrain@suse.de
+
+- added displaying of NTP daemon's log
+- added firewall settin support
+
+-------------------------------------------------------------------
 Wed Jan 21 17:28:47 CET 2004 - jsrain@suse.de
 
 - updated for the new interpreter

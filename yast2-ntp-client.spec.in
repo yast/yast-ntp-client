@@ -1,8 +1,8 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages yast2-packager
+# neededforbuild yast2-devel-packages yast2-firewall
 
 @HEADER@
-Requires:	yast2
+Requires:	yast2 yast2-firewall
 
 BuildArchitectures:	noarch
 
@@ -27,7 +27,6 @@ Summary:	Configuration of ntp-client
 @clientdir@/ntp-client_*.ycp
 @scrconfdir@/cfg_xntp.scr
 @scrconfdir@/etc_ntp.scr
-@agentdir@/ag_ntp_conf
 @moduledir@/*.y*
 @configdir@/ntp-client.y2cc
 @desktopdir@/ntp-client.desktop
