@@ -20,5 +20,5 @@ X-SuSE-YaST-AutoInstResource=ntp-client
 Icon=ntp-client
 Exec=/sbin/yast2 ntp-client 
 
-Name=NTP client
+Name=NTP Client
 GenericName=Configure NTP client
