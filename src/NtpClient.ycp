@@ -16,6 +16,7 @@ module "NtpClient";
 textdomain "ntp-client";
 
 import "Mode";
+import "NetworkDevices";
 import "Package";
 import "Progress";
 import "Report";
@@ -105,14 +106,18 @@ global define boolean Read() ``{
     /* NtpClient read dialog caption */
     string caption = _("Initializing NTP Client Configuration");
 
-    integer steps = 1;
+    integer steps = 2;
     integer sl = 500;
 
     // We do not set help text here, because it was set outside
     Progress::New( caption, " ", steps, [
 	    // progress stage
+	    _("Read network configuration"),
+	    // progress stage
 	    _("Read NTP settings"),
 	], [
+	    // progress step
+	    _("Reading network configuration..."),
 	    // progress step
 	    _("Reading NTP settings..."),
 	    // progress step
@@ -120,6 +125,14 @@ global define boolean Read() ``{
 	],
 	""
     );
+
+    // read network configuration
+    if(Abort()) return false;
+    Progress::NextStage();
+
+    Progress::off ();
+    NetworkDevices::Read ();
+    Progress::on ();
 
     // read current settings
     if(Abort()) return false;

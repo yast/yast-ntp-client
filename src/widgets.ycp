@@ -73,8 +73,10 @@ global define void startStore (any id, map event) ``{
  */
 global define any startHandle (any id, map event) ``{
     boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+    list<string> devices = NetworkDevices::Locate ("STARTMODE", "onboot");
+    devices = filter (string d, devices, ``(d != "lo"));
     // yes-no popup
-    if (start && ! Popup::ContinueCancel (_("Warning!
+    if (start && size (devices) == 0 && ! Popup::ContinueCancel (_("Warning!
 
 If you do not have a permanent Internet connection,
 starting the NTP daemon can take a very long time and 

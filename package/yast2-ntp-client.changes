@@ -6,6 +6,9 @@ Mon Mar 15 10:13:16 CET 2004 - jsrain@suse.cz
 - fixed saving address of the NTP server from the simple dialog
 - added support for lookup NTP servers via SLP
 - reduced VSpacings in order to fit in new wizard
+- not asking for confirmation when set NTP service on if at least
+  one network interface started on boot found (#35487)
+- fixed handling of `abort event
 
 -------------------------------------------------------------------
 Wed Mar 10 02:20:52 CET 2004 - sh@suse.de

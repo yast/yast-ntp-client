@@ -95,7 +95,7 @@ define symbol SimpleDialog () ``{
 
     symbol ret = CWM::Run (w,
 	// yes-no popup
-	 $[`abort : ``(reallyExit ())]);
+	 $[`abort : reallyExit ]);
 
     // and now store the settings if needed
     if (ret != `abort && ret != `back && ret != `cancel)
@@ -146,8 +146,7 @@ define symbol MainDialog () ``{
     CWM::handleWidgets (w, $["ID" : "never"]);
 
     return CWM::Run (w,
-	// yes-no popup
-	 $[`abort : ``(! NtpClient::modified || reallyExit ())]);
+	 $[`abort : reallyExit]);
 
 }
 
@@ -192,7 +191,7 @@ define symbol ServerDialog () ``{
     return CWM::ShowAndRun (["server_address", "init_sync", "options"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : ``(Popup::ReallyAbort (true))]);
+	$[`abort : abortPopup]);
 }
 
 /**
@@ -216,7 +215,7 @@ define symbol PeerDialog () ``{
     return CWM::ShowAndRun (["paddress", "init_sync", "options"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : ``(Popup::ReallyAbort (true))]);
+	$[`abort : abortPopup]);
 }
 
 /**
@@ -262,7 +261,7 @@ define symbol RadioDialog () ``{
 	    "options", "fudge_button"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : ``(Popup::ReallyAbort (true))]);
+	$[`abort : abortPopup]);
 }
 
 /**
@@ -283,7 +282,7 @@ define symbol BCastDialog () ``{
 
     return CWM::ShowAndRun (["bcaddress", "options"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : ``(Popup::ReallyAbort (true))]);
+	$[`abort : abortPopup]);
 }
 
 /**
@@ -302,7 +301,7 @@ define symbol BCastClientDialog () ``{
 
     return CWM::ShowAndRun (["bccaddress"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : ``(Popup::ReallyAbort (true))]);
+	$[`abort : abortPopup]);
 }
 
 /**
