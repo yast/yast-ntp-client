@@ -3,6 +3,7 @@ Mon Sep  1 11:35:25 CEST 2003 - jsrain@suse.de
 
 - separated "Type of entry to add" popup to extra dialog and added
   some help to the entries (#29669)
+- 2.8.7
 
 -------------------------------------------------------------------
 Fri Aug 29 13:13:26 CEST 2003 - jsrain@suse.de
