@@ -3,6 +3,7 @@ Wed Sep 10 10:27:35 CEST 2003 - jsrain@suse.de
 
 - stopping XNTP daemon when set to never start it automatically
   (30358)
+- 2.8.9
 
 -------------------------------------------------------------------
 Fri Sep  5 08:30:16 CEST 2003 - jsrain@suse.de
