@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug 19 16:31:25 CEST 2004 - visnov@suse.cz
+
+- fixed command line return type
+- 2.10.3 
+
+-------------------------------------------------------------------
 Mon Aug 16 08:25:14 CEST 2004 - jsrain@suse.cz
 
 - fixed firewall port identification

@@ -43,7 +43,7 @@ include "ntp-client/commandline.ycp";
 
 
 /* main ui function */
-boolean ret = CommandLine::Run (cmdline);
+any ret = CommandLine::Run (cmdline);
 y2debug("ret=%1", ret);
 
 /* Finish */
