@@ -308,8 +308,7 @@ global define symbol serverAddressHandle (string id, map event) {
 	    != "never";
 	UI::ChangeWidget (`id (id), `Enabled, enabled);
 	UI::ChangeWidget (`id (`test_server), `Enabled, enabled);
-	UI::ChangeWidget (`id (`lookup_address), `Enabled, enabled);
-	UI::ChangeWidget (`id (`select_list), `Enabled, enabled);
+	UI::ChangeWidget (`id (`select_server), `Enabled, enabled);
 	return nil;
     }
     if (ev_id == `lookup_address)
@@ -328,7 +327,7 @@ global define symbol serverAddressHandle (string id, map event) {
     {
 	NtpClient::TestNtpServer (server, false);
     }
-    else if (ev_id == `select_list) {
+    else if (ev_id == `select_server) {
 	return `select;
     }
     return nil;
@@ -537,6 +536,13 @@ string last_country = nil;
  * @return symbol always nil
  */
 global symbol ServerListHandle (string id, map event) {
+    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
+    {
+	boolean enabled = (boolean)UI::QueryWidget (`id ("list_rb"), `Value);
+	UI::ChangeWidget (`id (`country), `Enabled, enabled);
+	UI::ChangeWidget (`id (`servers), `Enabled, enabled);
+	return nil;
+    }
     string country = (string)UI::QueryWidget (`id (`country), `Value);
     if (country == nil)
 	country = "";
@@ -571,14 +577,15 @@ global symbol ServerListHandle (string id, map event) {
 		label = sformat ("%1 (%2%3)", s, label, l_country);
 	    return `item (`id (s), label);
 	});
-	UI::ReplaceWidget (`servers_rp, `SelectionBox (`id (`servers),
+	UI::ReplaceWidget (`servers_rp, `ComboBox (`id (`servers),
+	    `opt (`hstretch),
 	    // selection box header
 	    _("&Servers"), items));
 	return nil;
     }
     if (event["ID"]:nil == `test || event["ID"]:nil == `info)
     {
-	string server = (string)UI::QueryWidget (`id (`servers), `CurrentItem);
+	string server = (string)UI::QueryWidget (`id (`servers), `Value);
 	if (server == nil || server == "")
 	{
 	    // message report (no server selected)
@@ -589,10 +596,6 @@ global symbol ServerListHandle (string id, map event) {
 	{
 	    TestNtpServer (server, false);
 	}
-/*	else if (event["ID"]:nil == `info)
-	{
-	    // TODO
-	}*/
 	return nil;
     }
     return nil;
@@ -653,6 +656,7 @@ global void ServerListInit (string id) {
 	UI::ChangeWidget (`id (`country), `Value, lang);
     }
     ServerListHandle (id, $[]);
+    ServerListHandle (id, $["ID" : "list_rb"]);
 }
 
 /**
@@ -661,7 +665,7 @@ global void ServerListInit (string id) {
  * @param event map event that caused storing process
  */
 global void ServerListStore (string id, map event) {
-    string address = (string)UI::QueryWidget (`id (`servers), `CurrentItem);
+    string address = (string)UI::QueryWidget (`id (`servers), `Value);
     NtpClient::selected_record["address"] = address;
 }
 
@@ -672,7 +676,7 @@ global void ServerListStore (string id, map event) {
  * @return boolean true if validation succeeded
  */
 global boolean ServerListValidate (string id, map event) {
-    string address = (string)UI::QueryWidget (`id (`servers), `CurrentItem);
+    string address = (string)UI::QueryWidget (`id (`servers), `Value);
     if (address == "" || address == nil)
     {
 	// report message
@@ -680,6 +684,51 @@ global boolean ServerListValidate (string id, map event) {
 	return false;
     }
     return true;
+}
+
+global void ServersSourceInit (string id) {
+    UI::ChangeWidget (`id (id), `CurrentButton, "lookup_rb");
+}
+
+global symbol FoundServersHandle (string id, map event) {
+    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
+    {
+	boolean enabled = (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value);
+	UI::ChangeWidget (`id ("server_address"), `Enabled, enabled);
+	UI::ChangeWidget (`id (`lookup_server), `Enabled, enabled);
+	return nil;
+    }
+    if (event["ID"]:nil == `lookup_server)
+    {
+	symbol method = `slp;
+	list<string> server_names = NtpClient::DetectNtpServers (method);
+	UI::ReplaceWidget (`server_address_rp,
+	    `ComboBox (`id ("server_address"),
+		`opt (`editable, `hstretch),
+		// combo box label
+		_("&NTP Server"),
+		server_names));
+	return nil;
+    }
+    return nil;
+}
+
+global void FoundServersInit (string id) {
+    FoundServersHandle (id, $["ID" : "list_rb"]);
+}
+
+global symbol SelectTestHandle (string id, map event) {
+    string server = "";
+    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+    {
+	server = (string)UI::QueryWidget (`id ("sever_address"), `Value);
+    }
+    else
+    {
+	server = (string)UI::QueryWidget (`id (`servers), `Value);
+    }
+    NtpClient::TestNtpServer (server, false);
+    return nil;
 }
 
 /**
@@ -764,19 +813,12 @@ global define map<string,any> InitWidgets () ``{
 		    `VBox (
 			`Label (" "),
 			// push button
-			`PushButton (`id (`test_server), _("&Test"))
+			`PushButton (`id (`select_server), _("&Select"))
 		    )
 		),
 		`HBox (
 		    `HStretch (),
-		    `HWeight (1,
-			// push button
-			`PushButton (`id (`lookup_address), _("&Lookup"))
-		    ),
-		    `HWeight (1,
-			// push button
-			`PushButton (`id (`select_list), _("&Select from List"))
-		    ),
+		    `PushButton (`id (`test_server), _("&Test")),
 		    `HStretch ()
 		)
 	    ),
@@ -902,6 +944,34 @@ global define map<string,any> InitWidgets () ``{
 	    "hspacing" : 3,
 	    "vspacing" : 1,
 	],
+	"servers_source" : $[
+	    "widget" : `radio_buttons,
+	    "items" : [
+		["lookup_rb", _("Loc&al Network")],
+		["list_rb", _("&Public NTP server")],
+	    ],
+	    "opt" : [`notify],
+	    "init" : ServersSourceInit,
+	    "label" : _("NTP Server Location"),
+	],
+	"found_servers" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `HBox (
+		`ReplacePoint (`id (`server_address_rp),
+		    `ComboBox (`id ("server_address"),
+			`opt (`editable, `hstretch),
+			// combo box label
+			_("&NTP Server"))
+		),
+		`VBox (
+		    `Label (" "),
+		    // push button
+		    `PushButton (`id (`lookup_server), _("&Lookup"))
+		)
+	    ),
+	    "init" : FoundServersInit,
+	    "handle" : FoundServersHandle,
+	],
 	"servers_list" : $[
 	    "widget" : `custom,
 	    "custom_widget" : `VBox (
@@ -909,15 +979,10 @@ global define map<string,any> InitWidgets () ``{
 		    `ComboBox (`id (`country), `opt (`notify, `hstretch),
 			// combo box header
 			_("&Country"), [])),
-		`ReplacePoint (`id (`servers_rp), `SelectionBox (`id (`servers),
+		`ReplacePoint (`id (`servers_rp), `ComboBox (`id (`servers),
+		    `opt (`hstretch),
 		    // selection box header
-		    _("&Servers"), [])),
-		`HBox (
-		    `HStretch (),
-		    `PushButton (`id (`test), _("&Test")),
-//		    `PushButton (`id (`info), _("&Info")),
-		    `HStretch ()
-		)
+		    _("&Servers"), []))
 	    ),
 	    "init" : ServerListInit,
 	    "handle" : ServerListHandle,
@@ -925,6 +990,12 @@ global define map<string,any> InitWidgets () ``{
 	    "validate_type" : `function,
 	    "validate_function" : ServerListValidate,
 	    "help" : HELPS["servers_list"]:"",
+	],
+	"select_test" : $[
+	    "widget" : `push_button,
+	    "label" : _("&Test"),
+	    "handle_events" : ["select_test"],
+	    "handle" : SelectTestHandle,
 	],
     ];
 }

@@ -654,6 +654,7 @@ global boolean TestNtpServer (string server, boolean silent) {
     integer status = Service::Status ("xntpd");
     if (status == 0)
 	Service::Stop ("xntpd");
+    y2milestone ("Testing reachability of server %1", server);
     integer ret = (integer)SCR::Execute (.target.bash, sformat (
 	"/usr/sbin/ntpdate %1",
 	server

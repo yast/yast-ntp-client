@@ -489,14 +489,25 @@ define symbol FirewallDialog () ``{
 symbol ServerSelectionDialog () {
     term contents = `HBox (`HStretch (), `VBox (
 	`VStretch (),
-	"servers_list",
+        "servers_source",
+	`VSpacing (1),
+	`Frame (_("Local Network"),
+	    "found_servers"
+	),
+	`VSpacing (1),
+	`Frame (_("Public NTP Server"),
+	    "servers_list"
+	),
+	`VSpacing (1),
+	"select_test",
 	`VStretch ()
     ), `HStretch ());
 
     // dialog caption
     string caption = _("Select NTP Server");
 
-    return CWM::ShowAndRun (["servers_list"], NtpClient::widgets,
+    return CWM::ShowAndRun (["servers_source", "found_servers", "servers_list",
+	"select_test"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : abortPopup]);
 }
