@@ -103,7 +103,7 @@ Select the type of the entry to add here.</p>")
     + _("<p>To add NTP server to synchronize against,
 select <b>Server</b>.</p>")
     // help text 3/6
-    + _("<p>To add NTP peer to synchronize one against each other, select
+    + _("<p>To add NTP peer to synchronize mutually, select
 <b>Peer</b>.</p>")
     // help text 4/6
     + _("<p>To configure local radio clock connected directly to your computer,
