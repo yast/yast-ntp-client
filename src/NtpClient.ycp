@@ -379,6 +379,7 @@ global define boolean Write() ``{
 	// error report
 	Report::Error (_("Cannot adjust the service"));
     }
+
     if (run_service && (! write_only)
 	&& 0 != Service::RunInitScript("xntpd", "restart"))
     {
@@ -517,6 +518,8 @@ global define boolean selectSyncRecord (integer index) ``{
   * @return integer index of the record if found, -1 otherwise
   */
 global define integer findSyncRecord (string type, string address) ``{
+y2error ("Type: %1", type);
+y2error ("Addr: %1", address);
     integer index = -1;
     integer ret = -1;
     foreach (map<string,any> m, ntp_records, ``{

@@ -43,7 +43,7 @@ define integer findSyncRecord (map options) ``{
 	CommandLine::Print (_("The synchronization peer not specified"));
 	return -1;
     }
-    string address = options["address"]:"";
+    string address = options[type]:"";
     integer index = NtpClient::findSyncRecord (type, address);
     if (index == -1)
     {
@@ -129,7 +129,8 @@ define boolean NtpListHandler (map options) ``{
                 clock_name = _("Local Radio Clock");
 	    CommandLine::Print (sformat ("%1 %2", clock_name, device));
         }
-	CommandLine::Print (sformat ("%1 %2", types[type]:"", address));
+	else
+	    CommandLine::Print (sformat ("%1 %2", types[type]:"", address));
     });
     return false;
 }
