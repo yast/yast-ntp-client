@@ -1,11 +1,8 @@
 Execute	.target.bash "rpm -q xntp" 0
 Read	.init.scripts.exists "xntpd" true
 Read	.init.scripts.runlevel "xntpd" $["xntp":$[]]
-Read	.etc.ntp_conf.server [["ntp1", "options1"], ["127.127.1.2", "options_clock"], ["ntp2", "options2"]]
-Read	.etc.ntp_conf.fudge [["127.127.1.2", "fudge_clock"]]
-Read	.etc.ntp_conf.peer [["peer1", "options_peer"]]
-Read	.etc.ntp_conf.broadcast []
-Read	.etc.ntp_conf.broadcastclient []
+Read	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", "type":-1, "value":[$["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp1 options1"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"127.127.1.2 options_clock"], $["comment":"", "kind":"value", "name":"fudge", "type":0, "value":"127.127.1.2fudge_clock"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp2 options2"], $["comment":"", "kind":"value", "name":"peer", "type":0, "value":"peer1 options_peer"]]]
+Read	.sysconfig.xntp.XNTPD_RUN_CHROOTED "yes"
 Read	.sysconfig.xntp.XNTPD_INITIAL_NTPDATE "AUTO-2"
 Return	true
-Return	$["peers":[$["initial":true, "key":"server", "param":"options1", "value":"ntp1"], $["initial":false, "key":"radio", "param":"options_clock", "value":"127.127.1.2"], $["initial":true, "key":"server", "param":"options2", "value":"ntp2"], $["initial":false, "key":"fudge", "param":"fudge_clock", "value":"127.127.1.2"], $["initial":false, "key":"peer", "param":"options_peer", "value":"peer1"]], "start_at_boot":false]
+Return	$["peers":[$["address":"ntp1", "comment":"", "initial_sync":true, "options":" options1", "type":"server"], $["address":"127.127.1.2", "comment":"", "initial_sync":false, "options":" options_clock", "type":"__clock"], $["address":"ntp2", "comment":"", "initial_sync":true, "options":" options2", "type":"server"], $["address":"peer1", "comment":"", "initial_sync":false, "options":" options_peer", "type":"peer"]], "start_at_boot":false, "start_in_chroot":true]

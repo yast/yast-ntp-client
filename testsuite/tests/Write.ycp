@@ -29,42 +29,31 @@
 	"init" : $[
 	    "scripts" : $[
 		"exists" : true,
-//		"runlevel" : $["xntp" : $[]],
 	    ],
 	],
-/*	"etc" : $[
+	"etc" : $[
 	    "ntp_conf" : $[
-		"server" : [
-		    ["ntp1", "options1"],
-		    ["127.127.1.2", "options_clock"],
-		    ["ntp2", "options2"]
+		"all" : $[
+		    "comment":"",
+		    "file":-1,
+		    "kind":"section",
+		    "name":"",
+		    "type":-1,
+		    "value":[],
 		],
-		"fudge" : [
-		    ["127.127.1.2", "fudge_clock"],
-		],
-		"peer" : [
-		    ["peer1", "options_peer"],
-		],
-		"broadcast" : [],
-		"broadcastclient" : [],
 	    ],
 	],
-	"sysconfig" : $[
-	    "xntp" : $[
-		"XNTPD_INITIAL_NTPDATE" : "AUTO-2",
-	    ],
-	],*/
     ];
 
     TEST (``(NtpClient::Import ($[
 	"peers":[
-	    $["key": "server", "value": "ntp1", "param": "options1", "initial": true],
-	    $["key": "radio", "value": "127.127.1.2", "param": "options_clock", "initial": false],
-	    $["key": "server", "value": "ntp2", "param": "options2", "initial": true],
-	    $["key": "fudge", "value": "127.127.1.2", "param": "fudge_clock", "initial": false],
-	    $["key": "peer", "value": "peer1", "param": "options_peer", "initial": false]
+	    $["address":"ntp1", "initial_sync":true, "options":" options1", "type":"server"],
+	    $["address":"127.127.1.2", "initial_sync":false, "options":" options_clock", "type":"__clock"],
+	    $["address":"ntp2", "initial_sync":true, "options":" options2", "type":"server"],
+	    $["address":"peer1", "initial_sync":false, "options":" options_peer", "type":"peer"]
 	],
-	"start_at_boot":false])), [READ, $[], $[]], nil);
+	"start_at_boot":false,
+	"start_in_chroot":true,])), [READ, $[], $[]], nil);
 
     TEST (``(NtpClient::Write ()), [READ, $[], $[]], nil);
 }
