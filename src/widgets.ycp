@@ -78,8 +78,7 @@ global define any startHandle (any id, map event) ``{
 
 If you do not have a permanent Internet connection,
 starting the NTP daemon can take a very long time and 
-NTP daemon might not run properly.
-")))
+the daemon might not run properly.")))
 	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
 
     if (start != run_service)
@@ -152,7 +151,7 @@ global define void overviewInit (any id) ``{
 	    string device = i["device"]:"";
 	    if (device == "")
 		// table cell, %1 is integer 0-3
-		device = sformat (_("Unit number: %1"), unit_number);
+		device = sformat (_("Unit Number: %1"), unit_number);
 	    if (clock_type == 1 && unit_number == 0)
 		device = "";
 	    string clock_name = clock_types[clock_type, "name"]:"";
@@ -375,7 +374,7 @@ global define symbol browseButtonHandle (string id, map event) ``{
     if (current == "")
 	current = "/dev";
     // popup header
-    current = UI::AskForExistingFile (current, "", _("Select the device"));
+    current = UI::AskForExistingFile (current, "", _("Select the Device"));
     if (current != nil)
 	UI::ChangeWidget (`id ("device"), `Value, current);
     return nil;
@@ -407,7 +406,7 @@ global define map<string,any> InitWidgets () ``{
 	"complex_button" : $[
 	    "widget" : `push_button,
 	    // push button label
-	    "label" : _("Co&mplex configuration"),
+	    "label" : _("Co&mplex Configuration"),
 	    "help" : HELPS["complex_button"]:"",
 	    "handle_events" : [ "complex_button" ],
 	    "handle" : NtpClient::complexButtonHandle,
@@ -415,7 +414,7 @@ global define map<string,any> InitWidgets () ``{
 	"fudge_button" : $[
 	    "widget" : `push_button,
 	    // push button label
-	    "label" : _("&Driver calibration"),
+	    "label" : _("&Driver Calibration"),
 	    "help" : HELPS["fudge_button"]:"",
 	    "handle_events" : [ "fudge_button" ],
 	    "handle" : NtpClient::fudgeButtonHandle,
@@ -440,7 +439,7 @@ global define map<string,any> InitWidgets () ``{
 	"run_chroot" : $[
 	    "widget" : `checkbox,
 	    // check box
-	    "label" : _("Run NTP daemon in chroot &jail"),
+	    "label" : _("Run NTP Daemon in Chroot &Jail"),
 	    "init" : NtpClient::chrootInit,
 	    "store" : NtpClient::chrootStore,
 	    "handle" : ntpEnabledOrDisabled,
@@ -448,7 +447,7 @@ global define map<string,any> InitWidgets () ``{
 	],
 	"server_address" : union (address, $[
 	    // text entry label
-	    "label" : _("&NTP server"),
+	    "label" : _("&NTP Server"),
 	    "help" : HELPS["server_address"]:"",
 	    "handle" : ntpEnabledOrDisabled,
 	]),
@@ -490,7 +489,7 @@ global define map<string,any> InitWidgets () ``{
 	"clock_type" : $[
 	    "widget" : `combobox,
 	    // combo box label
-	    "label" : _("Clock &type"),
+	    "label" : _("Clock &Type"),
 	    "items" : getClockTypesCombo (),
 	    "help" : HELPS["clock_type"]:"",
 	    "opt" : [ `notify ],
@@ -501,7 +500,7 @@ global define map<string,any> InitWidgets () ``{
 	"unit_number" : $[
 	    "widget" : `intfield,
 	    // int field
-	    "label" : _("Unit &number"),
+	    "label" : _("Unit &Number"),
 	    "help" : HELPS["unit_number"]:"",
 	    "minimum" : 0,
 	    "maximum" : 3,
@@ -511,7 +510,7 @@ global define map<string,any> InitWidgets () ``{
 	"create_symlink" : $[
 	    "widget" : `checkbox,
 	    // check box
-	    "label" : _("Create &symlink"),
+	    "label" : _("Create &Symlink"),
 	    "opt" : [ `notify ],
 	    "init" : createSymlinkHandle,
 	    "handle_events" : [ "create_symlink" ],
@@ -566,7 +565,7 @@ global define map<string,any> InitWidgets () ``{
                 ["broadcastclient", _("&Accepting Broadcast Packets")]
 	    ],
 	    // frame
-	    "label" : _("Kind of Synchronization Peer"),
+	    "label" : _("Synchronization Peer Type"),
 	    "init" : NtpClient::peerTypesInit,
 	    "handle" : NtpClient::peerTypesHandle,
 	    "help" : HELPS["peer_types"]:"",

@@ -163,7 +163,7 @@ define symbol TypeSelectDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Select the Kind of the Synchronization Peer");
+    string caption = _("Select the Synchronization Peer Type");
 
     return CWM::ShowAndRun (["peer_types"],
 	NtpClient::widgets,
@@ -322,10 +322,10 @@ define symbol FudgeDialog () ``{
 	`VStretch (),
 	`HBox (
 	    // text entry
-	    `HWeight (1, `TextEntry (`id (`time1), _("Calibration offset 1"))),
+	    `HWeight (1, `TextEntry (`id (`time1), _("Calibration Offset 1"))),
 	    `HSpacing (3),
 	    // text entry
-	    `HWeight (1, `TextEntry (`id (`time2), _("Calibration offset 2")))
+	    `HWeight (1, `TextEntry (`id (`time2), _("Calibration Offset 2")))
 	),
 	`VStretch (),
 	`HBox (
@@ -401,7 +401,7 @@ define symbol FirewallDialog () ``{
     if (! SuSEFirewall::start)
     {
 	// report message
-	Report::Message (_("The SuSE firewall is not configured."));
+	Report::Message (_("The SUSE firewall is not configured."));
 	return `back;
     }
     // dialog caption
@@ -413,19 +413,19 @@ define symbol FirewallDialog () ``{
 	    _("Firewall configuration"),
 	     [
 		// item of a combo box
-		`item (`id (false), _("Preserve current")),
+		`item (`id (false), _("Preserve Current")),
 		// item of a combo box
 		`item (`id (true), _("Change"))
 	])),
 	`VStretch (),
 	// check box
-	`Left(`CheckBox(`id(`ext),_("Allow access from &external interfaces"))),
+	`Left(`CheckBox(`id(`ext),_("Allow Access from &External Interfaces"))),
 	`VStretch (),
 	// check box
-	`Left(`CheckBox(`id(`int),_("Allow access from &internal interfaces"))),
+	`Left(`CheckBox(`id(`int),_("Allow Access from &Internal Interfaces"))),
 	`VStretch (),
 	// check box
-	`Left(`CheckBox(`id(`dmz),_("Allow access from &demilitarized zone"))),
+	`Left(`CheckBox(`id(`dmz),_("Allow Access from &Demilitarized Zone"))),
 	`VStretch (),
 	// push button
 	`PushButton (`id (`propose), _("&Propose Configuration")),

@@ -132,8 +132,7 @@ global define boolean Read() ``{
 	boolean install_ok = Require::RequireAndConflictTarget (["xntp"], [],
 	    // richtext, %1 is name of package
 	    _("For network time synchronization, an NTP daemon is required.
-YaST2 will install package %1.
-"));
+YaST2 will install package %1."));
 	if (! install_ok && ! Require::LastOperationCanceled ())
 	{
 	    // error popup
@@ -476,21 +475,19 @@ global define map Export () ``{
  * @return string summary of the current configuration
  */
 global define string Summary() ``{
-	string summary = "";
-	// summary string
-	summary = Summary::AddHeader(summary, _("Status"));
+    string summary = "";
     if (run_service)
 	// summary string
-	summary = Summary::AddLine(summary, _("The NTP daemon starts when starting the system") );
+	summary = Summary::AddLine(summary, _("The NTP daemon starts when starting the system.") );
     else
 	// summary string
-	summary = Summary::AddLine(summary, _("The NTP daemon does not start automatically") );
+	summary = Summary::AddLine(summary, _("The NTP daemon does not start automatically.") );
 
     map types = $[
 	// summary string, %1 is list of addresses
-	"server" : _("Servers"),
+	"server" : _("Servers: %1"),
 	// summary string, %1 is list of addresses
-	"__clock" : _("Radio Clocks"),
+	"__clock" : _("Radio Clocks: %1"),
 	// summary string, %1 is list of addresses
 	"peer" : _("Peers: %1"),
 	// summary string, %1 is list of addresses
@@ -505,12 +502,9 @@ global define string Summary() ``{
 	names = filter (string n, names, ``(n != ""));
 	if (size (names) > 0)
 	{
-        summary = Summary::AddHeader(summary, types[t]:"" );
-		summary = Summary::OpenList(summary);
-	    foreach(string n, names, ``{
-			summary = Summary::AddListItem(summary, n);
-		});
-		summary = Summary::CloseList(summary);
+	    summary = Summary::AddLine (summary, sformat (
+		types[t]:"", splitstring ((list<string>)names, ", ")
+	    ));
 	}
     });
     return summary;
