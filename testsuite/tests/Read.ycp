@@ -93,10 +93,17 @@
 	"target" : $[
 	    "string" : "",
 	    "tmpdir" : "/tmp",
+	    "size" : 0,
+	],
+    ];
+    map WRITE = $[];
+    map EXEC = $[
+	"target" : $[
+	    "bash_output" : $[],
 	],
     ];
 
-    TESTSUITE_INIT ([READ, $[], $[]], nil);
+    TESTSUITE_INIT ([READ, WRITE, EXEC], nil);
 
     import "Progress";
     import "NtpClient";
@@ -106,6 +113,6 @@
 
     Progress::off ();
 
-    TEST (``(NtpClient::Read ()), [READ, $[], $[]], nil);
-    TEST (``(NtpClient::Export ()), [READ, $[], $[]], nil);
+    TEST (``(NtpClient::Read ()), [READ, WRITE, EXEC], nil);
+    TEST (``(NtpClient::Export ()), [READ, WRITE, EXEC], nil);
 }

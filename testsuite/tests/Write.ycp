@@ -51,10 +51,18 @@
 	"target" : $[
 	    "string" : "",
 	    "tmpdir" : "/tmp",
+	    "size" : 0,
+	],
+    ];
+    map WRITE = $[];
+    map EXEC = $[
+	"target" : $[
+	    "bash_output" : $[],
 	],
     ];
 
-    TESTSUITE_INIT ([READ, $[], $[]], nil);
+
+    TESTSUITE_INIT ([READ, WRITE, EXEC], nil);
 
     import "Progress";
     import "NtpClient";
@@ -72,7 +80,7 @@
 	    $["address":"peer1", "initial_sync":false, "options":" options_peer", "type":"peer"]
 	],
 	"start_at_boot":false,
-	"start_in_chroot":true,])), [READ, $[], $[]], nil);
+	"start_in_chroot":true,])), [READ, WRITE, EXEC], nil);
 
-    TEST (``(NtpClient::Write ()), [READ, $[], $[]], nil);
+    TEST (``(NtpClient::Write ()), [READ, WRITE, EXEC], nil);
 }
