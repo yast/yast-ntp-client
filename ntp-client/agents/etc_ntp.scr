@@ -1,0 +1,24 @@
+/**
+ * File:        etc_cups_printers.scr
+ * Summary:     Agent for reading /etc/cups/printers.conf file
+ * Author:      Jiri Srain <jsrain@suse.cz>
+ * Access:      read
+ *
+ * $Id$
+ *
+ */
+.etc.ntp_conf
+
+`ag_ini(
+    `IniAgent ( "/etc/ntp.conf",
+	$[
+	    "options"	: [ "global_values", "repeat_names", "comments_last" ],
+	    "comments"	: [ "^[ \t]*#.*$", "^[ \t]*$" ],
+	    "params"    : [
+		$[ "match" : [ "^[ \t]*([^ \t]+)[ \t]+(.*)$", "%s %s" ]],
+	    ],
+	    "subindent"	: "  "
+	]
+))
+
+

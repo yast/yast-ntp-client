@@ -1,0 +1,342 @@
+-------------------------------------------------------------------
+Wed Mar 16 15:51:15 CET 2005 - locilka@suse.cz
+
+- Fixed bug #73039
+  Firewall configuration had never been saved
+- Changing maintainer -> locilka
+- 2.11.3
+
+-------------------------------------------------------------------
+Mon Feb 14 12:29:46 CET 2005 - jsrain@suse.cz
+
+- do not ask to confirm abort if nothing changed (#50743)
+- 2.11.2
+
+-------------------------------------------------------------------
+Wed Dec 15 14:38:09 CET 2004 - jsrain@suse.cz
+
+- clean-up of neededforbuild and requires
+- using generic firewall enabling widget/popup
+- using Progress::set
+- 2.11.1
+
+-------------------------------------------------------------------
+Tue Nov  2 11:38:57 CET 2004 - jsrain@suse.cz
+
+- adapted to new Mode.ycp interface
+- 2.11.0
+
+-------------------------------------------------------------------
+Tue Oct 19 14:34:08 CEST 2004 - jsrain@suse.cz
+
+- using unified messages from Message.ycp/Confirm.ycp/Label.ycp
+
+-------------------------------------------------------------------
+Fri Sep 17 10:20:51 CEST 2004 - jsrain@suse.cz
+
+- added NTP servers located at "Physikalisch-Technische
+  Bundesanstalt" to the list of NTP servers (#45409)
+- 2.10.8
+
+-------------------------------------------------------------------
+Tue Sep 14 08:24:14 CEST 2004 - jsrain@suse.cz
+
+- adapted testsuite to changes in yast2-firewall
+- 2.10.7
+
+-------------------------------------------------------------------
+Mon Sep  6 16:15:38 CEST 2004 - jsrain@suse.cz
+
+- fixed using NTP server detected via SLP
+- 2.10.6
+
+-------------------------------------------------------------------
+Fri Sep  3 14:18:08 CEST 2004 - jsrain@suse.cz
+
+- added GerModified and SetModified functions to _auto client
+
+-------------------------------------------------------------------
+Mon Aug 30 13:08:37 CEST 2004 - jsrain@suse.cz
+
+- removed duplicated ntp_servers.ycp file
+- 2.10.5
+
+-------------------------------------------------------------------
+Mon Aug 23 10:31:56 CEST 2004 - locilka@suse.cz
+
+- added missing data: ntp_servers
+- 2.10.4
+
+-------------------------------------------------------------------
+Thu Aug 19 16:31:25 CEST 2004 - visnov@suse.cz
+
+- fixed command line return type
+- 2.10.3 
+
+-------------------------------------------------------------------
+Mon Aug 16 08:25:14 CEST 2004 - jsrain@suse.cz
+
+- fixed firewall port identification
+- 2.10.2
+
+-------------------------------------------------------------------
+Tue Aug 10 09:36:19 CEST 2004 - jsrain@suse.cz
+
+- merged texts from proofread
+
+-------------------------------------------------------------------
+Mon Aug  9 12:07:05 CEST 2004 - jsrain@suse.cz
+
+- adapted to the new firewall interface
+- updated to changes in CWM
+- split the UI and backend (the border wasn't clear)
+- 2.10.1
+
+-------------------------------------------------------------------
+Tue Aug  3 15:57:42 CEST 2004 - jsrain@suse.cz
+
+- updated helps
+- updated comments to functions and texts fro translations
+- other updates
+
+-------------------------------------------------------------------
+Fri Jul 30 15:42:18 CEST 2004 - jsrain@suse.cz
+
+- UI updates
+
+-------------------------------------------------------------------
+Thu Jul 29 09:48:11 CEST 2004 - jsrain@suse.cz
+
+- added a list of NTP servers and offering to select one of them
+- added support for configuring via DHCP
+- 2.10.0
+
+-------------------------------------------------------------------
+Mon Jul 19 12:36:29 CEST 2004 - jsrain@suse.cz
+
+- use common function for checking installed packages (#30872)
+
+-------------------------------------------------------------------
+Mon Jun 21 07:55:25 CEST 2004 - jsrain@suse.cz
+
+- fixed saving of options to /etc/ntp.conf (#42199)
+
+-------------------------------------------------------------------
+Sun May 30 05:15:03 CEST 2004 - nashif@suse.de
+
+- Honor old syntax when importing (#41379)
+- 2.9.13
+
+-------------------------------------------------------------------
+Fri May 21 08:13:20 CEST 2004 - jsrain@suse.cz
+
+- dont complain about missing packages when cloning (nashif)
+- 2.9.12
+
+-------------------------------------------------------------------
+Tue May  4 09:04:19 CEST 2004 - jsrain@suse.cz
+
+- merged texts from proofread
+- 2.9.11
+
+-------------------------------------------------------------------
+Thu Apr  8 14:30:30 CEST 2004 - jsrain@suse.cz
+
+- fixed texts of menu button in the log display dialog (#38522)
+
+-------------------------------------------------------------------
+Fri Apr  2 16:08:30 CEST 2004 - jsrain@suse.de
+
+- changed version to GPL
+- 2.9.10
+
+-------------------------------------------------------------------
+Tue Mar 30 08:31:54 CEST 2004 - jsrain@suse.de
+
+- fixed typo in variable name
+- 2.9.9
+
+-------------------------------------------------------------------
+Fri Mar 26 14:36:57 CET 2004 - jsrain@suse.de
+
+- added missing textdomain, added missing comments for translators
+
+-------------------------------------------------------------------
+Mon Mar 15 11:28:36 CET 2004 - jsrain@suse.cz
+
+- fixed parsing of configuration files with comments on the same
+  line as option (eg. server ntp.example.com #comment) (#35818)
+- fixed saving address of the NTP server from the simple dialog
+- added support for lookup NTP servers via SLP
+- reduced VSpacings in order to fit in new wizard
+- not asking for confirmation when set NTP service on if at least
+  one network interface started on boot found (#35487)
+- fixed handling of `abort event
+- 2.9.8
+
+-------------------------------------------------------------------
+Wed Mar 10 02:20:52 CET 2004 - sh@suse.de
+
+- V 2.9.7
+- Migration to new wizard 
+
+-------------------------------------------------------------------
+Tue Mar  9 09:34:23 CET 2004 - jsrain@suse.de
+
+- Require -> Package
+- using Sequencer module
+
+-------------------------------------------------------------------
+Mon Mar  8 18:12:02 CET 2004 - jsrain@suse.de
+
+- setting icon
+- 2.9.6
+
+-------------------------------------------------------------------
+Fri Mar  5 15:15:32 CET 2004 - jsrain@suse.de
+
+- types fixes
+- 2.9.5
+
+-------------------------------------------------------------------
+Wed Mar  3 12:49:15 CET 2004 - jsrain@suse.de
+
+- fixed testsuite
+- 2.9.4
+
+-------------------------------------------------------------------
+Mon Mar  1 16:38:57 CET 2004 - jsrain@suse.de
+
+- fixed displaying NTP summary
+- merged texts from proofread
+- more strict data types
+- 2.9.3
+
+-------------------------------------------------------------------
+Mon Feb 16 17:37:37 CET 2004 - jsrain@suse.de
+
+- syntax fix of abort checking (in order to build)
+- 2.9.2
+
+-------------------------------------------------------------------
+Tue Feb 10 08:19:59 CET 2004 - jsrain@suse.de
+
+- dropped .y2cc file
+- 2.9.1
+
+-------------------------------------------------------------------
+Thu Jan 22 17:37:58 CET 2004 - jsrain@suse.de
+
+- added displaying of NTP daemon's log
+- added firewall settin support
+- 2.9.0
+
+-------------------------------------------------------------------
+Wed Jan 21 17:28:47 CET 2004 - jsrain@suse.de
+
+- updated for the new interpreter
+- added support for command line interface
+
+-------------------------------------------------------------------
+Thu Sep 25 10:05:18 CEST 2003 - jsrain@suse.de
+
+- typos fixed (#30274)
+
+-------------------------------------------------------------------
+Thu Sep 11 06:56:31 CEST 2003 - nashif@suse.de
+
+- #30291: return list of required packages for autoinstallation
+
+-------------------------------------------------------------------
+Wed Sep 10 10:27:35 CEST 2003 - jsrain@suse.de
+
+- stopping XNTP daemon when set to never start it automatically
+  (30358)
+- 2.8.9
+
+-------------------------------------------------------------------
+Fri Sep  5 08:30:16 CEST 2003 - jsrain@suse.de
+
+- merged texts from proofread
+- 2.8.8
+
+-------------------------------------------------------------------
+Tue Sep  2 11:29:07 CEST 2003 - jsrain@suse.de
+
+- marked missed texts for translation
+- fixed translation of exit without saving popup (was evaluated in
+  incorect textdomain)
+
+-------------------------------------------------------------------
+Mon Sep  1 11:35:25 CEST 2003 - jsrain@suse.de
+
+- separated "Type of entry to add" popup to extra dialog and added
+  some help to the entries (#29669)
+- 2.8.7
+
+-------------------------------------------------------------------
+Fri Aug 29 13:13:26 CEST 2003 - jsrain@suse.de
+
+- improved helps (#29379)
+- displaying correctly local CMOS clock (#29422)
+- 2.8.6
+
+-------------------------------------------------------------------
+Mon Aug 25 17:33:19 CEST 2003 - jsrain@suse.de
+
+- not touching sysconfig/xntp:XNTPD_INITIAL_NTPDATE if containg
+  AUTO and would be replaced with empty string (#29315)
+- 2.8.5
+
+-------------------------------------------------------------------
+Wed Aug 20 15:18:40 CEST 2003 - jsuchome@suse.de
+
+- removed redundant "initialization dialog" (#28779)
+- 2.8.4
+
+-------------------------------------------------------------------
+Mon Aug 11 09:43:03 CEST 2003 - jsrain@suse.de
+
+- merged text from proofread
+- 2.8.3
+
+-------------------------------------------------------------------
+Wed Aug  6 13:52:54 CEST 2003 - jsrain@suse.de
+
+- fixed Abort button handling
+
+-------------------------------------------------------------------
+Wed Aug  6 08:48:57 CEST 2003 - jsrain@suse.de
+
+- changed internal structure (autoyast requirement)
+- reporting error if xntp package installation fails
+- handling double-click in the summary table
+- 2.8.2
+
+-------------------------------------------------------------------
+Tue Aug  5 15:46:20 CEST 2003 - jsrain@suse.de
+
+- added warning if NTP daemon set to be started at boot
+- added more testsuites
+- added some documentation
+
+-------------------------------------------------------------------
+Mon Aug  4 14:42:15 CEST 2003 - jsrain@suse.de
+
+- added .desktop file
+- 2.8.1
+
+-------------------------------------------------------------------
+Wed Jul 30 07:56:30 CEST 2003 - jsrain@suse.de
+
+- not (re)starting service during autoinstallation
+
+-------------------------------------------------------------------
+Tue Jul 29 14:52:50 CEST 2003 - jsrain@suse.de
+
+- adapted to udpated CWM interface
+
+-------------------------------------------------------------------
+Mon Jul  7 16:11:29 CEST 2003 - jsrain@suse.de
+
+- initial version

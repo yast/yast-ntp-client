@@ -1,0 +1,17 @@
+general
+-------
+
+Better configuration of options (parse them, show individual widgets)
+Allow to start nxtp when some interface is brought up
+Add button for log displaying in the main dialog
+Enhance local radio clock dialog
+
+
+ntp.conf agent
+--------------
+
+Enhance ntp.conf agent in order to perserve the order of commands
+Enhance ntp.conf agent in order to perserve comments
+  (other possibility may be to update ini-agent to support multiple occurences
+  of one keyword)
+

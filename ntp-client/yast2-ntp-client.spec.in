@@ -1,0 +1,33 @@
+@HEADER-COMMENT@
+# neededforbuild yast2-devel-packages yast2-slp
+
+@HEADER@
+Requires:	yast2 yast2-slp
+
+BuildArchitectures:	noarch
+
+Summary:	Configuration of ntp-client
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+%dir @yncludedir@/ntp-client
+@yncludedir@/ntp-client/*
+@clientdir@/ntp-client.ycp
+@clientdir@/ntp-client_*.ycp
+@scrconfdir@/cfg_xntp.scr
+@scrconfdir@/etc_ntp.scr
+@moduledir@/*.y*
+@desktopdir@/ntp-client.desktop
+@ydatadir@/ntp_servers.ycp
+%doc @docdir@

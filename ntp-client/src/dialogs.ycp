@@ -1,0 +1,546 @@
+/**
+ * File:	include/ntp-client/dialogs.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Dialogs definitions
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+import "CWM";
+import "Label";
+import "NtpClient";
+import "Popup";
+import "SuSEFirewall";
+import "Wizard";
+import "Report";
+
+include "ntp-client/misc.ycp";
+include "ntp-client/widgets.ycp";
+
+map<string,map<string,any> > widgets = nil;
+
+/**
+ * Get the map of all widgets
+ * @return a map with all widgets for CWM
+ */
+define map<string,map<string,any> > GetWidgets () {
+    if (widgets == nil)
+	widgets = InitWidgets ();
+    return widgets;
+}
+
+/**
+ * Display the popup to confirm abort
+ * @return boolean true if confirmed
+ */
+define boolean abortPopup () ``{
+    return Popup::ReallyAbort (true);
+}
+
+/**
+ * Read settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+define symbol ReadDialog() ``{
+    Wizard::RestoreHelp(HELPS["read"]:"");
+    NtpClient::AbortFunction = PollAbort;
+    boolean ret = NtpClient::Read();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Write settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+define symbol WriteDialog() ``{
+    Wizard::RestoreHelp(HELPS["write"]:"");
+    NtpClient::AbortFunction = PollAbort;
+    boolean ret = NtpClient::Write();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Main dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol SimpleDialog () ``{
+    NtpClient::simple_dialog = true;
+
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "complex_button"],
+	GetWidgets ());
+    term contents = `HBox (`HSpacing (1), `VBox (
+	`VStretch (),
+	`HBox (
+	    `HStretch (),
+	    "start",
+	    `HStretch ()
+	),
+	`VStretch (),
+	`HBox (
+	    `HStretch (),
+	    "server_address",
+	    `HStretch ()
+	),
+	`VStretch (),
+	"complex_button",
+	`VStretch ()
+    ), `HSpacing (1));
+
+    // dialog caption
+    string caption = _("NTP Client Configuration");
+    string help = CWM::MergeHelps (w);
+    contents = CWM::PrepareDialog (contents, w);
+    Wizard::SetContentsButtons (caption, contents, help,
+	Label::BackButton (), Label::FinishButton ());
+    Wizard::HideBackButton();
+    Wizard::SetAbortButton(`abort, Label::CancelButton() );
+
+    startInit (nil);
+    CWM::handleWidgets (w, $["ID" : "never"]);
+
+    symbol ret = CWM::Run (w,
+	// yes-no popup
+	 $[`abort : reallyExitSimple ]);
+
+    // and now store the settings if needed
+    if (ret != `abort && ret != `back && ret != `cancel)
+    {
+    }
+    y2milestone ("Simple dialog: Returning %1", ret);
+    return ret;
+}
+
+/**
+ * Main dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol MainDialog () ``{
+    NtpClient::simple_dialog = false;
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "config_dhcp", "firewall", "overview"],
+	GetWidgets ());
+    term contents = `HBox (`HSpacing (1), `VBox (
+	`VSpacing (1),
+	`HBox (
+	    `HStretch (),
+	    `VBox (
+	    "start",
+		`Left ("run_chroot"),
+		`Left ("config_dhcp"),
+		"firewall"
+	    ),
+	    `HStretch ()
+	),
+	`VSpacing (1),
+	"overview",
+	`VSpacing (1)
+    ), `HSpacing (1));
+
+    // dialog caption
+    string caption = _("Complex NTP Client Configuration");
+    string help = CWM::MergeHelps (w);
+    contents = CWM::PrepareDialog (contents, w);
+    Wizard::SetContentsButtons (caption, contents, help,
+	Label::BackButton (), Label::FinishButton ());
+    Wizard::HideBackButton();
+    Wizard::SetAbortButton(`abort, Label::CancelButton() );
+
+    startInit (nil);
+    CWM::handleWidgets (w, $["ID" : "never"]);
+
+    return CWM::Run (w,
+	 $[`abort : reallyExitComplex]);
+
+}
+
+/**
+ * Type of new peer selection dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol TypeSelectDialog () ``{
+    term contents = `HBox (`HStretch (), `VBox (
+	`VSpacing (3),
+	"peer_types",
+	`VSpacing (3)
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Select the Synchronization Peer Type");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["peer_types"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::NextButton (),
+	"fallback_functions" : $[`abort : abortPopup ]
+    ]);
+}
+
+/**
+ * Server editing dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol ServerDialog () ``{
+    term contents = `HBox (`HStretch (), `VBox (
+	`VSpacing (3),
+	"server_address",
+	`VSpacing (1),
+	`Left ("init_sync"),
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Configure NTP Server");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["server_address", "init_sync", "options"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup],
+    ]);
+}
+
+/**
+ * Peer editing dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol PeerDialog () ``{
+    term contents = `HBox (`HStretch (), `VBox (
+	`VSpacing (3),
+	"paddress",
+	`VSpacing (1),
+	`Left ("init_sync"),
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Configure NTP Peer");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["paddress", "init_sync", "options"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
+}
+
+/**
+ * Reference clock editing dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol RadioDialog () ``{
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (0.5),
+	`HBox (
+	    "clock_type",
+	    `HStretch ()
+	),
+	`HBox (
+	    "unit_number",
+	    `HStretch ()
+	),
+	`VSpacing (0.5),
+	`HBox (
+	    "create_symlink",
+	    `HStretch ()
+	),
+	`HBox (
+	    "device",
+	    `VBox (
+		`Label (""),
+		"browse"
+	    ),
+	    `HStretch ()
+	),
+	`VSpacing (0.5),
+	"options",
+	`VSpacing (0.5),
+	"fudge_button",
+	`VSpacing (1)
+    ), `HSpacing (3));
+
+    // dialog caption
+    string caption = _("Configure Local Reference Clock");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["clock_type", "unit_number",
+	    "create_symlink", "device", "browse",
+	    "options", "fudge_button"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
+}
+
+/**
+ * Broadcast editing dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol BCastDialog () ``{
+    term contents = `HBox (`HStretch (), `VBox (
+	`VSpacing (3),
+	"bcaddress",
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Configure Broadcasting");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["bcaddress", "options"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
+}
+
+/**
+ * Broadcast client editing dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol BCastClientDialog () ``{
+    term contents = `HBox (`HStretch (), `VBox (
+	`VStretch (),
+	"bccaddress",
+	`VStretch ()
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Configure Broadcasting Client");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["bccaddress"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
+}
+
+/**
+ * Fudge factors dialog
+ * @return symbol for wizard sequencer
+ */
+define symbol FudgeDialog () ``{
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (3),
+	`HBox (
+	    // text entry
+	    `HWeight (1, `TextEntry (`id (`refid), _("&Reference ID"), "")),
+	    `HSpacing (3),
+	    // int field
+	    `HWeight (1, `IntField (`id (`stratum), _("&Stratum"), 0, 15, 2))
+	),
+	`VStretch (),
+	`HBox (
+	    // text entry
+	    `HWeight (1, `TextEntry (`id (`time1), _("Calibration Offset 1"))),
+	    `HSpacing (3),
+	    // text entry
+	    `HWeight (1, `TextEntry (`id (`time2), _("Calibration Offset 2")))
+	),
+	`VStretch (),
+	`HBox (
+	    // check box
+	    `HWeight (1, `CheckBox (`id (`flag1), _("Flag &1"), false)),
+	    `HSpacing (3),
+	    // check box
+	    `HWeight (1, `CheckBox (`id (`flag2), _("Flag &2"), false))
+	),
+	`VStretch (),
+	`HBox (
+	    // check box
+	    `HWeight (1, `CheckBox (`id (`flag3), _("Flag &3"), false)),
+	    `HSpacing (3),
+	    // check box
+	    `HWeight (1, `CheckBox (`id (`flag4), _("Flag &4"), false))
+	),
+	`VSpacing (3)
+    ), `HSpacing (3));
+
+    // dialog caption
+    string caption = _("Clock Driver Calibration");
+
+    Wizard::SetContentsButtons (caption, contents, fudgeHelp (),
+            Label::BackButton (), Label::NextButton ());
+
+    map options = string2opts (NtpClient::selected_record["fudge_options"]:"",
+	["time1", "time2", "stratum", "refid",
+	    "flag1", "flag2", "flag3", "flag4"],
+	[]);
+    y2error ("Options: %1", options);
+
+    UI::ChangeWidget (`id (`refid), `Value, options["parsed", "refid"]:"");
+    UI::ChangeWidget (`id (`stratum), `Value, tointeger (options["parsed", "stratum"]:"3"));
+    UI::ChangeWidget (`id (`time1), `Value, options["parsed", "time1"]:"");
+    UI::ChangeWidget (`id (`time2), `Value, options["parsed", "time2"]:"");
+    UI::ChangeWidget (`id (`flag1), `Value, options["parsed", "flag1"]:"" == "1");
+    UI::ChangeWidget (`id (`flag2), `Value, options["parsed", "flag2"]:"" == "1");
+    UI::ChangeWidget (`id (`flag3), `Value, options["parsed", "flag3"]:"" == "1");
+    UI::ChangeWidget (`id (`flag4), `Value, options["parsed", "flag4"]:"" == "1");
+
+    UI::ChangeWidget (`id (`time1), `ValidChars, "1234567890.");
+    UI::ChangeWidget (`id (`time2), `ValidChars, "1234567890.");
+
+    any ret = nil;
+    while (ret == nil)
+    {
+        ret = UI::UserInput ();
+    }
+    if (ret == `cancel)
+	ret = `abort;
+    if (ret == `back || ret == `abort)
+	return (symbol)ret;
+    if (ret == `next)
+    {
+	options["parsed", "refid"] = UI::QueryWidget (`id (`refid), `Value);
+	options["parsed", "stratum"] = UI::QueryWidget (`id (`stratum), `Value);
+	options["parsed", "time1"] = UI::QueryWidget (`id (`time1), `Value);
+	options["parsed", "time2"] = UI::QueryWidget (`id (`time2), `Value);
+	options["parsed", "flag1"] = (boolean)UI::QueryWidget (`id (`flag1), `Value) ? 1 : 0;
+	options["parsed", "flag2"] = (boolean)UI::QueryWidget (`id (`flag2), `Value) ? 1 : 0;
+	options["parsed", "flag3"] = (boolean)UI::QueryWidget (`id (`flag3), `Value) ? 1 : 0;
+	options["parsed", "flag4"] = (boolean)UI::QueryWidget (`id (`flag4), `Value) ? 1 : 0;
+	NtpClient::selected_record["fudge_options"] = opts2string (
+	    options["parsed"]:$[],
+	    options["unknown"]:""
+	);
+    }
+    return (symbol)ret;
+}
+
+/**
+ * Dialog for selecting a server from a list
+ * @return symbol for wizard sequencer
+ */
+symbol ServerSelectionDialog () {
+    term contents = `HBox (`HStretch (), `VBox (
+	`VStretch (),
+        "servers_source",
+	`VSpacing (1),
+	// frame
+	`Frame (_("Local Network"),
+	    "found_servers"
+	),
+	`VSpacing (1),
+	// frame
+	`Frame (_("Public NTP Server"),
+	    "servers_list"
+	),
+	`VSpacing (1),
+	"select_test",
+	`VStretch ()
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Select NTP Server");
+
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["servers_source", "found_servers", "servers_list",
+	    "select_test"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_function" : $[`abort : abortPopup]
+    ]);
+}
+
+// fake dialogs (WS switches)
+
+/**
+ * Pseudo-dialog to fetch information for the simple dialog
+ * @return symbol for wizard sequencer (always `next)
+ */
+symbol SimpleDialogPrepare () {
+    list<map> peers = NtpClient::getSyncRecords ();
+    list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
+    integer index = servers[0, "index"]:-1;
+    NtpClient::selectSyncRecord (index);
+    return `next;
+}
+
+
+/**
+ * Pseudo-dialog to store information after the simple dialog
+ * @return symbol for wizard sequencer (always `next)
+ */
+symbol SimpleDialogFinish () {
+    if (NtpClient::selected_record["address"]:"" != "")
+	NtpClient::storeSyncRecord ();
+    return `next;
+}
+
+
+/**
+ * Pseudo-dialog to store settings to main structure
+ * @return symbol for wizard sequencer
+ */
+
+define symbol StoreRecord () ``{
+    sync_record_modified = true;
+    NtpClient::storeSyncRecord ();
+    return `next;
+}
+
+/**
+  * Select the type of configuration - simple vs. complex
+  * @return symbol for ws `simple or `complex
+  */
+define symbol SelectConfigType () ``{
+    if (NtpClient::config_dhcp)
+    {
+	y2milestone ("Configuration set via DHCP");
+	return `complex;
+    }
+    list<map> peers = NtpClient::getSyncRecords ();
+    list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
+    list<map> clocks = filter (map m, peers, ``(m["type"]:"" == "__clock"));
+    if (size (peers) != size (servers) + size (clocks))
+    {
+	y2milestone ("Something else than server and clock present");
+	return `complex;
+    }
+    if (size (servers) > 1 || size (clocks) > 1)
+    {
+	y2milestone ("More than one server or more than one clock present");
+	return `complex;
+    }
+    string clock_addr = clocks[0, "address"]:"";
+    if ("127.127.1.0" != clock_addr && "" != clock_addr)
+    {
+	y2milestone ("Non-standard clock present");
+	return `complex;
+    }
+    y2milestone ("Going simple dialog");
+    return `simple;
+}
+/* EOF */
+}

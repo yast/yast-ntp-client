@@ -1,0 +1,86 @@
+/**
+ * File:
+ *  Read.ycp
+ *
+ * Module:
+ *  NTP client configurator
+ *
+ * Summary:
+ *  Reading configuration testsuite
+ *
+ * Authors:
+ *  Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+
+    // testedfiles: NtpClient.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"init" : $[
+	    "scripts" : $[
+		"exists" : true,
+	    ],
+	],
+	"etc" : $[
+	    "ntp_conf" : $[
+		"all" : $[
+		    "comment":"",
+		    "file":-1,
+		    "kind":"section",
+		    "name":"",
+		    "type":-1,
+		    "value":[],
+		],
+	    ],
+	],
+	"sysconfig" : $[
+	    "xntp" : $[
+		"XNTPD_INITIAL_NTPDATE" : "AUTO-2",
+		"XNTPD_RUN_CHROOTED" : "yes",
+	    ],
+	    "personal-firewall" : $[
+		"REJECT_ALL_INCOMING_CONNECTIONS" : "no",
+	    ],
+	],
+	"target" : $[
+	    "string" : "",
+	    "tmpdir" : "/tmp",
+	    "size" : 0,
+	],
+    ];
+    map WRITE = $[];
+    map EXEC = $[
+	"target" : $[
+	    "bash_output" : $[],
+	],
+    ];
+
+
+    TESTSUITE_INIT ([READ, WRITE, EXEC], nil);
+
+    import "Progress";
+    import "NtpClient";
+    import "Mode";
+
+    Mode::SetTest ("testsuite");
+
+    boolean progress_orig = Progress::set (false);
+
+    TEST (``(NtpClient::Import ($[
+	"peers":[
+	    $["address":"ntp1", "initial_sync":true, "options":" options1", "type":"server"],
+	    $["address":"127.127.1.2", "initial_sync":false, "options":" options_clock", "type":"__clock"],
+	    $["address":"ntp2", "initial_sync":true, "options":" options2", "type":"server"],
+	    $["address":"peer1", "initial_sync":false, "options":" options_peer", "type":"peer"]
+	],
+	"start_at_boot":false,
+	"start_in_chroot":true,])), [READ, WRITE, EXEC], nil);
+
+    TEST (``(NtpClient::Write ()), [READ, WRITE, EXEC], nil);
+}
