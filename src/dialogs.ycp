@@ -126,14 +126,16 @@ define symbol MainDialog () ``{
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
 	`HBox (
-	    `HStretch (),
 	    `VBox (
-	    "start",
+		"start",
 		`Left ("run_chroot"),
 		`Left ("config_dhcp"),
-		"firewall"
-	    ),
-	    `HStretch ()
+		`Frame (
+		    // TRANSLATORS: UI frame label
+		    _("Firewall Settings"),
+		    "firewall"
+		)
+	    )
 	),
 	`VSpacing (1),
 	"overview",
