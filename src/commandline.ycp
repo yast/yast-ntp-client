@@ -88,7 +88,7 @@ define boolean updateSyncRecord (map options) ``{
   * @return boolean true if settings have been changed
   */
 define boolean NtpStatusHandler (map options) ``{
-    CommandLine::Print (NtpClient::run_serviceA
+    CommandLine::Print (NtpClient::run_service
 	// status information for command line
 	? _("NTP daemon is enabled.")
 	// status information for command line
