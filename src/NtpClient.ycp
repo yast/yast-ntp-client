@@ -15,6 +15,7 @@
 module "NtpClient";
 textdomain "ntp-client";
 
+import "Directory";
 import "Mode";
 import "NetworkDevices";
 import "PackageSystem";
@@ -60,6 +61,16 @@ global boolean run_service = false;
 global boolean run_chroot = false;
 
 /**
+ * NTP servers will be configured via DHCP
+ */
+global boolean config_dhcp = false;
+
+/**
+ * NTP servers will be configured via DHCP - value got while reading
+ */
+global boolean original_config_dhcp = false;
+
+/**
   * Index of the currently sellected item
   */
 global integer selected_index = -1;
@@ -84,11 +95,27 @@ global map firewall_settings = $[];
   */
 global list required_packages = ["xntp"];
 
+/**
+ * List of known NTP servers
+ * server -> information
+ */
+map<string,map<string,string> > ntp_servers = nil;
+
+/**
+ * Mapping between country codes and country names ("CZ" -> "Czech Republic")
+ */
+map<string,string> country_names = nil;
+
+
 global define list<map<string,any> >getSyncRecords ();
 global define boolean storeSyncRecord ();
 global define boolean deleteSyncRecord (integer index);
 global define boolean selectSyncRecord (integer index);
 global define boolean Write ();
+global boolean TestNtpServer (string server, boolean silent);
+global list<string> DetectNtpServers (symbol method);
+global map<string, map<string,string> > GetNtpServers ();
+global map<string, string> GetCountryNames ();
 
 global boolean simple_dialog = false;
 
@@ -96,6 +123,50 @@ include "ntp-client/misc.ycp";
 include "ntp-client/widgets.ycp";
 
 global map<string,any> widgets = InitWidgets ();
+
+/**
+ * Get the list of known NTP servers
+ * @return a list of known NTP servers
+ */
+global map<string, map<string,string> > GetNtpServers () {
+    if (ntp_servers == nil)
+    {
+	ntp_servers = $[];
+	list<map<string,string> > servers = (list<map<string,string> >)
+	    SCR::Read (.target.ycp, Directory::datadir + "/ntp_servers.ycp");
+	if (servers == nil)
+	{
+	    y2error ("Failed to read the list of NTP servers");
+	}
+	else
+	{
+	    y2milestone ("%1 known NTP servers read", size (servers));
+	    ntp_servers = listmap (map<string,string> s, servers, {
+		string server = s["address"]:"";
+		return $[ server : s ];
+	    });
+	}
+    }
+    return ntp_servers;
+}
+
+/**
+ * Get the mapping between country codea and names ("CZ" -> "Czech Republic")
+ * @return a map the country codes and names mapping
+ */
+global map<string, string> GetCountryNames () {
+    if (country_names == nil)
+    {
+	country_names = (map<string,string>)
+	    eval(SCR::Read(.target.yast2, "country.ycp"));
+    }
+    if (country_names == nil)
+    {
+	y2error ("Failed to read country names");
+	country_names = $[];
+    }
+    return country_names;
+}
 
 /**
  * Read all ntp-client settings
@@ -133,7 +204,11 @@ global define boolean Read() ``{
     Progress::off ();
     NetworkDevices::Read ();
     Progress::on ();
+    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
+    original_config_dhcp = config_dhcp;
 
+    GetNtpServers ();
+    GetCountryNames ();
     // read current settings
     if(Abort()) return false;
     Progress::NextStage();
@@ -291,6 +366,8 @@ global define boolean Read() ``{
  */
 global define boolean Write() ``{
 
+    boolean update_dhcp = original_config_dhcp != config_dhcp;
+
     /* NtpClient read dialog caption */
     string caption = _("Saving NTP Client Configuration");
 
@@ -320,11 +397,29 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage();
 
-    y2milestone ("Writing settings %1", ntp_records);
+    if (update_dhcp)
+    {
+	SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF,
+	    config_dhcp ? "yes" : "no");
+	SCR::Write (.sysconfig.network.dhcp, nil);
+	// switch DHCP udpates off before sacing the settings
+	if (! config_dhcp)
+	{
+	    Service::RunInitScript ("network", "restart-all-dhcp-clients");
+	}
+    }
 
-    list<map<string, any> > save2 = (list<map<string, any> >)flatten (maplist (
+    if (config_dhcp && ! update_dhcp)
+    {
+	y2milestone ("Configuration was and will be DHCP, not touching /etc/dhcps.conf");
+    }
+    else
+    {
+      y2milestone ("Writing settings %1", ntp_records);
+
+      list<map<string, any> > save2 = (list<map<string, any> >)flatten (maplist(
 	map<string, any> r, ntp_records,
-    ``{
+      {
 	map<string,any> s1 = $[
 	    "comment" : r["comment"]:"",
 	    "kind" : "value",
@@ -345,28 +440,34 @@ global define boolean Write() ``{
 	    s1["name"] = "server";
 	}
 	return [ s1, s2 ];
-    }));
-    save2 = filter (map<string, any> m, save2, ``(m != nil));
+      }));
+      save2 = filter (map<string, any> m, save2, ``(m != nil));
 
-    boolean failed = false;
-    map conf = (map)SCR::Read (.etc.ntp_conf.all);
-    if (conf == nil)
-    {
+      boolean failed = false;
+      map conf = (map)SCR::Read (.etc.ntp_conf.all);
+      if (conf == nil)
+      {
         failed = true;
-    }
-    else
-    {
+      }
+      else
+      {
 	conf["value"] = save2;
 	if (! SCR::Write (.etc.ntp_conf.all, conf))
 	    failed = true;
 	if (! SCR::Write (.etc.ntp_conf, nil))
 	    failed = true;
-    }
+      }
 
-    if (failed)
+      if (failed)
 	// error report
 	Report::Error (_("Cannot write settings to /etc/ntp.conf."));
+    }
 
+    // if configuration via DHCP was turned on, restart DHCP clients now
+    if (update_dhcp && config_dhcp)
+    {
+	Service::RunInitScript ("network", "restart-all-dhcp-clients");
+    }
 
     list init = maplist (map<string,any> p, ntp_records, ``(
 	(p["type"]:"" == "server" || p["type"]:"" == "peer")
@@ -459,6 +560,7 @@ global define boolean Write() ``{
 global define boolean Import (map settings) ``{
     run_service = settings["start_at_boot"]:false;
     run_chroot = settings["start_in_chroot"]:true;
+    config_dhcp = settings["configure_dhcp"]:false;
     ntp_records = settings["peers"]:[];
     ntp_records = maplist(map<string, any> p, ntp_records, ``{
             if (haskey(p, "key") && haskey(p, "value") )
@@ -475,6 +577,7 @@ global define boolean Import (map settings) ``{
             }
             });
     modified = true;
+    original_config_dhcp = nil;
     return true;
 }
 
@@ -487,6 +590,7 @@ global define map Export () ``{
     return $[
 	"start_at_boot" : run_service,
 	"start_in_chroot" : run_chroot,
+	"configure_dhcp" : config_dhcp,
 	"peers" : ntp_records,
     ];
 }
@@ -516,6 +620,13 @@ global define string Summary() ``{
 	// summary string, %1 is list of addresses
 	"broadcastclient" : _("Accept broadcasted time information from"),
     ];
+    if (config_dhcp)
+    {
+	summary = Summary::AddLine (summary,
+	    // summary string
+	    _("Configure NTP daemon via DHCP."));
+	return summary;
+    }
     foreach (string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
 	list<map<string,any> > l
@@ -531,6 +642,58 @@ global define string Summary() ``{
 	}
     });
     return summary;
+}
+
+/**
+ * Test if specified NTP server answers
+ * @param server string host name or IP address of the NTP server
+ * @param silent boolean don't report the result of the detection
+ * @return boolean true if NTP server answers properly
+ */
+global boolean TestNtpServer (string server, boolean silent) {
+    integer status = Service::Status ("xntpd");
+    if (status == 0)
+	Service::Stop ("xntpd");
+    integer ret = (integer)SCR::Execute (.target.bash, sformat (
+	"/usr/sbin/ntpdate %1",
+	server
+    ));
+    if (status == 0)
+	Service::Start ("xntpd");
+    boolean ok = ret == 0;
+    if (! silent)
+    {
+	if (ok)
+	{
+	    // message report - result of test of connection to NTP server
+	    Report::Message (_("Server is reachable and responds properly."));
+	}
+	else
+	{
+	    // message report - result of test of connection to NTP server
+	    Report::Message (_("Server is unreachable or does not respond properly."));
+	}
+    }
+    return ok;
+}
+
+/**
+ * Detect NTP servers present in the local network
+ * @param method symbol method of the detection (only `slp suported ATM)
+ * @return a list of found NTP servers
+ */
+global list<string> DetectNtpServers (symbol method) {
+    if (method == `slp)
+    {
+	list<map> servers = SLP::FindSrvs ("service:ntp", "");
+	list<string> server_names = maplist (map m, servers, ``(
+	    (string)(m["pcHost"]:"")
+	));
+	server_names = filter (string s, server_names, ``(s != ""));
+	return server_names;
+    }
+    y2error ("Unknown detection method: %1", method);
+    return [];
 }
 
 /**

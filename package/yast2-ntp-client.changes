@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jul 29 09:48:11 CEST 2004 - jsrain@suse.cz
+
+- added a list of NTP servers and offering to select one of them
+- added support for configuring via DHCP
+
+-------------------------------------------------------------------
 Mon Jul 19 12:36:29 CEST 2004 - jsrain@suse.cz
 
 - use common function for checking installed packages (#30872)

@@ -143,7 +143,21 @@ global define void chrootStore (any id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-global define void overviewInit (any id) ``{
+global define void ConfigDhcpInit (any id) ``{
+    UI::ChangeWidget (`id (id), `Value, NtpClient::config_dhcp);
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+global define void ConfigDhcpStore (any id, map event) ``{
+    NtpClient::config_dhcp = (boolean)(UI::QueryWidget (`id (id), `Value));
+    NtpClient::modified = true;
+}
+
+define void overviewRedraw () {
     map types = $[
 	// table cell, NTP relationship type
 	"server" : _("Server"),
@@ -199,15 +213,17 @@ global define any overviewHandle (string id, map event) ``{
     }
     NtpClient::modified = true;
     any ev_id = event["ID"]:nil;
-    if (ev_id == "boot" || ev_id == "never")
+    if (ev_id == "boot" || ev_id == "never" || ev_id == "config_dhcp")
     {
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
 	    != "never";
+	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
+	enabled = enabled && ! (boolean)
+	    UI::QueryWidget (`id ("config_dhcp"), `Value);
 	UI::ChangeWidget (`id (`add), `Enabled, enabled);
 	UI::ChangeWidget (`id (`edit), `Enabled, enabled);
 	UI::ChangeWidget (`id (`delete), `Enabled, enabled);
 	UI::ChangeWidget (`id (`overview), `Enabled, enabled);
-	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
 	return nil;
     }
     map types = $[
@@ -239,10 +255,18 @@ global define any overviewHandle (string id, map event) ``{
 	    NtpClient::deleteSyncRecord (
 		(integer)(UI::QueryWidget (`id (`overview), `CurrentItem))
 	    );
-	    overviewInit (id);
+	    overviewRedraw ();
 	}
     }
+}
 
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+global define void overviewInit (string id) ``{
+    overviewRedraw ();
+    overviewHandle (id, $["ID" : "boot"]);
 }
 
 /**
@@ -277,21 +301,21 @@ global define void addressStore (any id, map event) ``{
  */
 global define symbol serverAddressHandle (string id, map event) {
     any ev_id = event["ID"]:nil;
+    string server = (string)UI::QueryWidget (`id (id), `Value);
     if (ev_id == "boot" || ev_id == "never")
     {
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
 	    != "never";
 	UI::ChangeWidget (`id (id), `Enabled, enabled);
+	UI::ChangeWidget (`id (`test_server), `Enabled, enabled);
 	UI::ChangeWidget (`id (`lookup_address), `Enabled, enabled);
+	UI::ChangeWidget (`id (`select_list), `Enabled, enabled);
 	return nil;
     }
     if (ev_id == `lookup_address)
     {
-	list<map> servers = SLP::FindSrvs ("service:ntp", "");
-	list<string> server_names = maplist (map m, servers, ``(
-	    (string)(m["pcHost"]:"")
-	));
-	server_names = filter (string s, server_names, ``(s != ""));
+	symbol method = `slp;
+	list<string> server_names = NtpClient::DetectNtpServers (method);
 	UI::ReplaceWidget (`server_address_rp,
 	    `ComboBox (`id ("server_address"),
 		`opt (`editable, `hstretch),
@@ -299,6 +323,13 @@ global define symbol serverAddressHandle (string id, map event) {
 		_("&NTP Server"),
 		server_names));
 	return nil;
+    }
+    else if (ev_id == `test_server)
+    {
+	NtpClient::TestNtpServer (server, false);
+    }
+    else if (ev_id == `select_list) {
+	return `select;
     }
     return nil;
 }
@@ -497,6 +528,159 @@ global define void deviceStore (string id, map event) ``{
 	UI::QueryWidget (`id (id), `Value);
 }
 
+string last_country = nil;
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+global symbol ServerListHandle (string id, map event) {
+    string country = (string)UI::QueryWidget (`id (`country), `Value);
+    if (country == nil)
+	country = "";
+    y2milestone ("Handling server list change, last country: %1, current country: %2", last_country, country);
+    if (country != last_country)
+    {
+	last_country = country;
+        map<string,string> country_names = $[];
+	map<string,map<string,string> > servers = GetNtpServers ();
+	if (country != "")
+	{
+	    servers = filter (string s, map<string,string> o, servers, {
+		return o["country"]:"" == country;
+	    });
+	}
+	else
+	{
+            country_names = NtpClient::GetCountryNames ();
+	}
+	list items = maplist (string s, map<string,string> o, servers, {
+	    string label = o["location"]:"";
+	    string l_country = o["country"]:"";
+	    if (country != "")
+		l_country = "";
+	    else
+		l_country = country_names[l_country]:l_country;
+	    if (label != "" && l_country != "")
+		label = sformat ("%1 (%2, %3)", s, label, l_country);
+	    else if (label == "" && l_country == "")
+		label = s;
+	    else
+		label = sformat ("%1 (%2%3)", s, label, l_country);
+	    return `item (`id (s), label);
+	});
+	UI::ReplaceWidget (`servers_rp, `SelectionBox (`id (`servers),
+	    // selection box header
+	    _("&Servers"), items));
+	return nil;
+    }
+    if (event["ID"]:nil == `test || event["ID"]:nil == `info)
+    {
+	string server = (string)UI::QueryWidget (`id (`servers), `CurrentItem);
+	if (server == nil || server == "")
+	{
+	    // message report (no server selected)
+	    Report::Message (_("Select an NTP server."));
+	    return nil;
+	}
+	if (event["ID"]:nil == `test)
+	{
+	    TestNtpServer (server, false);
+	}
+/*	else if (event["ID"]:nil == `info)
+	{
+	    // TODO
+	}*/
+	return nil;
+    }
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+global void ServerListInit (string id) {
+    map<string,string> country_names = NtpClient::GetCountryNames ();
+    map<string,string> country_codes = mapmap (
+	string k,
+	string v,
+	country_names,
+    {
+	return $[ v : k ];
+    });
+    list<string> country_name_list = maplist (
+	string k,
+	string v,
+	country_codes,
+    {
+	return k;
+    });
+    country_name_list = lsort (country_name_list);
+    list<string> countries_lst = toset (maplist (
+	string s, map<string,string> m,
+	GetNtpServers (),
+    {
+	string country = m["country"]:"";
+	string label = country_names[country]:country;
+	return label;
+    }));
+    countries_lst = lsort (countries_lst);
+    list countries = maplist (string label, countries_lst, {
+	string code = country_codes[label]:label;
+	return `item (`id (code), label);
+    });
+    // combo box item
+    countries = prepend (countries, `item (`id (""), _("All countries")));
+    UI::ReplaceWidget (`country_rp,
+	`ComboBox (`id (`country), `opt (`notify, `hstretch),
+	    // combo box header
+	    _("&Country"), countries));
+    last_country = nil;
+
+    string lang = (string)SCR::Read (.sysconfig.language.RC_LANG);
+    if (lang != nil)
+    {
+	// remove the .UTF-8 first
+        list<string> l = splitstring (lang, ".");
+        lang = l[0]:"";
+	// remove leading language (keep country only)
+        l = splitstring (lang, "_");
+	lang = l[size (l) - 1]:lang;
+	y2milestone ("Current lnaguage: %1", lang);
+	UI::ChangeWidget (`id (`country), `Value, lang);
+    }
+    ServerListHandle (id, $[]);
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+global void ServerListStore (string id, map event) {
+    string address = (string)UI::QueryWidget (`id (`servers), `CurrentItem);
+    NtpClient::selected_record["address"] = address;
+}
+
+/**
+ * Validation function of a widget
+ * @param id string widget id
+ * @param event map event that caused validation
+ * @return boolean true if validation succeeded
+ */
+global boolean ServerListValidate (string id, map event) {
+    string address = (string)UI::QueryWidget (`id (`servers), `CurrentItem);
+    if (address == "" || address == nil)
+    {
+	// report message
+	Report::Message (_("Select an NTP server."));
+	return false;
+    }
+    return true;
+}
 
 /**
  * Initialize all widgets
@@ -553,23 +737,47 @@ global define map<string,any> InitWidgets () ``{
 	    "handle" : ntpEnabledOrDisabled,
 	    "help" : HELPS["chroot_environment"]:"",
 	],
+	"config_dhcp" : $[
+	    "widget" : `checkbox,
+	    "opt" : [ `notify ],
+	    // check box
+	    "label" : _("Configure NTP Daemon via &DHCP"),
+	    "init" : NtpClient::ConfigDhcpInit,
+	    "store" : NtpClient::ConfigDhcpStore,
+	    "handle" : ntpEnabledOrDisabled,
+	    "help" : HELPS["config_dhcp"]:"",
+	],
 	"server_address" : union (address, $[
 	    // text entry label
 	    "label" : _("&NTP Server"),
 	    "help" : HELPS["server_address"]:"",
 	    "handle" : serverAddressHandle,
 	    "widget" : `custom,
-	    "custom_widget" : `HBox (
-		`ReplacePoint (`id (`server_address_rp),
-		    `ComboBox (`id ("server_address"),
-			`opt (`editable, `hstretch),
-			// combo box label
-			_("&NTP Server"))
+	    "custom_widget" : `VBox (
+		`HBox (
+		    `ReplacePoint (`id (`server_address_rp),
+			`ComboBox (`id ("server_address"),
+			    `opt (`editable, `hstretch),
+			    // combo box label
+			    _("&NTP Server"))
+		    ),
+		    `VBox (
+			`Label (" "),
+			// push button
+			`PushButton (`id (`test_server), _("&Test"))
+		    )
 		),
-		`VBox (
-		    `Label (" "),
-		    // push button
-		    `PushButton (`id (`lookup_address), _("&Lookup"))
+		`HBox (
+		    `HStretch (),
+		    `HWeight (1,
+			// push button
+			`PushButton (`id (`lookup_address), _("&Lookup"))
+		    ),
+		    `HWeight (1,
+			// push button
+			`PushButton (`id (`select_list), _("&Select from List"))
+		    ),
+		    `HStretch ()
 		)
 	    ),
 	]),
@@ -693,6 +901,30 @@ global define map<string,any> InitWidgets () ``{
 	    "help" : HELPS["peer_types"]:"",
 	    "hspacing" : 3,
 	    "vspacing" : 1,
+	],
+	"servers_list" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `VBox (
+		`ReplacePoint (`id (`country_rp),
+		    `ComboBox (`id (`country), `opt (`notify, `hstretch),
+			// combo box header
+			_("&Country"), [])),
+		`ReplacePoint (`id (`servers_rp), `SelectionBox (`id (`servers),
+		    // selection box header
+		    _("&Servers"), [])),
+		`HBox (
+		    `HStretch (),
+		    `PushButton (`id (`test), _("&Test")),
+//		    `PushButton (`id (`info), _("&Info")),
+		    `HStretch ()
+		)
+	    ),
+	    "init" : ServerListInit,
+	    "handle" : ServerListHandle,
+	    "store" : ServerListStore,
+	    "validate_type" : `function,
+	    "validate_function" : ServerListValidate,
+	    "help" : HELPS["servers_list"]:"",
 	],
     ];
 }

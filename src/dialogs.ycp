@@ -54,13 +54,7 @@ define symbol WriteDialog() ``{
  */
 define symbol SimpleDialog () ``{
     NtpClient::simple_dialog = true;
-    // prepare the stuff first
-    list<map> peers = NtpClient::getSyncRecords ();
-    list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
-    integer index = servers[0, "index"]:-1;
-    NtpClient::selectSyncRecord (index);
 
-    // now process the dialog
     list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "complex_button"],
 	NtpClient::widgets);
     term contents = `HBox (`HSpacing (1), `VBox (
@@ -100,8 +94,6 @@ define symbol SimpleDialog () ``{
     // and now store the settings if needed
     if (ret != `abort && ret != `back && ret != `cancel)
     {
-	if (NtpClient::selected_record["address"]:"" != "")
-	    NtpClient::storeSyncRecord ();
     }
     y2milestone ("Simple dialog: Returning %1", ret);
     return ret;
@@ -113,7 +105,7 @@ define symbol SimpleDialog () ``{
  */
 define symbol MainDialog () ``{
     NtpClient::simple_dialog = false;
-    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "overview"],
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "config_dhcp", "overview"],
 	NtpClient::widgets);
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
@@ -125,7 +117,10 @@ define symbol MainDialog () ``{
 	`VSpacing (1),
 	`HBox (
 	    `HStretch (),
-	    "run_chroot",
+	    `VBox (
+		`Left ("run_chroot"),
+		`Left ("config_dhcp")
+	    ),
 	    `HStretch ()
 	),
 	`VSpacing (1),
@@ -487,8 +482,49 @@ define symbol FirewallDialog () ``{
     return (symbol)ret;
 }
 
+/**
+ * Dialog for selecting a server from a list
+ * @return symbol for wizard sequencer
+ */
+symbol ServerSelectionDialog () {
+    term contents = `HBox (`HStretch (), `VBox (
+	`VStretch (),
+	"servers_list",
+	`VStretch ()
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Select NTP Server");
+
+    return CWM::ShowAndRun (["servers_list"], NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (),
+	$[`abort : abortPopup]);
+}
 
 // fake dialogs (WS switches)
+
+/**
+ * Pseudo-dialog to fetch information for the simple dialog
+ * @return symbol for wizard sequencer (always `next)
+ */
+symbol SimpleDialogPrepare () {
+    list<map> peers = NtpClient::getSyncRecords ();
+    list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
+    integer index = servers[0, "index"]:-1;
+    NtpClient::selectSyncRecord (index);
+    return `next;
+}
+
+
+/**
+ * Pseudo-dialog to store information after the simple dialog
+ * @return symbol for wizard sequencer (always `next)
+ */
+symbol SimpleDialogFinish () {
+    if (NtpClient::selected_record["address"]:"" != "")
+	NtpClient::storeSyncRecord ();
+    return `next;
+}
 
 
 /**
@@ -506,6 +542,11 @@ define symbol StoreRecord () ``{
   * @return symbol for ws `simple or `complex
   */
 define symbol SelectConfigType () ``{
+    if (NtpClient::config_dhcp)
+    {
+	y2milestone ("Configuration set via DHCP");
+	return `complex;
+    }
     list<map> peers = NtpClient::getSyncRecords ();
     list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
     list<map> clocks = filter (map m, peers, ``(m["type"]:"" == "__clock"));

@@ -84,6 +84,11 @@
 	    "personal-firewall" : $[
 		"REJECT_ALL_INCOMING_CONNECTIONS" : "no",
 	    ],
+	    "network" : $[
+		"dhcp" : $[
+		    "DHCLIENT_MODIFY_NTP_CONF" : "no",
+		],
+	    ],
 	],
 	"target" : $[
 	    "string" : "",

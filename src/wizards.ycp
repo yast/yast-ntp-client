@@ -29,6 +29,7 @@ define symbol ComplexSequence() ``{
 	"main"		:   ``(MainDialog ()),
 	"type_select"	:   ``(TypeSelectDialog ()),
 	"server"	:   ``(ServerDialog ()),
+	"server_select"	:   ``(ServerSelectionDialog ()),
 	"peer"		:   ``(PeerDialog ()),
 	"clock"		:   ``(RadioDialog ()),
 	"fudge"		:   ``(FudgeDialog ()),
@@ -70,6 +71,11 @@ define symbol ComplexSequence() ``{
 	"server" : $[
 	    `abort	: `abort,
 	    `next	: "store_record",
+	    `select	: "server_select",
+	],
+	"server_select" : $[
+	    `abort	: `abort,
+	    `next	: "server",
 	],
 	"clock" : $[
 	    `abort	: `abort,
@@ -112,20 +118,36 @@ define symbol SimpleSequence () ``{
 
     map aliases = $[
 	"switcher"	:[``(SelectConfigType ()), true ],
+	"simple_pre"	:[``(SimpleDialogPrepare ()), true ],
 	"simple"	: ``(SimpleDialog ()),
+	"simple_post"	:[``(SimpleDialogFinish ()), true ],
+	"server_select"	: ``(ServerSelectionDialog ()),
 	"complex"	: ``(ComplexSequence ()),
     ];
 
     map sequence = $[
 	"ws_start" : "switcher",
 	"switcher" : $[
-	    `simple : "simple",
+	    `simple : "simple_pre",
 	    `complex : "complex",
+	],
+	"simple_pre" : $[
+	    `abort	: `abort,
+	    `next	: "simple",
 	],
 	"simple" : $[
 	    `abort	: `abort,
-	    `next	: `next,
+	    `next	: "simple_post",
 	    `complex	: "complex",
+	    `select	: "server_select",
+	],
+	"simple_post" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	],
+	"server_select" : $[
+	    `abort	: `abort,
+	    `next	: "simple",
 	],
 	"complex" : $[
 	    `abort	: `abort,
