@@ -49,6 +49,10 @@ global boolean write_only = false;
  * @return true on success
  */
 
+global list<map<string, any> >ntp_records = [];
+
+
+
 global boolean start_at_boot = false;
 
 global list peers = [];
@@ -85,7 +89,7 @@ global define boolean Read() ``{
     /* NtpClient read dialog caption */
     string caption = _("Initializing NTP Client Configuration");
 
-    integer steps = 2;
+    integer steps = 1;
     integer sl = 500;
 
     // We do not set help text here, because it was set outside
@@ -123,24 +127,58 @@ YaST2 will install package %1.
 
     start_at_boot = Runlevel::ServiceEnabled ("xntpd");
     peers = [];
-    foreach (`k, rw_order, ``{
-	path v = paths[k]:nil;
-	list l = SCR::Read (v);
-	if (l == nil)
+
+    map conf = (map)SCR::Read (.etc.ntp_conf.all);
+    if (conf == nil)
+    {
+	failed = true;
+	conf = $[];
+    }
+    list<map<string, any> > value = conf["value"]:[];
+    integer index = -1;
+    ntp_records = maplist (map<string, any> m, value, ``{
+	index = index + 1;
+	string type = m["name"]:"";
+	string address = m["value"]:"";
+	string options = "";
+	if (contains ([
+	    "server", "peer", "broadcast", "broadcastclient", "manycast",
+	    "manycastclient", "fudge" ],
+	    type))
 	{
-	    y2error ("Reading %1 returned nil", v);
-	    failed = true;
-	    l = [];
+	    list l = splitstring (address, " ");
+	    l = filter (string s, l, ``(s != ""));
+	    address = l[0]:"";
+	    l[0] = "";
+	    options = mergestring (l, " ");
 	}
-	list(map) p = maplist (list e, l, ``(
-	    $[
-		"key" : k,
-		"value" : e[0]:"",
-		"param" : e[1]:"",
-	    ]
-	));
-//	l = maplist (`e, l, ``(prepend (e, k)));
-	peers = merge (peers, p);
+	map entry = $[
+	    "type" : type,
+	    "address" : address,
+	    "options" : options,
+	    "comment" : m["comment"]:"",
+	];
+	return entry;
+    });
+    list<map<string, any> > fudge_records = filter (map m, ntp_records, ``(
+	m["type"]:"" == "fudge"
+    ));
+    map <string, map<string, any> > fudge_map = listmap (map m, fudge_records,
+    ``{
+	string key = m["address"]:"";
+	return $[key: m];
+    });
+    ntp_records = filter (map m, ntp_records, ``(
+	m["type"]:"" != "fudge"
+    ));
+
+    ntp_records = maplist (map m, ntp_records, ``{
+	if (haskey (fudge_map, m["address"]:""))
+	{
+	    m["fudge_options"] = fudge_map[m["address"]:"", "options"]:"";
+	    m["fudge_comment"] = fudge_map[m["address"]:"", "comment"]:"";
+	}
+	return m;
     });
 
     string initial_sync = SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
@@ -151,10 +189,21 @@ YaST2 will install package %1.
 	y2error ("Failed reading .sysconfig.xntp.XNTPD_INITIAL_NTPDATE");
     }
 
+    // mark local clock to be local clock and not real servers
+    ntp_records = maplist (`p, ntp_records, ``{
+	if (p["type"]:"" == "server"
+	    && regexpmatch (p["address"]:"", "^127\.127\.[0-9]+.[0-9]+$"))
+	{
+	    p["type"] = "__clock";
+	}
+	return p;
+    });
+
+    // mark those servers and peers that are used for initial syncing
     if (initial_sync == "AUTO")
     {
-	peers = maplist (`p, peers, ``{
-	    p["initial"] = p["key"]:"" == "server";
+	ntp_records = maplist (`p, ntp_records, ``{
+	    p["initial_sync"] = p["type"]:"" == "server";
 	    return p;
 	});
     }
@@ -162,40 +211,29 @@ YaST2 will install package %1.
     {
 	integer count = tointeger (
 	    regexpsub (initial_sync, "AUTO-([0-9]+)", "\\1"));
-	peers = maplist (`p, peers, ``{
-	    if ((p["key"]:"" == "server"
-		    && ! regexpmatch (p["value"]:"",
-			"^127\.127\.[0-9]+.[0-9]+$"))
-		|| p["key"]:"" == "peer")
+	ntp_records = maplist (`p, ntp_records, ``{
+	    if (p["type"]:"" == "server" || p["type"]:"" == "peer")
 	    {
 		count = count - 1;
-		p["initial"] = count >= 0;
+		p["initial_sync"] = count >= 0;
 	    }
 	    else
-		p["initial"] = false;
+		p["initial_sync"] = false;
 	    return p;
 	});
     }
     else
     {
 	list listed = splitstring (initial_sync, " ");
-	peers = maplist (`p, peers, ``{
-	    p["initial"] = (p["key"]:"" == "server" || p["key"]:"" == "peer")
-		&& contains (listed, p["value"]:"");
+	ntp_records = maplist (`p, ntp_records, ``{
+	    p["initial_sync"]
+		= (p["type"]:"" == "server" || p["type"]:"" == "peer")
+		    && contains (listed, p["address"]:"");
 	    return p;
 	});
     }
 
-    peers = maplist (`p, peers, ``{
-	if (p["key"]:"" == "server"
-	    && regexpmatch (p["value"]:"", "^127\.127\.[0-9]+.[0-9]+$"))
-	{
-	    p["key"] = "radio";
-	}
-	return p;
-    });
-
-    y2milestone ("Read settings: %1", peers);
+y2error ("Read servers: %1", ntp_records);
 
     if(failed)
     {
@@ -248,29 +286,48 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage();
 
-    y2milestone ("Writing settings %1", peers);
+    y2milestone ("Writing settings %1", ntp_records);
+
+    list<map<string, any> > save2 = flatten (maplist (
+	map<string, any> r, ntp_records,
+    ``{
+	map s1 = $[
+	    "comment" : r["comment"]:"",
+	    "kind" : "value",
+	    "name" : r["type"]:"",
+	    "type" : 0,
+	    "value" : r["address"]:"" + " " + r["options"]:"",
+	];
+	map s2 = nil;
+	if (r["type"]:"" == "__clock")
+	{
+	    s2 = $[
+		"comment" : r["fudge_comment"]:"",
+		"kind" : "value",
+		"name" : "fudge",
+		"type" : 0,
+		"value" : r["address"]:"" + " " + r["fudge_options"]:"",
+	    ];
+	    s1["name"] = "server";
+	}
+	return [ s1, s2 ];
+    }));
+    save2 = filter (map m, save2, ``(m != nil));
 
     boolean failed = false;
-    list(map) peers2 = maplist (`p, peers, ``{
-	if (p["key"]:"" == "radio")
-	    p["key"] = "server";
-	return p;
-    });
-    foreach (`k, rw_order, ``{
-	path v = paths[k]:nil;
-	list(map) l = filter (map e, peers2, ``(e["key"]:"" == k));
-	list(list) l2 = maplist (`e, l, ``(
-	    [e["value"]:"", e["param"]:""]
-	));
-	boolean b = SCR::Write (v, l2);
-	if (! b)
-	{
-	    y2error ("Writing %1 failed", v);
+    map conf = (map)SCR::Read (.etc.ntp_conf.all);
+    if (conf == nil)
+    {
+        failed = true;
+    }
+    else
+    {
+	conf["value"] = save2;
+	if (! SCR::Write (.etc.ntp_conf.all, conf))
 	    failed = true;
-	    l = [];
-	}
-    });
-    failed = failed || ! SCR::Write (.etc.ntp_conf, nil);
+	if (! SCR::Write (.etc.ntp_conf, nil))
+	    failed = true;
+    }
 
     if (failed)
 	// error report
@@ -278,9 +335,10 @@ global define boolean Write() ``{
 
 
     list init = maplist (`p, peers2, ``(
-	(p["key"]:"" == "server" || p["key"]:"" == "peer") && p["initial"]:false
-	    ? p["value"]:""
-	    : nil
+	(p["type"]:"" == "server" || p["type"]:"" == "peer")
+	    && p["initial_sync"]:false
+		? p["address"]:""
+		: nil
     ));
     init = filter (`i, init, ``(i != nil));
     string init_str = mergestring (init, " ");
