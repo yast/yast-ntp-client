@@ -20,6 +20,11 @@ include "commandline/commandline.ycp";
 include "ntp-client/wizards.ycp";
 
 
+/**
+ * Get the type of the synchronization record
+ * @param options a map of the command line options
+ * @return string the sync record type
+ */
 define string getSyncRecordType (map options) ``{
     string type = "";
     if (haskey (options, "server"))

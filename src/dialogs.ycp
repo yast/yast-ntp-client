@@ -22,6 +22,10 @@ import "Report";
 include "ntp-client/helps.ycp";
 include "ntp-client/misc.ycp";
 
+/**
+ * Display the popup to confirm abort
+ * @return boolean true if confirmed
+ */
 define boolean abortPopup () ``{
     return Popup::ReallyAbort (true);
 }
@@ -391,6 +395,10 @@ define symbol FudgeDialog () ``{
     return (symbol)ret;
 }
 
+/**
+ * Run the firewall settings dialog
+ * @return symbol for wizadr sequencer
+ */
 define symbol FirewallDialog () ``{
     if (! SuSEFirewall::start)
     {
@@ -491,10 +499,12 @@ symbol ServerSelectionDialog () {
 	`VStretch (),
         "servers_source",
 	`VSpacing (1),
+	// frame
 	`Frame (_("Local Network"),
 	    "found_servers"
 	),
 	`VSpacing (1),
+	// frame
 	`Frame (_("Public NTP Server"),
 	    "servers_list"
 	),

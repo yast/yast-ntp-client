@@ -92,26 +92,21 @@ it must be created manually.</p>"),
     "fudge_button" : _("<p><b><big>Driver Calibration</big></b><br>
 To calibrate the clock driver, click <b>Driver Calibration</b>.</p>"),
 
-    // help text 1/1, alt. 1 part 1/4
+    // help text 1/1, alt. 1 part 1/3
     "server_address" : _("<p><b><big>Address of the NTP Server</big></b><br>
-To select the address of the NTP server, use <b>NTP Server</b>.
-To find an NTP server, ask your Internet provider or
-see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>")
+To set the address of the NTP server, use <b>NTP Server</b>.
+To find an NTP server, ask your network administrator or Internet service
+provider.</p>")
     +
-    // help text 1/1, alt. 1 part 2/4
+    // help text 1/1, alt. 1 part 2/3
+    _("<p><b><big>Selecting a Server</big></b><br>
+To select a NTP server from those found in the local network
+or from the list of known NTP sevrers, click <b>Select</b>.</p>")
+    +
+    // help text 1/1, alt. 1 part 3/3
     _("<p><b><big>Testing Server Accessibility</big></b><br>
-To test if the selected server is up and answers properly,
-click <b>Test</b>.</p>")
-    +
-    // help text 1/1, alt. 1 part 3/4
-    _("<p><b><big>Finding Servers</big></b><br>
-To find NTP servers in the local network using the
-Service Location Protocol (SLP), click <b>Lookup</b>.</p>")
-    +
-    // help text 1/1, alt. 1 part 4/4
-    _("<p><b><big>Selecting Server from List</big></b><br>
-If you do not know any NTP server suitable for you, click
-<b>Select from List</b> and choose one from the list.</p>"),
+To test if the selected server is up and responds properly,
+click <b>Test</b>.</p>"),
 
     // help text 1/1, alt. 2
     "paddress" : _("<p><b><big>Address</big></b><br>
@@ -159,24 +154,43 @@ select <b>Radio Clock</b>.</p>")
     + _("<p>To accepts NTP packets broadcasted by other hosts on the network
 and use them for setting local time, select <b>Accepting Broadcast Packets<b>.</p>"),
 
-    // help text 1/3
-    "servers_list" : _("<p><big><b>Select NTP server</b></big><br>
-Select the NTP server to use from the <b>NTP Servers</b> list. To display
+    // help text 1/5
+    "servers_source" : _("<p><big><b>Server Location</b></big>
+Select if you want to find the NTP server in the local network or select
+the NTP server from the list of known NTP servers.</p>"),
+
+    // help text 2/5
+    "found_servers" : _("<p><big><b>Finding Server in the Local
+Network</b></big><br>
+To find NTP servers in the local network using the
+Service Location Protocol (SLP), click <b>Lookup</b>.
+Then select a server from the list of found servers.</p>"),
+
+    // help text 3/5
+    "servers_list" : _("<p><big><b>Selecting a Public NTP server</b></big><br>
+Select the NTP server to use from the <b>Public NTP Servers</b> list. To display
 NTP servers only for a particular country, select it in <b>Country</b>.</p>")
     +
-    // help text 2/3
-    _("<p><big><b>Testing Server Accessibility</b></big><br>
-To test if the server responds properly, click <b>Test</b>.</p>")
-    +
-    // help text 3/3
+    // help text 4/5
     _("<p><big><b>Note</b></big><br>
 The listed NTP servers may not be available from any country, but only
 for a particular country or region.<br>
 Before usingn any NTP server from the list ask your system administrator
 or internet service provider if there is an NTP server closer to you and
-prefer this recommended server to any server from this list.</p>"),
+prefer this recommended server to any server from this list.
+You may also see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>
+to find a close NTP server.</p>"),
+
+    // help text 5/5
+    "selected_test" : _("<p><big><b>Testing Server Accessibility</b></big><br>
+To test if the selected server responds properly, click <b>Test</b>.</p>"),
+
 ];
 
+/**
+ * Get help to the fudge factors settings dialog
+ * @return string the help text
+ */
 define string fudgeHelp () ``{
     // help text 1/2
     return _("<p><big><b>Clock Driver Calibration</b></big><br>
@@ -190,6 +204,10 @@ driver. Some drivers do not use all the options.</p>")
 <i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>");
 }
 
+/**
+ * Get help to the firewall settings dialog
+ * @return string the help text
+ */
 define string firewallHelp () ``{
     // help text 1/3
     return _("<p><big><b>Firewall Configuration</b></big><br>

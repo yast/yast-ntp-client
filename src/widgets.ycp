@@ -157,6 +157,9 @@ global define void ConfigDhcpStore (any id, map event) ``{
     NtpClient::modified = true;
 }
 
+/**
+ * Redraw the overview table
+ */
 define void overviewRedraw () {
     map types = $[
 	// table cell, NTP relationship type
@@ -311,19 +314,7 @@ global define symbol serverAddressHandle (string id, map event) {
 	UI::ChangeWidget (`id (`select_server), `Enabled, enabled);
 	return nil;
     }
-    if (ev_id == `lookup_address)
-    {
-	symbol method = `slp;
-	list<string> server_names = NtpClient::DetectNtpServers (method);
-	UI::ReplaceWidget (`server_address_rp,
-	    `ComboBox (`id ("server_address"),
-		`opt (`editable, `hstretch),
-		// combo box label
-		_("&NTP Server"),
-		server_names));
-	return nil;
-    }
-    else if (ev_id == `test_server)
+    if (ev_id == `test_server)
     {
 	NtpClient::TestNtpServer (server, false);
     }
@@ -580,7 +571,7 @@ global symbol ServerListHandle (string id, map event) {
 	UI::ReplaceWidget (`servers_rp, `ComboBox (`id (`servers),
 	    `opt (`hstretch),
 	    // selection box header
-	    _("&Servers"), items));
+	    _("Public NTP &Servers"), items));
 	return nil;
     }
     if (event["ID"]:nil == `test || event["ID"]:nil == `info)
@@ -706,7 +697,7 @@ global symbol FoundServersHandle (string id, map event) {
 	    `ComboBox (`id ("server_address"),
 		`opt (`editable, `hstretch),
 		// combo box label
-		_("&NTP Server"),
+		_("Local &NTP Server"),
 		server_names));
 	return nil;
     }
@@ -717,11 +708,27 @@ global void FoundServersInit (string id) {
     FoundServersHandle (id, $["ID" : "list_rb"]);
 }
 
+global boolean FoundServersValidate (string id, map event) {
+    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+    {
+	string server = (string)
+	    UI::QueryWidget (`id ("server_address"), `Value);
+	if (server == nil || server == "")
+	{
+	    UI::SetFocus (`id ("server_address"));
+	    // popup message
+	    Popup::Message (_("No server is selected."));
+	    return false;
+	}
+    }
+    return true;
+}
+
 global symbol SelectTestHandle (string id, map event) {
     string server = "";
     if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
     {
-	server = (string)UI::QueryWidget (`id ("sever_address"), `Value);
+	server = (string)UI::QueryWidget (`id ("server_address"), `Value);
     }
     else
     {
@@ -804,11 +811,10 @@ global define map<string,any> InitWidgets () ``{
 	    "widget" : `custom,
 	    "custom_widget" : `VBox (
 		`HBox (
-		    `ReplacePoint (`id (`server_address_rp),
-			`ComboBox (`id ("server_address"),
-			    `opt (`editable, `hstretch),
-			    // combo box label
-			    _("&NTP Server"))
+		    `TextEntry (`id ("server_address"),
+			`opt (`editable, `hstretch),
+			// text entry
+			_("&NTP Server")
 		    ),
 		    `VBox (
 			`Label (" "),
@@ -818,6 +824,7 @@ global define map<string,any> InitWidgets () ``{
 		),
 		`HBox (
 		    `HStretch (),
+		    // push button
 		    `PushButton (`id (`test_server), _("&Test")),
 		    `HStretch ()
 		)
@@ -947,12 +954,16 @@ global define map<string,any> InitWidgets () ``{
 	"servers_source" : $[
 	    "widget" : `radio_buttons,
 	    "items" : [
+		// radio button
 		["lookup_rb", _("Loc&al Network")],
+		// radio button
 		["list_rb", _("&Public NTP server")],
 	    ],
 	    "opt" : [`notify],
 	    "init" : ServersSourceInit,
+	    // frame label
 	    "label" : _("NTP Server Location"),
+	    "help" : HELPS["servers_source"]:"",
 	],
 	"found_servers" : $[
 	    "widget" : `custom,
@@ -961,7 +972,7 @@ global define map<string,any> InitWidgets () ``{
 		    `ComboBox (`id ("server_address"),
 			`opt (`editable, `hstretch),
 			// combo box label
-			_("&NTP Server"))
+			_("Local &NTP Server"))
 		),
 		`VBox (
 		    `Label (" "),
@@ -971,6 +982,9 @@ global define map<string,any> InitWidgets () ``{
 	    ),
 	    "init" : FoundServersInit,
 	    "handle" : FoundServersHandle,
+	    "validate_type" : `function,
+	    "validate_function" : FoundServersValidate,
+	    "help" : HELPS["found_servers"]:"",
 	],
 	"servers_list" : $[
 	    "widget" : `custom,
@@ -982,7 +996,7 @@ global define map<string,any> InitWidgets () ``{
 		`ReplacePoint (`id (`servers_rp), `ComboBox (`id (`servers),
 		    `opt (`hstretch),
 		    // selection box header
-		    _("&Servers"), []))
+		    _("Public NTP &Servers"), []))
 	    ),
 	    "init" : ServerListInit,
 	    "handle" : ServerListHandle,
@@ -993,9 +1007,11 @@ global define map<string,any> InitWidgets () ``{
 	],
 	"select_test" : $[
 	    "widget" : `push_button,
+	    // push button
 	    "label" : _("&Test"),
 	    "handle_events" : ["select_test"],
 	    "handle" : SelectTestHandle,
+	    "help" : HELPS["selected_test"]:"",
 	],
     ];
 }

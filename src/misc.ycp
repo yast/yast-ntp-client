@@ -28,10 +28,16 @@ define boolean reallyExit () ``{
 All changes will be lost."));
 }
 
+/**
+ * Restart the NTP daemon service
+ */
 define void restartNtpDaemon () ``{
     Service::RunInitScript("xntpd", "restart");
 }
 
+/**
+ * Write the NTP settings without displaying progress
+ */
 define void silentWrite () ``{
     Progress::off ();
     NtpClient::Write ();
@@ -41,6 +47,8 @@ define void silentWrite () ``{
 /**
  * Parse string to map of options
  * @param options_string string of options
+ * @param with_param a list of options that must have a parameter
+ * @param without_param a list of options that don't have any parameter
  * @return map options as a map
  */
 define map string2opts (string options_string, list<string> with_param,
@@ -84,7 +92,8 @@ define map string2opts (string options_string, list<string> with_param,
 
 /**
  * Create options string from a map
- * @param options map options represented as a map
+ * @param options a map options represented as a map
+ * @param other string other options that were set as string
  * @return string options represented as a string
  */
 define string opts2string (map<string,any> options, string other) ``{
@@ -147,6 +156,12 @@ define integer getClockType (string address) ``{
     return tointeger (cl_type);
 }
 
+/**
+ * Set the clock type into an IP address
+ * @param address string the IP address to patch the clock number into
+ * @param clock_type integer the clock type to be set
+ * @return string IP address with clock type set correctly
+ */
 define string setClockType (string address, integer clock_type) ``{
     if (address == "")
 	address = "127.127.0.0";
@@ -158,7 +173,6 @@ define string setClockType (string address, integer clock_type) ``{
     string ret = regexpsub (address,
 	"([0-9]+\.[0-9]+\.)[0-9]+(\.[0-9]+)",
 	sformat ("\\1%1\\2", clock_type));
-    y2error ("Ret: %1", ret);
     return ret;
 }
 
@@ -181,6 +195,12 @@ define integer getClockUnitNumber (string address) ``{
     return tointeger (cl_type);
 }
 
+/**
+ * Set the clock unit number into an IP address
+ * @param address string the IP address to patch the clock number into
+ * @param unit_number integer the unit number to be set
+ * @return string IP address with unit number set correctly
+ */
 define string setClockUnitNumber (string address, integer unit_number) ``{
     if (address == "")
 	address = "127.127.0.0";
@@ -192,7 +212,6 @@ define string setClockUnitNumber (string address, integer unit_number) ``{
     string ret = regexpsub (address,
 	"([0-9]+\.[0-9]+\.[0-9]+\.)[0-9]+",
 	sformat ("\\1%1", unit_number));
-    y2error ("Ret: %1", ret);
     return ret;
 }
 
@@ -213,6 +232,10 @@ define list getClockTypesCombo () ``{
     return ret;
 }
 
+/**
+ * Propose the interface to be allowed for access in firewall
+ * Sets the firewall settings inside the NtpClient module
+ */
 define void proposeInterfacesToAllowAccess () ``{
     list<map<string,any> > recs = NtpClient::getSyncRecords ();
     recs = filter (map<string,any> r, recs, ``(
@@ -244,7 +267,6 @@ define void proposeInterfacesToAllowAccess () ``{
 	out = regexpsub (out, "dev[ ]+([^ ]+)[ ]+src", "\\1");
 	return out;
     });
-y2error ("Ifaces: %1", ifaces);
     foreach (string ic, ["EXT", "INT", "DMZ"], ``{
 	NtpClient::firewall_settings[ic] = false;
 	string k = sformat ("FW_DEV_%1", ic);
@@ -255,7 +277,6 @@ y2error ("Ifaces: %1", ifaces);
 		NtpClient::firewall_settings[ic] = true;
 	});
     });
-y2error ("FS: %1", NtpClient::firewall_settings);
 }
 
 /* EOF */
