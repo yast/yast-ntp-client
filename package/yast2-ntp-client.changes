@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 16 17:37:37 CET 2004 - jsrain@suse.de
+
+- syntax fix of abort checking (in order to build)
+- 2.9.2
+
+-------------------------------------------------------------------
 Tue Feb 10 08:19:59 CET 2004 - jsrain@suse.de
 
 - dropped .y2cc file

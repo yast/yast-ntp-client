@@ -116,7 +116,7 @@ define boolean ReallyAbort() ``{
  */
 define boolean Abort() ``{
     if(NtpClient::AbortFunction != nil)
-	return eval(NtpClient::AbortFunction) == true;
+	return NtpClient::AbortFunction() == true;
     return false;
 }
 
