@@ -19,8 +19,16 @@ import "SuSEFirewall";
 import "Wizard";
 import "Report";
 
-include "ntp-client/helps.ycp";
 include "ntp-client/misc.ycp";
+include "ntp-client/widgets.ycp";
+
+map<string,map<string,any> > widgets = nil;
+
+define map<string,map<string,any> > GetWidgets () {
+    if (widgets == nil)
+	widgets = InitWidgets ();
+    return widgets;
+}
 
 /**
  * Display the popup to confirm abort
@@ -60,7 +68,7 @@ define symbol SimpleDialog () ``{
     NtpClient::simple_dialog = true;
 
     list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "complex_button"],
-	NtpClient::widgets);
+	GetWidgets ());
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VStretch (),
 	`HBox (
@@ -88,7 +96,7 @@ define symbol SimpleDialog () ``{
     Wizard::HideBackButton();
     Wizard::SetAbortButton(`abort, Label::CancelButton() );
 
-    NtpClient::startInit (nil);
+    startInit (nil);
     CWM::handleWidgets (w, $["ID" : "never"]);
 
     symbol ret = CWM::Run (w,
@@ -110,7 +118,7 @@ define symbol SimpleDialog () ``{
 define symbol MainDialog () ``{
     NtpClient::simple_dialog = false;
     list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "config_dhcp", "overview"],
-	NtpClient::widgets);
+	GetWidgets ());
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
 	`HBox (
@@ -141,7 +149,7 @@ define symbol MainDialog () ``{
     Wizard::HideBackButton();
     Wizard::SetAbortButton(`abort, Label::CancelButton() );
 
-    NtpClient::startInit (nil);
+    startInit (nil);
     CWM::handleWidgets (w, $["ID" : "never"]);
 
     return CWM::Run (w,
@@ -163,10 +171,15 @@ define symbol TypeSelectDialog () ``{
     // dialog caption
     string caption = _("Select the Synchronization Peer Type");
 
-    return CWM::ShowAndRunOrig (["peer_types"],
-	NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::NextButton (),
-	$[`abort : abortPopup ]);
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["peer_types"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::NextButton (),
+	"fallback_functions" : $[`abort : abortPopup ]
+    ]);
 }
 
 /**
@@ -187,10 +200,15 @@ define symbol ServerDialog () ``{
     // dialog caption
     string caption = _("Configure NTP Server");
 
-    return CWM::ShowAndRunOrig (["server_address", "init_sync", "options"],
-	NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : abortPopup]);
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["server_address", "init_sync", "options"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup],
+    ]);
 }
 
 /**
@@ -211,10 +229,15 @@ define symbol PeerDialog () ``{
     // dialog caption
     string caption = _("Configure NTP Peer");
 
-    return CWM::ShowAndRunOrig (["paddress", "init_sync", "options"],
-	NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : abortPopup]);
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["paddress", "init_sync", "options"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
 }
 
 /**
@@ -255,12 +278,17 @@ define symbol RadioDialog () ``{
     // dialog caption
     string caption = _("Configure Local Reference Clock");
 
-    return CWM::ShowAndRunOrig (["clock_type", "unit_number",
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["clock_type", "unit_number",
 	    "create_symlink", "device", "browse",
 	    "options", "fudge_button"],
-	NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : abortPopup]);
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
 }
 
 /**
@@ -279,9 +307,15 @@ define symbol BCastDialog () ``{
     // dialog caption
     string caption = _("Configure Broadcasting");
 
-    return CWM::ShowAndRunOrig (["bcaddress", "options"], NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : abortPopup]);
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["bcaddress", "options"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
 }
 
 /**
@@ -298,9 +332,15 @@ define symbol BCastClientDialog () ``{
     // dialog caption
     string caption = _("Configure Broadcasting Client");
 
-    return CWM::ShowAndRunOrig (["bccaddress"], NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : abortPopup]);
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["bccaddress"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_functions" : $[`abort : abortPopup]
+    ]);
 }
 
 /**
@@ -527,10 +567,16 @@ symbol ServerSelectionDialog () {
     // dialog caption
     string caption = _("Select NTP Server");
 
-    return CWM::ShowAndRunOrig (["servers_source", "found_servers", "servers_list",
-	"select_test"], NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (),
-	$[`abort : abortPopup]);
+    return CWM::ShowAndRun ($[
+	"widget_names" : ["servers_source", "found_servers", "servers_list",
+	    "select_test"],
+	"widget_descr" : GetWidgets (),
+	"contents" : contents,
+	"caption" : caption,
+	"back_button" : Label::BackButton (),
+	"next_button" : Label::OKButton (),
+	"fallback_function" : $[`abort : abortPopup]
+    ]);
 }
 
 // fake dialogs (WS switches)
