@@ -11,6 +11,7 @@
 
 textdomain "ntp-client";
 
+import "CWMFirewallInterfaces";
 import "IP";
 import "Popup";
 import "Progress";
@@ -26,6 +27,39 @@ define boolean reallyExit () ``{
     // yes-no popup
     return Popup::YesNo (_("Really exit?
 All changes will be lost."));
+}
+
+boolean reallyExitSimple () {
+    if (NtpClient::run_service
+	    == (UI::QueryWidget (`id ("start"), `CurrentButton) == "boot")
+	&& NtpClient::selected_record["address"]:""
+	    == UI::QueryWidget (`id ("server_address"), `Value)
+    )
+    {
+	return true;
+    }
+    return reallyExit ();
+}
+
+// FIXME this is quite ugly ... the whole checkinf if something was changed
+// ... but it works :-)
+boolean sync_record_modified = false;
+
+boolean reallyExitComplex () {
+    if (NtpClient::run_service
+	    == (UI::QueryWidget (`id ("start"), `CurrentButton) == "boot")
+        && NtpClient::run_chroot
+	    == UI::QueryWidget (`id ("run_chroot"), `Value)
+	&& NtpClient::config_dhcp
+	    == UI::QueryWidget (`id ("config_dhcp"), `Value)
+	&& (! CWMFirewallInterfaces::OpenFirewallModified ("firewall"))
+	&& (! sync_record_modified)
+    )
+    {
+	return true;
+    }
+    sync_record_modified = true;
+    return reallyExit ();
 }
 
 /**
@@ -210,15 +244,15 @@ define string setClockUnitNumber (string address, integer unit_number) ``{
   * Get entries for the clock type combo box
   * @return list of items for the combo box
   */
-define list getClockTypesCombo () ``{
+list<list<string> > getClockTypesCombo () {
     map<integer,string> clock_names = mapmap (integer k, map<string,string> v,
 	clock_types, ``(
 	    $[ k: v["name"]:"" ]
 	)
     );
-    list ret = maplist (integer k, string v, clock_names, ``(
-	`item (sformat ("%1", k), v)
-    ));
+    list<list<string> > ret = maplist (integer k, string v, clock_names, {
+	return [ sformat ("%1", k), v];
+    });
     return ret;
 }
 

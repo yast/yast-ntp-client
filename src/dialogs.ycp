@@ -105,7 +105,7 @@ define symbol SimpleDialog () ``{
 
     symbol ret = CWM::Run (w,
 	// yes-no popup
-	 $[`abort : reallyExit ]);
+	 $[`abort : reallyExitSimple ]);
 
     // and now store the settings if needed
     if (ret != `abort && ret != `back && ret != `cancel)
@@ -153,7 +153,7 @@ define symbol MainDialog () ``{
     CWM::handleWidgets (w, $["ID" : "never"]);
 
     return CWM::Run (w,
-	 $[`abort : reallyExit]);
+	 $[`abort : reallyExitComplex]);
 
 }
 
@@ -505,6 +505,7 @@ symbol SimpleDialogFinish () {
  */
 
 define symbol StoreRecord () ``{
+    sync_record_modified = true;
     NtpClient::storeSyncRecord ();
     return `next;
 }

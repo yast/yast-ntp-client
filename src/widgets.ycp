@@ -63,7 +63,7 @@ define symbol ntpEnabledOrDisabled (string id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void startInit (any id) ``{
+define void startInit (string id) ``{
     UI::ChangeWidget (`id ("start"), `CurrentButton,
 	NtpClient::run_service ? "boot" : "never");
 }
@@ -73,7 +73,7 @@ define void startInit (any id) ``{
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void startStore (any id, map event) ``{
+define void startStore (string id, map event) ``{
     NtpClient::run_service = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
 }
 
@@ -83,12 +83,13 @@ define void startStore (any id, map event) ``{
  * @param event map event that caused storing process
  * @return any always nil
  */
-define any startHandle (string id, map event) ``{
+define symbol startHandle (string id, map event) ``{
     boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
     list<string> devices = NetworkDevices::Locate ("STARTMODE", "onboot");
     devices = filter (string d, devices, ``(d != "lo"));
-    // yes-no popup
-    if (start && size (devices) == 0 && ! Popup::ContinueCancel (_("Warning!
+    if (start && size (devices) == 0 && event["EventReason"]:"" != ""
+	// continue-cancel popup
+	&& ! Popup::ContinueCancel (_("Warning!
 
 If you do not have a permanent Internet connection,
 starting the NTP daemon can take a very long time and 
@@ -97,6 +98,11 @@ the daemon might not run properly.")))
 
     if (start != NtpClient::run_service)
 	NtpClient::modified = true;
+
+    if (start)
+	CWMFirewallInterfaces::EnableOpenFirewallWidget ();
+    else
+	CWMFirewallInterfaces::DisableOpenFirewallWidget ();
 
     return nil;
 }
@@ -128,7 +134,7 @@ define symbol fudgeButtonHandle (string key, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void chrootInit (any id) ``{
+define void chrootInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value, NtpClient::run_chroot);
 }
 
@@ -137,7 +143,7 @@ define void chrootInit (any id) ``{
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void chrootStore (any id, map event) ``{
+define void chrootStore (string id, map event) ``{
     NtpClient::run_chroot = (boolean)(UI::QueryWidget (`id (id), `Value));
     NtpClient::modified = true;
 }
@@ -146,7 +152,7 @@ define void chrootStore (any id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void ConfigDhcpInit (any id) ``{
+define void ConfigDhcpInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value, NtpClient::config_dhcp);
 }
 
@@ -155,7 +161,7 @@ define void ConfigDhcpInit (any id) ``{
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void ConfigDhcpStore (any id, map event) ``{
+define void ConfigDhcpStore (string id, map event) ``{
     NtpClient::config_dhcp = (boolean)(UI::QueryWidget (`id (id), `Value));
     NtpClient::modified = true;
 }
@@ -206,7 +212,7 @@ define void overviewRedraw () {
  * @param event map event that caused storing process
  * @return any event to pass to WS or nil
  */
-define any overviewHandle (string id, map event) ``{
+define symbol overviewHandle (string id, map event) ``{
 //    ntpEnabledOrDisabled (id, event);
     if (event["ID"]:nil == `display_log)
     {
@@ -219,7 +225,7 @@ define any overviewHandle (string id, map event) ``{
     {
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
 	    != "never";
-	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
+//	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
 	enabled = enabled && ! (boolean)
 	    UI::QueryWidget (`id ("config_dhcp"), `Value);
 	UI::ChangeWidget (`id (`add), `Enabled, enabled);
@@ -228,7 +234,7 @@ define any overviewHandle (string id, map event) ``{
 	UI::ChangeWidget (`id (`overview), `Enabled, enabled);
 	return nil;
     }
-    map types = $[
+    map<string,symbol> types = $[
 	"server" : `server,
 	"peer" : `peer,
 	"__clock" : `clock,
@@ -258,8 +264,10 @@ define any overviewHandle (string id, map event) ``{
 		(integer)(UI::QueryWidget (`id (`overview), `CurrentItem))
 	    );
 	    overviewRedraw ();
+	    sync_record_modified = true;
 	}
     }
+    return nil;
 }
 
 /**
@@ -275,7 +283,7 @@ define void overviewInit (string id) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void addressInit (any id) ``{
+define void addressInit (string id) ``{
     UI::ChangeWidget (`id (id), `Value,
 	NtpClient::selected_record["address"]:"");
     UI::SetFocus (`id (id));
@@ -286,7 +294,7 @@ define void addressInit (any id) ``{
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void addressStore (any id, map event) ``{
+define void addressStore (string id, map event) ``{
     NtpClient::selected_record["address"] = UI::QueryWidget (`id (id), `Value);
     if (NtpClient::simple_dialog)
     {
@@ -327,7 +335,7 @@ define symbol serverAddressHandle (string id, map event) {
  * Initialize the widget
  * @param id any widget id
  */
-define void initSyncInit (any id) ``{
+define void initSyncInit (string id) ``{
     UI::ChangeWidget (`id ("init_sync"), `Value,
 	NtpClient::selected_record["initial_sync"]:false);
 }
@@ -337,7 +345,7 @@ define void initSyncInit (any id) ``{
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void initSyncStore (any id, map event) ``{
+define void initSyncStore (string id, map event) ``{
     NtpClient::selected_record["initial_sync"]
 	= UI::QueryWidget (`id ("init_sync"), `Value);
 }
@@ -346,7 +354,7 @@ define void initSyncStore (any id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void optionsInit (any id) ``{
+define void optionsInit (string id) ``{
     UI::ChangeWidget (`id ("options"), `Value, NtpClient::selected_record["options"]:"");
 }
 
@@ -355,7 +363,7 @@ define void optionsInit (any id) ``{
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void optionsStore (any id, map event) ``{
+define void optionsStore (string id, map event) ``{
     NtpClient::selected_record["options"] = UI::QueryWidget (`id ("options"), `Value);
 }
 
@@ -363,7 +371,7 @@ define void optionsStore (any id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void peerTypesInit (any id) ``{
+define void peerTypesInit (string id) ``{
     if (peer_type_selected != nil)
 	UI::ChangeWidget (`id ("peer_types"), `CurrentButton,
 	    peer_type_selected);
@@ -377,7 +385,7 @@ define void peerTypesInit (any id) ``{
  * @param event map event that caused storing process
  * @return symbol event to pass to WS or nil
  */
-define symbol peerTypesHandle (any id, map event) ``{
+define symbol peerTypesHandle (string id, map event) ``{
     peer_type_selected = (string)UI::QueryWidget (`id ("peer_types"), `CurrentButton);
     map<string,symbol> types = $[
 	"server" : `server,
@@ -815,7 +823,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "init" : startInit,
 	    "store" : startStore,
 	    "handle" : startHandle,
-	    "handle_events" : [ "boot" ],
+	    "handle_events" : [ "boot", "never" ],
 	    "opt" : [`notify],
 	],
 	"run_chroot" : $[

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Feb 14 12:29:46 CET 2005 - jsrain@suse.cz
+
+- do not ask to confirm abort if nothing changed (#50743)
+
+-------------------------------------------------------------------
 Wed Dec 15 14:38:09 CET 2004 - jsrain@suse.cz
 
 - clean-up of neededforbuild and requires
