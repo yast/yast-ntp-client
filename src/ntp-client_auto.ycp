@@ -53,7 +53,7 @@ else if (func == "Reset") {
 }
 /* Return required packages */
 else if (func == "Packages") {
-    ret = AutoPackages();
+    ret = NtpClient::AutoPackages();
 }
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
