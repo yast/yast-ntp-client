@@ -11,6 +11,7 @@
 
 textdomain "ntp-client";
 
+import "Confirm";
 import "Popup";
 import "Label";
 import "LogView";
@@ -254,7 +255,7 @@ define any overviewHandle (string id, map event) ``{
     else if (event["ID"]:nil == `delete)
     {
 	// yes-no popup
-	if (Popup::YesNo (_("Delete the selected item?")))
+	if (Confirm::DeleteSelected ())
 	{
 	    NtpClient::deleteSyncRecord (
 		(integer)(UI::QueryWidget (`id (`overview), `CurrentItem))
@@ -960,7 +961,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	"options" : $[
 	    "widget" : `textentry,
 	    // text entry label
-	    "label" : _("O&ptions"),
+	    "label" : Label::Options (),
 	    "init" : optionsInit,
 	    "store" : optionsStore,
 	    "help" : HELPS["options"]:"",

@@ -16,6 +16,7 @@ module "NtpClient";
 textdomain "ntp-client";
 
 import "Directory";
+import "Message";
 import "Mode";
 import "NetworkDevices";
 import "PackageSystem";
@@ -330,7 +331,7 @@ global define boolean Read() ``{
     if(failed)
     {
 	// error report
-	Report::Error(_("Cannot read the current settings."));
+	Report::Error (Message::CannotReadCurrentSettings ());
     }
 
     if (! Mode::test)
@@ -450,7 +451,7 @@ global define boolean Write() ``{
 
       if (failed)
 	// error report
-	Report::Error (_("Cannot write settings to /etc/ntp.conf."));
+	Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
     }
 
     // if configuration via DHCP was turned on, restart DHCP clients now
@@ -506,7 +507,7 @@ global define boolean Write() ``{
 	run_service ? "enable" : "disable"))
     {
 	// error report
-	Report::Error (_("Cannot adjust the service"));
+	Report::Error (Message::CannotAdjustService ("NTP"));
     }
 
     if (run_service && (! write_only)
