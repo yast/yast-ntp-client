@@ -11,6 +11,8 @@
 
 textdomain "ntp-client";
 
+import "Popup";
+
 /**
  * Ask user if exit without saving
  * @return boolean true if exit
