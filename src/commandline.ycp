@@ -199,7 +199,7 @@ define boolean NtpDeleteHandler (map options) ``{
 
 
 map cmdline = $[
-   "id"			: "printer",
+   "id"			: "ntp-client",
     // command line help text for NTP client module
     "help"		: _("NTP client configuration module."),
     "guihandler"	: GuiHandler,
