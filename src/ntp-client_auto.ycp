@@ -44,7 +44,7 @@ y2debug("param=%1", param);
 
 /* Create a summary*/
 if(func == "Summary") {
-    ret = select(NtpClient::Summary(), 0, "");
+    ret = NtpClient::Summary();
 }
 /* Reset configuration */
 else if (func == "Reset") {

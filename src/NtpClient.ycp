@@ -431,38 +431,47 @@ global define map Export () ``{
 
 /**
  * Create a textual summary and a list of unconfigured cards
- * @return list summary of the current configuration
+ * @return string summary of the current configuration
  */
-global define list Summary() ``{
-    list ret = [];
+global define string Summary() ``{
+
+	string summary = "";
+	summary = Summary::AddHeader(summary, _("Status"));
     if (run_service)
 	// summary string
-	ret = [_("The NTP daemon starts when starting the system") ];
+	summary = Summary::AddLine(summary, _("The NTP daemon starts when starting the system") );
     else
 	// summary string
-	ret = [_("The NTP daemon does not start automatically") ];
+	summary = Summary::AddLine(summary, _("The NTP daemon does not start automatically") );
 
     map types = $[
 	// summary string, %1 is list of addresses
-	"server" : _("Servers: %1"),
+	"server" : _("Servers"),
 	// summary string, %1 is list of addresses
-	"__clock" : _("Radio Clocks: %1"),
+	"__clock" : _("Radio Clocks"),
 	// summary string, %1 is list of addresses
 	"peer" : _("Peers: %1"),
 	// summary string, %1 is list of addresses
-	"broadcast" : _("Broadcast time information to: %1"),
+	"broadcast" : _("Broadcast time information to"),
 	// summary string, %1 is list of addresses
-	"broadcastclient" : _("Accept broadcasted time information from: %1"),
+	"broadcastclient" : _("Accept broadcasted time information from"),
     ];
-    foreach (`t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
+    foreach (string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
-	list l = filter (map<string,any> p, ntp_records, ``(p["key"]:"" == t));
-	list names = maplist (map<string,any> i, l, ``(i["value"]:""));
-	names = filter (`n, names, ``(n != ""));
+	list l = filter (map<string,any> p, ntp_records, ``(p["type"]:"" == t));
+	list names = maplist (map<string,any> i, l, ``(i["address"]:""));
+	names = filter (string n, names, ``(n != ""));
 	if (size (names) > 0)
-	    ret = add (ret, sformat (types[t]:"", mergestring ((list<string>)names, ", ")));
+	{
+        summary = Summary::AddHeader(summary, types[t]:"" );
+		summary = Summary::OpenList(summary);
+	    foreach(string n, names, ``{
+			summary = Summary::AddListItem(summary, n);
+		});
+		summary = Summary::CloseList(summary);
+	}
     });
-    return ret;
+    return summary;
 }
 
 /**
