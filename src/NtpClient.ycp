@@ -57,6 +57,14 @@ global integer selected_item_index = -1;
 
 global map selected_item = $[];
 
+
+/**
+ * Required packages
+ */
+global list required_packages = ["xntp"];
+
+
+
 list rw_order = [ "server", "fudge", "peer", "broadcast", "broadcastclient" ];
 
 map paths = $[
@@ -388,6 +396,16 @@ global define list Summary() ``{
 	    ret = add (ret, sformat (types[t]:"", mergestring (names, ", ")));
     });
     return ret;
+}
+
+
+/**
+ * Return required packages for auto-installation
+ * @return map of packages to be installed and to be removed
+ */
+global define map AutoPackages() ``{
+	return ($["install": required_packages, "remove": []]);
+
 }
 
 /* EOF */

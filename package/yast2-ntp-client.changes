@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Sep 11 06:56:31 CEST 2003 - nashif@suse.de
+
+- #30291: return list of required packages for autoinstallation
+
+-------------------------------------------------------------------
 Wed Sep 10 10:27:35 CEST 2003 - jsrain@suse.de
 
 - stopping XNTP daemon when set to never start it automatically

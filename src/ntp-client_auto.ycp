@@ -51,6 +51,10 @@ else if (func == "Reset") {
     NtpClient::Import($[]);
     ret = $[];
 }
+/* Return required packages */
+else if (func == "Packages") {
+    ret = AutoPackages();
+}
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
     ret = NtpClientAutoSequence();
