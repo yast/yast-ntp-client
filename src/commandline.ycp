@@ -126,7 +126,7 @@ define boolean NtpListHandler (map options) ``{
             string device = i["device"]:"";
             if (device == "")
                 // table cell, %1 is integer 0-3
-                device = sformat (_("Unit number: %1"), unit_number);
+                device = sformat (_("Unit Number: %1"), unit_number);
             if (clock_type == 1 && unit_number == 0)
                 device = "";
             string clock_name = clock_types[clock_type, "name"]:"";
@@ -264,12 +264,12 @@ map cmdline = $[
 	],
 	"broadcast" : $[
 	    // command line help text for an option
-	    "help"	: _("The address to broadcast to"),
+	    "help"	: _("The address to which to broadcast"),
 	    "type"	: "string",
 	],
 	"broadcastclient" : $[
 	    // command line help text for an option
-	    "help"	: _("The address accept broadcasts from"),
+	    "help"	: _("The address from which to accept broadcasts"),
 	    "type"	: "string",
 	],
 	"options" : $[

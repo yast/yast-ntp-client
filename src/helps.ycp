@@ -35,9 +35,10 @@ An additional dialog will inform you whether it is safe to do so.</p>"),
 
     // help text 1/4
     "start" : _("<p><b><big>Automatically Start NTP Daemon</big></b><br>
-Select whether to start NTP daemon when booting system. The
+Select whether to start the NTP daemon when booting the system. The
 NTP daemon resolves host names when initializing. Your
-network connection must be started before the NTP daemon starts.</p>"),
+network connection must be started before the NTP daemon starts.</p>
+"),
 
     // help text 2/4
     "chroot_environment" : _("<p><b><big>Chroot Jail</big></b><br>

@@ -1,4 +1,22 @@
 -------------------------------------------------------------------
+Sun May 30 05:15:03 CEST 2004 - nashif@suse.de
+
+- Honor old syntax when importing (#41379)
+- 2.9.13
+
+-------------------------------------------------------------------
+Fri May 21 08:13:20 CEST 2004 - jsrain@suse.cz
+
+- dont complain about missing packages when cloning (nashif)
+- 2.9.12
+
+-------------------------------------------------------------------
+Tue May  4 09:04:19 CEST 2004 - jsrain@suse.cz
+
+- merged texts from proofread
+- 2.9.11
+
+-------------------------------------------------------------------
 Thu Apr  8 14:30:30 CEST 2004 - jsrain@suse.cz
 
 - fixed texts of menu button in the log display dialog (#38522)

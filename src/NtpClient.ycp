@@ -140,7 +140,7 @@ global define boolean Read() ``{
 
     boolean failed = false;
 
-    if (! Package::Installed ("xntp") || Mode::config)
+    if (! Package::Installed ("xntp") && !Mode::config)
     {
 	boolean install_ok = Package::Install ("xntp");
 	if (! install_ok && ! Package::LastOperationCanceled ())
@@ -463,6 +463,18 @@ global define boolean Import (map settings) ``{
     run_service = settings["start_at_boot"]:false;
     run_chroot = settings["start_in_chroot"]:true;
     ntp_records = settings["peers"]:[];
+    ntp_records = maplist(map<string, any> p, ntp_records, ``{
+            if (haskey(p, "key") && haskey(p, "value") )
+            {
+                p["type"] = p["key"]:"";
+                p["address"] = p["value"]:"";
+		if (haskey (p, "initial"))
+		    p["initial_sync"] = p["initial"]:false;
+                return (p);
+            } else {
+                return (p);
+            }
+            });
     modified = true;
     return true;
 }
