@@ -30,4 +30,5 @@ Summary:	Configuration of ntp-client
 @agentdir@/ag_ntp_conf
 @moduledir@/NtpClient.ycp
 @configdir@/ntp-client.y2cc
+@desktopdir@/ntp-client.desktop
 %doc @docdir@
