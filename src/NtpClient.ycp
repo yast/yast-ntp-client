@@ -119,7 +119,7 @@ global define boolean Read() ``{
     {
 	boolean install_ok = Require::RequireAndConflictTarget (["xntp"], [],
 	    // richtext, %1 is name of package
-	    _("For network time synchronization, an XNTP daemon is required.
+	    _("For network time synchronization, an NTP daemon is required.
 YaST2 will install package %1.
 "));
 	if (! install_ok && ! Require::LastOperationCanceled ())
@@ -273,12 +273,12 @@ global define boolean Write() ``{
 	    // progress stage
 	    _("Write NTP settings"),
 	    // progress stage
-	    _("Restart XNTP daemon")
+	    _("Restart NTP daemon")
 	], [
 	    // progress step
 	    _("Writing the settings..."),
 	    // progress step
-	    _("Restarting XNTP daemon..."),
+	    _("Restarting NTP daemon..."),
 	    // progress step
 	    _("Finished")
 	],
@@ -383,7 +383,7 @@ global define boolean Write() ``{
 	&& 0 != Service::RunInitScript("xntpd", "restart"))
     {
 	// error report
-	Report::Error (_("Cannot restart the XNTP daemon."));
+	Report::Error (_("Cannot restart the NTP daemon."));
     }
     if (! run_service)
     {
@@ -434,10 +434,10 @@ global define list Summary() ``{
     list ret = [];
     if (run_service)
 	// summary string
-	ret = [_("The XNTP daemon starts when starting the system") ];
+	ret = [_("The NTP daemon starts when starting the system") ];
     else
 	// summary string
-	ret = [_("The XNTP daemon does not start automatically") ];
+	ret = [_("The NTP daemon does not start automatically") ];
 
     map types = $[
 	// summary string, %1 is list of addresses

@@ -51,6 +51,7 @@ define symbol ComplexSequence() ``{
 	    `add	: "type_select",
 	],
 	"type_select" : $[
+	    `abort	: `abort,
 	    `peer	: "peer",
 	    `server	: "server",
 	    `clock	: "clock",

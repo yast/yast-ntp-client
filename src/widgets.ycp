@@ -60,8 +60,8 @@ global define any startHandle (any id, map event) ``{
     if (start && ! Popup::ContinueCancel (_("Warning!
 
 If you do not have a permanent Internet connection,
-starting the XNTP daemon can take a very long time and 
-XNTP daemon might not run properly.
+starting the NTP daemon can take a very long time and 
+NTP daemon might not run properly.
 ")))
 	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
 
@@ -156,7 +156,8 @@ global define void overviewInit (any id) ``{
  * @param event map event that caused storing process
  * @return any event to pass to WS or nil
  */
-global define any overviewHandle (any id, map event) ``{
+global define any overviewHandle (string id, map event) ``{
+    ntpEnabledOrDisabled (id, event);
     any ev_id = event["ID"]:nil;
     if (ev_id == "boot" || ev_id == "never")
     {
@@ -262,39 +263,6 @@ global define void optionsStore (any id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-global define void fudgeInit (any id) ``{
-    string fudge = "";
-    string address = selected_record["value"]:"";
-    foreach (map<string,any>p, ntp_records, ``{
-	if (p["key"]:"" == "fudge" && p["value"]:"" == address)
-	    fudge = p["param"]:"";
-    });
-    UI::ChangeWidget (`id ("fudge_options"), `Value, fudge);
-}
-
-/**
- * Store settings of the widget
- * @param id any widget id
- * @param event map event that caused storing process
- */
-global define void fudgeStore (any id, map event) ``{
-    // remove old entry first
-    string address = selected_record["value"]:"";
-    ntp_records = maplist (map<string,any> p, ntp_records, ``{
-	if (p["key"]:"" == "fudge" && p["value"]:"" == address)
-	    p = nil;
-	return p;
-    });
-    // and create a new one
-    address = (string)UI::QueryWidget (`id ("rcaddress"), `Value);
-    ntp_records = add (ntp_records,
-	$["key" : "fudge", "value" : address, "param" : UI::QueryWidget (`id ("fudge_options"), `Value)]);
-}
-
-/**
- * Initialize the widget
- * @param id any widget id
- */
 global define void peerTypesInit (any id) ``{
     if (peer_type_selected != nil)
 	UI::ChangeWidget (`id ("peer_types"), `CurrentButton,
@@ -379,6 +347,7 @@ global define symbol browseButtonHandle (string id, map event) ``{
     string current = (string)UI::QueryWidget (`id ("device"), `Value);
     if (current == "")
 	current = "/dev";
+    // popup header
     current = UI::AskForExistingFile (current, "", _("Select the device"));
     if (current != nil)
 	UI::ChangeWidget (`id ("device"), `Value, current);
@@ -406,13 +375,12 @@ global define map<string,any> InitWidgets () ``{
 	    "label" : _("A&ddress"),
 	    "init" : NtpClient::addressInit,
 	    "store" : NtpClient::addressStore,
-	    "help" : HELPS["address"]:"",
     ];
     return $[
 	"complex_button" : $[
 	    "widget" : `push_button,
 	    // push button label
-	    "label" : _("&Complex configuration"),
+	    "label" : _("Co&mplex configuration"),
 	    "help" : HELPS["complex_button"]:"",
 	    "handle_events" : [ "complex_button" ],
 	    "handle" : NtpClient::complexButtonHandle,
@@ -445,7 +413,7 @@ global define map<string,any> InitWidgets () ``{
 	"run_chroot" : $[
 	    "widget" : `checkbox,
 	    // check box
-	    "label" : _("Start XNTP daemon in &chroot jail"),
+	    "label" : _("Run NTP daemon in chroot &jail"),
 	    "init" : NtpClient::chrootInit,
 	    "store" : NtpClient::chrootStore,
 	    "handle" : ntpEnabledOrDisabled,
@@ -476,12 +444,11 @@ global define map<string,any> InitWidgets () ``{
 	    "init" : NtpClient::overviewInit,
 	    "handle" : NtpClient::overviewHandle,
 	],
-	"address" : address,
 	"bcaddress" : union (address, $[
 	    "help" : HELPS["bcaddress"]:"",
 	]),
-	"rcaddress" : union (address, $[
-	    "help" : HELPS["rcaddress"]:"",
+	"bccaddress" : union (address, $[
+	    "help" : HELPS["bccaddress"]:"",
 	]),
 	"clock_type" : $[
 	    "widget" : `combobox,
@@ -506,6 +473,7 @@ global define map<string,any> InitWidgets () ``{
 	],
 	"create_symlink" : $[
 	    "widget" : `checkbox,
+	    // check box
 	    "label" : _("Create &symlink"),
 	    "opt" : [ `notify ],
 	    "init" : createSymlinkHandle,
@@ -517,6 +485,7 @@ global define map<string,any> InitWidgets () ``{
 	],
 	"device" : $[
 	    "widget" : `textentry,
+	    // text entry
 	    "label" : _("&Device"),
 	    "init" : deviceInit,
 	    "store" : deviceStore,
@@ -560,7 +529,7 @@ global define map<string,any> InitWidgets () ``{
                 ["broadcastclient", _("&Accepting Broadcast Packets")]
 	    ],
 	    // frame
-	    "label" : _("Entry Type"),
+	    "label" : _("Kind of Synchronization Peer"),
 	    "init" : NtpClient::peerTypesInit,
 	    "handle" : NtpClient::peerTypesHandle,
 	    "help" : HELPS["peer_types"]:"",

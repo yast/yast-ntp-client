@@ -20,6 +20,10 @@ import "Popup";
 include "ntp-client/helps.ycp";
 include "ntp-client/misc.ycp";
 
+define boolean abortPopup () ``{
+    return Popup::ReallyAbort (true);
+}
+
 /**
  * Read settings dialog
  * @return `abort if aborted and `next otherwise
@@ -89,10 +93,10 @@ define symbol SimpleDialog () ``{
 
     symbol ret = CWM::Run (w,
 	// yes-no popup
-	 $[`abort : ``(! NtpClient::modified || reallyExit ())]);
+	 $[`abort : ``(reallyExit ())]);
 
     // and now store the settings if needed
-    if (ret != `abort && ret != `back)
+    if (ret != `abort && ret != `back && ret != `cancel)
     {
 	if (NtpClient::selected_record["address"]:"" != "")
 	    NtpClient::storeSyncRecord ();
@@ -136,6 +140,9 @@ define symbol MainDialog () ``{
     Wizard::ReplaceAbortButton (
 	`PushButton (`id (`abort), Label::CancelButton ()));
 
+    NtpClient::startInit (nil);
+    CWM::handleWidgets (w, $["ID" : "never"]);
+
     return CWM::Run (w,
 	// yes-no popup
 	 $[`abort : ``(! NtpClient::modified || reallyExit ())]);
@@ -154,12 +161,12 @@ define symbol TypeSelectDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Select Type of Entry to Add");
+    string caption = _("Select the Kind of the Synchronization Peer");
 
     return CWM::ShowAndRun (["peer_types"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::NextButton (),
-	$[`abort : ``(Popup::ReallyAbort (true))]);
+	$[`abort : abortPopup ]);
 }
 
 /**
@@ -193,7 +200,7 @@ define symbol ServerDialog () ``{
 define symbol PeerDialog () ``{
     term contents = `HBox (`HStretch (), `VBox (
 	`VSpacing (3),
-	"address",
+	"paddress",
 	`VSpacing (1),
 	`Left ("init_sync"),
 	`VSpacing (1),
@@ -204,7 +211,7 @@ define symbol PeerDialog () ``{
     // dialog caption
     string caption = _("Configure NTP Peer");
 
-    return CWM::ShowAndRun (["address", "init_sync", "options"],
+    return CWM::ShowAndRun (["paddress", "init_sync", "options"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : ``(Popup::ReallyAbort (true))]);
@@ -261,13 +268,13 @@ define symbol RadioDialog () ``{
  * @return symbol for wizard sequencer
  */
 define symbol BCastDialog () ``{
-    term contents = `HBox (`HStretch (3), `VBox (
+    term contents = `HBox (`HStretch (), `VBox (
 	`VSpacing (3),
 	"bcaddress",
 	`VSpacing (1),
 	"options",
 	`VSpacing (3)
-    ), `HStretch (3));
+    ), `HStretch ());
 
     // dialog caption
     string caption = _("Configure Broadcasting");
@@ -276,51 +283,62 @@ define symbol BCastDialog () ``{
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : ``(Popup::ReallyAbort (true))]);
 }
+
 /**
  * Broadcast client editing dialog
  * @return symbol for wizard sequencer
  */
 define symbol BCastClientDialog () ``{
-    term contents = `HBox (`HStretch (3), `VBox (
-	`VSpacing (3),
-	"address",
-	`VSpacing (1),
-	"options",
-	`VSpacing (3)
-    ), `HStretch (3));
+    term contents = `HBox (`HStretch (), `VBox (
+	`VStretch (),
+	"bccaddress",
+	`VStretch ()
+    ), `HStretch ());
 
     // dialog caption
     string caption = _("Configure Broadcasting Client");
 
-    return CWM::ShowAndRun (["address", "options"], NtpClient::widgets,
+    return CWM::ShowAndRun (["bccaddress"], NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : ``(Popup::ReallyAbort (true))]);
 }
 
+/**
+ * Fudge factors dialog
+ * @return symbol for wizard sequencer
+ */
 define symbol FudgeDialog () ``{
     term contents = `HBox (`HSpacing (3), `VBox (
 	`VSpacing (3),
 	`HBox (
+	    // text entry
 	    `HWeight (1, `TextEntry (`id (`refid), _("&Reference ID"), "")),
 	    `HSpacing (3),
+	    // int field
 	    `HWeight (1, `IntField (`id (`stratum), _("&Stratum"), 0, 15, 2))
 	),
 	`VStretch (),
 	`HBox (
+	    // text entry
 	    `HWeight (1, `TextEntry (`id (`time1), _("Calibration offset 1"))),
 	    `HSpacing (3),
+	    // text entry
 	    `HWeight (1, `TextEntry (`id (`time2), _("Calibration offset 2")))
 	),
 	`VStretch (),
 	`HBox (
+	    // check box
 	    `HWeight (1, `CheckBox (`id (`flag1), _("Flag &1"), false)),
 	    `HSpacing (3),
+	    // check box
 	    `HWeight (1, `CheckBox (`id (`flag2), _("Flag &2"), false))
 	),
 	`VStretch (),
 	`HBox (
+	    // check box
 	    `HWeight (1, `CheckBox (`id (`flag3), _("Flag &3"), false)),
 	    `HSpacing (3),
+	    // check box
 	    `HWeight (1, `CheckBox (`id (`flag4), _("Flag &4"), false))
 	),
 	`VSpacing (3)
