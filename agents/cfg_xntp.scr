@@ -12,5 +12,5 @@
 .sysconfig.xntp
 
 `ag_ini(
-    SysConfigFile("/etc/sysconfig/xntp")
+    `SysConfigFile("/etc/sysconfig/xntp")
 )
