@@ -271,7 +271,7 @@ global define map InitWidgets () ``{
     map address = $[
 	    "widget" : `textentry,
 	    // text entry label
-	    "label" : ("A&ddress"),
+	    "label" : _("A&ddress"),
 	    "init" : ``(NtpClient::addressInit ()),
 	    "store" : ``(NtpClient::addressStore ()),
 	    "help" : HELPS["address"]:"",
@@ -358,9 +358,9 @@ global define map InitWidgets () ``{
                 // radio button, NTP relationship type
                 [`radio, _("&Radio Clock")],
                 // radio button, NTP relationship type
-                [`broadcast, _("&Broadcasting")],
+                [`bcast, _("&Broadcasting")],
                 // radio button, NTP relationship type
-                [`broadcastclient, _("&Accepting Broadcast Packets")]
+                [`bcastclient, _("&Accepting Broadcast Packets")]
 	    ],
 	    // frame
 	    "label" : _("Entry Type"),

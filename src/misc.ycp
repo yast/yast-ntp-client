@@ -12,6 +12,16 @@
 textdomain "ntp-client";
 
 /**
+ * Ask user if exit without saving
+ * @return boolean true if exit
+ */
+global define boolean reallyExit () ``{
+    // yes-no popup
+    return Popup::YesNo (_("Really exit?
+All changes will be lost."));
+}
+
+/**
  * Parse string to map of options
  * @param options_string string of options
  * @return map options as a map
@@ -85,7 +95,7 @@ global define boolean PollAbort() ``{
  * @return true if abort is confirmed
  */
 global define boolean ReallyAbort() ``{
-    return /*!modified ||*/ UI::ReallyAbortPopup(true);
+    return /*!modified ||*/ Popup::ReallyAbort(true);
 }
 
 

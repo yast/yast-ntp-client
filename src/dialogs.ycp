@@ -72,8 +72,7 @@ global define symbol MainDialog () ``{
 
     return CWM::Run (w,
 	// yes-no popup
-	 $[`abort : ``(! NtpClient::modified || Popup::YesNo (_("Really exit?
-All changes will be lost.")))]);
+	 $[`abort : ``(! NtpClient::modified || NtpClient::reallyExit ())]);
 
 }
 

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep  2 11:29:07 CEST 2003 - jsrain@suse.de
+
+- marked missed texts for translation
+- fixed translation of exit without saving popup (was evaluated in
+  incorect textdomain)
+
+-------------------------------------------------------------------
 Mon Sep  1 11:35:25 CEST 2003 - jsrain@suse.de
 
 - separated "Type of entry to add" popup to extra dialog and added
