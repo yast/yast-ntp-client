@@ -12,6 +12,7 @@ X-SuSE-YaST-Group=Net_advanced
 X-SuSE-YaST-Argument=
 X-SuSE-YaST-RootOnly=true
 X-SuSE-YaST-AutoInst=all
+X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoinstResource= ntp-client

@@ -17,6 +17,7 @@ import "NtpClient";
 import "Popup";
 import "SuSEFirewall";
 import "Wizard";
+import "Report";
 
 include "ntp-client/helps.ycp";
 include "ntp-client/misc.ycp";
