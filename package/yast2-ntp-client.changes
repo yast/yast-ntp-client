@@ -4,6 +4,8 @@ Mon Mar 15 10:13:16 CET 2004 - jsrain@suse.cz
 - fixed parsing of configuration files with comments on the same
   line as option (eg. server ntp.example.com #comment) (#35818)
 - fixed saving address of the NTP server from the simple dialog
+- added support for lookup NTP servers via SLP
+- reduced VSpacings in order to fit in new wizard
 
 -------------------------------------------------------------------
 Wed Mar 10 02:20:52 CET 2004 - sh@suse.de

@@ -14,7 +14,7 @@ textdomain "ntp-client";
 import "Popup";
 import "Label";
 import "LogView";
-import "NtpClient";
+import "SLP";
 
 include "ntp-client/helps.ycp";
 
@@ -94,7 +94,10 @@ the daemon might not run properly.")))
  * @return any always `complex
  */
 global define symbol complexButtonHandle (string key, map event) ``{
-    return `complex;
+    if (event["ID"]:nil == "complex_button")
+	return `complex;
+    ntpEnabledOrDisabled (key, event);
+    return nil;
 }
 
 /**
@@ -173,7 +176,7 @@ global define void overviewInit (any id) ``{
  * @return any event to pass to WS or nil
  */
 global define any overviewHandle (string id, map event) ``{
-    ntpEnabledOrDisabled (id, event);
+//    ntpEnabledOrDisabled (id, event);
     if (event["ID"]:nil == `display_log)
     {
 	showLogPopup ();
@@ -193,6 +196,7 @@ global define any overviewHandle (string id, map event) ``{
 	UI::ChangeWidget (`id (`edit), `Enabled, enabled);
 	UI::ChangeWidget (`id (`delete), `Enabled, enabled);
 	UI::ChangeWidget (`id (`overview), `Enabled, enabled);
+	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
 	return nil;
     }
     map types = $[
@@ -252,6 +256,40 @@ global define void addressStore (any id, map event) ``{
 	selected_record["type"] = "server";
 	selected_record["initial_sync"] = true;
     }
+}
+
+/**
+ * Handle events on the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return any event to pass to WS or nil
+ */
+global define symbol serverAddressHandle (string id, map event) {
+    any ev_id = event["ID"]:nil;
+    if (ev_id == "boot" || ev_id == "never")
+    {
+	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
+	    != "never";
+	UI::ChangeWidget (`id (id), `Enabled, enabled);
+	UI::ChangeWidget (`id (`lookup_address), `Enabled, enabled);
+	return nil;
+    }
+    if (ev_id == `lookup_address)
+    {
+	list<map> servers = SLP::FindSrvs ("service:ntp", "");
+	list<string> server_names = maplist (map m, servers, ``(
+	    (string)(m["pcHost"]:"")
+	));
+	server_names = filter (string s, server_names, ``(s != ""));
+	UI::ReplaceWidget (`server_address_rp,
+	    `ComboBox (`id ("server_address"),
+		`opt (`editable, `hstretch),
+		// combo box label
+		_("&NTP Server"),
+		server_names));
+	return nil;
+    }
+    return nil;
 }
 
 /**
@@ -413,7 +451,7 @@ global define map<string,any> InitWidgets () ``{
 	    // push button label
 	    "label" : _("Co&mplex Configuration"),
 	    "help" : HELPS["complex_button"]:"",
-	    "handle_events" : [ "complex_button" ],
+	    "handle_events" : [ "complex_button", "never", "boot" ],
 	    "handle" : NtpClient::complexButtonHandle,
 	],
 	"fudge_button" : $[
@@ -454,7 +492,20 @@ global define map<string,any> InitWidgets () ``{
 	    // text entry label
 	    "label" : _("&NTP Server"),
 	    "help" : HELPS["server_address"]:"",
-	    "handle" : ntpEnabledOrDisabled,
+	    "handle" : serverAddressHandle,
+	    "widget" : `custom,
+	    "custom_widget" : `HBox (
+		`ReplacePoint (`id (`server_address_rp),
+		    `ComboBox (`id ("server_address"),
+			`opt (`editable, `hstretch),
+			// combo box label
+			_("&NTP Server"))
+		),
+		`VBox (
+		    `Label (" "),
+		    `PushButton (`id (`lookup_address), _("&Lookup"))
+		)
+	    ),
 	]),
 	"overview" : $[
 	    "widget" : `custom,
@@ -470,7 +521,7 @@ global define map<string,any> InitWidgets () ``{
 		    `PushButton (`id (`delete), Label::DeleteButton ()),
 		    `HStretch (),
 		    // menu button
-		    `MenuButton (_("&Advanced"), [
+		    `MenuButton (`id (`advanced), _("&Advanced"), [
 			// item of menu button
 			`item (`id (`display_log), _("Display &Log")),
 			// item of menu button

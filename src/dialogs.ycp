@@ -225,7 +225,7 @@ define symbol PeerDialog () ``{
  */
 define symbol RadioDialog () ``{
     term contents = `HBox (`HSpacing (3), `VBox (
-	`VSpacing (1),
+	`VSpacing (0.5),
 	`HBox (
 	    "clock_type",
 	    `HStretch ()
@@ -234,7 +234,7 @@ define symbol RadioDialog () ``{
 	    "unit_number",
 	    `HStretch ()
 	),
-	`VSpacing (1),
+	`VSpacing (0.5),
 	`HBox (
 	    "create_symlink",
 	    `HStretch ()
@@ -247,9 +247,9 @@ define symbol RadioDialog () ``{
 	    ),
 	    `HStretch ()
 	),
-	`VSpacing (1),
+	`VSpacing (0.5),
 	"options",
-	`VSpacing (1),
+	`VSpacing (0.5),
 	"fudge_button",
 	`VSpacing (1)
     ), `HSpacing (3));

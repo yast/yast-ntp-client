@@ -84,11 +84,16 @@ it must be created manually.</p>"),
     "fudge_button" : _("<p><b><big>Driver Calibration</big></b><br>
 To calibrate the clock driver, click <b>Driver Calibration</b>.</p>"),
 
-    // help text 1/1, alt. 1
+    // help text 1/1, alt. 1 part 1/2
     "server_address" : _("<p><b><big>Address of the NTP Server</big></b><br>
 To select the address of the NTP server, use <b>NTP Server</b>.
 To find an NTP server, ask your Internet provider or
-see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>"),
+see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>")
+    +
+    // help text 1/1, alt. 1 part 2/2
+    _("<p><b><big>Finding Servers</big></b><br>
+To find NTP servers in the local network using the
+Service Location Protocol (SLP), click <b>Lookup</b>.</p>"),
 
     // help text 1/1, alt. 2
     "paddress" : _("<p><b><big>Address</big></b><br>
