@@ -17,7 +17,7 @@ textdomain "ntp-client";
 
 import "Mode";
 import "NetworkDevices";
-import "Package";
+import "PackageSystem";
 import "Progress";
 import "Report";
 import "Service";
@@ -140,14 +140,11 @@ global define boolean Read() ``{
 
     boolean failed = false;
 
-    if (! Package::Installed ("xntp") && !Mode::config)
+    if (! Mode::test
+	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["xntp"])
+    )
     {
-	boolean install_ok = Package::Install ("xntp");
-	if (! install_ok && ! Package::LastOperationCanceled ())
-	{
-	    // error popup
-	    Report::Error (_("Installing required packages failed."));
-	}
+	return false;
     }
 
     run_service = Service::Enabled ("xntpd");

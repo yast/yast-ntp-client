@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jul 19 12:36:29 CEST 2004 - jsrain@suse.cz
+
+- use common function for checking installed packages (#30872)
+
+-------------------------------------------------------------------
 Mon Jun 21 07:55:25 CEST 2004 - jsrain@suse.cz
 
 - fixed saving of options to /etc/ntp.conf (#42199)
