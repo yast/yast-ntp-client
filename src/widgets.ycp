@@ -65,15 +65,15 @@ XNTP daemon need not run properly.")))
 global define void overviewInit (any id) ``{
     integer index = -1;
     map types = $[
-	// table cell
+	// table cell, NTP relationship type
 	"server" : _("Server"),
-	// table cell
+	// table cell, NTP relationship type
 	"peer" : _("Peer"),
-	// table cell
+	// table cell, NTP relationship type
 	"radio" : _("Local Radio Clock"),
-	// table cell
+	// table cell, NTP relationship type
 	"broadcast" : _("Broadcast"),
-	// table cell
+	// table cell, NTP relationship type
 	"broadcastclient" : _("Accepting Broadcasts"),
     ];
     list items = maplist (`i, peers, ``{
@@ -105,47 +105,11 @@ global define any overviewHandle (any id, map event) ``{
 	"radio" : `radio,
 	"broadcast" : `bcast,
 	"broadcastclient" : `bcastclient,
-   ];
-   selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
-   if (event["ID"]:nil == `add)
+    ];
+    selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
+    if (event["ID"]:nil == `add)
     {
-	selected_item_index = -1;
-	UI::OpenDialog (`VBox (
-	    `RadioButtonGroup (`id (`rbg), `VBox (
-		// label
-		`Left (`Label (_("Select Type of Entry to Add"))),
-		`VSpacing (1),
-		// radio button
-		`Left (`RadioButton (`id ("server"), _("&Server"), true)),
-		// radio button
-		`Left (`RadioButton (`id ("peer"), _("&Peer"))),
-		// radio button
-		`Left (`RadioButton (`id ("radio"), _("&Radio Clock"))),
-		// radio button
-		`Left (`RadioButton (`id ("broadcast"), _("&Broadcasting"))),
-		`Left (`RadioButton (`id ("broadcastclient"),
-		    // radio button
-		    _("&Accepting Broadcast Packets")))
-	    )),
-	    `VSpacing (1),
-	    `HBox (
-		`HStretch (),
-		`PushButton (`id (`ok), `opt (`default), Label::OKButton ()),
-		`HSpacing (2),
-		`PushButton (`id (`cancel), Label::CancelButton ()),
-		`HStretch ()
-	    )
-	));
-	UI::SetFocus (`id ("server"));
-	any ret = nil;
-	while (ret == nil)
-	    ret = UI::UserInput ();
-	string type = UI::QueryWidget (`id (`rbg), `CurrentButton);
-	UI::CloseDialog ();
-	if (ret != `ok)
-	    return nil;
-	selected_item = $["key" : type, "value" : "", "param" : ""];
-	return types[type]:nil;
+	return `add;
     }
     else if (event["ID"]:nil == `edit || event["ID"]:nil == `overview)
     {
@@ -253,6 +217,51 @@ global define void fudgeStore (any id, map event) ``{
 	$["key" : "fudge", "value" : address, "param" : UI::QueryWidget (`id ("fudge_options"), `Value)]);
 }
 
+// selected type of peer
+global symbol peer_type_selected = nil;
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+global define void peerTypesInit (any id) ``{
+    if (peer_type_selected != nil)
+	UI::ChangeWidget (`id ("peer_types"), `CurrentButton,
+	    peer_type_selected);
+    else
+	UI::ChangeWidget (`id ("peer_types"), `CurrentButton, `server);
+}
+
+/**
+ * Handle events on the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ * @return any event to pass to WS or nil
+ */
+global define symbol peerTypesHandle (any id, map event) ``{
+    peer_type_selected = UI::QueryWidget (`id ("peer_types"), `CurrentButton);
+    if (event["ID"]:nil == `next)
+	return peer_type_selected;
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+global define void peerTypesStore (any id, map event) ``{
+    map types = $[
+	`server : "server",
+        `peer : "peer",
+        `radio : "radio",
+        `bcast : "broadcast",
+        `bcastclient : "broadcastclient",
+    ];
+    string type = types[peer_type_selected]:"server";
+    selected_item = $["key" : type, "value" : "", "param" : ""];
+    selected_item_index = -1;
+}
+
 
 /**
  * Initialize all widgets
@@ -338,6 +347,27 @@ global define map InitWidgets () ``{
 	    "init" : ``(NtpClient::fudgeInit ()),
 	    "store" : ``(NtpClient::fudgeStore ()),
 	    "help" : HELPS["fudge_options"]:"",
+	],
+	"peer_types" : $[
+	    "widget" : `radio_buttons,
+	    "items" : [
+		// radio button, NTP relationship type
+                [`server, _("&Server")],
+                // radio button, NTP relationship type
+                [`peer, _("&Peer")],
+                // radio button, NTP relationship type
+                [`radio, _("&Radio Clock")],
+                // radio button, NTP relationship type
+                [`broadcast, _("&Broadcasting")],
+                // radio button, NTP relationship type
+                [`broadcastclient, _("&Accepting Broadcast Packets")]
+	    ],
+	    // frame
+	    "label" : _("Entry Type"),
+	    "init" : ``(NtpClient::peerTypesInit ()),
+	    "handle" : ``(NtpClient::peerTypesHandle ()),
+	    "store" : ``(NtpClient::peerTypesStore ()),
+	    "help" : HELPS["peer_types"]:"",
 	],
     ];
 }

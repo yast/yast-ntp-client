@@ -96,6 +96,25 @@ write the parameters to the <b>Fudge Factors</b> text field.
 For details, see
 <i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>"),
 
+    // help text 1/6
+    "peer_types" : _("<p><b><big>Type of entry to add</big></b><br>
+Select the type of the entry to add here.</p>")
+    // help text 2/6
+    + _("<p>To add NTP server to synchronize against,
+select <b>Server</b>.</p>")
+    // help text 3/6
+    + _("<p>To add NTP peer to synchronize one against each other, select
+<b>Peer</b>.</p>")
+    // help text 4/6
+    + _("<p>To configure local radio clock connected directly to your computer,
+select <b>Radio Clock</b>.</p>")
+    // help text 5/6
+    + _("<p>To broadcast time information through network, select
+<b>Broadcasting</b>.</p>")
+    // help text 6/6
+    + _("<p>To accepts NTP packets broadcasted by other hosts on the network
+and use them for setting local time, select <b>Accepting Broadcast Packets<b>.</p>"),
+
 ];
 
 /* EOF */

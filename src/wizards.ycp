@@ -94,6 +94,7 @@ global define symbol MainSequence() ``{
 
     map aliases = $[
 	"main"		:   ``(MainDialog ()),
+	"type_select"	:   ``(TypeSelectDialog ()),
 	"server"	:   ``(ServerDialog ()),
 	"peer"		:   ``(PeerDialog ()),
 	"radio"		:   ``(RadioDialog ()),
@@ -107,6 +108,14 @@ global define symbol MainSequence() ``{
 	"main" : $[
 	    `abort	: `abort,
 	    `next	: `next,
+	    `peer	: "peer",
+	    `server	: "server",
+	    `radio	: "radio",
+	    `bcast	: "bcast",
+	    `bcastclient: "bcastclient",
+	    `add	: "type_select",
+	],
+	"type_select" : $[
 	    `peer	: "peer",
 	    `server	: "server",
 	    `radio	: "radio",

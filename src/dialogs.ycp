@@ -78,6 +78,26 @@ All changes will be lost.")))]);
 }
 
 /**
+ * Type of new peer selection dialog
+ * @return symbol for wizard sequencer
+ */
+global define symbol TypeSelectDialog () ``{
+    term contents = `HBox (`HStretch (), `VBox (
+	`VSpacing (3),
+	"peer_types",
+	`VSpacing (3)
+    ), `HStretch ());
+
+    // dialog caption
+    string caption = _("Select Type of Entry to Add");
+
+    return CWM::ShowAndRun (["peer_types"],
+	NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::NextButton (),
+	$[`abort : ``(Popup::ReallyAbort (true))]);
+}
+
+/**
  * Server editing dialog
  * @return symbol for wizard sequencer
  */
@@ -95,7 +115,7 @@ global define symbol ServerDialog () ``{
     // dialog caption
     string caption = _("Configure NTP Server");
 
-   return CWM::ShowAndRun (["saddress", "init_sync", "options"],
+    return CWM::ShowAndRun (["saddress", "init_sync", "options"],
 	NtpClient::widgets,
 	contents, caption, Label::BackButton (), Label::OKButton (),
 	$[`abort : ``(Popup::ReallyAbort (true))]);
