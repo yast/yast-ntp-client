@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Aug 25 17:33:19 CEST 2003 - jsrain@suse.de
+
+- not touching sysconfig/xntp:XNTPD_INITIAL_NTPDATE if containg
+  AUTO and would be replaced with empty string (#29315)
+- 2.8.5
+
+-------------------------------------------------------------------
 Wed Aug 20 15:18:40 CEST 2003 - jsuchome@suse.de
 
 - removed redundant "initialization dialog" (#28779)

@@ -275,8 +275,19 @@ global define boolean Write() ``{
 	    : nil
     ));
     init = filter (`i, init, ``(i != nil));
-
     string init_str = mergestring (init, " ");
+
+    // Don't remove the AUTO key, something should be present for initialization
+    // if there is no NTP server set explicitly
+    if (size (init) == 0)
+    {
+	string orig_init = SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
+	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-")
+	{
+	    init_str = orig_init;
+	}
+    }
+
     if (! (SCR::Write (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE, init_str)
 	&& SCR::Write (.sysconfig.xntp, nil)))
     {
