@@ -17,6 +17,7 @@ import "Label";
 import "LogView";
 import "SLP";
 import "NetworkDevices";
+import "NtpClient";
 import "CWMFirewallInterfaces";
 
 include "ntp-client/helps.ycp";
@@ -1057,7 +1058,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "help" : HELPS["selected_test"]:"",
 	],
 	"firewall" : CWMFirewallInterfaces::CreateOpenFirewallWidget ($[
-	    "services" : [ "dns-server" ],
+	    "services" : NtpClient::firewall_services,
 	    "display_details" : true,
 	]),
     ];

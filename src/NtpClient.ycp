@@ -82,10 +82,10 @@ global integer selected_index = -1;
   */
 global map<string,any> selected_record = $[];
 
-/**
-  * Should the firewall settings be changed?
-  */
-global boolean change_firewall = false;
+///**
+//  * Should the firewall settings be changed?
+//  */
+//global boolean change_firewall = false;
 
 /**
   * Required packages
@@ -496,12 +496,12 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage ();
 
-    if (change_firewall)
-    {
+//    if (change_firewall)
+//    {
 	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::Write ();
 	Progress::set (progress_orig);
-    }
+//    }
 
     if (! Service::Adjust ("xntpd",
 	run_service ? "enable" : "disable"))
