@@ -409,6 +409,7 @@ global define boolean Write() ``{
  */
 global define boolean Import (map settings) ``{
     run_service = settings["start_at_boot"]:false;
+    run_chroot = settings["start_in_chroot"]:true;
     ntp_records = settings["peers"]:[];
     modified = true;
     return true;
@@ -422,6 +423,7 @@ global define boolean Import (map settings) ``{
 global define map Export () ``{
     return $[
 	"start_at_boot" : run_service,
+	"start_in_chroot" : run_chroot,
 	"peers" : ntp_records,
     ];
 }

@@ -79,7 +79,7 @@ clock is connected to may be needed. To do it, check
 <b>Create Symlink</b> and set the <b>Device</b>. To browse the device,
 click <b>Browse</b>.
 For some of the clock types creating a symbolic link is not needed, or 
-must be created manually.</p>"),
+it must be created manually.</p>"),
 
     // help text 4/4
     "fudge_button" : _("<p><b><big>Driver calibration</big></b><br>
