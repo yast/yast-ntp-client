@@ -87,7 +87,7 @@ define map string2opts (string options_string, list<string> with_param,
  * @param options map options represented as a map
  * @return string options represented as a string
  */
-define string opts2string (map options, string other) ``{
+define string opts2string (map<string,any> options, string other) ``{
     string ret = other;
     foreach (string k, any v, options, ``{
 	if (v == true)
@@ -202,11 +202,12 @@ define string setClockUnitNumber (string address, integer unit_number) ``{
   * @return list of items for the combo box
   */
 define list getClockTypesCombo () ``{
-    map clock_names = mapmap (integer k, map<string,string> v, clock_types, ``(
+    map<integer,string> clock_names = mapmap (integer k, map<string,string> v,
+	clock_types, ``(
 	    $[ k: v["name"]:"" ]
 	)
     );
-    list ret = maplist (string k, string v, clock_names, ``(
+    list ret = maplist (integer k, string v, clock_names, ``(
 	`item (sformat ("%1", k), v)
     ));
     return ret;

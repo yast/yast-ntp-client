@@ -45,7 +45,7 @@ global boolean write_only = false;
  * Read all ntp-client settings
  * @return true on success
  */
-global list<map<string, any> >ntp_records = [];
+global list<map<string, any> > ntp_records = [];
 
 
 /**
@@ -66,7 +66,7 @@ global integer selected_index = -1;
 /**
   * The currently sellected item
   */
-global map selected_record = $[];
+global map<string,any> selected_record = $[];
 
 /**
   * Should the firewall settings be changed?
@@ -174,7 +174,7 @@ YaST2 will install package %1."));
 	];
 	return entry;
     });
-    list<map<string, any> > fudge_records = filter (map m, ntp_records, ``(
+    list<map<string, any> > fudge_records = filter (map<string,any> m, ntp_records, ``(
 	m["type"]:"" == "fudge"
     ));
     map <string, map<string, any> > fudge_map = (map <string, map<string, any> >)listmap (map m, fudge_records,
@@ -182,7 +182,7 @@ YaST2 will install package %1."));
 	string key = m["address"]:"";
 	return $[key: m];
     });
-    ntp_records = filter (map m, ntp_records, ``(
+    ntp_records = filter (map<string,any> m, ntp_records, ``(
 	m["type"]:"" != "fudge"
     ));
 
@@ -339,7 +339,7 @@ global define boolean Write() ``{
 	}
 	return [ s1, s2 ];
     }));
-    save2 = filter (map m, save2, ``(m != nil));
+    save2 = filter (map<string, any> m, save2, ``(m != nil));
 
     boolean failed = false;
     map conf = (map)SCR::Read (.etc.ntp_conf.all);
@@ -367,7 +367,7 @@ global define boolean Write() ``{
 		? p["address"]:""
 		: nil
     ));
-    init = filter (`i, init, ``(i != nil));
+    init = filter (any i, init, ``(i != nil));
     string init_str = mergestring ((list<string>)init, " ");
 
     // Don't remove the AUTO key, something should be present for initialization
@@ -497,13 +497,15 @@ global define string Summary() ``{
     ];
     foreach (string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
-	list l = filter (map<string,any> p, ntp_records, ``(p["type"]:"" == t));
-	list names = maplist (map<string,any> i, l, ``(i["address"]:""));
+	list<map<string,any> > l
+	    = filter (map<string,any> p, ntp_records, ``(p["type"]:"" == t));
+	list<string> names
+	    = maplist (map<string,any> i, l, ``(i["address"]:""));
 	names = filter (string n, names, ``(n != ""));
 	if (size (names) > 0)
 	{
 	    summary = Summary::AddLine (summary, sformat (
-		types[t]:"", splitstring ((list<string>)names, ", ")
+		types[t]:"", mergestring ((list<string>)names, ", ")
 	    ));
 	}
     });
@@ -531,7 +533,7 @@ global define list<map<string,any> >getSyncRecords () ``{
 	    "device" : m["device"]:"",
 	];
     });
-    ret = filter (map m, ret, ``(m != nil));
+    ret = filter (map<string,any> m, ret, ``(m != nil));
     return ret;
 }
 
@@ -598,7 +600,7 @@ global define boolean deleteSyncRecord (integer index) ``{
 	return false;
     }
     ntp_records[index] = nil;
-    ntp_records = filter (map r, ntp_records, ``(r != nil));
+    ntp_records = filter (map<string,any> r, ntp_records, ``(r != nil));
     modified = true;
     return true;
 }

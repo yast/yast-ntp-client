@@ -1,8 +1,10 @@
 -------------------------------------------------------------------
-Mon Mar  1 09:01:51 CET 2004 - jsrain@suse.de
+Mon Mar  1 16:38:57 CET 2004 - jsrain@suse.de
 
 - fixed displaying NTP summary
 - merged texts from proofread
+- more strict data types
+- 2.9.3
 
 -------------------------------------------------------------------
 Mon Feb 16 17:37:37 CET 2004 - jsrain@suse.de
