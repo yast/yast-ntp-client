@@ -11,6 +11,11 @@
 
 textdomain "ntp-client";
 
+/**
+ * Parse string to map of options
+ * @param options_string string of options
+ * @return map options as a map
+ */
 global define map string2opts (string options_string) ``{
     list l = splitstring (options_string, " ");
     l = filter (`e, l, ``(e != ""));
@@ -29,6 +34,11 @@ global define map string2opts (string options_string) ``{
     return ret;
 }
 
+/**
+ * Create options string from a map
+ * @param options map options represented as a map
+ * @return string options represented as a string
+ */
 global define string opts2string (map options) ``{
     list(string) ret = [];
     foreach (`k, `v, options, ``{
@@ -42,6 +52,40 @@ global define string opts2string (map options) ``{
 	}
     });
     return mergestring (ret, " ");
+}
+
+/**
+ * If modified, ask for confirmation
+ * @return true if abort is confirmed
+ */
+global define boolean ReallyAbort() ``{
+    return !modified || UI::ReallyAbortPopup(true);
+}
+
+/**
+ * Abort function
+ * @return blah blah lahjk
+ */
+global define boolean Abort() ``{
+    if(AbortFunction != nil)
+	return eval(AbortFunction) == true;
+    return false;
+}
+
+/**
+ * Check for pending Abort press
+ * @return true if pending abort
+ */
+global define boolean PollAbort() ``{
+    return UI::PollInput() == `abort;
+}
+
+/**
+ * If modified, ask for confirmation
+ * @return true if abort is confirmed
+ */
+global define boolean ReallyAbort() ``{
+    return /*!modified ||*/ UI::ReallyAbortPopup(true);
 }
 
 

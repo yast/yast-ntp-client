@@ -34,60 +34,51 @@ You can abort the saving by pressing the <b>Abort</b> button.
 An additional dialog will inform you whether it is safe to do so or not.
 </p>"),
 
-    /* */
-    "start" : _("<p><b><big>FIXME TODO</big></b></p>"),
+    // help text 1/2
+    "start" : _("<p><b><big>Automatically start XNTP daemon</big></b><br>
+Select if you want to start XNTP daemon when booting system, or not. Note,
+that XNTP daemon resolves hostnames when initializing. It means that your
+network connection must be brought up before XNTP daemon starts.</p>"),
+    // help text 2/2
+    "overview" : _("<p><b><big>Configured servers</big></b><br>
+To adjust NTP servers, peers, local radio clocks and NTP broadcasting,
+select appropriate line and click <b>Edit</b>. To add a new entry, click
+<b>Add</b>. To delete existing entry, select it and click <b>Delete</b>.</p>"),
 
-    "overview" : _("<p><b><big>FIXME TODO</big></b></p>"),
+    // help text 1/1, alt. 1
+    "saddress" : _("<p><b><big>Address</big></b><br>
+To set the remote host address, use the <b>Address</b> text field.
+If you do not know any NTP server, ask you internet provider, or
+see <i>http://www.eecis.udel.edu/~mills/ntp/servers.html</i>.</p>"),
 
+    // help text 1/1, alt. 2
+    "bcaddress" : _("<p><b><big>Address</big></b><br>
+To set the address to broadcast to, use the <b>Address</b> text field.</p>"),
 
+    // help text 1/1, alt. 3
+    "rcaddress" : _("<p><b><big>Address</big></b><br>
+To set the radio clock address, use the <b>Address</b> text field.
+Note, that you have to create symbolic link according to selected radio
+clock. For details, install package <i>xntp-doc</i> and see
+<i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>"),
 
-    /* Summary dialog help 1/3 */
-    "summary" : _("<p><b><big>NtpClient configuration</big></b><br>
-Configure ntp-client here.<br></p>") +
+    // help text 1/1, alt. 4
+    "address" : _("<p><b><big>Address</big></b><br>
+To set the remote host address, use the <b>Address</b> text field.</p>"),
 
-    /* Summary dialog help 2/3 */
-    _("<p><b><big>Adding a ntp-client:</big></b><br>
-Choose ntp-client from the list of the detected ntp-clients.
-If your ntp-client was not autodetected, use <b>Other (not detected)</b>.
-Then press <b>Configure</b>.</p>") +
+    // help text 2/4, optinal
+    "init_sync" : _("<p><b><big>Initial synchronization</big></b><br>
+The first synchronization of the clock is performed before XNTP daemon is
+started. To use this host to initial synchronization, select
+<b>Use for initial synchronization</b>.</p>"),
 
-    /* Summary dialog help 3/3 */
-    _("<p><b><big>Editing or deleting:</big></b><br>
-If you press <b>Edit</b>, an additional dialog in which to change
-the configuration opens.</p>"),
+    // help text 3/4
+    "options" : _("<p><b><big>Options</big></b><br>
+To specify options, write them to the <b>Options</b> text field.</p>"),
 
-    /* Ovreview dialog help 1/3 */
-/*    "overview" : _("<p><b><big>NtpClient configuration overview</big></b><br>
-Obtain an overview about installed ntp-clients. Additionally
-edit their configuration.<br></p>") +
-
-    /* Ovreview dialog help 2/3 */
-/*_("<p><b><big>Adding a ntp-client:</big></b><br>
-Press <b>Add</b> to configure a ntp-client.</p>") +
-
-    /* Ovreview dialog help 3/3 */
-/*_("<p><b><big>Editing or deleting:</big></b><br>
-Choose a ntp-client to change or remove.
-Then press <b>Edit</b> or <b>Delete</b> as desired.</p>"),
-
-    /* Configure1 dialog help 1/2 */
-    "c1" : _("<p><b><big>Configure, part one</big></b><br>
-Please press the <b>Next</b> button.
-<br></p>") +
-
-    /* Configure1 dialog help 2/2 */
-_("<p><b><big>Selecting something:</big></b><br>
-It is not possible, you must code it first :-)
-</p>"),
-
-    /* Configure2 dialog help 1/2 */
-    "c2" : _("<p><b><big>Configure, part two</big></b><br>
-Please press the <b>Next</b> button.
-<br></p>") +
-
-    /* Configure2 dialog help 2/2 */
-_("<p><b><big>Selecting something:</big></b><br>
-It is not possible, you must code it first :-)
+    // help text 4/4, optional
+    "fudge_options" : _("<p><b><big>Fudge options</big></b><br>
+To specify fudge options, write them to the <b>Fudge options</b> text field.
 </p>"),
 
 ];

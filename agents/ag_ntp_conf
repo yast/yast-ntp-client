@@ -8,7 +8,7 @@ sub parse ()
     y2milestone ("Parsing /etc/ntp.conf");
     my @ret = ();
     my $comment = "";
-    open (IN, "/etc/ntp.conf");
+    open (IN, "/etc/ntp.conf") || return @ret;
     while ( $line = <IN> )
     {
 	chomp ( $line );
@@ -133,7 +133,7 @@ while ( <STDIN> )
 			    foreach $arg ( @argument )
 			    {
 				( $value, $param ) = @{$arg};
-				y2debug ("Val", %value, "Param", $param);
+				y2debug ("Key", $key, "Val", $value, "Param", $param);
 				my %new_rec = ( "key" => $key, "value" => $value, "param" => $param);
 				push (@data, \%new_rec);
 			    }
@@ -150,7 +150,8 @@ while ( <STDIN> )
 		    foreach $arg ( @argument )
 		    {
 			( $value, $param ) = @{$arg};
-			%new_rec = ( "key" => $key, "value" => $value, "param" => $param);
+			y2debug ("Key", $key, "Value", $value);
+			my %new_rec = ( "key" => $key, "value" => $value, "param" => $param);
 			push (@data, \%new_rec);
 		    }
 		}

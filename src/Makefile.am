@@ -12,7 +12,6 @@ ynclude_DATA =			\
 	helps.ycp		\
 	wizards.ycp		\
 	dialogs.ycp		\
-	routines.ycp		\
 	widgets.ycp		\
 	misc.ycp
 

@@ -19,9 +19,11 @@ import "Progress";
 import "Report";
 import "Summary";
 import "Runlevel";
+import "Require";
+import "Mode";
 
-include "ntp-client/routines.ycp";
 include "ntp-client/widgets.ycp";
+include "ntp-client/misc.ycp";
 
 global map widgets = InitWidgets ();
 
@@ -35,8 +37,6 @@ global block AbortFunction = nil;
  * Data was modified?
  */
 global boolean modified = false;
-
-global boolean proposal_valid = false;
 
 /**
  * Write only, used during autoinstallation.
@@ -99,6 +99,12 @@ global define boolean Read() ``{
 
     boolean failed = false;
 
+    if (! Require::IsPackageInstalled ("xntp") || Mode::config)
+	Require::RequireAndConflictTarget (["xntp"], [],
+	    // richtext, %1 is name of package
+	    _("For network time synchronizxation NTP daemon is required.
+YaST2 will install package %1."));
+
     start_at_boot = Runlevel::ServiceEnabled ("xntpd");
     peers = [];
     foreach (`k, rw_order, ``{
@@ -134,7 +140,9 @@ global define boolean Read() ``{
 	integer count = tointeger (
 	    regexpsub (initial_sync, "AUTO-([0-9]+)", "\\1"));
 	peers = maplist (`p, peers, ``{
-	    if (p[0]:"" == "server")
+	    if ((p[0]:"" == "server"
+		    && ! regexpmatch (p[1]:"", "^127\.127\.[0-9]+.[0-9]+$"))
+		|| p[0]:"" == "peer")
 	    {
 		count = count - 1;
 		p[3] = count >= 0;
@@ -166,11 +174,13 @@ global define boolean Read() ``{
 
     if(failed)
     {
+	// error report
 	Report::Error(_("Can not read current settings!"));
     }
 
     if(Abort()) return false;
-    ProgressNextStage(_("Finished"));
+    Progress::NextStage ();
+    Progress::Title (_("Finished"));
     sleep(sl);
 
     if(Abort()) return false;
@@ -189,10 +199,9 @@ global define boolean Write() ``{
 
     integer steps = 2;
 
-    integer sl = 500;
+    integer sl = 0;
     sleep(sl);
 
-    // TODO FIXME Names of real stages
     // We do not set help text here, because it was set outside
     Progress::New(caption, " ", steps, [
 	    // progress stage
@@ -214,20 +223,20 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage();
 
+    y2milestone ("Writing settings %1", peers);
+
     boolean failed = false;
     list peers2 = maplist (`p, peers, ``{
 	if (p[0]:"" == "radio")
 	    p[0] = "server";
 	return p;
     });
-y2error ("Peers2: %1", peers2);
     foreach (`k, rw_order, ``{
 	path v = paths[k]:nil;
 	list l = filter (`e, peers2, ``(e[0]:"" == k));
 	l = maplist (`e, l, ``(
 	    [e[1]:"", e[2]:""]
 	));
-y2error ("Writing %1 to %2", l, v);
 	boolean b = SCR::Write (v, l);
 	if (! b)
 	{
@@ -239,6 +248,7 @@ y2error ("Writing %1 to %2", l, v);
     failed = failed || ! SCR::Write (.etc.ntp_conf, nil);
 
     if (failed)
+	// error report
 	Report::Error (_("Can not write settings to /etc/ntp.conf!"));
 
 
@@ -253,6 +263,7 @@ y2error ("Writing %1 to %2", l, v);
     if (! (SCR::Write (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE, init_str)
 	&& SCR::Write (.sysconfig.xntp, nil)))
     {
+	// error report
 	Report::Error (_("Can not write sysconfig variables."));
     }
 
@@ -265,15 +276,18 @@ y2error ("Writing %1 to %2", l, v);
     if (! Runlevel::ServiceAdjust ("xntpd",
 	start_at_boot ? "enable" : "disable"))
     {
+	// error report
 	Report::Error (_("Can not adjust the service"));
     }
     if (start_at_boot && 0 != Runlevel::RunInitScript("xntpd", "restart"))
+	// error report
 	Report::Error (_("Can not restart NTP daemon!"));
 
     sleep(sl);
 
     if(Abort()) return false;
-    ProgressNextStage(_("Finished"));
+    Progress::NextStage ();
+    Progress::Title (_("Finished"));
     sleep(sl);
 
     if(Abort()) return false;
@@ -287,8 +301,9 @@ y2error ("Writing %1 to %2", l, v);
  * @return boolean True on success
  */
 global define boolean Import (map settings) ``{
-    // TODO FIXME: your code here (fill the above mentioned variables)...
-    sleep(3000);
+    start_at_boot = settings["start_at_boot"]:false;
+    peers = settings["peers"]:[];
+    modified = true;
     return true;
 }
 
@@ -298,9 +313,10 @@ global define boolean Import (map settings) ``{
  * @return map Dumped settings (later acceptable by Import ())
  */
 global define map Export () ``{
-    // TODO FIXME: your code here (return the above mentioned variables)...
-    sleep(3000);
-    return $[];
+    return $[
+	"start_at_boot" : start_at_boot,
+	"peers" : peers,
+    ];
 }
 
 /**
@@ -309,17 +325,35 @@ global define map Export () ``{
  * @return summary of the current configuration
  */
 global define list Summary() ``{
-    // TODO FIXME: your code here...
-    return [ _("Configuration summary ..."), [] ];
-}
+    list ret = [];
+    if (start_at_boot)
+	// summary string
+	ret = [_("Start XNTP daemon when starting system") ];
+    else
+	// summary string
+	ret = [_("Do not start XNTP daemon automatically") ];
 
-/**
- * Create an overview table with all configured cards
- * @return table items
- */
-global define list Overview() ``{
-    // TODO FIXME: your code here...
-    return [];
+    map types = $[
+	// summary string, %1 is list of addresses
+	"server" : _("Servers: %1"),
+	// summary string, %1 is list of addresses
+	"radio" : _("Radio clocks: %1"),
+	// summary string, %1 is list of addresses
+	"peer" : _("Peers: %1"),
+	// summary string, %1 is list of addresses
+	"broadcast" : _("Broadcast to: %1"),
+	// summary string, %1 is list of addresses
+	"broadcastclient" : _("Accept broadcasts from: %1"),
+    ];
+    foreach (`t, ["server", "radio", "peer", "broadcast", "broadcastclient" ],
+    ``{
+	list l = filter (`p, peers, ``(p[0]:"" == t));
+	list names = maplist (`i, l, ``(i[1]:""));
+	names = filter (`n, names, ``(n != ""));
+	if (size (names) > 0)
+	    ret = add (ret, sformat (types[t]:"", mergestring (names, ", ")));
+    });
+    return ret;
 }
 
 /* EOF */

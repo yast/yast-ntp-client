@@ -11,13 +11,12 @@
 
 textdomain "ntp-client";
 
-import "Wizard";
-import "Wizard_hw";
-
+import "Popup";
+import "Label";
 import "NtpClient";
 
 include "ntp-client/helps.ycp";
-include "ntp-client/routines.ycp";
+include "ntp-client/misc.ycp";
 
 /**
  * Initialize the widget
@@ -44,11 +43,16 @@ global define void startStore (any id, any event) ``{
 global define void overviewInit (any id) ``{
     integer index = -1;
     map types = $[
+	// table cell
 	"server" : _("Server"),
+	// table cell
 	"peer" : _("Peer"),
+	// table cell
 	"radio" : _("Local radio clock"),
-	"broadcast" : "FIXME",
-	"broadcastclient" : "FIXME",
+	// table cell
+	"broadcast" : _("Broadcast"),
+	// table cell
+	"broadcastclient" : _("Accepting broadcasts"),
     ];
     list items = maplist (`i, peers, ``{
 	index = index + 1;
@@ -71,22 +75,41 @@ global define any overviewHandle (any id, any event) ``{
     map types = $[
 	"server" : `server,
 	"peer" : `peer,
+	"radio" : `radio,
+	"broadcast" : `bcast,
+	"broadcastclient" : `bcastclient,
    ];
+   selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
    if (event == `add)
     {
 	selected_item_index = -1;
 	UI::OpenDialog (`VBox (
 	    `RadioButtonGroup (`id (`rbg), `VBox (
+		// label
+		`Left (`Label (_("Select type of entry to add"))),
+		`VSpacing (1),
+		// radio button
 		`Left (`RadioButton (`id ("server"), _("&Server"), true)),
-		`Left (`RadioButton (`id ("peer"), _("&Peer")))
+		// radio button
+		`Left (`RadioButton (`id ("peer"), _("&Peer"))),
+		// radio button
+		`Left (`RadioButton (`id ("radio"), _("&Radio clock"))),
+		// radio button
+		`Left (`RadioButton (`id ("broadcast"), _("&Broadcasting"))),
+		`Left (`RadioButton (`id ("broadcastclient"),
+		    // radio button
+		    _("&Accepting broadcast packets")))
 	    )),
+	    `VSpacing (1),
 	    `HBox (
 		`HStretch (),
-		`PushButton (`id (`ok), Label::OKButton ()),
+		`PushButton (`id (`ok), `opt (`default), Label::OKButton ()),
+		`HSpacing (2),
 		`PushButton (`id (`cancel), Label::CancelButton ()),
 		`HStretch ()
 	    )
 	));
+	UI::SetFocus (`id ("server"));
 	any ret = nil;
 	while (ret == nil)
 	    ret = UI::UserInput ();
@@ -106,8 +129,14 @@ global define any overviewHandle (any id, any event) ``{
     }
     else if (event == `delete)
     {
-
-
+	// yes-no popup
+	if (Popup::YesNo (_("Delete selected item?")))
+	{
+	    peers[selected_item_index] = nil;
+	    peers = filter (`p, peers, ``(p != nil));
+	    overviewInit (id);
+	    NtpClient::modified = true;
+	}
     }
 
 }
@@ -117,7 +146,8 @@ global define any overviewHandle (any id, any event) ``{
  * @param id any widget id
  */
 global define void addressInit (any id) ``{
-    UI::ChangeWidget (`id ("address"), `Value, selected_item[1]:"");
+    UI::ChangeWidget (`id (id), `Value, selected_item[1]:"");
+    UI::SetFocus (`id (id));
 }
 
 /**
@@ -126,7 +156,7 @@ global define void addressInit (any id) ``{
  * @param event any event that caused storing process
  */
 global define void addressStore (any id, any event) ``{
-    selected_item[1] = UI::QueryWidget (`id ("address"), `Value);
+    selected_item[1] = UI::QueryWidget (`id (id), `Value);
 }
 
 /**
@@ -147,17 +177,79 @@ global define void initSyncStore (any id, any event) ``{
 }
 
 /**
+ * Initialize the widget
+ * @param id any widget id
+ */
+global define void optionsInit (any id) ``{
+    UI::ChangeWidget (`id ("options"), `Value, selected_item[2]:"");
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event any event that caused storing process
+ */
+global define void optionsStore (any id, any event) ``{
+    selected_item[2] = UI::QueryWidget (`id ("options"), `Value);
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+global define void fudgeInit (any id) ``{
+    string fudge = "";
+    string address = selected_item[1]:"";
+    foreach (`p, peers, ``{
+	if (p[0]:"" == "fudge" && p[1]:"" == address)
+	    fudge = p[2]:"";
+    });
+    UI::ChangeWidget (`id ("fudge_options"), `Value, fudge);
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event any event that caused storing process
+ */
+global define void fudgeStore (any id, any event) ``{
+    // remove old entry first
+    string address = selected_item[1]:"";
+    peers = maplist (`p, peers, ``{
+	if (p[0]:"" == "fudge" && p[1]:"" == address)
+	    p = nil;
+	return p;
+    });
+    // and create a new one
+    address = UI::QueryWidget (`id ("rcaddress"), `Value);
+    peers = add (peers,
+	["fudge", address, UI::QueryWidget (`id ("fudge_options"), `Value)]);
+}
+
+
+/**
  * Initialize all widgets
  * @return map of widgets
  */
 global define map InitWidgets () ``{
+    map address = $[
+	    "widget" : `textentry,
+	    // text entry label
+	    "label" : ("A&ddress"),
+	    "init" : ``(NtpClient::addressInit ()),
+	    "store" : ``(NtpClient::addressStore ()),
+	    "help" : HELPS["address"]:"",
+    ];
     return $[
 	"start" : $[
 	    "widget" : `radio_buttons,
+	    // frame
 	    "label" : _("Automatically start NTP daemon"),
 	    "items" : [
+		// radio button
 		[ "never", _("N&ever") ],
-		[ "boot", _("When booting system") ],
+		// radio button
+		[ "boot", _("When &booting system") ],
 	    ],
 	    "help" : HELPS["start"]:"",
 	    "init" : ``(NtpClient::startInit ()),
@@ -166,7 +258,11 @@ global define map InitWidgets () ``{
 	"overview" : $[
 	    "widget" : `custom,
 	    "custom_widget" : `VBox (
-		`Table (`id (`overview), `header (_("Type"), _("Address"))),
+		`Table (`id (`overview), `header (
+		    // table header
+		    _("Type"),
+		    // table header
+		    _("Address"))),
 		`HBox (
 		    `PushButton (`id (`add), Label::AddButton ()),
 		    `PushButton (`id (`edit), Label::EditButton ()),
@@ -178,19 +274,40 @@ global define map InitWidgets () ``{
 	    "init" : ``(NtpClient::overviewInit ()),
 	    "handle" : ``(NtpClient::overviewHandle ()),
 	],
-	"address" : $[
-	    "widget" : `textentry,
-	    "label" : ("A&ddress"),
-	    "init" : ``(NtpClient::addressInit ()),
-	    "store" : ``(NtpClient::addressStore ()),
-	    "help" : "FIXME TODO",
-	],
+	"address" : address,
+	"saddress" : union (address, $[
+	    "help" : HELPS["saddress"]:"",
+	]),
+	"bcaddress" : union (address, $[
+	    "help" : HELPS["bcaddress"]:"",
+	]),
+	"rcaddress" : union (address, $[
+	    "help" : HELPS["rcaddress"]:"",
+	]),
+
 	"init_sync" : $[
 	    "widget" : `checkbox,
+	    // checkbox
 	    "label" : _("Use for &initial synchronization"),
 	    "init" : ``(NtpClient::initSyncInit ()),
 	    "store" : ``(NtpClient::initSyncStore ()),
-	    "help" : "FIXME TODO",
+	    "help" : HELPS["init_sync"]:"",
+	],
+	"options" : $[
+	    "widget" : `textentry,
+	    // text entry label
+	    "label" : _("O&ptions"),
+	    "init" : ``(NtpClient::optionsInit ()),
+	    "store" : ``(NtpClient::optionsStore ()),
+	    "help" : HELPS["options"]:"",
+	],
+	"fudge_options" : $[
+	    "widget" : `textentry,
+	    // text entry label
+	    "label" : _("&Fudge factors"),
+	    "init" : ``(NtpClient::fudgeInit ()),
+	    "store" : ``(NtpClient::fudgeStore ()),
+	    "help" : HELPS["fudge_options"]:"",
 	],
     ];
 }

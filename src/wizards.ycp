@@ -46,7 +46,9 @@ global define symbol NtpClientSequence() ``{
 	]
     ];
 
+    // dialog caption
     string caption = _("NtpClient configuration");
+    // label
     term contents = `Label(_("Initializing ..."));
 
     Wizard::CreateDialog();
@@ -65,15 +67,16 @@ global define symbol NtpClientSequence() ``{
  */
 global define symbol MainSequence() ``{
 
-    /* FIXME: adapt to your needs */
     map aliases = $[
 	"main"		:   ``(MainDialog ()),
 	"server"	:   ``(ServerDialog ()),
 	"peer"		:   ``(PeerDialog ()),
+	"radio"		:   ``(RadioDialog ()),
+	"bcast"		:   ``(BCastDialog ()),
+	"bcastclient"	:   ``(BCastClientDialog ()),
 	"store_record"	: [ ``(StoreRecord ()), true],
     ];
 
-    /* FIXME: adapt to your needs */
     map sequence = $[
 	"ws_start" : "main",
 	"main" : $[
@@ -81,12 +84,27 @@ global define symbol MainSequence() ``{
 	    `next	: `next,
 	    `peer	: "peer",
 	    `server	: "server",
+	    `radio	: "radio",
+	    `bcast	: "bcast",
+	    `bcastclient: "bcastclient",
 	],
 	"peer" : $[
 	    `abort	: `abort,
 	    `next	: "store_record",
 	],
 	"server" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"radio" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"bcast" : $[
+	    `abort	: `abort,
+	    `next	: "store_record",
+	],
+	"bcastclient" : $[
 	    `abort	: `abort,
 	    `next	: "store_record",
 	],

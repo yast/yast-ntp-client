@@ -14,9 +14,11 @@ textdomain "ntp-client";
 import "NtpClient";
 import "Wizard";
 import "CWM";
+import "Label";
+import "Popup";
 
 include "ntp-client/helps.ycp";
-include "ntp-client/routines.ycp";
+include "ntp-client/misc.ycp";
 
 /**
  * Read settings dialog
@@ -45,6 +47,7 @@ global define symbol WriteDialog() ``{
  * @return symbol for wizard sequencer
  */
 global define symbol MainDialog () ``{
+    list w = CWM::CreateWidgets (["start", "overview"], NtpClient::widgets);
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
 	`HBox (
@@ -59,9 +62,18 @@ global define symbol MainDialog () ``{
 
     // dialog caption
     string caption = _("NTP client configuration");
+    string help = CWM::MergeHelps (w);
+    contents = CWM::PrepareDialog (contents, w);
+    Wizard::SetContentsButtons (caption, contents, help,
+	Label::BackButton (), Label::FinishButton ());
+    Wizard::ReplaceBackButton(`VSpacing (0));
+    Wizard::ReplaceAbortButton (
+	`PushButton (`id (`abort), Label::CancelButton ()));
 
-    return CWM::ShowAndRun (["start", "overview"], NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::FinishButton (), $[]);
+    return CWM::Run (w,
+	 $[`abort : ``(! NtpClient::modified || Popup::YesNo (_("Really exit?
+All changes will be lost.")))]);
+
 }
 
 /**
@@ -69,18 +81,23 @@ global define symbol MainDialog () ``{
  * @return symbol for wizard sequencer
  */
 global define symbol ServerDialog () ``{
-    term contents = `HBox (`HSpacing (1), `VBox (
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (3),
+	"saddress",
 	`VSpacing (1),
-	"address",
-	"init_sync",
-	`VSpacing (1)
-    ), `HSpacing (1));
+	`Left ("init_sync"),
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HSpacing (3));
 
     // dialog caption
     string caption = _("Configure NTP server");
 
-   return CWM::ShowAndRun (["address", "init_sync"], NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (), $[]);
+   return CWM::ShowAndRun (["saddress", "init_sync", "options"],
+	NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (),
+	$[`abort : ``(Popup::ReallyAbort (true))]);
 }
 
 /**
@@ -88,18 +105,90 @@ global define symbol ServerDialog () ``{
  * @return symbol for wizard sequencer
  */
 global define symbol PeerDialog () ``{
-    term contents = `HBox (`HSpacing (1), `VBox (
-	`VSpacing (1),
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (3),
 	"address",
-	`VSpacing (1)
-    ), `HSpacing (1));
+	`VSpacing (1),
+	`Left ("init_sync"),
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HSpacing (3));
 
     // dialog caption
     string caption = _("Configure NTP peer");
 
-    return CWM::ShowAndRun (["address"], NtpClient::widgets,
-	contents, caption, Label::BackButton (), Label::OKButton (), $[]);
+    return CWM::ShowAndRun (["address", "init_sync", "options"],
+	NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (),
+	$[`abort : ``(Popup::ReallyAbort (true))]);
 }
+
+/**
+ * Reference clock editing dialog
+ * @return symbol for wizard sequencer
+ */
+global define symbol RadioDialog () ``{
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (3),
+	"rcaddress",
+	`VSpacing (1),
+	"options",
+	`VSpacing (1),
+	"fudge_options",
+	`VSpacing (3)
+    ), `HSpacing (3));
+
+    // dialog caption
+    string caption = _("Configure serial reference clock");
+
+    return CWM::ShowAndRun (["rcaddress", "options", "fudge_options"],
+	NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (),
+	$[`abort : ``(Popup::ReallyAbort (true))]);
+}
+
+/**
+ * Broadcast editing dialog
+ * @return symbol for wizard sequencer
+ */
+global define symbol BCastDialog () ``{
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (3),
+	"bcaddress",
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HSpacing (3));
+
+    // dialog caption
+    string caption = _("Configure broadcasting");
+
+    return CWM::ShowAndRun (["bcaddress", "options"], NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (),
+	$[`abort : ``(Popup::ReallyAbort (true))]);
+}
+/**
+ * Broadcast client editing dialog
+ * @return symbol for wizard sequencer
+ */
+global define symbol BCastClientDialog () ``{
+    term contents = `HBox (`HSpacing (3), `VBox (
+	`VSpacing (3),
+	"address",
+	`VSpacing (1),
+	"options",
+	`VSpacing (3)
+    ), `HSpacing (3));
+
+    // dialog caption
+    string caption = _("Configure broadcasting client");
+
+    return CWM::ShowAndRun (["address", "options"], NtpClient::widgets,
+	contents, caption, Label::BackButton (), Label::OKButton (),
+	$[`abort : ``(Popup::ReallyAbort (true))]);
+}
+
 
 /**
  * Pseudo-dialog to store settings to main structure
@@ -112,6 +201,7 @@ global define symbol StoreRecord () ``{
     else
 	NtpClient::peers[NtpClient::selected_item_index]
 	    = NtpClient::selected_item;
+    NtpClient::modified = true;
     return `next;
 }
 

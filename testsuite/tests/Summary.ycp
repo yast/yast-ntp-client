@@ -1,0 +1,37 @@
+/**
+ * File:
+ *  Summary.ycp
+ *
+ * Module:
+ *  NTP client configurator
+ *
+ * Summary:
+ *  Summary testsuite
+ *
+ * Authors:
+ *  Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+    include "testsuite.ycp";
+    import "Progress";
+    import "NtpClient";
+    import "Mode";
+
+    Mode::test = true;
+
+    Progress::off ();
+
+    NtpClient::Import ($[
+	"start_at_boot" : true,
+	"peers" : [
+	    [ "server", "10.20.30.40"],
+	    [ "server", "20.40.60.80"],
+	    [ "peer", "1.2.3.4"]
+	],
+    ]);
+    TEST (``(NtpClient::Summary ()), [], nil);
+}

@@ -1,5 +1,5 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages
+# neededforbuild yast2-devel-packages yast2-packager
 
 @HEADER@
 Requires:	yast2
@@ -25,6 +25,9 @@ Summary:	Configuration of ntp-client
 @yncludedir@/ntp-client/*
 @clientdir@/ntp-client.ycp
 @clientdir@/ntp-client_*.ycp
+@scrconfdir@/cfg_xntp.scr
+@scrconfdir@/etc_ntp.scr
+@agentdir@/ag_ntp_conf
 @moduledir@/NtpClient.ycp
 @configdir@/ntp-client.y2cc
 %doc @docdir@
