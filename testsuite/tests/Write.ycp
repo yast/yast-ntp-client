@@ -16,6 +16,9 @@
  */
 
 {
+
+    // testedfiles: NtpClient.ycp
+
     include "testsuite.ycp";
 
     map READ = $[
