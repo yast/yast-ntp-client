@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Aug  6 08:48:57 CEST 2003 - jsrain@suse.de
+
+- changed internal structure (autoyast requirement)
+- reporting error if xntp package installation fails
+- handling double-click in the summary table
+- 2.8.2
+
+-------------------------------------------------------------------
 Tue Aug  5 15:46:20 CEST 2003 - jsrain@suse.de
 
 - added warning if NTP daemon set to be started at boot

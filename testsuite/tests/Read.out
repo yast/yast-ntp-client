@@ -8,4 +8,4 @@ Read	.etc.ntp_conf.broadcast []
 Read	.etc.ntp_conf.broadcastclient []
 Read	.sysconfig.xntp.XNTPD_INITIAL_NTPDATE "AUTO-2"
 Return	true
-Return	$["peers":[["server", "ntp1", "options1", true], ["radio", "127.127.1.2", "options_clock", false], ["server", "ntp2", "options2", true], ["fudge", "127.127.1.2", "fudge_clock", false], ["peer", "peer1", "options_peer", false]], "start_at_boot":false]
+Return	$["peers":[$["initial":true, "key":"server", "param":"options1", "value":"ntp1"], $["initial":false, "key":"radio", "param":"options_clock", "value":"127.127.1.2"], $["initial":true, "key":"server", "param":"options2", "value":"ntp2"], $["initial":false, "key":"fudge", "param":"fudge_clock", "value":"127.127.1.2"], $["initial":false, "key":"peer", "param":"options_peer", "value":"peer1"]], "start_at_boot":false]

@@ -74,9 +74,9 @@ global define void overviewInit (any id) ``{
     ];
     list items = maplist (`i, peers, ``{
 	index = index + 1;
-	if (! haskey (types, i[0]:""))
+	if (! haskey (types, i["key"]:""))
 	    return nil;
-	return `item (`id (index), types[i[0]:""]:"", i[1]:"");
+	return `item (`id (index), types[i["key"]:""]:"", i["value"]:"");
     });
     items = filter (`i, items, ``(i != nil));
     UI::ChangeWidget (`id (`overview), `Items, items);
@@ -135,14 +135,14 @@ global define any overviewHandle (any id, map event) ``{
 	UI::CloseDialog ();
 	if (ret != `ok)
 	    return nil;
-	selected_item = [type, "", ""];
+	selected_item = $["key" : type, "value" : "", "param" : ""];
 	return types[type]:nil;
     }
-    else if (event["ID"]:nil == `edit)
+    else if (event["ID"]:nil == `edit || event["ID"]:nil == `overview)
     {
 	selected_item_index = UI::QueryWidget (`id (`overview), `CurrentItem);
-	selected_item = peers[selected_item_index]:[];
-	string type = selected_item[0]:"";
+	selected_item = peers[selected_item_index]:$[];
+	string type = selected_item["key"]:"";
 	return types[type]:nil;
     }
     else if (event["ID"]:nil == `delete)
@@ -164,7 +164,7 @@ global define any overviewHandle (any id, map event) ``{
  * @param id any widget id
  */
 global define void addressInit (any id) ``{
-    UI::ChangeWidget (`id (id), `Value, selected_item[1]:"");
+    UI::ChangeWidget (`id (id), `Value, selected_item["value"]:"");
     UI::SetFocus (`id (id));
 }
 
@@ -174,7 +174,7 @@ global define void addressInit (any id) ``{
  * @param event map event that caused storing process
  */
 global define void addressStore (any id, map event) ``{
-    selected_item[1] = UI::QueryWidget (`id (id), `Value);
+    selected_item["value"] = UI::QueryWidget (`id (id), `Value);
 }
 
 /**
@@ -182,7 +182,7 @@ global define void addressStore (any id, map event) ``{
  * @param id any widget id
  */
 global define void initSyncInit (any id) ``{
-    UI::ChangeWidget (`id ("init_sync"), `Value, selected_item[3]:false);
+    UI::ChangeWidget (`id ("init_sync"), `Value, selected_item["initial"]:false);
 }
 
 /**
@@ -191,7 +191,7 @@ global define void initSyncInit (any id) ``{
  * @param event map event that caused storing process
  */
 global define void initSyncStore (any id, map event) ``{
-    selected_item[3] = UI::QueryWidget (`id ("init_sync"), `Value);
+    selected_item["initial"] = UI::QueryWidget (`id ("init_sync"), `Value);
 }
 
 /**
@@ -199,7 +199,7 @@ global define void initSyncStore (any id, map event) ``{
  * @param id any widget id
  */
 global define void optionsInit (any id) ``{
-    UI::ChangeWidget (`id ("options"), `Value, selected_item[2]:"");
+    UI::ChangeWidget (`id ("options"), `Value, selected_item["param"]:"");
 }
 
 /**
@@ -208,7 +208,7 @@ global define void optionsInit (any id) ``{
  * @param event map event that caused storing process
  */
 global define void optionsStore (any id, map event) ``{
-    selected_item[2] = UI::QueryWidget (`id ("options"), `Value);
+    selected_item["param"] = UI::QueryWidget (`id ("options"), `Value);
 }
 
 /**
@@ -217,10 +217,10 @@ global define void optionsStore (any id, map event) ``{
  */
 global define void fudgeInit (any id) ``{
     string fudge = "";
-    string address = selected_item[1]:"";
+    string address = selected_item["value"]:"";
     foreach (`p, peers, ``{
-	if (p[0]:"" == "fudge" && p[1]:"" == address)
-	    fudge = p[2]:"";
+	if (p["key"]:"" == "fudge" && p["value"]:"" == address)
+	    fudge = p["param"]:"";
     });
     UI::ChangeWidget (`id ("fudge_options"), `Value, fudge);
 }
@@ -232,16 +232,16 @@ global define void fudgeInit (any id) ``{
  */
 global define void fudgeStore (any id, map event) ``{
     // remove old entry first
-    string address = selected_item[1]:"";
+    string address = selected_item["value"]:"";
     peers = maplist (`p, peers, ``{
-	if (p[0]:"" == "fudge" && p[1]:"" == address)
+	if (p["key"]:"" == "fudge" && p["value"]:"" == address)
 	    p = nil;
 	return p;
     });
     // and create a new one
     address = UI::QueryWidget (`id ("rcaddress"), `Value);
     peers = add (peers,
-	["fudge", address, UI::QueryWidget (`id ("fudge_options"), `Value)]);
+	$["key" : "fudge", "value" : address, "param" : UI::QueryWidget (`id ("fudge_options"), `Value)]);
 }
 
 
@@ -279,7 +279,7 @@ global define map InitWidgets () ``{
 	"overview" : $[
 	    "widget" : `custom,
 	    "custom_widget" : `VBox (
-		`Table (`id (`overview), `header (
+		`Table (`id (`overview), `opt (`notify), `header (
 		    // table header
 		    _("Type"),
 		    // table header

@@ -58,11 +58,11 @@
 
     TEST (``(NtpClient::Import ($[
 	"peers":[
-	    ["server", "ntp1", "options1", true],
-	    ["radio", "127.127.1.2", "options_clock", false],
-	    ["server", "ntp2", "options2", true],
-	    ["fudge", "127.127.1.2", "fudge_clock", false],
-	    ["peer", "peer1", "options_peer", false]
+	    $["key": "server", "value": "ntp1", "param": "options1", "initial": true],
+	    $["key": "radio", "value": "127.127.1.2", "param": "options_clock", "initial": false],
+	    $["key": "server", "value": "ntp2", "param": "options2", "initial": true],
+	    $["key": "fudge", "value": "127.127.1.2", "param": "fudge_clock", "initial": false],
+	    $["key": "peer", "value": "peer1", "param": "options_peer", "initial": false]
 	],
 	"start_at_boot":false])), [READ, $[], $[]], nil);
 

@@ -55,7 +55,7 @@ global list peers = [];
 
 global integer selected_item_index = -1;
 
-global list selected_item = [];
+global map selected_item = $[];
 
 list rw_order = [ "server", "fudge", "peer", "broadcast", "broadcastclient" ];
 
@@ -100,10 +100,17 @@ global define boolean Read() ``{
     boolean failed = false;
 
     if (! Require::AreAllPackagesInstalled (["xntp"]) || Mode::config)
-	Require::RequireAndConflictTarget (["xntp"], [],
+    {
+	boolean install_ok = Require::RequireAndConflictTarget (["xntp"], [],
 	    // richtext, %1 is name of package
 	    _("For network time synchronizxation NTP daemon is required.
 YaST2 will install package %1."));
+	if (! install_ok && ! Require::LastOperationCanceled ())
+	{
+	    // error popup
+	    Report::Error (_("Installing required packages failed."));
+	}
+    }
 
     start_at_boot = Runlevel::ServiceEnabled ("xntpd");
     peers = [];
@@ -116,8 +123,15 @@ YaST2 will install package %1."));
 	    failed = true;
 	    l = [];
 	}
-	l = maplist (`e, l, ``(prepend (e, k)));
-	peers = merge (peers, l);
+	list(map) p = maplist (list e, l, ``(
+	    $[
+		"key" : k,
+		"value" : e[0]:"",
+		"param" : e[1]:"",
+	    ]
+	));
+//	l = maplist (`e, l, ``(prepend (e, k)));
+	peers = merge (peers, p);
     });
 
     string initial_sync = SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
@@ -131,7 +145,7 @@ YaST2 will install package %1."));
     if (initial_sync == "AUTO")
     {
 	peers = maplist (`p, peers, ``{
-	    p[3] = p[0]:"" == "server";
+	    p["initial"] = p["key"]:"" == "server";
 	    return p;
 	});
     }
@@ -140,15 +154,16 @@ YaST2 will install package %1."));
 	integer count = tointeger (
 	    regexpsub (initial_sync, "AUTO-([0-9]+)", "\\1"));
 	peers = maplist (`p, peers, ``{
-	    if ((p[0]:"" == "server"
-		    && ! regexpmatch (p[1]:"", "^127\.127\.[0-9]+.[0-9]+$"))
-		|| p[0]:"" == "peer")
+	    if ((p["key"]:"" == "server"
+		    && ! regexpmatch (p["value"]:"",
+			"^127\.127\.[0-9]+.[0-9]+$"))
+		|| p["key"]:"" == "peer")
 	    {
 		count = count - 1;
-		p[3] = count >= 0;
+		p["initial"] = count >= 0;
 	    }
 	    else
-		p[3] = false;
+		p["initial"] = false;
 	    return p;
 	});
     }
@@ -156,16 +171,17 @@ YaST2 will install package %1."));
     {
 	list listed = splitstring (initial_sync, " ");
 	peers = maplist (`p, peers, ``{
-	    p[3] = p[0]:"" == "server" && contains (listed, p[1]:"");
+	    p["initial"] = (p["key"]:"" == "server" || p["key"]:"" == "peer")
+		&& contains (listed, p["value"]:"");
 	    return p;
 	});
     }
 
     peers = maplist (`p, peers, ``{
-	if (p[0]:"" == "server"
-	    && regexpmatch (p[1]:"", "^127\.127\.[0-9]+.[0-9]+$"))
+	if (p["key"]:"" == "server"
+	    && regexpmatch (p["value"]:"", "^127\.127\.[0-9]+.[0-9]+$"))
 	{
-	    p[0] = "radio";
+	    p["key"] = "radio";
 	}
 	return p;
     });
@@ -226,18 +242,18 @@ global define boolean Write() ``{
     y2milestone ("Writing settings %1", peers);
 
     boolean failed = false;
-    list peers2 = maplist (`p, peers, ``{
-	if (p[0]:"" == "radio")
-	    p[0] = "server";
+    list(map) peers2 = maplist (`p, peers, ``{
+	if (p["key"]:"" == "radio")
+	    p["key"] = "server";
 	return p;
     });
     foreach (`k, rw_order, ``{
 	path v = paths[k]:nil;
-	list l = filter (`e, peers2, ``(e[0]:"" == k));
-	l = maplist (`e, l, ``(
-	    [e[1]:"", e[2]:""]
+	list(map) l = filter (map e, peers2, ``(e["key"]:"" == k));
+	list(list) l2 = maplist (`e, l, ``(
+	    [e["value"]:"", e["param"]:""]
 	));
-	boolean b = SCR::Write (v, l);
+	boolean b = SCR::Write (v, l2);
 	if (! b)
 	{
 	    y2error ("Writing %1 failed", v);
@@ -253,8 +269,8 @@ global define boolean Write() ``{
 
 
     list init = maplist (`p, peers2, ``(
-	p[0]:"" == "server" && p[3]:false
-	    ? p[1]:""
+	(p["key"]:"" == "server" || p["key"]:"" == "peer") && p["initial"]:false
+	    ? p["value"]:""
 	    : nil
     ));
     init = filter (`i, init, ``(i != nil));
@@ -349,8 +365,8 @@ global define list Summary() ``{
     ];
     foreach (`t, ["server", "radio", "peer", "broadcast", "broadcastclient" ],
     ``{
-	list l = filter (`p, peers, ``(p[0]:"" == t));
-	list names = maplist (`i, l, ``(i[1]:""));
+	list l = filter (`p, peers, ``(p["key"]:"" == t));
+	list names = maplist (`i, l, ``(i["value"]:""));
 	names = filter (`n, names, ``(n != ""));
 	if (size (names) > 0)
 	    ret = add (ret, sformat (types[t]:"", mergestring (names, ", ")));
