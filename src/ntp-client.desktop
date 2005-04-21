@@ -17,7 +17,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=ntp-client
 
-Icon=ntp-client
+Icon=yast-ntp-client
 Exec=/sbin/yast2 ntp-client 
 
 Name=NTP Client
