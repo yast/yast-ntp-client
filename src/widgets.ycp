@@ -325,6 +325,7 @@ define boolean serverAddressValidate (string id, map event) {
 	&&
 	(!Hostname::Check(server_2) && !Hostname::CheckFQ(server_2))
     ) {
+	// TRANSLATORS: Popup error message
 	Report::Error(sformat(_("NTP server '%1' is neither valid hostname,
 nor fully qualified hostname, nor IPv4, nor IPv6."), server_1));
 	return false;
@@ -744,7 +745,7 @@ symbol FoundServersHandle (string id, map event) {
     if (event["ID"]:nil == `lookup_server)
     {
 	symbol method = `slp;
-	list<string> server_names = NtpClient::DetectNtpServers (method);
+	list<string> server_names = sort(NtpClient::DetectNtpServers (method));
 	UI::ReplaceWidget (`server_address_rp,
 	    `ComboBox (`id ("server_address"),
 		`opt (`editable, `hstretch),
@@ -1047,7 +1048,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 		    `ComboBox (`id ("server_address"),
 			`opt (`editable, `hstretch),
 			// combo box label
-			_("Local &NTP Server"))
+			_("Local &NTP Server"), [])
 		),
 		`VBox (
 		    `Label (" "),
