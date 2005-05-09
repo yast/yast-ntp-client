@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Mon May  9 15:18:59 CEST 2005 - locilka@suse.cz
+
+- Added "Scanning nework" popup which appears during scanning the
+  local network for NTP servers
+- Added error popups when no servers are found (popup text depends
+  on whether SuSEfirewall2 is running)
+- Added some missing comments for translators
+- 2.12.0 
+
+-------------------------------------------------------------------
 Thu Mar 31 14:23:34 CEST 2005 - locilka@suse.cz
 
 - Fixed bug #74376
