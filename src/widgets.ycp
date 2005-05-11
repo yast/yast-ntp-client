@@ -28,6 +28,9 @@ include "ntp-client/helps.ycp";
 // selected type of peer
 string peer_type_selected = nil;
 
+/* List of NTP servers already found */
+list <string> found_servers_cache = [];
+
 /**
  * Show popup with NTP daemon's log
  */
@@ -314,6 +317,11 @@ define void addressStore (string id, map event) ``{
  * @return boolean is successful
  */
 define boolean serverAddressValidate (string id, map event) {
+    // do not check the server IP/Host when changing dialog to "Select"
+    if (event["ID"]:nil == `select) {
+	return true;
+    }
+
     string server_1 = (string) UI::QueryWidget (`id (id), `Value);
     string server_2 = server_1;
     if (regexpmatch(server_2, "(.*)\.$")) {
@@ -734,6 +742,7 @@ void ServersSourceInit (string id) {
     UI::ChangeWidget (`id (id), `CurrentButton, "lookup_rb");
 }
 
+
 symbol FoundServersHandle (string id, map event) {
     if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
     {
@@ -749,6 +758,7 @@ symbol FoundServersHandle (string id, map event) {
 
 	symbol method = `slp;
 	list<string> server_names = sort(NtpClient::DetectNtpServers (method));
+	found_servers_cache = server_names;
 
 	UI::CloseDialog();
 
@@ -784,6 +794,11 @@ That could be caused by running SuSEfirewall2 which probably blocks the network 
  * @param id string widget id
  */
 void FoundServersInit (string id) {
+    list <term> items = [];
+    foreach (string server, found_servers_cache, {
+	items = add (items, `item(`id("server"), server));
+    });
+    UI::ChangeWidget (`id ("server_address"), `Items, items);
     FoundServersHandle (id, $["ID" : "list_rb"]);
 }
 

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed May 11 12:33:39 CEST 2005 - locilka@suse.cz
+
+- NTP Server entry-checking is ommited when changing the dialog to
+  select one from already found or public ones
+- Caching Lookup-Servers results
+
+-------------------------------------------------------------------
 Mon May  9 15:18:59 CEST 2005 - locilka@suse.cz
 
 - Added "Scanning nework" popup which appears during scanning the
