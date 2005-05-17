@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue May 17 13:14:01 CEST 2005 - locilka@suse.cz
+
+- Fixing bug #83918
+  NTP Client could freeze during saving the configuration when the
+  starting directory of YaST2 ntp-client was a network directory
+  and the "Configure via DHCP" option has been unselected.
+
+-------------------------------------------------------------------
 Wed May 11 12:33:39 CEST 2005 - locilka@suse.cz
 
 - NTP Server entry-checking is ommited when changing the dialog to
