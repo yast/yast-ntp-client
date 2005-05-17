@@ -128,8 +128,10 @@ define symbol MainDialog () ``{
 	`HBox (
 	    `VBox (
 		"start",
+		`VSpacing(),
 		`Left ("run_chroot"),
 		`Left ("config_dhcp"),
+		`VSpacing(),
 		`Frame (
 		    // TRANSLATORS: UI frame label
 		    _("Firewall Settings"),
@@ -171,7 +173,7 @@ define symbol TypeSelectDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Select the Synchronization Peer Type");
+    string caption = _("New Synchronization");
 
     return CWM::ShowAndRun ($[
 	"widget_names" : ["peer_types"],
@@ -200,7 +202,7 @@ define symbol ServerDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Configure NTP Server");
+    string caption = _("NTP Server");
 
     return CWM::ShowAndRun ($[
 	"widget_names" : ["server_address", "init_sync", "options"],
@@ -211,6 +213,98 @@ define symbol ServerDialog () ``{
 	"next_button" : Label::OKButton (),
 	"fallback_functions" : $[`abort : abortPopup],
     ]);
+}
+
+/**
+ * Dialog for selecting local server from a list
+ * @return symbol for wizard sequencer
+ */
+define symbol LocalServerSelectionDialog () {
+
+    list<map<string,any> > widgets = CWM::CreateWidgets (
+	[ "found_servers", "select_test_local"],
+	GetWidgets ()
+    );
+    
+    term contents = `HBox (
+	`HSpacing (1),
+	`VBox (
+	    `Frame (
+		// TRANSLATORS: frame label
+		_("Local NTP Server"),
+		`VBox (
+    		    `VSpacing (1),
+        	    widgets[0, "widget"]:`Empty(),
+    		    `VSpacing (1),
+		    widgets[1, "widget"]:`Empty()
+		)
+	    ),
+	    `VSpacing (1),
+	    `HBox (
+		`PushButton( `id(`next), Label::OKButton() ),
+		`PushButton( `id(`back), Label::CancelButton() )
+	    )
+	),
+	`HSpacing (1)
+    );
+
+    UI::OpenDialog(`opt(`decorated), contents);
+
+    symbol ret = CWM::Run (widgets, $[
+	`abort : abortPopup,
+	`ok : true,
+	`back : false,
+    ]);
+
+    UI::CloseDialog();
+
+    return ret;
+}
+
+/**
+ * Dialog for selecting local server from a list
+ * @return symbol for wizard sequencer
+ */
+define symbol PublicServerSelectionDialog () {
+
+    list<map<string,any> > widgets = CWM::CreateWidgets (
+	[ "servers_list", "select_test_public" ],
+	GetWidgets ()
+    );
+    
+    term contents = `HBox (
+	`HSpacing (1),
+	`VBox (
+	    `Frame (
+		// TRANSLATORS: frame label
+		_("Public NTP Server"),
+		`VBox (
+    		    `VSpacing (1),
+        	    widgets[0, "widget"]:`Empty(),
+    		    `VSpacing (1),
+    		    widgets[1, "widget"]:`Empty()
+		)
+	    ),
+	    `VSpacing (1),
+	    `HBox (
+		`PushButton( `id(`next), Label::OKButton() ),
+		`PushButton( `id(`back), Label::CancelButton() )
+	    )
+	),
+	`HSpacing (1)
+    );
+
+    UI::OpenDialog(`opt(`decorated), contents);
+
+    symbol ret = CWM::Run (widgets, $[
+	`abort : abortPopup,
+	`ok : true,
+	`back : false,
+    ]);
+
+    UI::CloseDialog();
+
+    return ret;
 }
 
 /**
@@ -229,7 +323,7 @@ define symbol PeerDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Configure NTP Peer");
+    string caption = _("NTP Peer");
 
     return CWM::ShowAndRun ($[
 	"widget_names" : ["paddress", "init_sync", "options"],
@@ -278,7 +372,7 @@ define symbol RadioDialog () ``{
     ), `HSpacing (3));
 
     // dialog caption
-    string caption = _("Configure Local Reference Clock");
+    string caption = _("Local Reference Clock");
 
     return CWM::ShowAndRun ($[
 	"widget_names" : ["clock_type", "unit_number",
@@ -307,7 +401,7 @@ define symbol BCastDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Configure Broadcasting");
+    string caption = _("Outgoing Broadcast");
 
     return CWM::ShowAndRun ($[
 	"widget_names" : ["bcaddress", "options"],
@@ -332,7 +426,7 @@ define symbol BCastClientDialog () ``{
     ), `HStretch ());
 
     // dialog caption
-    string caption = _("Configure Broadcasting Client");
+    string caption = _("Incoming Broadcast");
 
     return CWM::ShowAndRun ($[
 	"widget_names" : ["bccaddress"],
@@ -435,44 +529,6 @@ define symbol FudgeDialog () ``{
 	);
     }
     return (symbol)ret;
-}
-
-/**
- * Dialog for selecting a server from a list
- * @return symbol for wizard sequencer
- */
-symbol ServerSelectionDialog () {
-    term contents = `HBox (`HStretch (), `VBox (
-	`VStretch (),
-        "servers_source",
-	`VSpacing (1),
-	// frame
-	`Frame (_("Local Network"),
-	    "found_servers"
-	),
-	`VSpacing (1),
-	// frame
-	`Frame (_("Public NTP Server"),
-	    "servers_list"
-	),
-	`VSpacing (1),
-	"select_test",
-	`VStretch ()
-    ), `HStretch ());
-
-    // dialog caption
-    string caption = _("Select NTP Server");
-
-    return CWM::ShowAndRun ($[
-	"widget_names" : ["servers_source", "found_servers", "servers_list",
-	    "select_test"],
-	"widget_descr" : GetWidgets (),
-	"contents" : contents,
-	"caption" : caption,
-	"back_button" : Label::BackButton (),
-	"next_button" : Label::OKButton (),
-	"fallback_function" : $[`abort : abortPopup]
-    ]);
 }
 
 // fake dialogs (WS switches)

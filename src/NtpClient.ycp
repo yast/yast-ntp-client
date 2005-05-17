@@ -398,7 +398,7 @@ global define boolean Write() ``{
 	{
 	    // fixing bug #83918 according to the bug #61055
 	    string cmd = "cd /; /etc/init.d/network restart-all-dhcp-clients";
-	    return SCR::Execute (.target.bash, cmd);
+	    SCR::Execute (.target.bash, cmd);
 	}
     }
 

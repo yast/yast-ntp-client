@@ -17,8 +17,6 @@ import "Sequencer";
 
 include "ntp-client/dialogs.ycp";
 
-
-
 /**
  * Complex workflow of the ntp-client configuration
  * @return sequence result
@@ -29,7 +27,8 @@ define symbol ComplexSequence() ``{
 	"main"		:   ``(MainDialog ()),
 	"type_select"	:   ``(TypeSelectDialog ()),
 	"server"	:   ``(ServerDialog ()),
-	"server_select"	:   ``(ServerSelectionDialog ()),
+	"server_select_local"	:   ``(LocalServerSelectionDialog ()),
+	"server_select_public"	:   ``(PublicServerSelectionDialog ()),
 	"peer"		:   ``(PeerDialog ()),
 	"clock"		:   ``(RadioDialog ()),
 	"fudge"		:   ``(FudgeDialog ()),
@@ -65,11 +64,18 @@ define symbol ComplexSequence() ``{
 	"server" : $[
 	    `abort	: `abort,
 	    `next	: "store_record",
-	    `select	: "server_select",
+	    `select_local	: "server_select_local",
+	    `select_public	: "server_select_public",
 	],
-	"server_select" : $[
+	"server_select_local" : $[
 	    `abort	: `abort,
 	    `next	: "server",
+	    `back	: "server",
+	],
+	"server_select_public" : $[
+	    `abort	: `abort,
+	    `next	: "server",
+	    `back	: "server",
 	],
 	"clock" : $[
 	    `abort	: `abort,
@@ -115,7 +121,8 @@ define symbol SimpleSequence () ``{
 	"simple_pre"	:[``(SimpleDialogPrepare ()), true ],
 	"simple"	: ``(SimpleDialog ()),
 	"simple_post"	:[``(SimpleDialogFinish ()), true ],
-	"server_select"	: ``(ServerSelectionDialog ()),
+	"server_select_local"	: ``(LocalServerSelectionDialog ()),
+	"server_select_public"	: ``(PublicServerSelectionDialog ()),
 	"complex"	: ``(ComplexSequence ()),
     ];
 
@@ -133,15 +140,22 @@ define symbol SimpleSequence () ``{
 	    `abort	: `abort,
 	    `next	: "simple_post",
 	    `complex	: "complex",
-	    `select	: "server_select",
+	    `select_local	: "server_select_local",
+	    `select_public	: "server_select_public",
 	],
 	"simple_post" : $[
 	    `abort	: `abort,
 	    `next	: `next,
 	],
-	"server_select" : $[
+	"server_select_local" : $[
 	    `abort	: `abort,
 	    `next	: "simple",
+	    `back	: "simple",
+	],
+	"server_select_public" : $[
+	    `abort	: `abort,
+	    `next	: "simple",
+	    `back	: "simple",
 	],
 	"complex" : $[
 	    `abort	: `abort,

@@ -22,14 +22,26 @@ import "CWMFirewallInterfaces";
 import "Report";
 import "Hostname";
 import "IP";
+import "Progress";
 
 include "ntp-client/helps.ycp";
+include "ntp-client/dialogs.ycp";
 
 // selected type of peer
 string peer_type_selected = nil;
 
 /* List of NTP servers already found */
 list <string> found_servers_cache = [];
+
+/**
+ * Save the configuration and restart NTP deamon
+ */
+define boolean SilentWrite () {
+    boolean orig_progress = Progress::set(false);
+    boolean ret = NtpClient::Write();
+    Progress::set(orig_progress);
+    return ret;
+}
 
 /**
  * Show popup with NTP daemon's log
@@ -44,7 +56,7 @@ define void showLogPopup () ``{
 		restartNtpDaemon ],
 	    // menubutton entry, try to keep short
 	    [ _("Save Settings and Restart NTP Daemon"),
-		NtpClient::Write ],
+		SilentWrite ],
 	],
     ]);
     return nil;
@@ -183,9 +195,9 @@ define void overviewRedraw () {
 	// table cell, NTP relationship type
 	"peer" : _("Peer"),
 	// table cell, NTP relationship type
-	"broadcast" : _("Broadcast"),
+	"broadcast" : _("Outgoing Broadcast"),
 	// table cell, NTP relationship type
-	"broadcastclient" : _("Accepting Broadcasts"),
+	"broadcastclient" : _("Incoming Broadcast"),
     ];
     list items = maplist (map<string,any> i, NtpClient::getSyncRecords (), ``{
 	string type = i["type"]:"";
@@ -318,7 +330,7 @@ define void addressStore (string id, map event) ``{
  */
 define boolean serverAddressValidate (string id, map event) {
     // do not check the server IP/Host when changing dialog to "Select"
-    if (event["ID"]:nil == `select) {
+    if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public) {
 	return true;
     }
 
@@ -334,8 +346,8 @@ define boolean serverAddressValidate (string id, map event) {
 	(!Hostname::Check(server_2) && !Hostname::CheckFQ(server_2))
     ) {
 	// TRANSLATORS: Popup error message
-	Report::Error(sformat(_("NTP server '%1' is neither valid hostname,
-nor fully qualified hostname, nor IPv4, nor IPv6."), server_1));
+	Report::Error(sformat(_("NTP server '%1' is not a valid hostname,
+fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
 	return false;
     }
 
@@ -365,8 +377,11 @@ define symbol serverAddressHandle (string id, map event) {
 	if (serverAddressValidate("server_address",$[]))
 	    NtpClient::TestNtpServer (server, false);
     }
-    else if (ev_id == `select_server) {
-	return `select;
+    else if (ev_id == `select_local) {
+	return `select_local;
+    }
+    else if (ev_id == `select_public) {
+	return `select_public;
     }
     return nil;
 }
@@ -574,13 +589,13 @@ string last_country = nil;
  * @return symbol always nil
  */
 symbol ServerListHandle (string id, map event) {
-    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
-    {
-	boolean enabled = (boolean)UI::QueryWidget (`id ("list_rb"), `Value);
-	UI::ChangeWidget (`id (`country), `Enabled, enabled);
-	UI::ChangeWidget (`id (`servers), `Enabled, enabled);
-	return nil;
-    }
+//    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
+//    {
+//	boolean enabled = (boolean)UI::QueryWidget (`id ("list_rb"), `Value);
+//	UI::ChangeWidget (`id (`country), `Enabled, enabled);
+//	UI::ChangeWidget (`id (`servers), `Enabled, enabled);
+//	return nil;
+//    }
     string country = (string)UI::QueryWidget (`id (`country), `Value);
     if (country == nil)
 	country = "";
@@ -690,7 +705,7 @@ void ServerListInit (string id) {
 	// remove leading language (keep country only)
         l = splitstring (lang, "_");
 	lang = l[size (l) - 1]:lang;
-	y2milestone ("Current lnaguage: %1", lang);
+	y2milestone ("Current language: %1", lang);
 	UI::ChangeWidget (`id (`country), `Value, lang);
     }
     ServerListHandle (id, $[]);
@@ -744,13 +759,13 @@ void ServersSourceInit (string id) {
 
 
 symbol FoundServersHandle (string id, map event) {
-    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
-    {
-	boolean enabled = (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value);
-	UI::ChangeWidget (`id ("server_address"), `Enabled, enabled);
-	UI::ChangeWidget (`id (`lookup_server), `Enabled, enabled);
-	return nil;
-    }
+//    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
+//    {
+//	boolean enabled = (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value);
+//	UI::ChangeWidget (`id ("server_address"), `Enabled, enabled);
+//	UI::ChangeWidget (`id (`lookup_server), `Enabled, enabled);
+//	return nil;
+//    }
     if (event["ID"]:nil == `lookup_server)
     {
 	// TRANSLATORS: Busy message
@@ -769,7 +784,7 @@ symbol FoundServersHandle (string id, map event) {
 		// TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
 		//              There is a very high possibility that is is because of running firewall.
 		Report::Error(_("No NTP server has been found on your network.
-That could be caused by running SuSEfirewall2 which probably blocks the network scanning."));
+This could be caused by a running SuSEfirewall2, which probably blocks the network scanning."));
 	    // no server is available on the network
 	    } else {
 		// TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
@@ -782,7 +797,7 @@ That could be caused by running SuSEfirewall2 which probably blocks the network 
 	    `ComboBox (`id ("server_address"),
 		`opt (`editable, `hstretch),
 		// combo box label
-		_("Local &NTP Server"),
+		_("Address"),
 		server_names));
 	return nil;
     }
@@ -808,21 +823,21 @@ void FoundServersInit (string id) {
  * @param event map event that caused storing process
  */
 void FoundServersStore (string id, map event) {
-    if (UI::WidgetExists (`id ("lookup_rb"))
-	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
-    {
-	return;
-    }
+//    if (UI::WidgetExists (`id ("lookup_rb"))
+//    	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+//    	return;
+//    }
     string address = (string)UI::QueryWidget (`id ("server_address"), `Value);
     NtpClient::selected_record["address"] = address;
 }
 
 boolean FoundServersValidate (string id, map event) {
-    if (UI::WidgetExists (`id ("lookup_rb"))
-	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
-    {
-	return true;
-    }
+//    if (UI::WidgetExists (`id ("lookup_rb"))
+//	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+//	return true;
+//    }
     string server = (string)
 	UI::QueryWidget (`id ("server_address"), `Value);
     if (server == nil || server == "")
@@ -835,16 +850,30 @@ boolean FoundServersValidate (string id, map event) {
     return true;
 }
 
-symbol SelectTestHandle (string id, map event) {
+symbol LocalSelectTestHandle (string id, map event) {
     string server = "";
-    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
-    {
+//    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
 	server = (string)UI::QueryWidget (`id ("server_address"), `Value);
-    }
-    else
-    {
+//    }
+//    else
+//    {
+//	server = (string)UI::QueryWidget (`id (`servers), `Value);
+//    }
+    NtpClient::TestNtpServer (server, false);
+    return nil;
+}
+
+symbol PublicSelectTestHandle (string id, map event) {
+    string server = "";
+//    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+//	server = (string)UI::QueryWidget (`id ("server_address"), `Value);
+//    }
+//    else
+//    {
 	server = (string)UI::QueryWidget (`id (`servers), `Value);
-    }
+//    }
     NtpClient::TestNtpServer (server, false);
     return nil;
 }
@@ -886,7 +915,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 		// radio button
 		[ "never", _("N&ever") ],
 		// radio button
-		[ "boot", _("When &Booting System") ],
+		[ "boot", _("During &Boot") ],
 	    ],
 	    "help" : HELPS["start"]:"",
 	    "init" : startInit,
@@ -916,7 +945,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	],
 	"server_address" : union (address, $[
 	    // text entry label
-	    "label" : _("&NTP Server"),
+	    "label" : _("&Address"),
 	    "help" : HELPS["server_address"]:"",
 	    "handle" : serverAddressHandle,
 	    "validate_type" : `function,
@@ -927,12 +956,15 @@ define map<string,map<string,any> > InitWidgets () ``{
 		    `TextEntry (`id ("server_address"),
 			`opt (`editable, `hstretch),
 			// text entry
-			_("&NTP Server")
+			_("&Address")
 		    ),
 		    `VBox (
 			`Label (" "),
 			// push button
-			`PushButton (`id (`select_server), _("&Select"))
+			`MenuButton (`id (`select_server), _("&Select..."), [
+			    `item(`id(`select_local), _("Local NTP Server")),
+			    `item(`id(`select_public), _("Public NTP Server"))
+			])
 		    )
 		),
 		`HBox (
@@ -948,7 +980,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "custom_widget" : `VBox (
 		`Table (`id (`overview), `opt (`notify), `header (
 		    // table header
-		    _("Source Type"),
+		    _("Synchronization Type"),
 		    // table header
 		    _("Address"))),
 		`HBox (
@@ -957,11 +989,11 @@ define map<string,map<string,any> > InitWidgets () ``{
 		    `PushButton (`id (`delete), Label::DeleteButton ()),
 		    `HStretch (),
 		    // push button
-		    `PushButton (`id (`display_log), _("Display &Log"))
+		    `PushButton (`id (`display_log), _("Display &Log..."))
 		    // menu button
-//		    `MenuButton (`id (`advanced), _("&Advanced"), [
+//		    `MenuButton (`id (`advanced), _("&Advanced..."), [
 			// item of menu button
-//			`item (`id (`display_log), _("Display &Log")),
+//			`item (`id (`display_log), _("Display &Log...")),
 //		    ])
 		)
 	    ),
@@ -1052,12 +1084,12 @@ define map<string,map<string,any> > InitWidgets () ``{
                 // radio button, NTP relationship type
                 ["__clock", _("&Radio Clock")],
                 // radio button, NTP relationship type
-                ["broadcast", _("&Broadcasting")],
+                ["broadcast", _("&Outgoing Broadcast")],
                 // radio button, NTP relationship type
-                ["broadcastclient", _("&Accepting Broadcast Packets")]
+                ["broadcastclient", _("&Incoming Broadcast")]
 	    ],
 	    // frame
-	    "label" : _("Synchronization Peer Type"),
+	    "label" : _("Type"),
 	    "init" : peerTypesInit,
 	    "handle" : peerTypesHandle,
 	    "help" : HELPS["peer_types"]:"",
@@ -1085,7 +1117,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 		    `ComboBox (`id ("server_address"),
 			`opt (`editable, `hstretch),
 			// combo box label
-			_("Local &NTP Server"), [])
+			_("&Address"), [])
 		),
 		`VBox (
 		    `Label (" "),
@@ -1119,12 +1151,20 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "validate_function" : ServerListValidate,
 	    "help" : HELPS["servers_list"]:"",
 	],
-	"select_test" : $[
+	"select_test_local" : $[
 	    "widget" : `push_button,
 	    // push button
 	    "label" : _("&Test"),
-	    "handle_events" : ["select_test"],
-	    "handle" : SelectTestHandle,
+	    "handle_events" : ["select_test_local"],
+	    "handle" : LocalSelectTestHandle,
+	    "help" : HELPS["selected_test"]:"",
+	],
+	"select_test_public" : $[
+	    "widget" : `push_button,
+	    // push button
+	    "label" : _("&Test"),
+	    "handle_events" : ["select_test_public"],
+	    "handle" : PublicSelectTestHandle,
 	    "help" : HELPS["selected_test"]:"",
 	],
 	"firewall" : CWMFirewallInterfaces::CreateOpenFirewallWidget ($[
