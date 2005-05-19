@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Thu May 19 12:26:25 CEST 2005 - locilka@suse.cz
+
+- Fixing "Save and Restart" function not to produce Progress errors
+- Changing labels, headlines, names. Major changes:
+    Broadcast -> Outgoing Broadcast 
+    Accepting Broadcasts -> Incoming Broadcast
+- Replacing "Select NTP Server" dialog with two popups:
+  "Select Local NTP Server" and "Select Public NTP Server"
+- Changing texts to be YaST2 Style Guide Compatible
+
+-------------------------------------------------------------------
 Tue May 17 13:14:01 CEST 2005 - locilka@suse.cz
 
 - Fixing bug #83918
