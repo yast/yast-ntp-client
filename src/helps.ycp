@@ -93,14 +93,15 @@ To calibrate the clock driver, click <b>Driver Calibration</b>.</p>"),
 
     // help text 1/1, alt. 1 part 1/3
     "server_address" : _("<p><b><big>Address of the NTP Server</big></b><br>
-To set the address of the NTP server, use <b>NTP Server</b>.
+To set the address of the NTP server, use the <b>Address</b> entry.
 To find an NTP server, ask your network administrator or Internet service
 provider.</p>")
     +
     // help text 1/1, alt. 1 part 2/3
     _("<p><b><big>Selecting a Server</big></b><br>
 To select an NTP server from those found in the local network
-or from the list of known NTP servers, click <b>Select</b>.</p>")
+or from the list of known NTP servers, click <b>Select</b> and
+choose between <b>Local NTP Server</b> and <b>Public NTP Server</b>.</p>")
     +
     // help text 1/1, alt. 1 part 3/3
     _("<p><b><big>Testing Server Accessibility</big></b><br>

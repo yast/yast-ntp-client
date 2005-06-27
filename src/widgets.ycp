@@ -1113,16 +1113,20 @@ define map<string,map<string,any> > InitWidgets () ``{
 	"found_servers" : $[
 	    "widget" : `custom,
 	    "custom_widget" : `HBox (
-		`ReplacePoint (`id (`server_address_rp),
-		    `ComboBox (`id ("server_address"),
-			`opt (`editable, `hstretch),
-			// combo box label
-			_("&Address"), [])
+		`HWeight (3,
+		    `ReplacePoint (`id (`server_address_rp),
+			`ComboBox (`id ("server_address"),
+			    `opt (`editable, `hstretch),
+			    // combo box label
+			    _("&Address"), [])
+		    )
 		),
-		`VBox (
-		    `Label (" "),
-		    // push button
-		    `PushButton (`id (`lookup_server), _("&Lookup"))
+		`HWeight (1,
+		    `VBox (
+			`Label (" "),
+			// push button
+			`PushButton (`id (`lookup_server), _("&Lookup"))
+		    )
 		)
 	    ),
 	    "init" : FoundServersInit,

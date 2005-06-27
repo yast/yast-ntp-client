@@ -599,9 +599,9 @@ global define string Summary() ``{
 	// summary string, %1 is list of addresses
 	"peer" : _("Peers: %1"),
 	// summary string, %1 is list of addresses
-	"broadcast" : _("Broadcast time information to"),
+	"broadcast" : _("Broadcast time information to: %1"),
 	// summary string, %1 is list of addresses
-	"broadcastclient" : _("Accept broadcasted time information from"),
+	"broadcastclient" : _("Accept broadcasted time information from: %1"),
     ];
     if (config_dhcp)
     {
