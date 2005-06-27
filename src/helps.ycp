@@ -204,26 +204,5 @@ driver. Some drivers do not use all the options.</p>")
 <i>/usr/share/doc/packages/xntp-doc/html/refclock.htm</i></p>");
 }
 
-/**
- * Get help to the firewall settings dialog
- * @return string the help text
- */
-define string firewallHelp () ``{
-    // help text 1/3
-    return _("<p><big><b>Firewall Configuration</b></big><br>
-Use <b>Change Firewall Configuration</b> to set whether to preserve
-current firewall settings or set interfaces that can be used for remote
-access to the NTP daemon.</p>")
-    +
-    // help text 2/3
-    _("<p>For each interface class, set if the NTP daemon can be remotely accessed
-through interfaces that belong to the interface class.</p>")
-    +
-    // help text 3/3
-    _("<p><big><b>Automatic Proposal</b></big><br>
-To propose a firewall configuration automatically according to configured
-hosts against which to synchronize, use <b>Propose Configuration</b>.</p>");
-}
-
 /* EOF */
 }
