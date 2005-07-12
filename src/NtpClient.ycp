@@ -643,16 +643,25 @@ global boolean TestNtpServer (string server, boolean silent) {
     if (status == 0)
 	Service::Stop ("xntpd");
     y2milestone ("Testing reachability of server %1", server);
-    integer ret = (integer)SCR::Execute (.target.bash, sformat (
-	"/usr/sbin/ntpdate %1",
+
+    // testing the server using IPv4 and then using IPv6 protocol
+    // bug #74076, Firewall could have been blocked IPv6
+    integer ret_IPv4 = (integer) SCR::Execute (.target.bash, sformat (
+	"/usr/sbin/ntpdate -4 %1",
 	server
     ));
+    integer ret_IPv6 = 0;
+    if (ret_IPv4 != 0)
+	ret_IPv6 = (integer) SCR::Execute (.target.bash, sformat (
+	    "/usr/sbin/ntpdate -6 %1",
+	    server
+	));
     if (status == 0)
 	Service::Start ("xntpd");
 
     UI::CloseDialog();
 
-    boolean ok = ret == 0;
+    boolean ok = (ret_IPv4 == 0 || ret_IPv6 == 0);
     if (! silent)
     {
 	if (ok)
