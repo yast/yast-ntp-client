@@ -634,6 +634,11 @@ global define string Summary() ``{
  * @return boolean true if NTP server answers properly
  */
 global boolean TestNtpServer (string server, boolean silent) {
+    UI::OpenDialog(
+	// An informative popup label diring the NTP server testings
+	`Left(`Label(_("Testing the NTP server...")))
+    );
+
     integer status = Service::Status ("xntpd");
     if (status == 0)
 	Service::Stop ("xntpd");
@@ -644,6 +649,9 @@ global boolean TestNtpServer (string server, boolean silent) {
     ));
     if (status == 0)
 	Service::Start ("xntpd");
+
+    UI::CloseDialog();
+
     boolean ok = ret == 0;
     if (! silent)
     {
