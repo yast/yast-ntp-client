@@ -79,7 +79,7 @@ If you have multiple clocks of the same type, you must set
 <b>Unit Number</b>.</p>"),
 
     // help text 3/4
-    "device" : _("<p><b><big>Clock Device</big></b><br>
+    "device" : _("<p><b><big>Device</big></b><br>
 To make the clock work, it may be necessary to create a special symbolic link to 
 the device to which the clock is connected. To do this, check
 <b>Create Symlink</b> and set the <b>Device</b>. To browse the device,
@@ -149,10 +149,10 @@ select <b>Server</b>.</p>")
 select <b>Radio Clock</b>.</p>")
     // help text 5/6
     + _("<p>To broadcast time information through your network, select
-<b>Broadcasting</b>.</p>")
+<b>Outgoing Broadcast</b>.</p>")
     // help text 6/6
     + _("<p>To accepts NTP packets broadcasted by other hosts on the network
-and use them for setting local time, select <b>Accepting Broadcast Packets<b>.</p>"),
+and use them for setting local time, select <b>Incoming Broadcast<b>.</p>"),
 
     // help text 1/5
     "servers_source" : _("<p><big><b>Server Location</b></big>

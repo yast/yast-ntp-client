@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jul 19 10:32:09 CEST 2005 - locilka@suse.cz
+
+- Fixing some help texts to match exactly the dialog widget names
+
+-------------------------------------------------------------------
 Thu May 19 12:26:25 CEST 2005 - locilka@suse.cz
 
 - Fixing "Save and Restart" function not to produce Progress errors
