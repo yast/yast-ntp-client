@@ -784,7 +784,8 @@ symbol FoundServersHandle (string id, map event) {
 		// TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
 		//              There is a very high possibility that is is because of running firewall.
 		Report::Error(_("No NTP server has been found on your network.
-This could be caused by a running SuSEfirewall2, which probably blocks the network scanning."));
+This could be caused by a running SuSEfirewall2,
+which probably blocks the network scanning."));
 	    // no server is available on the network
 	    } else {
 		// TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
