@@ -474,8 +474,11 @@ define void createSymlinkInit (string id) ``{
  */
 define symbol createSymlinkHandle (string id, map event) ``{
     boolean active = (boolean)UI::QueryWidget (`id ("create_symlink"), `Value);
-    integer current = tointeger ((string)UI::QueryWidget (`id (id), `Value));
-    active = active && clock_types[current, "device"]:"" == "";
+    integer current = 0;
+    if (id == "clock_type") {
+	current = tointeger ((string)UI::QueryWidget (`id (id), `Value));
+	active = active && clock_types[current, "device"]:"" == "";
+    }
     UI::ChangeWidget (`id ("device"), `Enabled, active);
     UI::ChangeWidget (`id ("browse"), `Enabled, active);
     return nil;

@@ -2,6 +2,8 @@
 Tue Jul 19 10:32:09 CEST 2005 - locilka@suse.cz
 
 - Fixing some help texts to match exactly the dialog widget names
+- Fixing complains in y2log about converting 'true' to integer
+  during Radio Clock symlink configuration
 
 -------------------------------------------------------------------
 Thu May 19 12:26:25 CEST 2005 - locilka@suse.cz
