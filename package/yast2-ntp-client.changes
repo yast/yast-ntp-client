@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 28 11:26:40 CEST 2005 - locilka@suse.cz
+
+- Changed service name "xntpd" to "ntp" 
+
+-------------------------------------------------------------------
 Tue Jul 19 10:32:09 CEST 2005 - locilka@suse.cz
 
 - Fixing some help texts to match exactly the dialog widget names

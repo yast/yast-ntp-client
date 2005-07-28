@@ -58,6 +58,11 @@ global list<map<string, any> > ntp_records = [];
 global boolean run_service = false;
 
 /**
+ * Service name of the NTP daemon
+ */
+global string service_name = "ntp";
+
+/**
   * Should the daemon be started in chroot environment?
   */
 global boolean run_chroot = false;
@@ -219,7 +224,7 @@ global define boolean Read() ``{
 	return false;
     }
 
-    run_service = Service::Enabled ("xntpd");
+    run_service = Service::Enabled (service_name);
 
     map conf = (map)SCR::Read (.etc.ntp_conf.all);
     if (conf == nil)
@@ -505,7 +510,7 @@ global define boolean Write() ``{
 	Progress::set (progress_orig);
 //    }
 
-    if (! Service::Adjust ("xntpd",
+    if (! Service::Adjust (service_name,
 	run_service ? "enable" : "disable"))
     {
 	// error report
@@ -513,14 +518,14 @@ global define boolean Write() ``{
     }
 
     if (run_service && (! write_only)
-	&& 0 != Service::RunInitScript("xntpd", "restart"))
+	&& 0 != Service::RunInitScript(service_name, "restart"))
     {
 	// error report
 	Report::Error (_("Cannot restart the NTP daemon."));
     }
     if (! run_service)
     {
-	Service::RunInitScript("xntpd", "stop");
+	Service::RunInitScript(service_name, "stop");
     }
 
     sleep(sl);
@@ -639,9 +644,9 @@ global boolean TestNtpServer (string server, boolean silent) {
 	`Left(`Label(_("Testing the NTP server...")))
     );
 
-    integer status = Service::Status ("xntpd");
+    integer status = Service::Status (service_name);
     if (status == 0)
-	Service::Stop ("xntpd");
+	Service::Stop (service_name);
     y2milestone ("Testing reachability of server %1", server);
 
     // testing the server using IPv4 and then using IPv6 protocol
@@ -657,7 +662,7 @@ global boolean TestNtpServer (string server, boolean silent) {
 	    server
 	));
     if (status == 0)
-	Service::Start ("xntpd");
+	Service::Start (service_name);
 
     UI::CloseDialog();
 
