@@ -4,6 +4,6 @@
 
 scrconf_DATA =		\
 	etc_ntp.scr	\
-	cfg_xntp.scr
+	cfg_ntp.scr
 
 EXTRA_DIST = $(scrconf_DATA)

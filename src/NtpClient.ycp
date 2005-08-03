@@ -279,14 +279,14 @@ global define boolean Read() ``{
 	return m;
     });
 
-    run_chroot = SCR::Read (.sysconfig.xntp.XNTPD_RUN_CHROOTED) == "yes";
+    run_chroot = SCR::Read (.sysconfig.ntp.NTP_RUN_CHROOTED) == "yes";
 
-    string initial_sync = (string)SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
+    string initial_sync = (string)SCR::Read (.sysconfig.ntp.NTP_INITIAL_NTPDATE);
     if (initial_sync == nil)
     {
 	initial_sync = "";
 	failed = true;
-	y2error ("Failed reading .sysconfig.xntp.XNTPD_INITIAL_NTPDATE");
+	y2error ("Failed reading .sysconfig.ntp.NTP_INITIAL_NTPDATE");
     }
 
     // mark local clock to be local clock and not real servers
@@ -480,18 +480,18 @@ global define boolean Write() ``{
     // if there is no NTP server set explicitly
     if (size (init) == 0)
     {
-	string orig_init = (string)SCR::Read (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE);
+	string orig_init = (string)SCR::Read (.sysconfig.ntp.NTP_INITIAL_NTPDATE);
 	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-")
 	{
 	    init_str = orig_init;
 	}
     }
 
-    if (! (SCR::Write (.sysconfig.xntp.XNTPD_RUN_CHROOTED, run_chroot
+    if (! (SCR::Write (.sysconfig.ntp.NTP_RUN_CHROOTED, run_chroot
 	    ? "yes"
 	    : "no")
-	&& SCR::Write (.sysconfig.xntp.XNTPD_INITIAL_NTPDATE, init_str)
-	&& SCR::Write (.sysconfig.xntp, nil)))
+	&& SCR::Write (.sysconfig.ntp.NTP_INITIAL_NTPDATE, init_str)
+	&& SCR::Write (.sysconfig.ntp, nil)))
     {
 	// error report
 	Report::Error (_("Cannot write sysconfig variables."));

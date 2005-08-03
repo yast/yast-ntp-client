@@ -1,0 +1,16 @@
+/**
+ * File:	cfg_ntp.scr
+ * Summary:	Agent for reading/writing /etc/sysconfig/ntp
+ * Author:	Jiri Srain <jsrain@suse.cz>
+ * Access:	read / write
+ *
+ * $Id: cfg_xntp.scr 13018 2003-12-11 12:52:53Z jhumpol $
+ *
+ * Read/Sets the values defined in <tt>/etc/sysconfig/ntp</tt>
+ * in an easy manner.
+ */
+.sysconfig.ntp
+
+`ag_ini(
+    `SysConfigFile("/etc/sysconfig/ntp")
+)
