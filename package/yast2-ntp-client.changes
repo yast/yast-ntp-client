@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug  3 14:52:56 CEST 2005 - locilka@suse.cz
+
+- Changed the last "xntpd" to "ntp"
+- 2.12.3
+
+-------------------------------------------------------------------
 Thu Jul 28 11:26:40 CEST 2005 - locilka@suse.cz
 
 - Changed service name "xntpd" to "ntp" 

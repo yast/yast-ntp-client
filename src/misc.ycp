@@ -16,6 +16,7 @@ import "IP";
 import "Popup";
 import "Progress";
 import "Service";
+import "NtpClient";
 
 include "ntp-client/clocktypes.ycp";
 
@@ -66,7 +67,7 @@ boolean reallyExitComplex () {
  * Restart the NTP daemon service
  */
 define void restartNtpDaemon () ``{
-    Service::RunInitScript("xntpd", "restart");
+    Service::RunInitScript(NtpClient::service_name, "restart");
 }
 
 /**
