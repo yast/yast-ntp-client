@@ -206,7 +206,7 @@ global define boolean Read() ``{
     boolean progress_orig = Progress::set (false);
     NetworkDevices::Read ();
     Progress::set (progress_orig);
-    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
+    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTPD_CONF)) == "yes";
     original_config_dhcp = config_dhcp;
 
     GetNtpServers ();
@@ -279,14 +279,14 @@ global define boolean Read() ``{
 	return m;
     });
 
-    run_chroot = SCR::Read (.sysconfig.ntp.NTP_RUN_CHROOTED) == "yes";
+    run_chroot = SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED) == "yes";
 
-    string initial_sync = (string)SCR::Read (.sysconfig.ntp.NTP_INITIAL_NTPDATE);
+    string initial_sync = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
     if (initial_sync == nil)
     {
 	initial_sync = "";
 	failed = true;
-	y2error ("Failed reading .sysconfig.ntp.NTP_INITIAL_NTPDATE");
+	y2error ("Failed reading .sysconfig.ntp.NTPD_INITIAL_NTPDATE");
     }
 
     // mark local clock to be local clock and not real servers
@@ -395,7 +395,7 @@ global define boolean Write() ``{
 
     if (update_dhcp)
     {
-	SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF,
+	SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTPD_CONF,
 	    config_dhcp ? "yes" : "no");
 	SCR::Write (.sysconfig.network.dhcp, nil);
 	// switch DHCP udpates off before sacing the settings
@@ -480,17 +480,17 @@ global define boolean Write() ``{
     // if there is no NTP server set explicitly
     if (size (init) == 0)
     {
-	string orig_init = (string)SCR::Read (.sysconfig.ntp.NTP_INITIAL_NTPDATE);
+	string orig_init = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
 	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-")
 	{
 	    init_str = orig_init;
 	}
     }
 
-    if (! (SCR::Write (.sysconfig.ntp.NTP_RUN_CHROOTED, run_chroot
+    if (! (SCR::Write (.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot
 	    ? "yes"
 	    : "no")
-	&& SCR::Write (.sysconfig.ntp.NTP_INITIAL_NTPDATE, init_str)
+	&& SCR::Write (.sysconfig.ntp.NTPD_INITIAL_NTPDATE, init_str)
 	&& SCR::Write (.sysconfig.ntp, nil)))
     {
 	// error report
