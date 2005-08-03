@@ -4,6 +4,9 @@ Wed Aug  3 14:52:56 CEST 2005 - locilka@suse.cz
 - Changed the last "xntpd" to "ntp"
 - Changed SCR agent for xntpd to ntp
 - Changed sysconfig variables XNTPD to NTPD
+- Fixed testsuites
+- Changed sysconfig/network/dhcp.DHCLIENT_MODIFY_NTPD_CONF to the
+  DHCLIENT_MODIFY_NTP_CONF
 - 2.12.3
 
 -------------------------------------------------------------------

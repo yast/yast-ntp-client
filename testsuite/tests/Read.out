@@ -4,7 +4,7 @@ Log	Failed to read the list of NTP servers
 Read	.target.yast2 "country.ycp" nil
 Log	Failed to read country names
 Read	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", "type":-1, "value":[$["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp1 options1"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"127.127.1.2 options_clock"], $["comment":"", "kind":"value", "name":"fudge", "type":0, "value":"127.127.1.2fudge_clock"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp2 options2"], $["comment":"", "kind":"value", "name":"peer", "type":0, "value":"peer1 options_peer"]]]
-Read	.sysconfig.xntp.XNTPD_RUN_CHROOTED "yes"
-Read	.sysconfig.xntp.XNTPD_INITIAL_NTPDATE "AUTO-2"
+Read	.sysconfig.xntp.NTPD_RUN_CHROOTED "yes"
+Read	.sysconfig.xntp.NTPD_INITIAL_NTPDATE "AUTO-2"
 Return	true
 Return	$["configure_dhcp":false, "peers":[$["address":"ntp1", "comment":"", "initial_sync":true, "options":" options1", "type":"server"], $["address":"127.127.1.2", "comment":"", "initial_sync":false, "options":" options_clock", "type":"__clock"], $["address":"ntp2", "comment":"", "initial_sync":true, "options":" options2", "type":"server"], $["address":"peer1", "comment":"", "initial_sync":false, "options":" options_peer", "type":"peer"]], "start_at_boot":false, "start_in_chroot":true]

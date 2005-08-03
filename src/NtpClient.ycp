@@ -206,7 +206,7 @@ global define boolean Read() ``{
     boolean progress_orig = Progress::set (false);
     NetworkDevices::Read ();
     Progress::set (progress_orig);
-    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTPD_CONF)) == "yes";
+    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
     original_config_dhcp = config_dhcp;
 
     GetNtpServers ();
@@ -395,7 +395,7 @@ global define boolean Write() ``{
 
     if (update_dhcp)
     {
-	SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTPD_CONF,
+	SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF,
 	    config_dhcp ? "yes" : "no");
 	SCR::Write (.sysconfig.network.dhcp, nil);
 	// switch DHCP udpates off before sacing the settings
