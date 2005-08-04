@@ -151,7 +151,7 @@ select <b>Radio Clock</b>.</p>")
     + _("<p>To broadcast time information through your network, select
 <b>Outgoing Broadcast</b>.</p>")
     // help text 6/6
-    + _("<p>To accepts NTP packets broadcasted by other hosts on the network
+    + _("<p>To accept NTP packets broadcasted by other hosts on the network
 and use them for setting local time, select <b>Incoming Broadcast<b>.</p>"),
 
     // help text 1/5
