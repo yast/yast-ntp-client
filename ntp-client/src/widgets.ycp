@@ -1,0 +1,1187 @@
+/**
+ * File:	include/ntp-client/widgets.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Widgets definitions
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "ntp-client";
+
+import "Confirm";
+import "Popup";
+import "Label";
+import "LogView";
+import "SLP";
+import "NetworkDevices";
+import "NtpClient";
+import "CWMFirewallInterfaces";
+import "Report";
+import "Hostname";
+import "IP";
+import "Progress";
+
+include "ntp-client/helps.ycp";
+include "ntp-client/dialogs.ycp";
+
+// selected type of peer
+string peer_type_selected = nil;
+
+/* List of NTP servers already found */
+list <string> found_servers_cache = [];
+
+/**
+ * Save the configuration and restart NTP deamon
+ */
+define boolean SilentWrite () {
+    boolean orig_progress = Progress::set(false);
+    boolean ret = NtpClient::Write();
+    Progress::set(orig_progress);
+    return ret;
+}
+
+/**
+ * Show popup with NTP daemon's log
+ */
+define void showLogPopup () ``{
+    LogView::Display ($[
+	"file" : "/var/log/ntp",
+	"save" : true,
+	"actions" : [
+	    // menubutton entry, try to keep short
+	    [ _("Restart NTP Daemon"),
+		restartNtpDaemon ],
+	    // menubutton entry, try to keep short
+	    [ _("Save Settings and Restart NTP Daemon"),
+		SilentWrite ],
+	],
+    ]);
+    return nil;
+}
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+define symbol ntpEnabledOrDisabled (string id, map event) ``{
+    any ev_id = event["ID"]:nil;
+    if (ev_id == "boot" || ev_id == "never")
+    {
+	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
+	    != "never";
+	UI::ChangeWidget (`id (id), `Enabled, enabled);
+    }
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void startInit (string id) ``{
+    UI::ChangeWidget (`id ("start"), `CurrentButton,
+	NtpClient::run_service ? "boot" : "never");
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void startStore (string id, map event) ``{
+    NtpClient::run_service = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+}
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return any always nil
+ */
+define symbol startHandle (string id, map event) ``{
+    boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+    list<string> devices = NetworkDevices::Locate ("STARTMODE", "onboot");
+    devices = filter (string d, devices, ``(d != "lo"));
+    if (start && size (devices) == 0 && event["EventReason"]:"" != ""
+	// continue-cancel popup
+	&& ! Popup::ContinueCancel (_("Warning!
+
+If you do not have a permanent Internet connection,
+starting the NTP daemon can take a very long time and 
+the daemon might not run properly.")))
+	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
+
+    if (start != NtpClient::run_service)
+	NtpClient::modified = true;
+
+    if (start)
+	CWMFirewallInterfaces::EnableOpenFirewallWidget ();
+    else
+	CWMFirewallInterfaces::DisableOpenFirewallWidget ();
+
+    return nil;
+}
+
+/**
+ * Handle function of the widget
+ * @param key any widget id
+ * @param event map event that caused storing process
+ * @return symbol always `complex
+ */
+define symbol complexButtonHandle (string key, map event) ``{
+    if (event["ID"]:nil == "complex_button")
+	return `complex;
+    ntpEnabledOrDisabled (key, event);
+    return nil;
+}
+
+/**
+ * Handle function of the widget
+ * @param key string widget id
+ * @param event map event that caused storing process
+ * @return symbol always `complex
+ */
+define symbol fudgeButtonHandle (string key, map event) ``{
+    return `fudge;
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void chrootInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value, NtpClient::run_chroot);
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void chrootStore (string id, map event) ``{
+    NtpClient::run_chroot = (boolean)(UI::QueryWidget (`id (id), `Value));
+    NtpClient::modified = true;
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void ConfigDhcpInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value, NtpClient::config_dhcp);
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void ConfigDhcpStore (string id, map event) ``{
+    NtpClient::config_dhcp = (boolean)(UI::QueryWidget (`id (id), `Value));
+    NtpClient::modified = true;
+}
+
+/**
+ * Redraw the overview table
+ */
+define void overviewRedraw () {
+    map types = $[
+	// table cell, NTP relationship type
+	"server" : _("Server"),
+	// table cell, NTP relationship type
+	"peer" : _("Peer"),
+	// table cell, NTP relationship type
+	"broadcast" : _("Outgoing Broadcast"),
+	// table cell, NTP relationship type
+	"broadcastclient" : _("Incoming Broadcast"),
+    ];
+    list items = maplist (map<string,any> i, NtpClient::getSyncRecords (), ``{
+	string type = i["type"]:"";
+	string address = i["address"]:"";
+	integer index = i["index"]:-1;
+	if (type == "__clock")
+	{
+	    integer clock_type = getClockType (address);
+	    integer unit_number = getClockUnitNumber (address);
+	    string device = i["device"]:"";
+	    if (device == "")
+		// table cell, %1 is integer 0-3
+		device = sformat (_("Unit Number: %1"), unit_number);
+	    if (clock_type == 1 && unit_number == 0)
+		device = "";
+	    string clock_name = clock_types[clock_type, "name"]:"";
+	    if (clock_name == "")
+		// table cell, NTP relationship type
+		clock_name = _("Local Radio Clock");
+	    return `item (`id (index), clock_name, device);
+	}
+	return `item (`id (index), types[type]:"", address);
+    });
+    UI::ChangeWidget (`id (`overview), `Items, items);
+    UI::SetFocus (`id (`overview));
+}
+
+/**
+ * Handle events on the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ * @return any event to pass to WS or nil
+ */
+define symbol overviewHandle (string id, map event) ``{
+//    ntpEnabledOrDisabled (id, event);
+    if (event["ID"]:nil == `display_log)
+    {
+	showLogPopup ();
+	return nil;
+    }
+    NtpClient::modified = true;
+    any ev_id = event["ID"]:nil;
+    if (ev_id == "boot" || ev_id == "never" || ev_id == "config_dhcp")
+    {
+	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
+	    != "never";
+//	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
+	enabled = enabled && ! (boolean)
+	    UI::QueryWidget (`id ("config_dhcp"), `Value);
+	UI::ChangeWidget (`id (`add), `Enabled, enabled);
+	UI::ChangeWidget (`id (`edit), `Enabled, enabled);
+	UI::ChangeWidget (`id (`delete), `Enabled, enabled);
+	UI::ChangeWidget (`id (`overview), `Enabled, enabled);
+	return nil;
+    }
+    map<string,symbol> types = $[
+	"server" : `server,
+	"peer" : `peer,
+	"__clock" : `clock,
+	"broadcast" : `bcast,
+	"broadcastclient" : `bcastclient,
+    ];
+    if (event["ID"]:nil == `add)
+    {
+	NtpClient::selectSyncRecord (-1);
+	peer_type_selected = nil;
+	return `add;
+    }
+    else if (event["ID"]:nil == `edit || event["ID"]:nil == `overview)
+    {
+	NtpClient::selectSyncRecord (
+	    (integer)(UI::QueryWidget (`id (`overview), `CurrentItem))
+	);
+	string type = NtpClient::selected_record["type"]:"";
+	return types[type]:nil;
+    }
+    else if (event["ID"]:nil == `delete)
+    {
+	// yes-no popup
+	if (Confirm::DeleteSelected ())
+	{
+	    NtpClient::deleteSyncRecord (
+		(integer)(UI::QueryWidget (`id (`overview), `CurrentItem))
+	    );
+	    overviewRedraw ();
+	    sync_record_modified = true;
+	}
+    }
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void overviewInit (string id) ``{
+    overviewRedraw ();
+    overviewHandle (id, $["ID" : "boot"]);
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void addressInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value,
+	NtpClient::selected_record["address"]:"");
+    UI::SetFocus (`id (id));
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void addressStore (string id, map event) ``{
+    NtpClient::selected_record["address"] = UI::QueryWidget (`id (id), `Value);
+    if (NtpClient::simple_dialog)
+    {
+	NtpClient::selected_record["type"] = "server";
+	NtpClient::selected_record["initial_sync"] = true;
+    }
+}
+
+/**
+ * Handle events on the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return boolean is successful
+ */
+define boolean serverAddressValidate (string id, map event) {
+    // do not check the server IP/Host when changing dialog to "Select"
+    if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public) {
+	return true;
+    }
+
+    string server_1 = (string) UI::QueryWidget (`id (id), `Value);
+    string server_2 = server_1;
+    if (regexpmatch(server_2, "(.*)\.$")) {
+	server_2 = regexpsub (server_2, "(.*)\.$", "\\1");
+    }
+    
+    if (
+	(!Hostname::Check(server_1) && !Hostname::CheckFQ(server_1) && !IP::Check(server_1))
+	&&
+	(!Hostname::Check(server_2) && !Hostname::CheckFQ(server_2))
+    ) {
+	// TRANSLATORS: Popup error message
+	Report::Error(sformat(_("NTP server '%1' is not a valid hostname,
+fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
+	return false;
+    }
+
+    return true;
+}
+
+/**
+ * Handle events on the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol event to pass to WS or nil
+ */
+define symbol serverAddressHandle (string id, map event) {
+    any ev_id = event["ID"]:nil;
+    string server = (string) UI::QueryWidget (`id (id), `Value);
+    if (ev_id == "boot" || ev_id == "never")
+    {
+	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
+	    != "never";
+	UI::ChangeWidget (`id (id), `Enabled, enabled);
+	UI::ChangeWidget (`id (`test_server), `Enabled, enabled);
+	UI::ChangeWidget (`id (`select_server), `Enabled, enabled);
+	return nil;
+    }
+    if (ev_id == `test_server)
+    {
+	if (serverAddressValidate("server_address",$[]))
+	    NtpClient::TestNtpServer (server, false);
+    }
+    else if (ev_id == `select_local) {
+	return `select_local;
+    }
+    else if (ev_id == `select_public) {
+	return `select_public;
+    }
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void initSyncInit (string id) ``{
+    UI::ChangeWidget (`id ("init_sync"), `Value,
+	NtpClient::selected_record["initial_sync"]:false);
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void initSyncStore (string id, map event) ``{
+    NtpClient::selected_record["initial_sync"]
+	= UI::QueryWidget (`id ("init_sync"), `Value);
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void optionsInit (string id) ``{
+    UI::ChangeWidget (`id ("options"), `Value, NtpClient::selected_record["options"]:"");
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void optionsStore (string id, map event) ``{
+    NtpClient::selected_record["options"] = UI::QueryWidget (`id ("options"), `Value);
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
+define void peerTypesInit (string id) ``{
+    if (peer_type_selected != nil)
+	UI::ChangeWidget (`id ("peer_types"), `CurrentButton,
+	    peer_type_selected);
+    else
+	UI::ChangeWidget (`id ("peer_types"), `CurrentButton, "server");
+}
+
+/**
+ * Handle events on the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ * @return symbol event to pass to WS or nil
+ */
+define symbol peerTypesHandle (string id, map event) ``{
+    peer_type_selected = (string)UI::QueryWidget (`id ("peer_types"), `CurrentButton);
+    map<string,symbol> types = $[
+	"server" : `server,
+	"peer" : `peer,
+	"__clock" : `clock,
+	"broadcast" : `bcast,
+	"broadcastclient" : `bcastclient,
+    ];
+    if (event["ID"]:nil == `next)
+    {
+	NtpClient::selected_record["type"] = peer_type_selected;
+	return types[peer_type_selected]:nil;
+    }
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+define void createSymlinkInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value,
+	NtpClient::selected_record["create_symlink"]:false);
+}
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+define symbol createSymlinkHandle (string id, map event) ``{
+    boolean active = (boolean)UI::QueryWidget (`id ("create_symlink"), `Value);
+    integer current = 0;
+    if (id == "clock_type") {
+	current = tointeger ((string)UI::QueryWidget (`id (id), `Value));
+	active = active && clock_types[current, "device"]:"" == "";
+    }
+    UI::ChangeWidget (`id ("device"), `Enabled, active);
+    UI::ChangeWidget (`id ("browse"), `Enabled, active);
+    return nil;
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+define void createSymlinkStore (string id, map event) ``{
+    NtpClient::selected_record["create_symlink"] = (boolean)
+	UI::QueryWidget (`id (id), `Value);
+}
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+define symbol clockTypeHandle (string id, map event) ``{
+    integer current = tointeger ((string)UI::QueryWidget (`id (id), `Value));
+    boolean hw_avail = clock_types[current, "device"]:"" != "";
+    UI::ChangeWidget (`id ("create_symlink"), `Enabled, hw_avail);
+    return createSymlinkHandle (id, event);
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+define void clockTypeInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value, sformat ("%1",
+	getClockType (NtpClient::selected_record["address"]:"")));
+    clockTypeHandle (id, $[]);
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+define void clockTypeStore (string id, map event) ``{
+    NtpClient::selected_record["address"] = setClockType (
+	NtpClient::selected_record["address"]:"",
+	tointeger ((string)UI::QueryWidget (`id (id), `Value)));
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+define void unitNumberInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value,
+	getClockUnitNumber (NtpClient::selected_record["address"]:""));
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+define void unitNumberStore (string id, map event) ``{
+    NtpClient::selected_record["address"] = setClockUnitNumber (
+	NtpClient::selected_record["address"]:"",
+	(integer)UI::QueryWidget (`id (id), `Value));
+}
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+define symbol browseButtonHandle (string id, map event) ``{
+    string current = (string)UI::QueryWidget (`id ("device"), `Value);
+    if (current == "")
+	current = "/dev";
+    // popup header
+    current = UI::AskForExistingFile (current, "", _("Select the Device"));
+    if (current != nil)
+	UI::ChangeWidget (`id ("device"), `Value, current);
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+define void deviceInit (string id) ``{
+    UI::ChangeWidget (`id (id), `Value, NtpClient::selected_record["device"]:"");
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+define void deviceStore (string id, map event) ``{
+    NtpClient::selected_record["device"] = (string)
+	UI::QueryWidget (`id (id), `Value);
+}
+
+string last_country = nil;
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+symbol ServerListHandle (string id, map event) {
+//    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
+//    {
+//	boolean enabled = (boolean)UI::QueryWidget (`id ("list_rb"), `Value);
+//	UI::ChangeWidget (`id (`country), `Enabled, enabled);
+//	UI::ChangeWidget (`id (`servers), `Enabled, enabled);
+//	return nil;
+//    }
+    string country = (string)UI::QueryWidget (`id (`country), `Value);
+    if (country == nil)
+	country = "";
+    y2milestone ("Handling server list change, last country: %1, current country: %2", last_country, country);
+    if (country != last_country)
+    {
+	last_country = country;
+        map<string,string> country_names = $[];
+	map<string,map<string,string> > servers = NtpClient::GetNtpServers ();
+	if (country != "")
+	{
+	    servers = filter (string s, map<string,string> o, servers, {
+		return o["country"]:"" == country;
+	    });
+	}
+	else
+	{
+            country_names = NtpClient::GetCountryNames ();
+	}
+	list items = maplist (string s, map<string,string> o, servers, {
+	    string label = o["location"]:"";
+	    string l_country = o["country"]:"";
+	    if (country != "")
+		l_country = "";
+	    else
+		l_country = country_names[l_country]:l_country;
+	    if (label != "" && l_country != "")
+		label = sformat ("%1 (%2, %3)", s, label, l_country);
+	    else if (label == "" && l_country == "")
+		label = s;
+	    else
+		label = sformat ("%1 (%2%3)", s, label, l_country);
+	    return `item (`id (s), label);
+	});
+	UI::ReplaceWidget (`servers_rp, `ComboBox (`id (`servers),
+	    `opt (`hstretch),
+	    // selection box header
+	    _("Public NTP &Servers"), items));
+	return nil;
+    }
+    if (event["ID"]:nil == `test || event["ID"]:nil == `info)
+    {
+	string server = (string)UI::QueryWidget (`id (`servers), `Value);
+	if (server == nil || server == "")
+	{
+	    // message report (no server selected)
+	    Report::Message (_("Select an NTP server."));
+	    return nil;
+	}
+	if (event["ID"]:nil == `test)
+	{
+	    NtpClient::TestNtpServer (server, false);
+	}
+	return nil;
+    }
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+void ServerListInit (string id) {
+    map<string,string> country_names = NtpClient::GetCountryNames ();
+    map<string,string> country_codes = mapmap (
+	string k,
+	string v,
+	country_names,
+    {
+	return $[ v : k ];
+    });
+    list<string> country_name_list = maplist (
+	string k,
+	string v,
+	country_codes,
+    {
+	return k;
+    });
+    country_name_list = lsort (country_name_list);
+    list<string> countries_lst = toset (maplist (
+	string s, map<string,string> m,
+	NtpClient::GetNtpServers (),
+    {
+	string country = m["country"]:"";
+	string label = country_names[country]:country;
+	return label;
+    }));
+    countries_lst = lsort (countries_lst);
+    list countries = maplist (string label, countries_lst, {
+	string code = country_codes[label]:label;
+	return `item (`id (code), label);
+    });
+    // combo box item
+    countries = prepend (countries, `item (`id (""), _("All Countries")));
+    UI::ReplaceWidget (`country_rp,
+	`ComboBox (`id (`country), `opt (`notify, `hstretch),
+	    // combo box header
+	    _("&Country"), countries));
+    last_country = nil;
+
+    string lang = (string)SCR::Read (.sysconfig.language.RC_LANG);
+    if (lang != nil)
+    {
+	// remove the .UTF-8 first
+        list<string> l = splitstring (lang, ".");
+        lang = l[0]:"";
+	// remove leading language (keep country only)
+        l = splitstring (lang, "_");
+	lang = l[size (l) - 1]:lang;
+	y2milestone ("Current language: %1", lang);
+	UI::ChangeWidget (`id (`country), `Value, lang);
+    }
+    ServerListHandle (id, $[]);
+    ServerListHandle (id, $["ID" : "list_rb"]);
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+void ServerListStore (string id, map event) {
+    if (UI::WidgetExists (`id ("list_rb"))
+	&& ! (boolean)UI::QueryWidget (`id ("list_rb"), `Value))
+    {
+	return;
+    }
+    string address = (string)UI::QueryWidget (`id (`servers), `Value);
+    NtpClient::selected_record["address"] = address;
+}
+
+/**
+ * Validation function of a widget
+ * @param id string widget id
+ * @param event map event that caused validation
+ * @return boolean true if validation succeeded
+ */
+boolean ServerListValidate (string id, map event) {
+    if (UI::WidgetExists (`id ("list_rb"))
+	&& ! (boolean)UI::QueryWidget (`id ("list_rb"), `Value))
+    {
+	return true;
+    }
+    string address = (string)UI::QueryWidget (`id (`servers), `Value);
+    if (address == "" || address == nil)
+    {
+	// report message
+	Report::Message (_("Select an NTP server."));
+	return false;
+    }
+    return true;
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+void ServersSourceInit (string id) {
+    UI::ChangeWidget (`id (id), `CurrentButton, "lookup_rb");
+}
+
+
+symbol FoundServersHandle (string id, map event) {
+//    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
+//    {
+//	boolean enabled = (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value);
+//	UI::ChangeWidget (`id ("server_address"), `Enabled, enabled);
+//	UI::ChangeWidget (`id (`lookup_server), `Enabled, enabled);
+//	return nil;
+//    }
+    if (event["ID"]:nil == `lookup_server)
+    {
+	// TRANSLATORS: Busy message
+	UI::OpenDialog(`Label(_("Scanning for NTP servers on your network...")));
+
+	symbol method = `slp;
+	list<string> server_names = sort(NtpClient::DetectNtpServers (method));
+	found_servers_cache = server_names;
+
+	UI::CloseDialog();
+
+	// no server has been found
+	if (server_names == [] || server_names == nil) {
+	    // firewall probably blocks broadcast reply
+	    if (SuSEFirewall::GetStartService()) {
+		// TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
+		//              There is a very high possibility that is is because of running firewall.
+		Report::Error(_("No NTP server has been found on your network.
+This could be caused by a running SuSEfirewall2,
+which probably blocks the network scanning."));
+	    // no server is available on the network
+	    } else {
+		// TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
+		Report::Error(_("No NTP server has been found on your network."));
+	    }
+	    return nil;
+	}
+
+	UI::ReplaceWidget (`server_address_rp,
+	    `ComboBox (`id ("server_address"),
+		`opt (`editable, `hstretch),
+		// combo box label
+		_("Address"),
+		server_names));
+	return nil;
+    }
+    return nil;
+}
+
+/**
+ * Initialize the widget
+ * @param id string widget id
+ */
+void FoundServersInit (string id) {
+    list <term> items = [];
+    foreach (string server, found_servers_cache, {
+	items = add (items, `item(`id("server"), server));
+    });
+    UI::ChangeWidget (`id ("server_address"), `Items, items);
+    FoundServersHandle (id, $["ID" : "list_rb"]);
+}
+
+/**
+ * Store settings of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ */
+void FoundServersStore (string id, map event) {
+//    if (UI::WidgetExists (`id ("lookup_rb"))
+//    	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+//    	return;
+//    }
+    string address = (string)UI::QueryWidget (`id ("server_address"), `Value);
+    NtpClient::selected_record["address"] = address;
+}
+
+boolean FoundServersValidate (string id, map event) {
+//    if (UI::WidgetExists (`id ("lookup_rb"))
+//	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+//	return true;
+//    }
+    string server = (string)
+	UI::QueryWidget (`id ("server_address"), `Value);
+    if (server == nil || server == "")
+    {
+	UI::SetFocus (`id ("server_address"));
+	// popup message
+	Popup::Message (_("No server is selected."));
+	return false;
+    }
+    return true;
+}
+
+symbol LocalSelectTestHandle (string id, map event) {
+    string server = "";
+//    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+	server = (string)UI::QueryWidget (`id ("server_address"), `Value);
+//    }
+//    else
+//    {
+//	server = (string)UI::QueryWidget (`id (`servers), `Value);
+//    }
+    NtpClient::TestNtpServer (server, false);
+    return nil;
+}
+
+symbol PublicSelectTestHandle (string id, map event) {
+    string server = "";
+//    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
+//    {
+//	server = (string)UI::QueryWidget (`id ("server_address"), `Value);
+//    }
+//    else
+//    {
+	server = (string)UI::QueryWidget (`id (`servers), `Value);
+//    }
+    NtpClient::TestNtpServer (server, false);
+    return nil;
+}
+
+/**
+ * Initialize all widgets
+ * @return a map of widgets
+ */
+define map<string,map<string,any> > InitWidgets () ``{
+    map<string,any> address = $[
+	    "widget" : `textentry,
+	    // text entry label
+	    "label" : _("A&ddress"),
+	    "init" : addressInit,
+	    "store" : addressStore,
+    ];
+    return $[
+	"complex_button" : $[
+	    "widget" : `push_button,
+	    // push button label
+	    "label" : _("Co&mplex Configuration"),
+	    "help" : HELPS["complex_button"]:"",
+	    "handle_events" : [ "complex_button", "never", "boot" ],
+	    "handle" : complexButtonHandle,
+	],
+	"fudge_button" : $[
+	    "widget" : `push_button,
+	    // push button label
+	    "label" : _("&Driver Calibration"),
+	    "help" : HELPS["fudge_button"]:"",
+	    "handle_events" : [ "fudge_button" ],
+	    "handle" : fudgeButtonHandle,
+	],
+	"start" : $[
+	    "widget" : `radio_buttons,
+	    // frame
+	    "label" : _("Automatically Start NTP Daemon"),
+	    "items" : [
+		// radio button
+		[ "never", _("N&ever") ],
+		// radio button
+		[ "boot", _("During &Boot") ],
+	    ],
+	    "help" : HELPS["start"]:"",
+	    "init" : startInit,
+	    "store" : startStore,
+	    "handle" : startHandle,
+	    "handle_events" : [ "boot", "never" ],
+	    "opt" : [`notify],
+	],
+	"run_chroot" : $[
+	    "widget" : `checkbox,
+	    // check box
+	    "label" : _("Run NTP Daemon in Chroot &Jail"),
+	    "init" : chrootInit,
+	    "store" : chrootStore,
+	    "handle" : ntpEnabledOrDisabled,
+	    "help" : HELPS["chroot_environment"]:"",
+	],
+	"config_dhcp" : $[
+	    "widget" : `checkbox,
+	    "opt" : [ `notify ],
+	    // check box
+	    "label" : _("Configure NTP Daemon via &DHCP"),
+	    "init" : ConfigDhcpInit,
+	    "store" : ConfigDhcpStore,
+	    "handle" : ntpEnabledOrDisabled,
+	    "help" : HELPS["config_dhcp"]:"",
+	],
+	"server_address" : union (address, $[
+	    // text entry label
+	    "label" : _("&Address"),
+	    "help" : HELPS["server_address"]:"",
+	    "handle" : serverAddressHandle,
+	    "validate_type" : `function,
+	    "validate_function" : serverAddressValidate,
+	    "widget" : `custom,
+	    "custom_widget" : `VBox (
+		`HBox (
+		    `TextEntry (`id ("server_address"),
+			`opt (`editable, `hstretch),
+			// text entry
+			_("&Address")
+		    ),
+		    `VBox (
+			`Label (" "),
+			// push button
+			`MenuButton (`id (`select_server), _("&Select..."), [
+			    `item(`id(`select_local), _("Local NTP Server")),
+			    `item(`id(`select_public), _("Public NTP Server"))
+			])
+		    )
+		),
+		`HBox (
+		    `HStretch (),
+		    // push button
+		    `PushButton (`id (`test_server), _("&Test")),
+		    `HStretch ()
+		)
+	    ),
+	]),
+	"overview" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `VBox (
+		`Table (`id (`overview), `opt (`notify), `header (
+		    // table header
+		    _("Synchronization Type"),
+		    // table header
+		    _("Address"))),
+		`HBox (
+		    `PushButton (`id (`add), Label::AddButton ()),
+		    `PushButton (`id (`edit), Label::EditButton ()),
+		    `PushButton (`id (`delete), Label::DeleteButton ()),
+		    `HStretch (),
+		    // push button
+		    `PushButton (`id (`display_log), _("Display &Log..."))
+		    // menu button
+//		    `MenuButton (`id (`advanced), _("&Advanced..."), [
+			// item of menu button
+//			`item (`id (`display_log), _("Display &Log...")),
+//		    ])
+		)
+	    ),
+	    "help" : HELPS["overview"]:"",
+	    "init" : overviewInit,
+	    "handle" : overviewHandle,
+	],
+	"paddress" : union (address, $[
+	    "help" : HELPS["paddress"]:"",
+	]),
+	"bcaddress" : union (address, $[
+	    "help" : HELPS["bcaddress"]:"",
+	]),
+	"bccaddress" : union (address, $[
+	    "help" : HELPS["bccaddress"]:"",
+	]),
+	"clock_type" : $[
+	    "widget" : `combobox,
+	    // combo box label
+	    "label" : _("Clock &Type"),
+	    "items" : getClockTypesCombo (),
+	    "help" : HELPS["clock_type"]:"",
+	    "opt" : [ `notify ],
+	    "init" : clockTypeInit,
+	    "handle" : clockTypeHandle,
+	    "store" : clockTypeStore,
+	],
+	"unit_number" : $[
+	    "widget" : `intfield,
+	    // int field
+	    "label" : _("Unit &Number"),
+	    "help" : HELPS["unit_number"]:"",
+	    "minimum" : 0,
+	    "maximum" : 3,
+	    "init" : unitNumberInit,
+	    "store" : unitNumberStore,
+	],
+	"create_symlink" : $[
+	    "widget" : `checkbox,
+	    // check box
+	    "label" : _("Create &Symlink"),
+	    "opt" : [ `notify ],
+	    "init" : createSymlinkHandle,
+	    "handle_events" : [ "create_symlink" ],
+	    "init" : createSymlinkInit,
+	    "handle" : createSymlinkHandle,
+	    "store" : createSymlinkStore,
+	    "help" : " ",
+	],
+	"device" : $[
+	    "widget" : `textentry,
+	    // text entry
+	    "label" : _("&Device"),
+	    "init" : deviceInit,
+	    "store" : deviceStore,
+	    "help" : HELPS["device"]:"",
+	],
+	"browse" : $[
+	    "widget" : `push_button,
+	    "label" : Label::BrowseButton (),
+	    "handle_events" : [ "browse" ],
+	    "handle" : browseButtonHandle,
+	    "help" : " ",
+	],
+	"init_sync" : $[
+	    "widget" : `checkbox,
+	    // checkbox
+	    "label" : _("Use for &Initial Synchronization"),
+	    "init" : initSyncInit,
+	    "store" : initSyncStore,
+	    "help" : HELPS["init_sync"]:"",
+	],
+	"options" : $[
+	    "widget" : `textentry,
+	    // text entry label
+	    "label" : Label::Options (),
+	    "init" : optionsInit,
+	    "store" : optionsStore,
+	    "help" : HELPS["options"]:"",
+	],
+	"peer_types" : $[
+	    "widget" : `radio_buttons,
+	    "items" : [
+		// radio button, NTP relationship type
+                ["server", _("&Server")],
+                // radio button, NTP relationship type
+                ["peer", _("&Peer")],
+                // radio button, NTP relationship type
+                ["__clock", _("&Radio Clock")],
+                // radio button, NTP relationship type
+                ["broadcast", _("&Outgoing Broadcast")],
+                // radio button, NTP relationship type
+                ["broadcastclient", _("&Incoming Broadcast")]
+	    ],
+	    // frame
+	    "label" : _("Type"),
+	    "init" : peerTypesInit,
+	    "handle" : peerTypesHandle,
+	    "help" : HELPS["peer_types"]:"",
+	    "hspacing" : 3,
+	    "vspacing" : 1,
+	],
+	"servers_source" : $[
+	    "widget" : `radio_buttons,
+	    "items" : [
+		// radio button
+		["lookup_rb", _("Loc&al Network")],
+		// radio button
+		["list_rb", _("&Public NTP Server")],
+	    ],
+	    "opt" : [`notify],
+	    "init" : ServersSourceInit,
+	    // frame label
+	    "label" : _("NTP Server Location"),
+	    "help" : HELPS["servers_source"]:"",
+	],
+	"found_servers" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `HBox (
+		`HWeight (3,
+		    `ReplacePoint (`id (`server_address_rp),
+			`ComboBox (`id ("server_address"),
+			    `opt (`editable, `hstretch),
+			    // combo box label
+			    _("&Address"), [])
+		    )
+		),
+		`HWeight (1,
+		    `VBox (
+			`Label (" "),
+			// push button
+			`PushButton (`id (`lookup_server), _("&Lookup"))
+		    )
+		)
+	    ),
+	    "init" : FoundServersInit,
+	    "handle" : FoundServersHandle,
+	    "store" : FoundServersStore,
+	    "validate_type" : `function,
+	    "validate_function" : FoundServersValidate,
+	    "help" : HELPS["found_servers"]:"",
+	],
+	"servers_list" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `VBox (
+		`ReplacePoint (`id (`country_rp),
+		    `ComboBox (`id (`country), `opt (`notify, `hstretch),
+			// combo box header
+			_("&Country"), [])),
+		`ReplacePoint (`id (`servers_rp), `ComboBox (`id (`servers),
+		    `opt (`hstretch),
+		    // selection box header
+		    _("Public NTP &Servers"), []))
+	    ),
+	    "init" : ServerListInit,
+	    "handle" : ServerListHandle,
+	    "store" : ServerListStore,
+	    "validate_type" : `function,
+	    "validate_function" : ServerListValidate,
+	    "help" : HELPS["servers_list"]:"",
+	],
+	"select_test_local" : $[
+	    "widget" : `push_button,
+	    // push button
+	    "label" : _("&Test"),
+	    "handle_events" : ["select_test_local"],
+	    "handle" : LocalSelectTestHandle,
+	    "help" : HELPS["selected_test"]:"",
+	],
+	"select_test_public" : $[
+	    "widget" : `push_button,
+	    // push button
+	    "label" : _("&Test"),
+	    "handle_events" : ["select_test_public"],
+	    "handle" : PublicSelectTestHandle,
+	    "help" : HELPS["selected_test"]:"",
+	],
+	"firewall" : CWMFirewallInterfaces::CreateOpenFirewallWidget ($[
+	    "services" : NtpClient::firewall_services,
+	    "display_details" : true,
+	]),
+    ];
+}
+
+
+
+}

@@ -1,0 +1,54 @@
+ntp.conf agent
+==============
+
+ntp.conf file's interface is in ini-agent style. The only difference is
+that keys can be present multiple times.  It means that instead of
+single value, Read call returns list of values (and Write accepts
+multiple values).
+
+Important keys (that are to be read and written) are server, peer, fudge,
+broadcast and broadcastclient. As these lines consist from
+
+<key> <address> <options>
+
+where key and address aren't allowed to contain blank space. Options
+aren't parsed, and are kept as one string (this way NTP client component
+can decide the way the user edits them).
+
+Reading some key returns a list of all values whith this key. Each value
+is a list, where first entry is the address, and the second entry
+represents the options.
+
+Value taken for writing has the same format.
+
+As order of lines in /etc/ntp.conf is in most cases not important,
+ntp.conf agent doesn't care about the order too much. The only case
+when order is important is the "fudge" option, that should immediately
+follow appropriate "server" option. When writing the "fudge" option,
+ntp.conf agent makes sure that each "fudge" option follows appropriate
+"server" option. Because of this writing "fudge" options must be
+performed after writing "server" options (although "fidge" options
+didn't change).
+
+
+Agent interface:
+----------------
+
+Read (.etc.ntp_conf.server) -> [ ["chimera.suse.cz", ""], ["10.20.0.20", "" ]]
+  reads all servers present in the configuration file
+Write (.etc.ntp_conf.server, [ ["chimera.suse.cz", ""] ]) -> true
+  writes list of servers to the configuration file
+Write (.etc.ntp_conf, nil) -> true
+  really saves the configuration file to the disk
+Read (.etc.ntp_conf._reread) -> true
+  forces rereading configuration file from the disk
+Read (.etc.ntp_conf) -> [ ["server", "chimera", ""], ["peer", "pegasus", ""]]
+  reads complete list of all records. Usable mainly for debugging
+Write (.etc.ntp_conf, []) -> true
+  writes complete list of all records. May be usable during
+  autoinstallation to clean the file
+Write (.etc.ntp_conf.settings.ntp_conf_filename, "/etc/ntp.conf")
+  sets filename ntp agent will use. Is useful for creating testsuite
+  for this agent.
+
+

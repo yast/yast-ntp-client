@@ -1,0 +1,107 @@
+/**
+ * File:	clients/ntp-client_auto.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Client for autoinstallation
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ * This is a client for autoinstallation. It takes its arguments,
+ * goes through the configuration and return the setting.
+ * Does not do any changes to the configuration.
+ */
+
+/**
+ * @param function to execute
+ * @param map/list of ntp-client settings
+ * @return map edited settings, Summary or boolean on success depending on called function
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example map ret = WFM::CallFunction ("ntp-client_auto", [ "Summary", mm ]);
+ */
+
+{
+
+textdomain "ntp-client";
+
+y2milestone("----------------------------------------");
+y2milestone("NtpClient auto started");
+
+import "NtpClient";
+include "ntp-client/wizards.ycp";
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+/* Check arguments */
+if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
+    func = (string)WFM::Args(0);
+    if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+	param = (map)WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+/* Create a summary*/
+if(func == "Summary") {
+    ret = NtpClient::Summary();
+}
+/* Reset configuration */
+else if (func == "Reset") {
+    NtpClient::Import($[]);
+    ret = $[];
+}
+/* Return required packages */
+else if (func == "Packages") {
+    ret = NtpClient::AutoPackages();
+}
+/* Change configuration (run AutoSequence) */
+else if (func == "Change") {
+    ret = NtpClientAutoSequence();
+}
+/* Import configuration */
+else if (func == "Import") {
+    ret = NtpClient::Import(param);
+}
+/* Return actual state */
+else if (func == "Export") {
+    ret = NtpClient::Export();
+}
+/* did configuration change */
+else if (func == "GetModified") {
+    ret = NtpClient::modified;
+}
+/* set configuration as changed */
+else if (func == "SetModified") {
+    NtpClient::modified = true;
+    ret = true;
+}
+/* Read current state */
+else if (func == "Read") {
+    import "Progress";
+    boolean progress_orig = Progress::set (false);
+    ret = NtpClient::Read();
+    Progress::set (progress_orig);
+}
+/* Write givven settings */
+else if (func == "Write") {
+    import "Progress";
+    boolean progress_orig = Progress::set (false);
+    NtpClient::write_only = true;
+    ret = NtpClient::Write();
+    Progress::set (progress_orig);
+}
+/* Unknown function */
+else {
+    y2error("Unknown function: %1", func);
+    ret = false;
+}
+
+y2debug("ret=%1", ret);
+y2milestone("NtpClient auto finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}

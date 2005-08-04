@@ -1,0 +1,118 @@
+/**
+ * File:
+ *  Read.ycp
+ *
+ * Module:
+ *  NTP client configurator
+ *
+ * Summary:
+ *  Reading configuration testsuite
+ *
+ * Authors:
+ *  Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+
+    // testedfiles: NtpClient.ycp
+
+    include "testsuite.ycp";
+
+    map READ = $[
+	"init" : $[
+	    "scripts" : $[
+		"exists" : true,
+		"runlevel" : $["ntp" : $[]],
+	    ],
+	],
+	"etc" : $[
+	    "ntp_conf" : $[
+		"all" : $[
+		    "comment":"",
+		    "file":-1,
+		    "kind":"section",
+		    "name":"",
+		    "type":-1,
+		    "value":[
+			$[
+			    "comment":"",
+			    "kind":"value",
+			    "name":"server",
+			    "type":0,
+			    "value":"ntp1 options1"
+			],
+			$[
+			    "comment":"",
+			    "kind":"value",
+			    "name":"server",
+			    "type":0,
+			    "value":"127.127.1.2 options_clock"
+			],
+			$[
+			    "comment":"",
+			    "kind":"value",
+			    "name":"fudge",
+			    "type":0,
+			    "value":"127.127.1.2fudge_clock"
+			],
+			$[
+			    "comment":"",
+			    "kind":"value",
+			    "name":"server",
+			    "type":0,
+			    "value":"ntp2 options2"
+			],
+			$[
+			    "comment":"",
+			    "kind":"value",
+			    "name":"peer",
+			    "type":0,
+			    "value":"peer1 options_peer"
+			]
+		    ]
+		],
+	    ],
+	],
+	"sysconfig" : $[
+	    "ntp" : $[
+		"NTPD_INITIAL_NTPDATE" : "AUTO-2",
+		"NTPD_RUN_CHROOTED" : "yes",
+	    ],
+	    "personal-firewall" : $[
+		"REJECT_ALL_INCOMING_CONNECTIONS" : "no",
+	    ],
+	    "network" : $[
+		"dhcp" : $[
+		    "DHCLIENT_MODIFY_NTP_CONF" : "no",
+		],
+	    ],
+	],
+	"target" : $[
+	    "string" : "",
+	    "tmpdir" : "/tmp",
+	    "size" : 0,
+	],
+    ];
+    map WRITE = $[];
+    map EXEC = $[
+	"target" : $[
+	    "bash_output" : $[],
+	],
+    ];
+
+    TESTSUITE_INIT ([READ, WRITE, EXEC], nil);
+
+    import "Progress";
+    import "NtpClient";
+    import "Mode";
+
+    Mode::SetTest ("testsuite");
+
+    boolean progress_orig = Progress::set (false);
+
+    TEST (``(NtpClient::Read ()), [READ, WRITE, EXEC], nil);
+    TEST (``(NtpClient::Export ()), [READ, WRITE, EXEC], nil);
+}

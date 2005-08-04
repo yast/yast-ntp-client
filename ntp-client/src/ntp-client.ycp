@@ -1,0 +1,56 @@
+/**
+ * File:	clients/ntp-client.ycp
+ * Package:	Configuration of ntp-client
+ * Summary:	Main file
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ * Main file for ntp-client configuration. Uses all other files.
+ */
+
+{
+
+/***
+ * <h3>Configuration of the ntp-client</h3>
+ */
+
+textdomain "ntp-client";
+
+/* The main () */
+y2milestone ("----------------------------------------");
+y2milestone ("NtpClient module started");
+
+import "CommandLine";
+import "NtpClient";
+
+include "ntp-client/wizards.ycp";
+
+
+/**
+  * CommandLine handler for running GUI
+  * @return boolean true if settings were saved
+  */
+define boolean GuiHandler () ``{
+    symbol ret = NtpClientSequence();
+    if (ret == `abort || ret == `back || ret == `nil)
+	return false;
+    return true;
+}
+
+
+include "ntp-client/commandline.ycp";
+
+
+/* main ui function */
+any ret = CommandLine::Run (cmdline);
+y2debug("ret=%1", ret);
+
+/* Finish */
+y2milestone("NtpClient module finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}
