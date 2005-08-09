@@ -330,7 +330,8 @@ define void addressStore (string id, map event) ``{
  */
 define boolean serverAddressValidate (string id, map event) {
     // do not check the server IP/Host when changing dialog to "Select"
-    if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public) {
+    //   or when switching to the complex configuration
+    if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public || event["ID"]:nil == `complex) {
 	return true;
     }
 

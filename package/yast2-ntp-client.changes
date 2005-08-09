@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Aug  9 15:42:06 CEST 2005 - locilka@suse.cz
+
+- Fixing bug #102993
+  NTP server textentry is not checked when switching to the complex
+  configuration
+- 2.12.4
+
+-------------------------------------------------------------------
 Wed Aug  3 14:52:56 CEST 2005 - locilka@suse.cz
 
 - Changed the last "xntpd" to "ntp"
