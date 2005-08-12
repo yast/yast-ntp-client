@@ -634,10 +634,20 @@ symbol ServerListHandle (string id, map event) {
 		label = sformat ("%1 (%2%3)", s, label, l_country);
 	    return `item (`id (s), label);
 	});
-	UI::ReplaceWidget (`servers_rp, `ComboBox (`id (`servers),
-	    `opt (`hstretch),
-	    // selection box header
-	    _("Public NTP &Servers"), items));
+	UI::ReplaceWidget (`servers_rp,
+	    `VBox(
+		// Combobox has at least 40 characters
+		// bug #97184
+		`HSpacing(40),
+		`ComboBox (
+		    `id (`servers),
+		    `opt (`hstretch),
+		    // selection box header
+		    _("Public NTP &Servers"),
+		    items
+		)
+	    )
+	);
 	return nil;
     }
     if (event["ID"]:nil == `test || event["ID"]:nil == `info)
