@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug 12 13:53:26 CEST 2005 - locilka@suse.cz
+
+- ComboBox for selecting a public NTP server has at least 40
+  characters. Helpful for ncurses. Bug #97184
+
+-------------------------------------------------------------------
 Tue Aug  9 15:42:06 CEST 2005 - locilka@suse.cz
 
 - Fixing bug #102993
