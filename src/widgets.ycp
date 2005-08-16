@@ -329,6 +329,13 @@ define void addressStore (string id, map event) ``{
  * @return boolean is successful
  */
 define boolean serverAddressValidate (string id, map event) {
+    // NTP Client is disabled, do not check the server name
+    if (event["ID"]:nil == `next
+	&& UI::WidgetExists(`id ("start"))
+	&& ((string) UI::QueryWidget (`id ("start"), `CurrentButton) == "never")
+    ) {
+	return true;
+    }
     // do not check the server IP/Host when changing dialog to "Select"
     //   or when switching to the complex configuration
     if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public || event["ID"]:nil == `complex) {
