@@ -826,7 +826,7 @@ which probably blocks the network scanning."));
 void FoundServersInit (string id) {
     list <term> items = [];
     foreach (string server, found_servers_cache, {
-	items = add (items, `item(`id("server"), server));
+	items = add (items, `item(`id(server), server));
     });
     UI::ChangeWidget (`id ("server_address"), `Items, items);
     FoundServersHandle (id, $["ID" : "list_rb"]);
