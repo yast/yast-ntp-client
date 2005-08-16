@@ -1,8 +1,18 @@
 -------------------------------------------------------------------
+Tue Aug 16 14:31:27 CEST 2005 - locilka@suse.cz
+
+- Fixed bug #104907
+  Server selected from one of found with the Lookup function had
+  been returned as the string "server".
+- Fixed bug #104906
+  Now it is possible to save the configuration when
+  start ntp: "never" is selected and no server has been choosen.
+- 2.12.6 
+
+-------------------------------------------------------------------
 Tue Aug 16 11:50:17 CEST 2005 - locilka@suse.cz
 
 - Merged proofread texts
-- 2.12.6
 
 -------------------------------------------------------------------
 Fri Aug 12 13:53:26 CEST 2005 - locilka@suse.cz
