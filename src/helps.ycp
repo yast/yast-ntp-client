@@ -82,9 +82,9 @@ If you have multiple clocks of the same type, you must set
     "device" : _("<p><b><big>Device</big></b><br>
 To make the clock work, it may be necessary to create a special symbolic link to 
 the device to which the clock is connected. To do this, check
-<b>Create Symlink</b> and set the <b>Device</b>. To browse the device,
+<b>Create Symlink</b> and set the <b>Device</b>. To browse for the device,
 click <b>Browse</b>.
-For some of the clock types, it is not necessary to create a symbolic link or 
+For some clock types, it is not necessary to create a symbolic link or 
 it must be created manually.</p>"),
 
     // help text 4/4
