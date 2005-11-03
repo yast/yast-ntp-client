@@ -185,6 +185,14 @@ to find an NTP server near you.</p>"),
     "selected_test" : _("<p><big><b>Testing Server Accessibility</b></big><br>
 To test if the selected server responds properly, click <b>Test</b>.</p>"),
 
+    // help text connected with checkbox: "Use Random Server from pool.ntp.org"
+    // rwalter, please, correct it ;)
+    "use_random_servers" : _("<p><big><b>Use Random Servers</b></big><br>
+This amenity is offered by the pool.ntp.org. If you select this checkbox,
+then three different servers are added into the configuration. The server names are
+permanent but they change their DNS record (IP) every single hour. Whence it follows that
+your NTP is synchronized with different servers every hour.</p>"),
+
 ];
 
 /**

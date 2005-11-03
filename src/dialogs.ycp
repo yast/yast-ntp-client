@@ -71,7 +71,7 @@ define symbol WriteDialog() ``{
 define symbol SimpleDialog () ``{
     NtpClient::simple_dialog = true;
 
-    list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "complex_button"],
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "use_random_servers", "complex_button"],
 	GetWidgets ());
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VStretch (),
@@ -83,7 +83,14 @@ define symbol SimpleDialog () ``{
 	`VStretch (),
 	`HBox (
 	    `HStretch (),
-	    "server_address",
+	    `Frame (
+		// frame label
+		_("NTP Server Configuration"),
+		`VBox (
+		    `Left("use_random_servers"),
+		    "server_address"
+		)
+	    ),
 	    `HStretch ()
 	),
 	`VStretch (),
@@ -581,10 +588,23 @@ define symbol SelectConfigType () ``{
     list<map> peers = NtpClient::getSyncRecords ();
     list<map> servers = filter (map m, peers, ``(m["type"]:"" == "server"));
     list<map> clocks = filter (map m, peers, ``(m["type"]:"" == "__clock"));
+
+    boolean random_pool_servers_enabled_only = (
+	// number of listed servers is the same as the needed servers for random_pool_servers function
+	(size (servers) == size (NtpClient::random_pool_servers))
+	// enabled means that all of needed servers are listed
+	&& NtpClient::IsRandomServersServiceEnabled()
+    );
+
     if (size (peers) != size (servers) + size (clocks))
     {
 	y2milestone ("Something else than server and clock present");
 	return `complex;
+    }
+    if (random_pool_servers_enabled_only && size (clocks) <= 1)
+    {
+	y2milestone("Simple settings with random_pool_servers");
+	return `simple;
     }
     if (size (servers) > 1 || size (clocks) > 1)
     {

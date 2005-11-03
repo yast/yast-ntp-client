@@ -1,5 +1,11 @@
 #!/usr/bin/perl -w
 
+my $ntp_status = `LANG=C /etc/init.d/ntp status`;
+if ($ntp_status =~ /\.\.running/) {
+    warn "NTP daemon is running\nPlease, turn it off before running this script...\n\n";
+    exit;
+}
+
 use ycp;
 use Data::Dumper;
 
@@ -43,7 +49,8 @@ foreach my $url (@mills_urls) {
 	}
 	elsif ($line =~ /Location: (.*)<br>/)
 	{
-	    $server_ref->{"location"} = $1;
+	    $server_ref->{"exact_location"} = $1;
+	    $server_ref->{"exact_location"} =~ s/<[^>]*>//g;
 	}
 	elsif ($line =~ /Geographic Coordinates: (.*)<br>/)
 	{
@@ -55,7 +62,8 @@ foreach my $url (@mills_urls) {
 	}
 	elsif ($line =~ /Service Area: (.*)<br>/)
 	{
-	    $server_ref->{"service_area"} = $1;
+	    $server_ref->{"location"} = $1;
+	    $server_ref->{"location"} =~ s/<[^>]*>//g;
 	}
 	elsif ($line =~ /Access Policy: (.*)<br>/)
 	{
@@ -64,6 +72,11 @@ foreach my $url (@mills_urls) {
 	elsif ($line =~ /Contacts: (.*)<br>/)
 	{
 	    $server_ref->{"contacts"} = $1;
+	}
+	
+	# Relative server address cannot work well everywhere
+	if ($server_ref->{"address"} =~ /\./) {
+	    $server_ref->{"address"} .= ".";
 	}
     }
     close (PAGE);
@@ -80,7 +93,7 @@ foreach my $url (@mills_urls) {
     $status == 0;
 } @servers;
 
-open (OUT, ">servers.ycp");
+open (OUT, ">ntp_servers.ycp");
 print OUT "[\n";
 foreach my $sr (@servers) {
     print OUT "  \$[\n";

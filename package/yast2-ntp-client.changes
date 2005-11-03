@@ -1,4 +1,19 @@
 -------------------------------------------------------------------
+Thu Nov  3 08:53:46 CET 2005 - locilka@suse.cz
+
+- Added enhancement #114268
+  Selection of public servers newly contains
+  $country_shortname.pool.ntp.org for every state known for YaST.
+- Added enhancement #105300
+  New checkbox for adding 3 'random' servers from pool.ntp.org
+  which adds [0|1|2].pool.ntp.org servers. These servers names
+  change their IP (and physical destination) every hour.
+- Generated and tested new set of public NTP servers.
+- Fixed scropt for generating set of public servers not to contain
+  HTML tags in server name and location.
+- 2.13.0
+
+-------------------------------------------------------------------
 Tue Aug 16 14:31:27 CEST 2005 - locilka@suse.cz
 
 - Fixed bug #104907

@@ -185,6 +185,76 @@ define void ConfigDhcpStore (string id, map event) ``{
     NtpClient::modified = true;
 }
 
+define void RandomServersInit (string id) {
+    if (id != "use_random_servers") return nil;
+    y2milestone("Initializing random servers");
+
+    if (NtpClient::IsRandomServersServiceEnabled()) {
+	// Random servers function is enabled
+	UI::ChangeWidget(`id ("use_random_servers"), `Value, true);
+	UI::ChangeWidget(`id ("server_address"), `Enabled, false);
+	UI::ChangeWidget(`id (`select_server), `Enabled, false);
+	UI::ChangeWidget(`id ("server_address"), `Value, "");
+    } else {
+	// Random servers function is disabled
+	UI::ChangeWidget(`id ("use_random_servers"), `Value, false);
+	UI::ChangeWidget(`id ("server_address"), `Enabled, true);
+	UI::ChangeWidget(`id (`select_server), `Enabled, true);
+    }
+}
+
+define void RandomServersStore (string id, map event) {
+    if (id != "use_random_servers") return nil;
+
+    if ((boolean) UI::QueryWidget(`id("use_random_servers"), `Value)) {
+	NtpClient::ActivateRandomPoolServersFunction();
+    } else {
+	NtpClient::DeActivateRandomPoolServersFunction();
+    }
+}
+
+// if there was some server defined before pool_ntp_org was selected
+string ntp_server_before_random_servers = "";
+
+/**
+ * Function handles the "use_random_servers" checkbox
+ */
+define symbol RandomServersHandle (string id, map event) {
+    // do nat handle anything when called by pressing the checkbox
+    if (id != "use_random_servers") return nil;
+    if (event["EventReason"]:"" != "ValueChanged") return nil;
+
+    y2milestone("Handling random_servers");
+    boolean use_random_servers = (boolean) UI::QueryWidget(`id("use_random_servers"), `Value);
+    // If random servers are selected, user is not allowed to enter his/her own NTP server
+    if (use_random_servers) {
+	y2milestone("Activating random servers");
+	ntp_server_before_random_servers = (string) UI::QueryWidget(`id ("server_address"), `Value);
+	// if there is already some server defined
+	if (ntp_server_before_random_servers != "") {
+	    if (!Popup::ContinueCancel(_("Enabling function Random Servers from pool.ntp.org would
+replace the current NTP Server.
+
+Are you sure you want to lose your current NTP server?"))) {
+		// user has cancelled the operation, return it back
+		UI::ChangeWidget(`id("use_random_servers"), `Value, false);
+		return nil;
+	    }
+	}
+
+	UI::ChangeWidget(`id ("server_address"), `Enabled, false);
+	UI::ChangeWidget(`id (`select_server), `Enabled, false);
+	UI::ChangeWidget(`id ("server_address"), `Value, "");
+    } else {
+	y2milestone("Deactivating random servers");
+	UI::ChangeWidget(`id ("server_address"), `Enabled, true);
+	UI::ChangeWidget(`id (`select_server), `Enabled, true);
+	UI::ChangeWidget(`id ("server_address"), `Value, ntp_server_before_random_servers);
+    }
+
+    return nil;
+}
+
 /**
  * Redraw the overview table
  */
@@ -341,6 +411,10 @@ define boolean serverAddressValidate (string id, map event) {
     if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public || event["ID"]:nil == `complex) {
 	return true;
     }
+    
+    // if the option "random_servers" is selected, do not check the server name
+    if (UI::WidgetExists(`id("use_random_servers")) && (boolean) UI::QueryWidget(`id("use_random_servers"), `Value))
+	return true;
 
     string server_1 = (string) UI::QueryWidget (`id (id), `Value);
     string server_2 = server_1;
@@ -382,8 +456,12 @@ define symbol serverAddressHandle (string id, map event) {
     }
     if (ev_id == `test_server)
     {
-	if (serverAddressValidate("server_address",$[]))
-	    NtpClient::TestNtpServer (server, false);
+	if (UI::WidgetExists(`id("use_random_servers")) && (boolean) UI::QueryWidget(`id("use_random_servers"), `Value)) {
+	    NtpClient::TestNtpServer (NtpClient::random_pool_servers[random(4)]:"0.pool.ntp.org", false);
+	} else {
+	    if (serverAddressValidate("server_address",$[]))
+		NtpClient::TestNtpServer (server, false);
+	}
     }
     else if (ev_id == `select_local) {
 	return `select_local;
@@ -965,6 +1043,16 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "handle" : ntpEnabledOrDisabled,
 	    "help" : HELPS["config_dhcp"]:"",
 	],
+	"use_random_servers" : $[
+	    "widget" : `checkbox,
+	    "opt" : [ `notify ],
+	    // check box
+	    "label" : _("&Use Random Servers from pool.ntp.org"),
+	    "init" : RandomServersInit,
+	    "store" : RandomServersStore,
+	    "handle" : RandomServersHandle,
+	    "help" : HELPS["use_random_servers"]:"",
+	],
 	"server_address" : union (address, $[
 	    // text entry label
 	    "label" : _("&Address"),
@@ -976,7 +1064,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "custom_widget" : `VBox (
 		`HBox (
 		    `TextEntry (`id ("server_address"),
-			`opt (`editable, `hstretch),
+			`opt (`hstretch),
 			// text entry
 			_("&Address")
 		    ),

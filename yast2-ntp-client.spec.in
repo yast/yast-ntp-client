@@ -2,7 +2,7 @@
 # neededforbuild yast2-devel-packages yast2-slp
 
 @HEADER@
-Requires:	yast2 yast2-slp
+Requires:	yast2 yast2-slp yast2-country
 
 BuildArchitectures:	noarch
 
