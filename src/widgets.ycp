@@ -232,10 +232,10 @@ define symbol RandomServersHandle (string id, map event) {
 	ntp_server_before_random_servers = (string) UI::QueryWidget(`id ("server_address"), `Value);
 	// if there is already some server defined
 	if (ntp_server_before_random_servers != "") {
-	    if (!Popup::ContinueCancel(_("Enabling function Random Servers from pool.ntp.org would
-replace the current NTP Server.
+	    if (!Popup::ContinueCancel(_("Enabling Random Servers from pool.ntp.org would
+replace the current NTP server.
 
-Are you sure you want to lose your current NTP server?"))) {
+Really replace the current NTP server?"))) {
 		// user has cancelled the operation, return it back
 		UI::ChangeWidget(`id("use_random_servers"), `Value, false);
 		return nil;
