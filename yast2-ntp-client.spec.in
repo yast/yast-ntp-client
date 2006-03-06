@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	yast2-devel-packages yast2-slp
+BuildRequires:	yast2-slp perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
 Requires:	yast2 yast2-slp yast2-country
 
 BuildArchitectures:	noarch
