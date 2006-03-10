@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 10 10:56:22 CET 2006 - locilka@suse.cz
+
+- merged texts from proofread
+- 2.14.3
+
+-------------------------------------------------------------------
 Mon Mar  6 18:44:03 CET 2006 - locilk@suse.cz
 
 - Adjusted BuildRequires for package
