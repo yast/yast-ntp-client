@@ -186,10 +186,12 @@ define void ConfigDhcpStore (string id, map event) ``{
 }
 
 define void RandomServersInit (string id) {
+    ntpEnabledOrDisabled(id, $[]);
     if (id != "use_random_servers") return nil;
     y2milestone("Initializing random servers");
 
-    if (NtpClient::IsRandomServersServiceEnabled()) {
+    boolean rnd_servers = NtpClient::IsRandomServersServiceEnabled();
+    if (rnd_servers) {
 	// Random servers function is enabled
 	UI::ChangeWidget(`id ("use_random_servers"), `Value, true);
 	UI::ChangeWidget(`id ("server_address"), `Enabled, false);
@@ -198,8 +200,13 @@ define void RandomServersInit (string id) {
     } else {
 	// Random servers function is disabled
 	UI::ChangeWidget(`id ("use_random_servers"), `Value, false);
-	UI::ChangeWidget(`id ("server_address"), `Enabled, true);
-	UI::ChangeWidget(`id (`select_server), `Enabled, true);
+	if (NtpClient::run_service) {
+	    UI::ChangeWidget(`id ("server_address"), `Enabled, true);
+	    UI::ChangeWidget(`id (`select_server), `Enabled, true);
+	} else {
+	    UI::ChangeWidget(`id ("server_address"), `Enabled, false);
+	    UI::ChangeWidget(`id (`select_server), `Enabled, false);
+	}
     }
 }
 
@@ -220,9 +227,11 @@ string ntp_server_before_random_servers = "";
  * Function handles the "use_random_servers" checkbox
  */
 define symbol RandomServersHandle (string id, map event) {
-    // do nat handle anything when called by pressing the checkbox
+    ntpEnabledOrDisabled(id, event);
+    // do not handle anything when called by pressing the checkbox
     if (id != "use_random_servers") return nil;
     if (event["EventReason"]:"" != "ValueChanged") return nil;
+    if (event["WidgetID"]:"" != "use_random_servers") return nil;
 
     y2milestone("Handling random_servers");
     boolean use_random_servers = (boolean) UI::QueryWidget(`id("use_random_servers"), `Value);
@@ -449,9 +458,16 @@ define symbol serverAddressHandle (string id, map event) {
     {
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
 	    != "never";
-	UI::ChangeWidget (`id (id), `Enabled, enabled);
+	// checkbox selected - random servers feature
+	if (UI::QueryWidget(`id ("use_random_servers"), `Value) == true) {
+	    UI::ChangeWidget (`id (id), `Enabled, false);
+	    UI::ChangeWidget (`id (`select_server), `Enabled, false);
+	} else {
+	    UI::ChangeWidget (`id (id), `Enabled, enabled);
+	    UI::ChangeWidget (`id (`select_server), `Enabled, enabled);
+	}
 	UI::ChangeWidget (`id (`test_server), `Enabled, enabled);
-	UI::ChangeWidget (`id (`select_server), `Enabled, enabled);
+
 	return nil;
     }
     if (ev_id == `test_server)
@@ -469,6 +485,7 @@ define symbol serverAddressHandle (string id, map event) {
     else if (ev_id == `select_public) {
 	return `select_public;
     }
+
     return nil;
 }
 
@@ -990,6 +1007,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "init" : addressInit,
 	    "store" : addressStore,
     ];
+    
     return $[
 	"complex_button" : $[
 	    "widget" : `push_button,
@@ -1064,7 +1082,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "custom_widget" : `VBox (
 		`HBox (
 		    `TextEntry (`id ("server_address"),
-			`opt (`hstretch),
+			`opt(`hstretch),
 			// text entry
 			_("&Address")
 		    ),

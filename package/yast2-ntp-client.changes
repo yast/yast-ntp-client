@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar 13 09:31:30 CET 2006 - locilka@suse.cz
+
+- fixed bug #155325, problems with widgets around random pool
+  servers feature
+- 2.13.4
+
+-------------------------------------------------------------------
 Fri Mar 10 10:56:22 CET 2006 - locilka@suse.cz
 
 - merged texts from proofread
