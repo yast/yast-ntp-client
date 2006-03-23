@@ -18,6 +18,7 @@ import "Popup";
 import "SuSEFirewall";
 import "Wizard";
 import "Report";
+import "Confirm";
 
 include "ntp-client/misc.ycp";
 include "ntp-client/widgets.ycp";
@@ -48,6 +49,11 @@ define boolean abortPopup () ``{
  */
 define symbol ReadDialog() ``{
     Wizard::RestoreHelp(HELPS["read"]:"");
+    
+    // checking for root permissions (#158483)
+    if (!Confirm::MustBeRoot())
+	return `abort;
+    
     NtpClient::AbortFunction = PollAbort;
     boolean ret = NtpClient::Read();
     return ret ? `next : `abort;
