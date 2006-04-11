@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Apr 11 11:53:06 CEST 2006 - locilka@suse.cz
+
+- Switching from simple to complex configuration was eating server
+  entries (#165149).
+- 2.13.6
+
+-------------------------------------------------------------------
 Thu Mar 23 08:45:37 CET 2006 - locilka@suse.cz
 
 - Added checking for root permissions into the module startup

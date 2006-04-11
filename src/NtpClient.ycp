@@ -441,13 +441,15 @@ global boolean IsRandomServersServiceEnabled () {
  * from the current configuration.
  */
 global define void DeActivateRandomPoolServersFunction () {
-    ntp_records = filter (map <string, any> one_record, ntp_records, {
-	return (
-	    // filter out servers
-	    one_record["type"]:"" != "server"
-	    // contained in the random_pool_servers list
-	    && !contains(random_pool_servers, one_record["address"]:"")
-	);
+    foreach (string random_pool_server, random_pool_servers, {
+	ntp_records = filter (map <string, any> one_record, ntp_records, {
+	    return (
+		// do not filter out not-servers
+		one_record["type"]:"" != "server"
+		// do not filter out serces that are not random_pool_servers
+		|| one_record["address"]:"" != random_pool_server
+	    );
+	});
     });
 }
 
@@ -458,6 +460,13 @@ global define void DeActivateRandomPoolServersFunction () {
 global define void ActivateRandomPoolServersFunction () {
     // remove all old ones
     DeActivateRandomPoolServersFunction();
+
+    ntp_records = filter (map <string, any> one_record, ntp_records, {
+	return (
+	    // filter out all servers
+	    one_record["type"]:"" != "server"
+	);
+    });
 
     foreach (string one_server, random_pool_servers, {
 	ntp_records = add (ntp_records, $[
