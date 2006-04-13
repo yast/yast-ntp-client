@@ -458,6 +458,17 @@ global define void DeActivateRandomPoolServersFunction () {
  * into the current configuration.
  */
 global define void ActivateRandomPoolServersFunction () {
+    // leave the current configuration if any
+    map <string, map <string, any> > store_current_options = $[];
+    foreach (map <string, any> one_record, ntp_records, {
+	if (one_record["type"]:"" == "server" && one_record["address"]:"" != "") {
+	    string one_address = one_record["address"]:"";
+	    store_current_options[one_address]                 = $[];
+	    store_current_options[one_address, "options"]      = one_record["options"]:"";
+	    store_current_options[one_address, "initial_sync"] = one_record["initial_sync"]:true;
+	}
+    });
+
     // remove all old ones
     DeActivateRandomPoolServersFunction();
 
@@ -469,11 +480,21 @@ global define void ActivateRandomPoolServersFunction () {
     });
 
     foreach (string one_server, random_pool_servers, {
+	boolean one_initial_sync = true;
+	string  one_options      = "";
+	
+	if (haskey(store_current_options, one_server)) {
+	    one_initial_sync = store_current_options[one_server, "initial_sync"]:true;
+	    one_options      = store_current_options[one_server, "options"]:"";
+	    y2milestone("Leaving current configuration for server '%1', initial_sync: '%2', options '%3'",
+		one_server, one_initial_sync, one_options);
+	}
+	
 	ntp_records = add (ntp_records, $[
 	    "address":one_server,
 	    "comment":"\n# Random pool server, see http://www.pool.ntp.org/ for more information\n",
-	    "initial_sync":true,
-	    "options":"",
+	    "initial_sync":one_initial_sync,
+	    "options":one_options,
 	    "type":"server"
 	]);
     });
