@@ -127,14 +127,62 @@ the daemon might not run properly.")))
 }
 
 /**
+ * Checks the current simple configuration filled in UI.
+ * Selected option RandomPoolServers returns true;
+ * Selected valid server address also returns true;
+ *
+ * @return boolean whether the configuration is correct
+ */
+define boolean CheckCurrentSimpleConfiguration () {
+    // if the option "random_servers" is selected, do not check the server name
+    if (UI::WidgetExists(`id("use_random_servers")) && (boolean) UI::QueryWidget(`id("use_random_servers"), `Value))
+	return true;
+
+    string server_1 = (string) UI::QueryWidget (`id ("server_address"), `Value);
+    string server_2 = server_1;
+    if (regexpmatch(server_2, "(.*)\.$")) {
+	server_2 = regexpsub (server_2, "(.*)\.$", "\\1");
+    }
+    
+    if (
+	(!Hostname::Check(server_1) && !Hostname::CheckFQ(server_1) && !IP::Check(server_1))
+	&&
+	(!Hostname::Check(server_2) && !Hostname::CheckFQ(server_2))
+    ) {
+	// TRANSLATORS: Popup error message
+	Report::Error(sformat(_("NTP server '%1' is not a valid hostname,
+fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
+	return false;
+    }
+
+    return true;
+}
+
+/**
  * Handle function of the widget
  * @param key any widget id
  * @param event map event that caused storing process
  * @return symbol always `complex
  */
 define symbol complexButtonHandle (string key, map event) ``{
-    if (event["ID"]:nil == "complex_button")
+    if (event["ID"]:nil == "complex_button") {
+	boolean conf_check = CheckCurrentSimpleConfiguration();
+	y2milestone("Checking the current simple configuration returned: %1", conf_check);
+
+	NtpClient::selected_record["address"] = UI::QueryWidget (`id ("server_address"), `Value);
+	// disabled in case of PoolNTPorg feature
+	if ((boolean) UI::QueryWidget (`id ("server_address"), `Enabled) &&
+	  NtpClient::selected_record["address"]:nil != nil &&
+	  NtpClient::selected_record["address"]:"" != "") {
+	    NtpClient::selected_record["type"] = "server";
+	    NtpClient::selected_record["initial_sync"] = true;
+	    y2milestone("Storing the current address record: %1", NtpClient::selected_record);
+	    NtpClient::storeSyncRecord();
+	}
+
+	y2milestone("Switching to complex configuration...");
 	return `complex;
+    }
     ntpEnabledOrDisabled (key, event);
     return nil;
 }
@@ -421,28 +469,7 @@ define boolean serverAddressValidate (string id, map event) {
 	return true;
     }
     
-    // if the option "random_servers" is selected, do not check the server name
-    if (UI::WidgetExists(`id("use_random_servers")) && (boolean) UI::QueryWidget(`id("use_random_servers"), `Value))
-	return true;
-
-    string server_1 = (string) UI::QueryWidget (`id (id), `Value);
-    string server_2 = server_1;
-    if (regexpmatch(server_2, "(.*)\.$")) {
-	server_2 = regexpsub (server_2, "(.*)\.$", "\\1");
-    }
-    
-    if (
-	(!Hostname::Check(server_1) && !Hostname::CheckFQ(server_1) && !IP::Check(server_1))
-	&&
-	(!Hostname::Check(server_2) && !Hostname::CheckFQ(server_2))
-    ) {
-	// TRANSLATORS: Popup error message
-	Report::Error(sformat(_("NTP server '%1' is not a valid hostname,
-fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
-	return false;
-    }
-
-    return true;
+    return CheckCurrentSimpleConfiguration();
 }
 
 /**

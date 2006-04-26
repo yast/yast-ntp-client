@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Apr 26 09:17:00 CEST 2006 - locilka@suse.cz
+
+- Check and store the changed address record when switching from
+  the simple to the complex configuration.
+- 2.13.8
+
+-------------------------------------------------------------------
 Thu Apr 13 16:02:25 CEST 2006 - locilka@suse.cz
 
 - Leaving the 'initial_sync' and 'options' for pool.ntp.org feature
