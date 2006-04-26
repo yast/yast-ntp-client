@@ -2,7 +2,7 @@
 Wed Apr 26 09:17:00 CEST 2006 - locilka@suse.cz
 
 - Check and store the changed address record when switching from
-  the simple to the complex configuration.
+  the simple to the complex configuration (#169206).
 - 2.13.8
 
 -------------------------------------------------------------------
