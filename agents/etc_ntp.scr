@@ -13,9 +13,13 @@
     `IniAgent ( "/etc/ntp.conf",
 	$[
 	    "options"	: [ "global_values", "repeat_names", "comments_last" ],
-	    "comments"	: [ "^[ \t]*#.*$", "^[ \t]*$" ],
+	    "comments"	: [
+		"^[ \t]*#.*$",
+		"^[ \t]*$",
+		"[ \t]*#.*$",
+	    ],
 	    "params"    : [
-		$[ "match" : [ "^[ \t]*([^ \t]+)[ \t]+(.*)$", "%s %s" ]],
+		$[ "match" : [ "^[ \t]*([^ \t]+)[ \t]+([^#]*)", "%s %s" ]],
 	    ],
 	    "subindent"	: "  "
 	]

@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu May 11 15:28:30 CEST 2006 - locilka@suse.cz
+
+- Adjusting ntp_conf rw agent to be able to understand additional
+  comments on the same line where are already some entries written
+  (#172589).
+- 2.13.9
+
+-------------------------------------------------------------------
 Wed Apr 26 09:17:00 CEST 2006 - locilka@suse.cz
 
 - Check and store the changed address record when switching from
