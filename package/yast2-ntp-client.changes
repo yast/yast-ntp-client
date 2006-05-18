@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Thu May 18 09:26:20 CEST 2006 - locilka@suse.cz
+
+- Do not report the empty server address when switching to the
+  Complex configuration (#176581).
+- Fixed behavior when switching to the complex configuration with
+  no server address defined before. Sometimes it deleted the local
+  clock entry.
+- 2.13.10
+
+-------------------------------------------------------------------
 Thu May 11 15:28:30 CEST 2006 - locilka@suse.cz
 
 - Adjusting ntp_conf rw agent to be able to understand additional

@@ -133,12 +133,17 @@ the daemon might not run properly.")))
  *
  * @return boolean whether the configuration is correct
  */
-define boolean CheckCurrentSimpleConfiguration () {
+define boolean CheckCurrentSimpleConfiguration (boolean check_the_server) {
     // if the option "random_servers" is selected, do not check the server name
     if (UI::WidgetExists(`id("use_random_servers")) && (boolean) UI::QueryWidget(`id("use_random_servers"), `Value))
 	return true;
 
     string server_1 = (string) UI::QueryWidget (`id ("server_address"), `Value);
+    if (!check_the_server && server_1 == "") {
+	y2milestone("Not checking an empty server...");
+	return true;
+    }
+
     string server_2 = server_1;
     if (regexpmatch(server_2, "(.*)\.$")) {
 	server_2 = regexpsub (server_2, "(.*)\.$", "\\1");
@@ -159,6 +164,22 @@ fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
 }
 
 /**
+ * Check the current confifuration and returns whether some server address is defined
+ */
+boolean ServerAddressIsInConfiguration () {
+    boolean ret = false;
+
+    foreach (map<string, any> one_record, NtpClient::ntp_records, {
+	if (one_record["type"]:nil == "server") {
+	    ret = true;
+	    break;
+	}
+    });
+
+    return ret;
+}
+
+/**
  * Handle function of the widget
  * @param key any widget id
  * @param event map event that caused storing process
@@ -166,11 +187,16 @@ fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
  */
 define symbol complexButtonHandle (string key, map event) ``{
     if (event["ID"]:nil == "complex_button") {
-	boolean conf_check = CheckCurrentSimpleConfiguration();
+	// true  - check and report the missing server value
+	// false - the opposite
+	boolean handle_the_server = ((string) UI::QueryWidget (`id ("server_address"), `Value) != "");
+
+	boolean conf_check = CheckCurrentSimpleConfiguration(handle_the_server);
 	y2milestone("Checking the current simple configuration returned: %1", conf_check);
 
 	NtpClient::selected_record["address"] = UI::QueryWidget (`id ("server_address"), `Value);
 	// disabled in case of PoolNTPorg feature
+	// and in case of missing server value
 	if ((boolean) UI::QueryWidget (`id ("server_address"), `Enabled) &&
 	  NtpClient::selected_record["address"]:nil != nil &&
 	  NtpClient::selected_record["address"]:"" != "") {
@@ -178,6 +204,13 @@ define symbol complexButtonHandle (string key, map event) ``{
 	    NtpClient::selected_record["initial_sync"] = true;
 	    y2milestone("Storing the current address record: %1", NtpClient::selected_record);
 	    NtpClient::storeSyncRecord();
+	// deleting the current record if current server address is empty
+	} else if (NtpClient::selected_record["address"]:"" == "") {
+	    // delete only the server record if there is some current server record
+	    if (ServerAddressIsInConfiguration()) {
+		NtpClient::selected_record = nil;
+		NtpClient::storeSyncRecord();
+	    }
 	}
 
 	y2milestone("Switching to complex configuration...");
@@ -441,9 +474,13 @@ define void addressInit (string id) ``{
  * @param event map event that caused storing process
  */
 define void addressStore (string id, map event) ``{
+    // Don't store anything in case of switching to the complex configuration
+    if (event["ID"]:nil == `complex) return;
+
     NtpClient::selected_record["address"] = UI::QueryWidget (`id (id), `Value);
     if (NtpClient::simple_dialog)
     {
+	y2milestone("Storing the server address in simple configuration");
 	NtpClient::selected_record["type"] = "server";
 	NtpClient::selected_record["initial_sync"] = true;
     }
@@ -469,7 +506,7 @@ define boolean serverAddressValidate (string id, map event) {
 	return true;
     }
     
-    return CheckCurrentSimpleConfiguration();
+    return CheckCurrentSimpleConfiguration(true);
 }
 
 /**
