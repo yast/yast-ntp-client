@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon May 22 16:12:12 CEST 2006 - locilka@suse.cz
+
+- When switchich to the complex configuration or saving the simple
+  configuration, current server was allways re-added with
+  initial_sync==true even if there was no reason to change
+  the current value of initial_sync (#177575).
+- 2.13.11
+
+-------------------------------------------------------------------
 Thu May 18 09:26:20 CEST 2006 - locilka@suse.cz
 
 - Do not report the empty server address when switching to the

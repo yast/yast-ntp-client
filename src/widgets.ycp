@@ -33,6 +33,9 @@ string peer_type_selected = nil;
 /* List of NTP servers already found */
 list <string> found_servers_cache = [];
 
+/* The 'Current Record' when NTP is being initialized, see bug 177575 */
+map <string, any> selected_record_during_init = $[];
+
 /**
  * Save the configuration and restart NTP deamon
  */
@@ -200,10 +203,16 @@ define symbol complexButtonHandle (string key, map event) ``{
 	if ((boolean) UI::QueryWidget (`id ("server_address"), `Enabled) &&
 	  NtpClient::selected_record["address"]:nil != nil &&
 	  NtpClient::selected_record["address"]:"" != "") {
-	    NtpClient::selected_record["type"] = "server";
-	    NtpClient::selected_record["initial_sync"] = true;
-	    y2milestone("Storing the current address record: %1", NtpClient::selected_record);
-	    NtpClient::storeSyncRecord();
+	    // Save the server_address only when changed
+	    // do not re-add it (with defaut values) - bug 177575
+	    if (selected_record_during_init["address"]:"" == NtpClient::selected_record["address"]:"") {
+		y2milestone("The currently selected server is the same as when starting the module...");
+	    } else {
+		NtpClient::selected_record["type"] = "server";
+		NtpClient::selected_record["initial_sync"] = true;
+		y2milestone("Storing the current address record: %1", NtpClient::selected_record);
+		NtpClient::storeSyncRecord();
+	    }
 	// deleting the current record if current server address is empty
 	} else if (NtpClient::selected_record["address"]:"" == "") {
 	    // delete only the server record if there is some current server record
@@ -463,6 +472,7 @@ define void overviewInit (string id) ``{
  * @param id any widget id
  */
 define void addressInit (string id) ``{
+    selected_record_during_init = NtpClient::selected_record;
     UI::ChangeWidget (`id (id), `Value,
 	NtpClient::selected_record["address"]:"");
     UI::SetFocus (`id (id));
@@ -480,9 +490,18 @@ define void addressStore (string id, map event) ``{
     NtpClient::selected_record["address"] = UI::QueryWidget (`id (id), `Value);
     if (NtpClient::simple_dialog)
     {
-	y2milestone("Storing the server address in simple configuration");
-	NtpClient::selected_record["type"] = "server";
-	NtpClient::selected_record["initial_sync"] = true;
+	// Save the server_address only when changed
+	// do not re-add it (with defaut values) - bug 177575
+	if (selected_record_during_init["address"]:"" == NtpClient::selected_record["address"]:"")
+	{
+	    y2milestone("The currently selected server is the same as when starting the module...");
+	}
+	else
+	{
+	    y2milestone("Storing the server address in simple configuration");
+	    NtpClient::selected_record["type"] = "server";
+	    NtpClient::selected_record["initial_sync"] = true;
+	}
     }
 }
 
@@ -558,6 +577,7 @@ define symbol serverAddressHandle (string id, map event) {
  * @param id any widget id
  */
 define void initSyncInit (string id) ``{
+    y2milestone("Selected %1", NtpClient::selected_record);
     UI::ChangeWidget (`id ("init_sync"), `Value,
 	NtpClient::selected_record["initial_sync"]:false);
 }
