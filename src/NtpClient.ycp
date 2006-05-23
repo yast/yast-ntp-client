@@ -462,10 +462,10 @@ global define void ActivateRandomPoolServersFunction () {
     map <string, map <string, any> > store_current_options = $[];
     foreach (map <string, any> one_record, ntp_records, {
 	if (one_record["type"]:"" == "server" && one_record["address"]:"" != "") {
-	    string one_address = one_record["address"]:"";
-	    store_current_options[one_address]                 = $[];
-	    store_current_options[one_address, "options"]      = one_record["options"]:"";
-	    store_current_options[one_address, "initial_sync"] = one_record["initial_sync"]:true;
+	    string one_address					= one_record["address"]:"";
+	    store_current_options[one_address]                  = $[];
+	    store_current_options[one_address, "options"]       = one_record["options"]:"";
+	    store_current_options[one_address, "initial_sync"]  = one_record["initial_sync"]:true;
 	}
     });
 

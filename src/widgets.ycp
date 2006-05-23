@@ -171,11 +171,20 @@ fully qualified hostname, IPv4 address, or IPv6 address."), server_1));
  */
 boolean ServerAddressIsInConfiguration () {
     boolean ret = false;
+    boolean rss = NtpClient::IsRandomServersServiceEnabled();
 
     foreach (map<string, any> one_record, NtpClient::ntp_records, {
+	// checking for server
 	if (one_record["type"]:nil == "server") {
-	    ret = true;
-	    break;
+	    // RandomServersService is disabled
+	    if (!rss) {
+		ret = true;
+		break;
+	    // RandomServersService is enabled, don't take servers from RSS
+	    } else if (!contains(NtpClient::random_pool_servers, one_record["address"]:"")) {
+		ret = true;
+		break;
+	    }
 	}
     });
 

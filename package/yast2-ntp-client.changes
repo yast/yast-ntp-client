@@ -5,6 +5,8 @@ Mon May 22 16:12:12 CEST 2006 - locilka@suse.cz
   configuration, current server was allways re-added with
   initial_sync==true even if there was no reason to change
   the current value of initial_sync (#177575).
+- Remember all servers correctly when random pool servers are
+  selected (#177570).
 - 2.13.11
 
 -------------------------------------------------------------------
