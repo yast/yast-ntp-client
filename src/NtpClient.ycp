@@ -620,13 +620,14 @@ global define boolean Write() ``{
     init = filter (any i, init, ``(i != nil));
     string init_str = mergestring ((list<string>)init, " ");
 
+    // if DHCLIENT_MODIFY_NTP_CONF, NTPD_INITIAL = AUTO
+    if (update_dhcp) {
+	init_str = "AUTO";
     // Don't remove the AUTO key, something should be present for initialization
     // if there is no NTP server set explicitly
-    if (size (init) == 0)
-    {
+    } else if (size (init) == 0) {
 	string orig_init = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
-	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-")
-	{
+	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-") {
 	    init_str = orig_init;
 	}
     }

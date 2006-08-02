@@ -158,7 +158,7 @@ define symbol MainDialog () ``{
     ), `HSpacing (1));
 
     // dialog caption
-    string caption = _("Complex NTP Configuration");
+    string caption = _("Advanced NTP Configuration");
     string help = CWM::MergeHelps (w);
     contents = CWM::PrepareDialog (contents, w);
     Wizard::SetContentsButtons (caption, contents, help,
