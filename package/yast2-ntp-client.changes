@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Wed Aug  2 17:15:43 CEST 2006 - locilka@suse.cz
+
+- Complex configuration renamed to Advanced configuration (#179476)
+
+-------------------------------------------------------------------
+Tue Jul 18 15:05:25 CEST 2006 - locilka@suse.cz
+
+- NTP Client renamed to NTP Configuration because one can also
+  configure an NTP Server here (#173411).
+- 2.13.12 
+
+-------------------------------------------------------------------
 Mon May 22 16:12:12 CEST 2006 - locilka@suse.cz
 
 - When switchich to the complex configuration or saving the simple

@@ -20,6 +20,6 @@ X-SuSE-YaST-AutoInstResource=ntp-client
 Icon=yast-ntp-client
 Exec=/sbin/yast2 ntp-client 
 
-Name=NTP Client
-GenericName=Configure an NTP client
+Name=NTP Configuration
+GenericName=Configure an NTP client or server
 X-KDE-SubstituteUID=true

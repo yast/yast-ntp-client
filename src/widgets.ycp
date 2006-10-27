@@ -231,7 +231,7 @@ define symbol complexButtonHandle (string key, map event) ``{
 	    }
 	}
 
-	y2milestone("Switching to complex configuration...");
+	y2milestone("Switching to advanced configuration...");
 	return `complex;
     }
     ntpEnabledOrDisabled (key, event);
@@ -493,7 +493,7 @@ define void addressInit (string id) ``{
  * @param event map event that caused storing process
  */
 define void addressStore (string id, map event) ``{
-    // Don't store anything in case of switching to the complex configuration
+    // Don't store anything in case of switching to the advanced configuration
     if (event["ID"]:nil == `complex) return;
 
     NtpClient::selected_record["address"] = UI::QueryWidget (`id (id), `Value);
@@ -529,7 +529,7 @@ define boolean serverAddressValidate (string id, map event) {
 	return true;
     }
     // do not check the server IP/Host when changing dialog to "Select"
-    //   or when switching to the complex configuration
+    //   or when switching to the advanced configuration
     if (event["ID"]:nil == `select_local || event["ID"]:nil == `select_public || event["ID"]:nil == `complex) {
 	return true;
     }
@@ -1105,7 +1105,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	"complex_button" : $[
 	    "widget" : `push_button,
 	    // push button label
-	    "label" : _("Co&mplex Configuration"),
+	    "label" : _("Ad&vanced Configuration"),
 	    "help" : HELPS["complex_button"]:"",
 	    "handle_events" : [ "complex_button", "never", "boot" ],
 	    "handle" : complexButtonHandle,

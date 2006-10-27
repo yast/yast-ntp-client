@@ -65,9 +65,9 @@ To assign NTP-related firewall settings or display the log of the NTP
 daemon, select <b>Advanced</b>.</p>"),
 
     // help text to a button
-    "complex_button" : _("<p><b><big>Complex configuration</big></b><br>
+    "complex_button" : _("<p><b><big>Advanced configuration</big></b><br>
 To configure this host to synchronize against multiple remote hosts or against
-a locally connected clock, use <b>Complex Configuration</b>."),
+a locally connected clock, use <b>Advanced Configuration</b>."),
 
     // help text 1/4
     "clock_type" : _("<p><b><big>Clock Type</big></b><br>
