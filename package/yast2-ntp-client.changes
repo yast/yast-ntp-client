@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Oct 30 09:45:30 CET 2006 - kmachalkova@suse.cz
+
+- Improved Autoyast profile validation (ntpclient.rnc moved from
+  autoyast package (#215248)
+- Always set NTP_INITIAL_NTPDATE to AUTO if ntp.conf is modified
+  via DHCP
+- 2.14.0  
+
+-------------------------------------------------------------------
 Wed Aug  2 17:15:43 CEST 2006 - locilka@suse.cz
 
 - Complex configuration renamed to Advanced configuration (#179476)

@@ -12,10 +12,11 @@ X-SuSE-YaST-Group=Net_advanced
 X-SuSE-YaST-Argument=
 X-SuSE-YaST-RootOnly=true
 X-SuSE-YaST-AutoInst=all
-X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=ntp-client
+X-SuSE-YaST-AutoInstClonable=true
+X-SuSE-YaST-AutoInstSchema=ntpclient.rnc
 
 Icon=yast-ntp-client
 Exec=/sbin/yast2 ntp-client 

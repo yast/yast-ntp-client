@@ -37,7 +37,7 @@ peer_address = element address { text }
 peers =
   element peers {
     LIST,
-    peer+
+    peer*
   }
 start_at_boot =
   element start_at_boot { BOOLEAN }
