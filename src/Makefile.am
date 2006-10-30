@@ -25,7 +25,11 @@ desktop_DATA =			\
 module_DATA =			\
 	NtpClient.ycp
 
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
+rncdir= $(schemadir)/autoyast/rnc/
+rnc_DATA =			\
+	ntpclient.rnc
+
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA) $(rnc_DATA)
 
 
 ntp-client:

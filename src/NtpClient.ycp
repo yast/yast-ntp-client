@@ -621,7 +621,7 @@ global define boolean Write() ``{
     string init_str = mergestring ((list<string>)init, " ");
 
     // if DHCLIENT_MODIFY_NTP_CONF, NTPD_INITIAL = AUTO
-    if (update_dhcp) {
+    if (config_dhcp) {
 	init_str = "AUTO";
     // Don't remove the AUTO key, something should be present for initialization
     // if there is no NTP server set explicitly

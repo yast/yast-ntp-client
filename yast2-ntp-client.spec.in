@@ -31,3 +31,4 @@ Summary:	Configuration of ntp-client
 @desktopdir@/ntp-client.desktop
 @ydatadir@/ntp_servers.ycp
 %doc @docdir@
+@schemadir@/autoyast/rnc/ntpclient.rnc
