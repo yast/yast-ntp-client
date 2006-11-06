@@ -481,9 +481,14 @@ define void overviewInit (string id) ``{
  * @param id any widget id
  */
 define void addressInit (string id) ``{
-    selected_record_during_init = NtpClient::selected_record;
-    UI::ChangeWidget (`id (id), `Value,
-	NtpClient::selected_record["address"]:"");
+    string ad = NtpClient::ad_controller;
+    if ( ad != "")
+        UI::ChangeWidget(`id(id), `Value, ad);
+    else {
+        selected_record_during_init = NtpClient::selected_record;
+        UI::ChangeWidget (`id (id), `Value,
+	    NtpClient::selected_record["address"]:"");
+    }
     UI::SetFocus (`id (id));
 }
 

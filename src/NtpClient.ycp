@@ -16,6 +16,7 @@ module "NtpClient";
 textdomain "ntp-client";
 
 import "Directory";
+import "FileUtils";
 import "Message";
 import "Mode";
 import "NetworkDevices";
@@ -86,6 +87,11 @@ global integer selected_index = -1;
   * The currently sellected item
   */
 global map<string,any> selected_record = $[];
+
+/**
+  * Active Directory controller
+  */
+global string ad_controller = "";
 
 ///**
 //  * Should the firewall settings be changed?
@@ -257,6 +263,19 @@ global define boolean Read() ``{
     }
 
     run_service = Service::Enabled (service_name);
+
+    //Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
+    string ad_ntp_file = Directory::vardir + "/ad_ntp_data.ycp";
+    if(FileUtils::Exists(ad_ntp_file)) {
+	y2milestone("Reading %1", ad_ntp_file);
+	map <string, string> ad_ntp_data = (map <string, string>) SCR::Read(.target.ycp, ad_ntp_file);
+	ad_controller = ad_ntp_data["ads"]:"";
+	if(ad_controller != "") {
+	    y2milestone("Got %1 for ntp sync, deleting %2, since it is no longer needed", ad_controller, ad_ntp_file);
+	    SCR::Execute(.target.remove, ad_ntp_file);
+	}
+    }
+
 
     map conf = (map)SCR::Read (.etc.ntp_conf.all);
     if (conf == nil)
