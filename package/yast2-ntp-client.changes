@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Nov  6 14:16:06 CET 2006 - kmachalkova@suse.cz
+
+- Set ActiveDirectory DC as a default time server when called from
+  samba-client
+- 2.14.1 
+
+-------------------------------------------------------------------
 Mon Oct 30 09:45:30 CET 2006 - kmachalkova@suse.cz
 
 - Improved Autoyast profile validation (ntpclient.rnc moved from
