@@ -1,9 +1,16 @@
 -------------------------------------------------------------------
+Fri Nov 10 17:55:30 CET 2006 - kmachalkova@suse.cz
+
+- Don't forget to store type of ntp record (simple config -> server) 
+ (#216456) 
+- 2.13.15 
+
+-------------------------------------------------------------------
 Mon Nov  6 14:19:42 CET 2006 - kmachalkova@suse.cz
 
 - Set ActiveDirectory DC as a default time server when called from
   samba-client
-- 2.14.1
+- 2.13.14
 
 -------------------------------------------------------------------
 Mon Oct 30 09:53:30 CET 2006 - kmachalkova@suse.cz

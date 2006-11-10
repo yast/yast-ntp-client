@@ -938,7 +938,10 @@ void ServerListStore (string id, map event) {
 	return;
     }
     string address = (string)UI::QueryWidget (`id (`servers), `Value);
+    y2milestone("porn.bat");
     NtpClient::selected_record["address"] = address;
+    //Do not forget to add type of the record - here we have 'server' (#216456)
+    NtpClient::selected_record["type"] = "server";
 }
 
 /**
