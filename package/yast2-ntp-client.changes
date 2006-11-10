@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Nov 10 18:04:03 CET 2006 - kmachalkova@suse.cz
+
+- Don't forget to store type of ntp record (simple config -> server)
+ (#216456)
+- 2.14.2 
+
+-------------------------------------------------------------------
 Mon Nov  6 14:16:06 CET 2006 - kmachalkova@suse.cz
 
 - Set ActiveDirectory DC as a default time server when called from
