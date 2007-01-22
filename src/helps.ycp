@@ -60,9 +60,8 @@ peer, click <b>Add</b>. To delete an existing synchronization peer,
 select it and click <b>Delete</b>.</p>")
     +
     // help text 5/5
-    _("<p><b><big>Advanced Functions</big></b><br>
-To assign NTP-related firewall settings or display the log of the NTP
-daemon, select <b>Advanced</b>.</p>"),
+    _("<p><b><big>Display Log </big></b><br>
+To view the logs of NTP daemon in new window, click on <b>Display Log</b> button.</p>"),
 
     // help text to a button
     "complex_button" : _("<p><b><big>Advanced configuration</big></b><br>

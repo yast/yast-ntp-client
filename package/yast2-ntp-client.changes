@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Jan 22 11:09:09 CET 2007 - kmachalkova@suse.cz
+
+- Correct handling of switching between simple and advanced config
+  (display current server entries in server table) (#230240)
+- Updated obsolete help text
+- 2.15.0
+ 
+-------------------------------------------------------------------
 Fri Nov 10 18:04:03 CET 2006 - kmachalkova@suse.cz
 
 - Don't forget to store type of ntp record (simple config -> server)

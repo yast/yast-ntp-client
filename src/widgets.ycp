@@ -481,13 +481,18 @@ define void overviewInit (string id) ``{
  * @param id any widget id
  */
 define void addressInit (string id) ``{
+    //remember selected_record_during_init only when the module is started
+    //#230240
+    if (selected_record_during_init == $[]){
+        selected_record_during_init = NtpClient::selected_record;
+    }
+
     string ad = NtpClient::ad_controller;
     if ( ad != "")
         UI::ChangeWidget(`id(id), `Value, ad);
     else {
-        selected_record_during_init = NtpClient::selected_record;
         UI::ChangeWidget (`id (id), `Value,
-	    NtpClient::selected_record["address"]:"");
+	NtpClient::selected_record["address"]:"");
     }
     UI::SetFocus (`id (id));
 }
