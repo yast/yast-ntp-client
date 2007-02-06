@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb  6 10:32:24 CET 2007 - kmachalkova@suse.cz
+
+- Merged 'Great Britain' and 'UK' public ntp server lists (#241054)
+- 2.13.17 
+
+-------------------------------------------------------------------
 Mon Jan 22 10:56:48 CET 2007 - kmachalkova@suse.cz
 
 - Correct handling of switching between simple and advanced config 
