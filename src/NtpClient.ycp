@@ -151,7 +151,14 @@ global define map <string, string> GetAllKnownCountries () {
 	countries_already_read = true;
 	if (known_countries == nil) known_countries = $[];
     }
-    
+
+    //workaround bug #241054: servers in United Kingdom are in domain .uk
+    // domain .gb does not exist - add UK to the list of known countries
+    if (haskey(known_countries, "GB")){
+	known_countries["UK"] = known_countries["GB"]:"";
+	known_countries = remove(known_countries,"GB");
+    }
+
     return known_countries;
 }
 
