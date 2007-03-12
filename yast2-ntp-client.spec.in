@@ -1,8 +1,10 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	yast2-slp perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-Requires:	yast2 yast2-slp yast2-country
+BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
+#SLPAPI.pm 
+Requires:	yast2 >= 2.15.17 
+Requires:	yast2-country 
 
 BuildArchitectures:	noarch
 

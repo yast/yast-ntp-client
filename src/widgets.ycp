@@ -15,7 +15,7 @@ import "Confirm";
 import "Popup";
 import "Label";
 import "LogView";
-import "SLP";
+import "SLPAPI";
 import "NetworkDevices";
 import "NtpClient";
 import "CWMFirewallInterfaces";

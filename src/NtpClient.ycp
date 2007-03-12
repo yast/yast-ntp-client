@@ -24,7 +24,7 @@ import "PackageSystem";
 import "Progress";
 import "Report";
 import "Service";
-import "SLP";
+import "SLPAPI";
 import "Summary";
 import "SuSEFirewall";
 
@@ -862,7 +862,24 @@ global boolean TestNtpServer (string server, boolean silent) {
 global list<string> DetectNtpServers (symbol method) {
     if (method == `slp)
     {
-	list<map> servers = SLP::FindSrvs ("service:ntp", "");
+	string required_package = "yast2-slp";
+
+	if ( !PackageSystem::Installed(required_package) )
+	{
+	    if ( !PackageSystem::CheckAndInstallPackages( [required_package] ) )
+	    {
+		Report::Error( sformat(_("Cannot search for NTP server in local network
+without having package %1 installed."), required_package) );
+		y2warning("Not searching for local NTP servers via SLP");
+		return [];
+	    }
+	    else
+	    {
+		SCR::RegisterAgent(.slp, `ag_slp(`SlpAgent()));
+	    }
+	}
+
+	list<map> servers = SLPAPI::FindSrvs ("service:ntp", "");
 	list<string> server_names = maplist (map m, servers, ``(
 	    (string)(m["pcHost"]:"")
 	));

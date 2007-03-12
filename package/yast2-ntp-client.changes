@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar 12 12:01:39 CET 2007 - kmachalkova@suse.cz
+
+- Removed dependency on yast2-slp - install yast2-slp package only
+  when needed (scan for local NTP servers)
+- 2.15.2 
+
+-------------------------------------------------------------------
 Tue Feb  6 11:09:08 CET 2007 - kmachalkova@suse.cz
 
 - Merged 'Great Britain' and 'UK' public ntp server lists (#241054)
