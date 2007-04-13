@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Apr 13 16:42:50 CEST 2007 - kmachalkova@suse.cz
+
+- Use 'ntpdate -q' (query only) when testing if ntp server is accesible,
+  do not hard-set the time 
+- Updated list of public ntp servers
+- 2.15.3 
+
+-------------------------------------------------------------------
 Mon Mar 12 12:01:39 CET 2007 - kmachalkova@suse.cz
 
 - Removed dependency on yast2-slp - install yast2-slp package only
