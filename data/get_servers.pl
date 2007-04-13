@@ -75,9 +75,10 @@ foreach my $url (@mills_urls) {
 	}
 	
 	# Relative server address cannot work well everywhere
-	if ($server_ref->{"address"} =~ /\./) {
-	    $server_ref->{"address"} .= ".";
-	}
+	# and this doesn't work as well :(
+	#if ($server_ref->{"address"} =~ /\./) {
+	#    $server_ref->{"address"} .= ".";
+	#}
     }
     close (PAGE);
     if (defined ($server_ref))
@@ -89,7 +90,7 @@ foreach my $url (@mills_urls) {
 #test all of them
 @servers = grep {
     my $hostname = $_->{"address"};
-    my $status = system ("sudo /usr/sbin/ntpdate $hostname");
+    my $status = system ("sudo /usr/sbin/ntpdate -q $hostname");
     $status == 0;
 } @servers;
 

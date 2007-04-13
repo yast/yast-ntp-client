@@ -14,7 +14,7 @@ while ($line = <IN>)
     if ($line =~ /\"address\".*:.*\"(.+)\"/) 
     {
 	my $server = $1;
-	my $status = system ("sudo /usr/sbin/ntpdate $server");
+	my $status = system ("sudo /usr/sbin/ntpdate -q $server");
 	if ($status == 0)
 	{
 	    print "$server is accessible.\n";
