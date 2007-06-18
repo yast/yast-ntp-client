@@ -12,6 +12,7 @@
 textdomain "ntp-client";
 
 import "CWM";
+import "CWMTab";
 import "Label";
 import "NtpClient";
 import "Popup";
@@ -19,6 +20,7 @@ import "SuSEFirewall";
 import "Wizard";
 import "Report";
 import "Confirm";
+
 
 include "ntp-client/misc.ycp";
 include "ntp-client/widgets.ycp";
@@ -134,16 +136,27 @@ define symbol SimpleDialog () ``{
  */
 define symbol MainDialog () ``{
     NtpClient::simple_dialog = false;
-    list<map<string,any> > w = CWM::CreateWidgets (["start", "run_chroot", "config_dhcp", "firewall", "overview"],
-	GetWidgets ());
-    term contents = `HBox (`HSpacing (1), `VBox (
+
+    term tab1 = `HBox (`HSpacing (1), `VBox (
 	`VSpacing (1),
 	`HBox (
 	    `VBox (
 		"start",
 		`VSpacing(),
-		`Left ("run_chroot"),
 		`Left ("config_dhcp"),
+		`VSpacing()
+	    )
+	),
+	`VSpacing (1),
+	"overview",
+	`VSpacing(1)
+    ), `HSpacing (1));
+
+  term tab2 = `HBox (`HSpacing (1), `VBox (
+	`VSpacing (1),
+	`HBox (
+	    `VBox (
+		`Left ("run_chroot"),
 		`VSpacing(),
 		`Frame (
 		    // TRANSLATORS: UI frame label
@@ -152,10 +165,34 @@ define symbol MainDialog () ``{
 		)
 	    )
 	),
-	`VSpacing (1),
-	"overview",
-	`VSpacing (1)
+	`VStretch()
     ), `HSpacing (1));
+
+    map <string, any> tabs = $[
+	"general" : $[
+	    "header" : _("General Settings"),
+	    "contents" : tab1,
+	    "widget_names" : ["start", "config_dhcp", "overview"],
+	],
+	"security" : $[
+	    "header" : _("Security Settings"),
+	    "contents" :tab2,
+	    "widget_names" : [ "run_chroot", "firewall"]
+	]
+    ];
+
+    map <string, any> wd = $[
+	"tab" : CWMTab::CreateWidget ($[
+	    "tab_order" : ["general", "security"],
+	    "tabs" : tabs,
+	    "widget_descr" : GetWidgets(),
+	    "initial_tab" : "general",
+	    "tab_help" : "" 
+	    ])
+    ];
+
+    term contents = `VBox("tab");
+    list<map <string, any> > w = CWM::CreateWidgets (["tab"], (map <string, map <string, any> >)wd);
 
     // dialog caption
     string caption = _("Advanced NTP Configuration");
@@ -166,7 +203,6 @@ define symbol MainDialog () ``{
     Wizard::HideBackButton();
     Wizard::SetAbortButton(`abort, Label::CancelButton() );
 
-    startInit (nil);
     CWM::handleWidgets (w, $["ID" : "never"]);
 
     return CWM::Run (w,
