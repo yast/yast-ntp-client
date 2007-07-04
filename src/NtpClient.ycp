@@ -25,6 +25,7 @@ import "Progress";
 import "Report";
 import "Service";
 import "SLPAPI";
+import "String";
 import "Summary";
 import "SuSEFirewall";
 
@@ -52,6 +53,7 @@ global boolean write_only = false;
  */
 global list<map<string, any> > ntp_records = [];
 
+global map <string, map <string,any> > restrict_map = $[];
 
 /**
   * Should the daemon be started when system boots?
@@ -226,7 +228,6 @@ global define boolean Read() ``{
 
     integer steps = 2;
     integer sl = 500;
-
     // We do not set help text here, because it was set outside
     Progress::New( caption, " ", steps, [
 	    // progress stage
@@ -299,7 +300,7 @@ global define boolean Read() ``{
 	string options = "";
 	if (contains ([
 	    "server", "peer", "broadcast", "broadcastclient", "manycast",
-	    "manycastclient", "fudge" ],
+	    "manycastclient", "fudge", "restrict" ],
 	    type))
 	{
 	    list<string> l = splitstring (address, " \t");
@@ -324,8 +325,37 @@ global define boolean Read() ``{
 	string key = m["address"]:"";
 	return $[key: m];
     });
+
+    list<map<string, any> > restrict_records = filter (map<string,any> m, ntp_records, ``(
+	m["type"]:"" == "restrict"
+    ));
+
+    restrict_map = (map <string, map <string,any> > )listmap (map m, restrict_records,
+    {
+	string key = m["address"]:"";
+	map value = $[];
+
+	list <string> opts = splitstring( String::CutBlanks( m["options"]:"" ), " \t");
+	if ( opts[0]:""  == "mask") {
+	    value["mask"] = opts[1]:"";
+	    opts[0] = ""; opts[1] = "";
+	}
+	else {
+	    value["mask"] = "";
+	}
+
+	value["options"] = String::CutBlanks( mergestring(opts, " "));
+	value["comment"] = m["comment"]:"";
+
+	return $[key: value];
+    });
+
     ntp_records = filter (map<string,any> m, ntp_records, ``(
 	m["type"]:"" != "fudge"
+    ));
+
+    ntp_records = filter (map<string,any> m, ntp_records, ``(
+	m["type"]:"" != "restrict"
     ));
 
     ntp_records = (list<map<string,any> >)maplist (map m, ntp_records, ``{
@@ -583,6 +613,17 @@ global define boolean Write() ``{
     }
     else
     {
+      foreach (string key, map <string, any> m, restrict_map, {
+	map <string, any> ret = $[
+	   "address" : key,
+	   "comment" : m["comment"]:"",
+	   "type" : "restrict",
+	   "options": ((m["mask"]:"" != "") ? " mask " + m["mask"]:"" : "" ) + " " +
+		      m["options"]:"",
+        ];
+	ntp_records = add(ntp_records, ret);
+      });
+
       y2milestone ("Writing settings %1", ntp_records);
 
       list<map<string, any> > save2 = (list<map<string, any> >)flatten (maplist(

@@ -628,6 +628,30 @@ define void optionsStore (string id, map event) ``{
     NtpClient::selected_record["options"] = UI::QueryWidget (`id ("options"), `Value);
 }
 
+define void restrictOptionsInit ( string id ) ``{
+    string address = NtpClient::selected_record["address"]:"";
+    if( haskey( NtpClient::restrict_map, address) )
+    {
+	UI::ChangeWidget(`id(`use_ac), `Value, true);
+	UI::ChangeWidget(`id("ac_opts"), `Value, NtpClient::restrict_map[address,"options"]:"");
+    }
+}
+
+define void restrictOptionsStore (string id, map event ) ``{
+    string address = NtpClient::selected_record["address"]:"";
+    string opts = (string) UI::QueryWidget(`id("ac_opts"), `Value);
+
+    if( haskey( NtpClient::restrict_map, address) )
+        NtpClient::restrict_map[address, "options"] = opts;
+    else
+    {
+	NtpClient::restrict_map[address] = $[
+	   "comment" : "",
+	   "mask" : "",
+	   "options" : opts,
+	];
+    }
+}
 /**
  * Initialize the widget
  * @param id any widget id
@@ -1307,6 +1331,20 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "store" : optionsStore,
 	    "help" : HELPS["options"]:"",
 	],
+        "ac_options" : $[
+	    "widget" : `custom,
+	    "custom_widget" : `CheckBoxFrame (
+		`id(`use_ac), _("Apply Access Control for This Server"), false,
+		`VBox(
+	            `VSpacing(0.5),
+                    `Left(`TextEntry(`id("ac_opts"),  "Access Control Options")),
+		    `VSpacing(0.5)
+		)
+	     ),
+	    "init" : restrictOptionsInit,
+	    "store" : restrictOptionsStore,
+	    "help": "",
+        ],
 	"peer_types" : $[
 	    "widget" : `radio_buttons,
 	    "items" : [

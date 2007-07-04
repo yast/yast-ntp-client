@@ -242,11 +242,16 @@ define symbol TypeSelectDialog () ``{
 define symbol ServerDialog () ``{
     term contents = `HBox (`HStretch (), `VBox (
 	`VSpacing (3),
-	"server_address",
-	`VSpacing (1),
-	`Left ("init_sync"),
-	`VSpacing (1),
-	"options",
+	`Frame( _("Server Settings"),
+	    `VBox (
+	    "server_address",
+	    `VSpacing (0.5),
+	    `Left ("init_sync"),
+	    `VSpacing (0.5),
+	    "options")
+	),
+	`VSpacing(1),
+	"ac_options",
 	`VSpacing (3)
     ), `HStretch ());
 
@@ -254,7 +259,7 @@ define symbol ServerDialog () ``{
     string caption = _("NTP Server");
 
     return CWM::ShowAndRun ($[
-	"widget_names" : ["server_address", "init_sync", "options"],
+	"widget_names" : ["server_address", "init_sync", "options", "ac_options"],
 	"widget_descr" : GetWidgets (),
 	"contents" : contents,
 	"caption" : caption,
