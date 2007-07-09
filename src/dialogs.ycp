@@ -203,7 +203,7 @@ define symbol MainDialog () ``{
     Wizard::HideBackButton();
     Wizard::SetAbortButton(`abort, Label::CancelButton() );
 
-    CWM::handleWidgets (w, $["ID" : "never"]);
+    //CWM::handleWidgets (w, $["ID" : "never"]);
 
     return CWM::Run (w,
 	 $[`abort : reallyExitComplex]);
