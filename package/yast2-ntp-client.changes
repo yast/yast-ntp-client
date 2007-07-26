@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Thu Jul 26 17:16:41 CEST 2007 - kmachalkova@suse.cz
+
+- UI redesign: advanced configuration dialog splitted into 'General'
+  and 'Security' settings tab 
+- New GetNtpServersByCountry function - to be used by yast2-timezone
+  (FaTE #302192)
+- 2.15.4
+
+-------------------------------------------------------------------
 Fri Apr 13 16:42:50 CEST 2007 - kmachalkova@suse.cz
 
 - Use 'ntpdate -q' (query only) when testing if ntp server is accesible,
