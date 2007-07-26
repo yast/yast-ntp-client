@@ -836,33 +836,8 @@ symbol ServerListHandle (string id, map event) {
     if (country != last_country)
     {
 	last_country = country;
-        map<string,string> country_names = $[];
-	map<string,map<string,string> > servers = NtpClient::GetNtpServers ();
-	if (country != "")
-	{
-	    servers = filter (string s, map<string,string> o, servers, {
-		return o["country"]:"" == country;
-	    });
-	}
-	else
-	{
-            country_names = NtpClient::GetCountryNames ();
-	}
-	list items = maplist (string s, map<string,string> o, servers, {
-	    string label = o["location"]:"";
-	    string l_country = o["country"]:"";
-	    if (country != "")
-		l_country = "";
-	    else
-		l_country = country_names[l_country]:l_country;
-	    if (label != "" && l_country != "")
-		label = sformat ("%1 (%2, %3)", s, label, l_country);
-	    else if (label == "" && l_country == "")
-		label = s;
-	    else
-		label = sformat ("%1 (%2%3)", s, label, l_country);
-	    return `item (`id (s), label);
-	});
+
+	list items = NtpClient::GetNtpServersByCountry ( country); 
 	UI::ReplaceWidget (`servers_rp,
 	    `VBox(
 		// Combobox has at least 40 characters
@@ -939,15 +914,9 @@ void ServerListInit (string id) {
 	    _("&Country"), countries));
     last_country = nil;
 
-    string lang = (string)SCR::Read (.sysconfig.language.RC_LANG);
+    string lang =  NtpClient::GetCurrentLanguageCode();
     if (lang != nil)
     {
-	// remove the .UTF-8 first
-        list<string> l = splitstring (lang, ".");
-        lang = l[0]:"";
-	// remove leading language (keep country only)
-        l = splitstring (lang, "_");
-	lang = l[size (l) - 1]:lang;
 	y2milestone ("Current language: %1", lang);
 	UI::ChangeWidget (`id (`country), `Value, lang);
     }
