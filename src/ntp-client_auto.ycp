@@ -96,7 +96,7 @@ else if (func == "Write") {
 }
 
 else if (func == "GetNtpServersByCountry") {
-    string cc = param["country"] : NtpClient::GetCurrentLanguageCode();
+    string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
     ret = NtpClient::GetNtpServersByCountry( cc );
 }
 /* Unknown function */
