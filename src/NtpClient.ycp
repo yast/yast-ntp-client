@@ -164,6 +164,10 @@ global define map <string, string> GetAllKnownCountries () {
     return known_countries;
 }
 
+/**
+ * Read current language (RC_LANG from sysconfig)
+ * @return two-letter language code (cs_CZ.UTF-8 -> CZ)
+ */
 global define string GetCurrentLanguageCode (  ) {
     string lang = (string)SCR::Read (.sysconfig.language.RC_LANG);
     if (lang != nil)
@@ -231,6 +235,11 @@ global map<string, string> GetCountryNames () {
     return country_names;
 }
 
+/**
+ * Get list of public NTP servers for a country
+ * @param country two-letter country code
+ * @return list of servers (usable as combo-box items)
+ */
 global list GetNtpServersByCountry ( string country ) {
     map<string,string> country_names = $[];
     map<string,map<string,string> > servers = GetNtpServers ();
