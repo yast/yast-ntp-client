@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Jul 27 16:00:59 CEST 2007 - kmachalkova@suse.cz
+
+- Added functionality to restrict NTP service to selected servers
+  only and to modify access control flags for individual servers
+  (FaTE #120109)
+- 2.15.5
+
+-------------------------------------------------------------------
 Thu Jul 26 17:16:41 CEST 2007 - kmachalkova@suse.cz
 
 - UI redesign: advanced configuration dialog splitted into 'General'

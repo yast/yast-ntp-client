@@ -266,6 +266,45 @@ define void chrootStore (string id, map event) ``{
     NtpClient::modified = true;
 }
 
+define void secureInit (string id) ``{
+   UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
+}
+
+define void secureStore (string id, map event) ``{
+    boolean restrict = (boolean)(UI::QueryWidget(`id(id),`Value));
+
+    if (restrict)
+    {
+	list <string> servers = NtpClient::GetUsedNtpServers();
+
+	if( NtpClient::restrict_map == $[] )
+	{
+	    NtpClient::restrict_map["default"] = $[
+		"mask" : "",
+		"comment" : "",
+		"options" : "ignore"
+	    ];
+
+	    NtpClient::restrict_map["127.0.0.1"] = $[
+		"mask" : "",
+		"comment" : "",
+		"options" : ""
+	    ];
+
+	    foreach (string s, servers, {
+		NtpClient::restrict_map[s] = $[
+		    "mask" : "",
+		    "comment" : "",
+		    "options" : "nomodify notrap noquery"
+		];
+	    });
+	}
+    }
+    else
+    {
+	NtpClient::restrict_map = $[];
+    }
+}
 /**
  * Initialize the widget
  * @param id any widget id
@@ -630,16 +669,23 @@ define void optionsStore (string id, map event) ``{
 
 define void restrictOptionsInit ( string id ) ``{
     string address = NtpClient::selected_record["address"]:"";
-    if( haskey( NtpClient::restrict_map, address) )
+    if ( NtpClient::restrict_map == $[] )
     {
-	UI::ChangeWidget(`id(`use_ac), `Value, true);
-	UI::ChangeWidget(`id("ac_opts"), `Value, NtpClient::restrict_map[address,"options"]:"");
+	UI::ChangeWidget(`id("ac_options"), `Enabled, false);
+    }
+    else
+    {
+        if( haskey( NtpClient::restrict_map, address) )
+	    UI::ChangeWidget(`id("ac_options"), `Value, NtpClient::restrict_map[address,"options"]:"");
+
+	else
+	    UI::ChangeWidget(`id("ac_options"), `Value, "notrap nomodify noquery");
     }
 }
 
 define void restrictOptionsStore (string id, map event ) ``{
     string address = NtpClient::selected_record["address"]:"";
-    string opts = (string) UI::QueryWidget(`id("ac_opts"), `Value);
+    string opts = (string) UI::QueryWidget(`id("ac_options"), `Value);
 
     if( haskey( NtpClient::restrict_map, address) )
         NtpClient::restrict_map[address, "options"] = opts;
@@ -1149,6 +1195,13 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "handle" : ntpEnabledOrDisabled,
 	    "help" : HELPS["chroot_environment"]:"",
 	],
+	"secure"   : $[
+	    "widget" : `checkbox,
+	    //TRANSLATORS:
+	    "label"  : _("&Restrict NTP Service to Configured Servers Only "),
+	    "init"   : secureInit,
+	    "store"  : secureStore,
+        ],
 	"config_dhcp" : $[
 	    "widget" : `checkbox,
 	    "opt" : [ `notify ],
@@ -1301,15 +1354,8 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "help" : HELPS["options"]:"",
 	],
         "ac_options" : $[
-	    "widget" : `custom,
-	    "custom_widget" : `CheckBoxFrame (
-		`id(`use_ac), _("Apply Access Control for This Server"), false,
-		`VBox(
-	            `VSpacing(0.5),
-                    `Left(`TextEntry(`id("ac_opts"),  "Access Control Options")),
-		    `VSpacing(0.5)
-		)
-	     ),
+	    "widget" : `textentry,
+	    "label"  : "Access Control Options ",
 	    "init" : restrictOptionsInit,
 	    "store" : restrictOptionsStore,
 	    "help": "",
