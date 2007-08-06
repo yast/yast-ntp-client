@@ -1205,6 +1205,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "label"  : _("&Restrict NTP Service to Configured Servers Only "),
 	    "init"   : secureInit,
 	    "store"  : secureStore,
+	    "help"   : HELPS["secure"]:"",
         ],
 	"config_dhcp" : $[
 	    "widget" : `checkbox,
@@ -1362,7 +1363,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "label"  : "Access Control Options ",
 	    "init" : restrictOptionsInit,
 	    "store" : restrictOptionsStore,
-	    "help": "",
+	    "help": HELPS["restrict"]:"",
         ],
 	"peer_types" : $[
 	    "widget" : `radio_buttons,

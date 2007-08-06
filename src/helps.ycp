@@ -45,6 +45,14 @@ To run the NTP daemon in chroot jail, set
 <b>Run NTP Daemon in Chroot Jail</b>. Starting any daemon in a chroot jail
 is more secure and strongly recommended.</p>"),
 
+    "secure" : _("<p><b><big>Restricting NTP Service</big></b><br>
+By selecting the option <b>Restrict NTP Service to Configured Servers Only</b>
+you prohibit general access to NTP service on your computer and restrict it
+only to those servers listed in <i>/etc/ntp.conf</i> and localhost. Access 
+control flags can be fine-tuned by editing corresponding server entry in
+servers overview table. This option is however not available, if NTP is 
+configured via DHCP.</p>"),
+
     // help text 3/5
     "config_dhcp" : _("<p><b><big>Configuring via DHCP</big></b><br>
 To retrieve the information about NTP servers via the DHCP protocol from
@@ -133,6 +141,14 @@ started. To use this host for initial synchronization, select
 To fine tune the synchronization source, write the options to the
 <b>Options</b> text field. For details, see
 <i>/usr/share/doc/packages/xntp-doc/html/confopt.htm</i>.</p>"),
+
+    "restrict" : _("<p><b><big>Access Control Options</big></b><br>
+Here you can define access control flags (<i>restrict</i> directive in <i>
+/etc/ntp.conf</i>) for this server, indicating which type of packets you
+wish to accept from it. This option is only available if you have
+chosen <b>Restrict NTP Service to Configured Servers Only</b> option in
+<b>Security Settings</b>.</p>
+"),
 
     // help text 1/6
     "peer_types" : _("<p><b><big>Synchronization Peer Type</big></b><br>
