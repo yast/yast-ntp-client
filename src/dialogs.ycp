@@ -250,10 +250,11 @@ define symbol ServerDialog () ``{
 	    `VSpacing (0.5),
 	    `Left ("init_sync"),
 	    `VSpacing (0.5),
-	    "options")
+	    "options",
+	    `VSpacing(0.5),
+	    "ac_options",
+	    `VSpacing(0.5))
 	),
-	`VSpacing(1),
-	"ac_options",
 	`VSpacing (3)
     ), `HStretch ());
 
