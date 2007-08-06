@@ -267,7 +267,11 @@ define void chrootStore (string id, map event) ``{
 }
 
 define void secureInit (string id) ``{
-   UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
+    y2milestone("Restrict %1", NtpClient::restrict_map);
+    if (NtpClient::config_dhcp)
+	UI::ChangeWidget(`id("secure"), `Enabled, false);
+    else
+	UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
 }
 
 define void secureStore (string id, map event) ``{
@@ -669,7 +673,7 @@ define void optionsStore (string id, map event) ``{
 
 define void restrictOptionsInit ( string id ) ``{
     string address = NtpClient::selected_record["address"]:"";
-    if ( NtpClient::restrict_map == $[] )
+    if ( NtpClient::restrict_map == $[] || NtpClient::config_dhcp)
     {
 	UI::ChangeWidget(`id("ac_options"), `Enabled, false);
     }

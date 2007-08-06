@@ -158,6 +158,8 @@ define symbol MainDialog () ``{
 	    `VBox (
 		`Left ("run_chroot"),
 		`VSpacing(),
+		`Left ("secure"),
+		`VSpacing(),
 		`Frame (
 		    // TRANSLATORS: UI frame label
 		    _("Firewall Settings"),
@@ -177,7 +179,7 @@ define symbol MainDialog () ``{
 	"security" : $[
 	    "header" : _("Security Settings"),
 	    "contents" :tab2,
-	    "widget_names" : [ "run_chroot", "firewall"]
+	    "widget_names" : [ "run_chroot", "secure", "firewall"]
 	]
     ];
 
