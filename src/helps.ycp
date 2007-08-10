@@ -45,12 +45,13 @@ To run the NTP daemon in chroot jail, set
 <b>Run NTP Daemon in Chroot Jail</b>. Starting any daemon in a chroot jail
 is more secure and strongly recommended.</p>"),
 
-    "secure" : _("<p><b><big>Restricting NTP Service</big></b><br>
+    "secure" : _("<p><b><big>Secure NTP Configuration</big></b><br>
 By selecting the option <b>Restrict NTP Service to Configured Servers Only</b>
-you prohibit general access to NTP service on your computer and restrict it
-only to those servers listed in <i>/etc/ntp.conf</i> and localhost. Access 
-control flags can be fine-tuned by editing corresponding server entry in
-servers overview table. This option is however not available, if NTP is 
+you prohibit all remote hosts to view and modify NTP settings on your 
+computer. In this way NTP service is restricted only to those servers listed
+in <i>/etc/ntp.conf</i> and localhost.<br> 
+Access control flags can be fine-tuned by editing corresponding server entry 
+in servers overview table. This option is not available if NTP is 
 configured via DHCP.</p>"),
 
     // help text 3/5
@@ -143,10 +144,11 @@ To fine tune the synchronization source, write the options to the
 <i>/usr/share/doc/packages/xntp-doc/html/confopt.htm</i>.</p>"),
 
     "restrict" : _("<p><b><big>Access Control Options</big></b><br>
-Here you can define access control flags (<i>restrict</i> directive in <i>
-/etc/ntp.conf</i>) for this server, indicating which type of packets you
-wish to accept from it. This option is only available if you have
-chosen <b>Restrict NTP Service to Configured Servers Only</b> option in
+Here you can define access control flags (<b><i>restrict</i></b> directive in
+<i>/etc/ntp.conf</i>) for this server, indicating which types of actions remote
+host can perform on your NTP daemon. By default, it is set to <i>notrap
+nomodify noquery</i> This option is only available if you have checked
+<b>Restrict NTP Service to Configured Servers Only</b> option in
 <b>Security Settings</b>.</p>
 "),
 
