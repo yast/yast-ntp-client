@@ -1,0 +1,168 @@
+/**
+ * File:	clients/ntp-client_proposal.ycp
+ * Summary:	Installation client for ntp configuration
+ * Author:	Bubli <kmachalkova@suse.cz>
+ *
+ */
+
+{
+textdomain "ntp-client";
+
+import "Hostname";
+import "NetworkService";
+import "NtpClient";
+import "Service";
+import "String";
+import "Stage";
+import "Package";
+import "Pkg";
+
+y2milestone("----------------------------------------");
+y2milestone("Ntp client proposal started");
+y2milestone("Arguments: %1", WFM::Args());
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
+    func = (string)WFM::Args(0);
+    if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+	param = (map)WFM::Args(1);
+}
+
+void ProposeSomething()
+{
+    list ntp_items = [];
+    if( NtpClient::already_proposed || NtpClient::ProcessNtpConf() )
+    {
+	ntp_items = maplist(string server, NtpClient::GetUsedNtpServers(),{
+	   return `item(`id(server), server); 
+	});
+    }
+    if( ntp_items == [])
+    {
+        string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
+	y2milestone("Nothing found in /etc/ntp.conf, proposing current language-based NTP server list");
+        ntp_items = NtpClient::GetNtpServersByCountry( cc, true );
+	NtpClient::already_proposed = true;
+    }
+    UI::ChangeWidget(`id(`ntp_address), `Items, ntp_items);
+
+}
+
+void AddSingleServer( string server )
+{
+   NtpClient::selected_record["address"] = server;
+   NtpClient::selected_record["type"] = "server";
+   NtpClient::storeSyncRecord();
+}
+
+if (func == "CreateUI")
+{
+   term cont =
+	`Left (`VBox ( `id(`ntp_content),
+            `Left (`RadioButton (`id (`ntp), `opt (`notify),
+                // radio button label
+                _("Synchronize with NTP Server"), false) 
+            ),
+            `VSpacing (0.5),
+            `HBox (
+                `HSpacing (3),
+                `MinWidth (38,
+                    `ComboBox (`id (`ntp_address), `opt (`editable),
+                        // combo box label
+                        _("NTP Server Address")
+                    )
+                ),
+                `VBox (
+                    `Label (""),
+                    // push button label
+                    `PushButton (`id (`ntp_configure), _("Configure..."))
+                )
+            )
+	));
+
+    if (UI::WidgetExists(`id(`rp)))
+    {
+        UI::ReplaceWidget(`id(`rp), cont);
+
+        if (!NetworkService::isNetworkRunning())
+        {
+            y2warning("Network is not running, NTP synchronization will not be available");
+            UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
+        }
+
+        //does not really work ideally, need something better pkg binding :(
+        if (!Package::Available("xntp"))
+        {
+            y2warning("xntp package is not installable, NTP synchronization will not be available");
+            UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
+        }
+    }
+
+    ret = true;
+}
+
+else if (func == "MakeProposal")
+{
+    ProposeSomething();
+    ret = true;
+}
+
+else if (func == "Write")
+{
+    string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
+    if (!Hostname::CheckFQ(ntp_server))
+    {
+        UI::SetFocus(`id(`ntp_address));
+	ret = `invalid_hostname;
+    }
+    else
+    {
+        y2milestone("Running ntpdate to sync with %1", ntp_server);
+
+        integer status = 0;
+        string service_name = "ntp";
+
+        //Stop NTP service on running system (during 1st stage, we don't care)
+        if( !Stage::initial() && status == 0)
+        {
+            Service::Stop(service_name);
+        }
+
+        //Schedule package for installation
+        Pkg::PkgInstall("xntp");
+
+        integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
+        y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
+
+        if( !Stage::initial() && status == 0)
+        {
+            Service::Start(service_name);
+        }
+
+        if (r == 0)
+        {
+            ret = `success;
+	    AddSingleServer(ntp_server);
+        }
+        else
+	ret = `ntpdate_failed;
+    }
+}
+
+else if (func == "AskUser")
+{
+    string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
+    AddSingleServer(ntp_server);
+    ret = (symbol) WFM::CallFunction("ntp-client");
+    ProposeSomething();
+}
+
+y2milestone("Ntp client proposal finished");
+y2milestone("----------------------------------------");
+return ret;
+}
+
+

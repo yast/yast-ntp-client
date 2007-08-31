@@ -8,7 +8,9 @@ yncludedir = @yncludedir@/ntp-client
 
 client_DATA =			\
 	ntp-client.ycp		\
-	ntp-client_auto.ycp
+	ntp-client_auto.ycp     \
+        ntp-client_proposal.ycp \
+        ntp-client_finish.ycp
 
 ynclude_DATA =			\
 	helps.ycp		\

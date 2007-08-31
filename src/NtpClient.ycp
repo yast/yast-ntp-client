@@ -58,7 +58,7 @@ global map <string, map <string,any> > restrict_map = $[];
 /**
   * Should the daemon be started when system boots?
   */
-global boolean run_service = false;
+global boolean run_service = true;
 
 /**
  * Service name of the NTP daemon
@@ -124,6 +124,8 @@ map<string,string> country_names = nil;
 
 global boolean simple_dialog = false;
 
+global boolean already_proposed = false;
+
 /**
  * Abort function
  * @return blah blah lahjk
@@ -156,7 +158,7 @@ global define map <string, string> GetAllKnownCountries () {
 
     //workaround bug #241054: servers in United Kingdom are in domain .uk
     // domain .gb does not exist - add UK to the list of known countries
-    if (haskey(known_countries, "GB")){
+	       if (haskey(known_countries, "GB")){
 	known_countries["UK"] = known_countries["GB"]:"";
 	known_countries = remove(known_countries,"GB");
     }
@@ -238,9 +240,10 @@ global map<string, string> GetCountryNames () {
 /**
  * Get list of public NTP servers for a country
  * @param country two-letter country code
+ * @param terse_output display additional data (location etc.)
  * @return list of servers (usable as combo-box items)
  */
-global list GetNtpServersByCountry ( string country ) {
+global list GetNtpServersByCountry ( string country, boolean terse_output ) {
     map<string,string> country_names = $[];
     map<string,map<string,string> > servers = GetNtpServers ();
     if (country != "")
@@ -255,7 +258,7 @@ global list GetNtpServersByCountry ( string country ) {
     }
 
     list items = maplist (string s, map<string,string> o, servers, {
-        string label = o["location"]:"";
+	string label = o["location"]:"";
         string l_country = o["country"]:"";
         if (country != "")
             l_country = "";
@@ -267,7 +270,11 @@ global list GetNtpServersByCountry ( string country ) {
             label = s;
         else
             label = sformat ("%1 (%2%3)", s, label, l_country);
-        return `item (`id (s), label);
+
+	if (terse_output)
+	    return `item (`id(s), s);
+	else
+            return `item (`id (s), label);
     });
 
     return items;
@@ -275,79 +282,22 @@ global list GetNtpServersByCountry ( string country ) {
 }
 
 /**
- * Read all ntp-client settings
+ * Read and parse /etc.ntp.conf
  * @return true on success
  */
-global define boolean Read() ``{
+global define boolean ProcessNtpConf() ``{
 
-    /* NtpClient read dialog caption */
-    string caption = _("Initializing NTP Client Configuration");
+    map conf = nil;
+    if (FileUtils::Exists("/etc/ntp.conf"))
+        conf = (map)SCR::Read (.etc.ntp_conf.all);
 
-    integer steps = 2;
-    integer sl = 500;
-    // We do not set help text here, because it was set outside
-    Progress::New( caption, " ", steps, [
-	    // progress stage
-	    _("Read network configuration"),
-	    // progress stage
-	    _("Read NTP settings"),
-	], [
-	    // progress step
-	    _("Reading network configuration..."),
-	    // progress step
-	    _("Reading NTP settings..."),
-	    // progress step
-	    _("Finished")
-	],
-	""
-    );
-
-    // read network configuration
-    if(Abort()) return false;
-    Progress::NextStage();
-
-    boolean progress_orig = Progress::set (false);
-    NetworkDevices::Read ();
-    Progress::set (progress_orig);
-    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
-    original_config_dhcp = config_dhcp;
-
-    GetNtpServers ();
-    GetCountryNames ();
-    // read current settings
-    if(Abort()) return false;
-    Progress::NextStage();
-
-    boolean failed = false;
-
-    if (! Mode::testsuite () && ! Mode::installation ()
-	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["xntp"])
-    )
+    if (conf == nil )
     {
+	y2error("Failed to read /etc/ntp.conf, either it doesn't exist or contains no data");
 	return false;
     }
 
-    run_service = Service::Enabled (service_name);
-
-    //Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
-    string ad_ntp_file = Directory::vardir + "/ad_ntp_data.ycp";
-    if(FileUtils::Exists(ad_ntp_file)) {
-	y2milestone("Reading %1", ad_ntp_file);
-	map <string, string> ad_ntp_data = (map <string, string>) SCR::Read(.target.ycp, ad_ntp_file);
-	ad_controller = ad_ntp_data["ads"]:"";
-	if(ad_controller != "") {
-	    y2milestone("Got %1 for ntp sync, deleting %2, since it is no longer needed", ad_controller, ad_ntp_file);
-	    SCR::Execute(.target.remove, ad_ntp_file);
-	}
-    }
-
-
-    map conf = (map)SCR::Read (.etc.ntp_conf.all);
-    if (conf == nil)
-    {
-	failed = true;
-	conf = $[];
-    }
+    already_proposed = true;
     list<map<string, any> > value = conf["value"]:[];
     integer index = -1;
     ntp_records = maplist (map<string, any> m, value, ``{
@@ -424,16 +374,6 @@ global define boolean Read() ``{
 	return m;
     });
 
-    run_chroot = SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED) == "yes";
-
-    string initial_sync = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
-    if (initial_sync == nil)
-    {
-	initial_sync = "";
-	failed = true;
-	y2error ("Failed reading .sysconfig.ntp.NTPD_INITIAL_NTPDATE");
-    }
-
     // mark local clock to be local clock and not real servers
     ntp_records = maplist (map<string,any> p, ntp_records, ``{
 	if (p["type"]:"" == "server"
@@ -443,6 +383,89 @@ global define boolean Read() ``{
 	}
 	return p;
     });
+
+    return true;
+
+}
+
+/**
+ * Read all ntp-client settings
+ * @return true on success
+ */
+global define boolean Read() ``{
+
+    /* NtpClient read dialog caption */
+    string caption = _("Initializing NTP Client Configuration");
+
+    integer steps = 2;
+    integer sl = 500;
+    // We do not set help text here, because it was set outside
+    Progress::New( caption, " ", steps, [
+	    // progress stage
+	    _("Read network configuration"),
+	    // progress stage
+	    _("Read NTP settings"),
+	], [
+	    // progress step
+	    _("Reading network configuration..."),
+	    // progress step
+	    _("Reading NTP settings..."),
+	    // progress step
+	    _("Finished")
+	],
+	""
+    );
+
+    // read network configuration
+    if(Abort()) return false;
+    Progress::NextStage();
+
+    boolean progress_orig = Progress::set (false);
+    NetworkDevices::Read ();
+    Progress::set (progress_orig);
+    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
+    original_config_dhcp = config_dhcp;
+
+    GetNtpServers ();
+    GetCountryNames ();
+    // read current settings
+    if(Abort()) return false;
+    Progress::NextStage();
+
+    boolean failed = false;
+
+    if (! Mode::testsuite () && ! Mode::installation ()
+	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["xntp"])
+    )
+    {
+	return false;
+    }
+
+    run_service = Service::Enabled (service_name);
+
+    //Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
+    string ad_ntp_file = Directory::vardir + "/ad_ntp_data.ycp";
+    if(FileUtils::Exists(ad_ntp_file)) {
+	y2milestone("Reading %1", ad_ntp_file);
+	map <string, string> ad_ntp_data = (map <string, string>) SCR::Read(.target.ycp, ad_ntp_file);
+	ad_controller = ad_ntp_data["ads"]:"";
+	if(ad_controller != "") {
+	    y2milestone("Got %1 for ntp sync, deleting %2, since it is no longer needed", ad_controller, ad_ntp_file);
+	    SCR::Execute(.target.remove, ad_ntp_file);
+	}
+    }
+
+    ProcessNtpConf();
+
+    run_chroot = SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED) == "yes";
+
+    string initial_sync = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
+    if (initial_sync == nil)
+    {
+	initial_sync = "";
+	failed = true;
+	y2error ("Failed reading .sysconfig.ntp.NTPD_INITIAL_NTPDATE");
+    }
 
     // mark those servers and peers that are used for initial syncing
     if (initial_sync == "AUTO")

@@ -87,18 +87,11 @@ else if (func == "Read") {
 else if (func == "Write") {
     import "Progress";
     boolean progress_orig = Progress::set (false);
-    //restart_service - also do 'rcntpd restart' and trigger time change
-    //otherwise - only write ntp.conf and stuff (default for autoyast)
-    if (param["restart_services"]:false == false)
-	NtpClient::write_only = true;
+    NtpClient::write_only = true;
     ret = NtpClient::Write();
     Progress::set (progress_orig);
 }
 
-else if (func == "GetNtpServersByCountry") {
-    string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
-    ret = NtpClient::GetNtpServersByCountry( cc );
-}
 /* Unknown function */
 else {
     y2error("Unknown function: %1", func);

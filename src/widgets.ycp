@@ -887,7 +887,7 @@ symbol ServerListHandle (string id, map event) {
     {
 	last_country = country;
 
-	list items = NtpClient::GetNtpServersByCountry ( country); 
+	list items = NtpClient::GetNtpServersByCountry ( country, false); 
 	UI::ReplaceWidget (`servers_rp,
 	    `VBox(
 		// Combobox has at least 40 characters
