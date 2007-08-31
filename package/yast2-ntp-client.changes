@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Fri Aug 31 17:04:37 CEST 2007 - kmachalkova@suse.cz
+
+- Move all installation-related functionality into separate inst.
+  clients (_proposal and _finish) (FaTE #302192)
+- Do not check for xntp package during installation (#299557, #299238)
+- Call 'ntpdate' to synchronize with NTP server during installation
+  (do not restart the service) (#299238)
+- 'During boot' NTP service start is now default (#302389)
+- 2.15.7
+
+-------------------------------------------------------------------
 Mon Aug  6 16:04:39 CEST 2007 - kmachalkova@suse.cz
 
 - Do not allow to edit access control rules if NTP is configured 
