@@ -1,4 +1,19 @@
 -------------------------------------------------------------------
+Mon Sep  3 17:01:12 CEST 2007 - kmachalkova@suse.cz
+
+- Fixed adding new NTP servers when calling ntp-client from outside 
+  (e.g. timezone) - do not re-read the configuration if it has been 
+  already read
+- Use error popup (Report::Error) if NTP test fails (#306018)
+- Display 'ntpd started on boot' warning message only if we don't 
+  use NM and/or no network device is started at boot time (#299666)
+- Do not query status/stop/start NTP service during installation 
+  (holds for NTP test and ntp proposal client)
+- Replace 'Finish' button with 'Accept' button in installation
+  proposal
+- 2.15.8
+
+-------------------------------------------------------------------
 Fri Aug 31 17:04:37 CEST 2007 - kmachalkova@suse.cz
 
 - Move all installation-related functionality into separate inst.
