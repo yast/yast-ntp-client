@@ -971,8 +971,9 @@ global boolean TestNtpServer (string server, boolean silent) {
 	}
 	else
 	{
-	    // message report - result of test of connection to NTP server
-	    Report::Message (_("Server is unreachable or does not respond properly."));
+	    // error message  - result of test of connection to NTP server
+            // report error instead of simple message (#306018)
+	    Report::Error (_("Server is unreachable or does not respond properly."));
 	}
     }
     return ok;
