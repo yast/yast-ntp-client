@@ -17,6 +17,7 @@ import "Label";
 import "LogView";
 import "SLPAPI";
 import "NetworkDevices";
+import "NetworkService";
 import "NtpClient";
 import "CWMFirewallInterfaces";
 import "Report";
@@ -107,11 +108,20 @@ define void startStore (string id, map event) ``{
  */
 define symbol startHandle (string id, map event) ``{
     boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
-    list<string> devices = NetworkDevices::Locate ("STARTMODE", "onboot");
+    //All these network devices are possibly started on boot || managed by NM
+    //hence do not display the message
+    list<string> d1 = NetworkDevices::Locate ("STARTMODE", "onboot");
+    list<string> d2 = NetworkDevices::Locate ("STARTMODE", "auto");
+    list<string> d3 = NetworkDevices::Locate ("STARTMODE", "nfsroot");
+    list<string> d4 = NetworkDevices::Locate ("STARTMODE", "managed");
+
+    list<string> devices = (list <string>) union( union(d1,d2), union(d3,d4));
     devices = filter (string d, devices, ``(d != "lo"));
-    if (start && size (devices) == 0 && event["EventReason"]:"" != ""
+    //Do not display this warning if we use NetworkManager (#299666)
+    if (start && !NetworkService::IsManaged() && size (devices) == 0 &&
+        event["EventReason"]:"" != "" &&
 	// continue-cancel popup
-	&& ! Popup::ContinueCancel (_("Warning!
+	! Popup::ContinueCancel (_("Warning!
 
 If you do not have a permanent Internet connection,
 starting the NTP daemon can take a very long time and 
