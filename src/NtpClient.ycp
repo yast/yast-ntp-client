@@ -967,6 +967,7 @@ global boolean TestNtpServer (string server, boolean silent) {
 
     //Do not do anything to ntp service during installation
     if ( !Stage::initial() )
+    {
         //Start the service if it was running
         if ( status == 0);
 	    Service::Start (service_name);
