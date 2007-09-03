@@ -124,7 +124,7 @@ map<string,string> country_names = nil;
 
 global boolean simple_dialog = false;
 
-global boolean already_proposed = false;
+global boolean config_has_been_read = false;
 
 /**
  * Abort function
@@ -297,7 +297,7 @@ global define boolean ProcessNtpConf() ``{
 	return false;
     }
 
-    already_proposed = true;
+    config_has_been_read = true;
     list<map<string, any> > value = conf["value"]:[];
     integer index = -1;
     ntp_records = maplist (map<string, any> m, value, ``{
@@ -393,6 +393,9 @@ global define boolean ProcessNtpConf() ``{
  * @return true on success
  */
 global define boolean Read() ``{
+
+    if (config_has_been_read)
+	return true;
 
     /* NtpClient read dialog caption */
     string caption = _("Initializing NTP Client Configuration");

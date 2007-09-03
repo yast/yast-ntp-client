@@ -34,7 +34,7 @@ if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
 void ProposeSomething()
 {
     list ntp_items = [];
-    if( NtpClient::already_proposed || NtpClient::ProcessNtpConf() )
+    if( NtpClient::config_has_been_read || NtpClient::ProcessNtpConf() )
     {
 	ntp_items = maplist(string server, NtpClient::GetUsedNtpServers(),{
 	   return `item(`id(server), server); 
@@ -45,7 +45,7 @@ void ProposeSomething()
         string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
 	y2milestone("Nothing found in /etc/ntp.conf, proposing current language-based NTP server list");
         ntp_items = NtpClient::GetNtpServersByCountry( cc, true );
-	NtpClient::already_proposed = true;
+	NtpClient::config_has_been_read = true;
     }
     UI::ChangeWidget(`id(`ntp_address), `Items, ntp_items);
 
@@ -53,8 +53,18 @@ void ProposeSomething()
 
 void AddSingleServer( string server )
 {
-   NtpClient::selected_record["address"] = server;
-   NtpClient::selected_record["type"] = "server";
+
+   integer idx = NtpClient::findSyncRecord("server", server); 
+
+   // -1 means adding new server
+   if (idx == -1)
+   {
+        NtpClient::selected_record["address"] = server;
+        NtpClient::selected_record["type"] = "server";
+   }
+   else
+	NtpClient::selectSyncRecord(idx);
+
    NtpClient::storeSyncRecord();
 }
 
