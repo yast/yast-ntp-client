@@ -132,13 +132,17 @@ else if (func == "Write")
     {
         y2milestone("Running ntpdate to sync with %1", ntp_server);
 
-        integer status = 0;
+        integer status = -1;
         string service_name = "ntp";
 
         //Stop NTP service on running system (during 1st stage, we don't care)
-        if( !Stage::initial() && status == 0)
+        if( !Stage::initial())
         {
-            Service::Stop(service_name);
+            status = Service::Status (service_name); 
+            //Stop service temporarily (otherwise ntpdate won't work)
+            //0 means service is running
+            if ( status == 0);
+	        Service::Stop (service_name);
         }
 
         //Schedule package for installation
@@ -147,9 +151,10 @@ else if (func == "Write")
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
         y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
 
-        if( !Stage::initial() && status == 0)
+        if( !Stage::initial())
         {
-            Service::Start(service_name);
+	    if( status == 0 )
+                Service::Start(service_name);
         }
 
         if (r == 0)

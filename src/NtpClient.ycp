@@ -25,6 +25,7 @@ import "Progress";
 import "Report";
 import "Service";
 import "SLPAPI";
+import "Stage";
 import "String";
 import "Summary";
 import "SuSEFirewall";
@@ -939,9 +940,16 @@ global boolean TestNtpServer (string server, boolean silent) {
 	`Left(`Label(_("Testing the NTP server...")))
     );
 
-    integer status = Service::Status (service_name);
-    if (status == 0)
-	Service::Stop (service_name);
+    integer status = -1;
+    //Do not do anything to ntp service during installation
+    if ( !Stage::initial() )
+    {
+        status = Service::Status (service_name); 
+        //Stop service temporarily (otherwise ntpdate won't work)
+        //0 means service is running
+        if ( status == 0);
+	    Service::Stop (service_name);
+    }
     y2milestone ("Testing reachability of server %1", server);
 
     // testing the server using IPv4 and then using IPv6 protocol
@@ -956,8 +964,13 @@ global boolean TestNtpServer (string server, boolean silent) {
 	    "/usr/sbin/ntpdate -6 -q %1",
 	    server
 	));
-    if (status == 0)
-	Service::Start (service_name);
+
+    //Do not do anything to ntp service during installation
+    if ( !Stage::initial() )
+        //Start the service if it was running
+        if ( status == 0);
+	    Service::Start (service_name);
+    }
 
     UI::CloseDialog();
 
