@@ -53,21 +53,14 @@ define boolean abortPopup () ``{
 define symbol ReadDialog() ``{
     Wizard::RestoreHelp(HELPS["read"]:"");
 
-    if(Stage::initial())
-    {
-	NtpClient::ProcessNtpConf();
-	return `next;
-    }
-    else
-    {
-        // checking for root permissions (#158483)
-        if (!Confirm::MustBeRoot())
-	    return `abort;
+    // checking for root permissions (#158483)
+    if (!Stage::initial() && !Confirm::MustBeRoot())
+        return `abort;
 
-    	NtpClient::AbortFunction = PollAbort;
-    	boolean ret = NtpClient::Read();
-    	return ret ? `next : `abort;
-    }
+    NtpClient::AbortFunction = PollAbort;
+    boolean ret = NtpClient::Read();
+    return ret ? `next : `abort;
+
 }
 
 /**
