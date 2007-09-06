@@ -8,7 +8,7 @@
 {
 textdomain "ntp-client";
 
-import "Hostname";
+import "Address";
 import "NetworkService";
 import "NtpClient";
 import "Service";
@@ -47,6 +47,7 @@ void ProposeSomething()
         ntp_items = NtpClient::GetNtpServersByCountry( cc, true );
 	NtpClient::config_has_been_read = true;
     }
+    ntp_items = add(ntp_items, "");
     UI::ChangeWidget(`id(`ntp_address), `Items, ntp_items);
 
 }
@@ -66,6 +67,17 @@ void AddSingleServer( string server )
 	NtpClient::selectSyncRecord(idx);
 
    NtpClient::storeSyncRecord();
+}
+
+boolean ValidateSingleServer( string ntp_server )
+{
+    if (!Address::Check(ntp_server) )
+    {
+        UI::SetFocus(`id(`ntp_address));
+	return false;
+    }
+
+    return true;
 }
 
 if (func == "CreateUI")
@@ -123,11 +135,8 @@ else if (func == "MakeProposal")
 else if (func == "Write")
 {
     string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
-    if (!Hostname::CheckFQ(ntp_server))
-    {
-        UI::SetFocus(`id(`ntp_address));
+    if ( !ValidateSingleServer( ntp_server ) )
 	ret = `invalid_hostname;
-    }
     else
     {
         y2milestone("Running ntpdate to sync with %1", ntp_server);
@@ -141,7 +150,7 @@ else if (func == "Write")
             status = Service::Status (service_name); 
             //Stop service temporarily (otherwise ntpdate won't work)
             //0 means service is running
-            if ( status == 0);
+            if ( status == 0)
 	        Service::Stop (service_name);
         }
 
@@ -170,9 +179,15 @@ else if (func == "Write")
 else if (func == "AskUser")
 {
     string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
-    AddSingleServer(ntp_server);
-    ret = (symbol) WFM::CallFunction("ntp-client");
-    ProposeSomething();
+    if ( !ValidateSingleServer( ntp_server ) )
+	ret = `invalid_hostname;
+    else
+    {
+        string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
+        AddSingleServer(ntp_server);
+        ret = (symbol) WFM::CallFunction("ntp-client");
+        ProposeSomething();
+    }
 }
 
 y2milestone("Ntp client proposal finished");
