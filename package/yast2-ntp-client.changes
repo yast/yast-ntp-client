@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Thu Sep  6 18:51:37 CEST 2007 - kmachalkova@suse.cz
+
+- Accept IP as a valid NTP server address (#308265)
+- Use Packages::addAdditionalPackage() for marking xntp package for 
+  installation so that it is not discarded later on (#307363) 
+- Correct fix for not re-reading NTP configuration when calling 
+  ntp-client from outside (no exception for the 1st stage)
+- 2.15.9
+
+-------------------------------------------------------------------
 Mon Sep  3 17:01:12 CEST 2007 - kmachalkova@suse.cz
 
 - Fixed adding new NTP servers when calling ntp-client from outside 
