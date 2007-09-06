@@ -15,6 +15,7 @@ import "Service";
 import "String";
 import "Stage";
 import "Package";
+import "Packages";
 import "Pkg";
 
 y2milestone("----------------------------------------");
@@ -155,7 +156,7 @@ else if (func == "Write")
         }
 
         //Schedule package for installation
-        Pkg::PkgInstall("xntp");
+        Packages::addAdditionalPackage("xntp");
 
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
         y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
