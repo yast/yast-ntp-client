@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Thu Sep 13 17:50:19 CEST 2007 - kmachalkova@suse.cz
+
+- In installation proposal, remember whether synchronization with
+  NTP server has been selected (#308238) 
+- Set AbortFunction back to 'nil' after NtpClient::Read has been 
+  called to prevent segfault after multiple calls (#294773)
+- 2.15.10
+
+-------------------------------------------------------------------
 Thu Sep  6 18:51:37 CEST 2007 - kmachalkova@suse.cz
 
 - Accept IP as a valid NTP server address (#308265)
