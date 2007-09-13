@@ -84,11 +84,7 @@ boolean ValidateSingleServer( string ntp_server )
 if (func == "CreateUI")
 {
    term cont =
-	`Left (`VBox ( `id(`ntp_content),
-            `Left (`RadioButton (`id (`ntp), `opt (`notify),
-                // radio button label
-                _("Synchronize with NTP Server"), false) 
-            ),
+	`Left ( `VBox(
             `VSpacing (0.5),
             `HBox (
                 `HSpacing (3),
@@ -124,6 +120,17 @@ if (func == "CreateUI")
         }
     }
 
+    ret = true;
+}
+
+else if (func == "GetUseNTP")
+{
+    ret = NtpClient::ntp_selected;
+}
+
+else if (func == "SetUseNTP")
+{
+    NtpClient::ntp_selected = param["ntp_used"]:false;
     ret = true;
 }
 
