@@ -127,6 +127,8 @@ global boolean simple_dialog = false;
 
 global boolean config_has_been_read = false;
 
+global boolean ntp_selected = false;
+
 /**
  * Abort function
  * @return blah blah lahjk
