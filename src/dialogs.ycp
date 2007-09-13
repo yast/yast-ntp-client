@@ -59,6 +59,7 @@ define symbol ReadDialog() ``{
 
     NtpClient::AbortFunction = PollAbort;
     boolean ret = NtpClient::Read();
+    NtpClient::AbortFunction = nil;
     return ret ? `next : `abort;
 
 }
