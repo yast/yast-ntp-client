@@ -177,7 +177,7 @@ else if (func == "Write")
         if (r == 0)
         {
             ret = `success;
-	    NtpClient::modified = truea;
+	    NtpClient::modified = true;
 	    AddSingleServer(ntp_server);
         }
         else
