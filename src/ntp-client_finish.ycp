@@ -42,6 +42,8 @@ else if (func == "Write")
 
     NtpClient::Import( ex );
 
+    NtpClient::write_only = true;
+
     NtpClient::Write();
 
 }
