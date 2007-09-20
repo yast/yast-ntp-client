@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Thu Sep 20 18:11:22 CEST 2007 - kmachalkova@suse.cz
+
+- Do not write NTP configuration at the end of 1st stage of 
+  installation if it hasn't been modified (#326338) 
+- Set write_only mode at the end of 1st stage, do not start NTP 
+  service (#326478 related)
+- 2.15.11
+  
+-------------------------------------------------------------------
 Thu Sep 13 17:50:19 CEST 2007 - kmachalkova@suse.cz
 
 - In installation proposal, remember whether synchronization with
