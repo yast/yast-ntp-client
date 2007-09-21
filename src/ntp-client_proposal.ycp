@@ -163,7 +163,14 @@ else if (func == "Write")
         }
 
         //Schedule package for installation
-        Packages::addAdditionalPackage("xntp");
+        if (Package::Available("xntp"))
+	// FIXME: later use
+	//   if (Package::Available("xntp")) { Packages::addAdditionalPackage("xntp"); }
+	Packages::addAdditionalPackage("xntp");
+	// bugzilla #327050
+	// Agent for writing /etc/ntp.conf needs to be installed
+	// to write the settings at the end of the installation
+	Packages::addAdditionalPackage("yast2-ntp-client");
 
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
         y2milestone ("'ntpdate %1' returned %2", ntp_server, r);

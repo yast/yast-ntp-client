@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Sep 21 11:33:24 CEST 2007 - locilka@suse.cz
+
+- When user selects to use NTP during installation, trigger also
+  yast2-ntp-client RPM for installation (#327050).
+- 2.15.12
+
+-------------------------------------------------------------------
 Thu Sep 20 18:11:22 CEST 2007 - kmachalkova@suse.cz
 
 - Do not write NTP configuration at the end of 1st stage of 
