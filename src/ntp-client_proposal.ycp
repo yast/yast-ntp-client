@@ -17,6 +17,7 @@ import "Stage";
 import "Package";
 import "Packages";
 import "Pkg";
+import "Popup";
 
 y2milestone("----------------------------------------");
 y2milestone("Ntp client proposal started");
@@ -147,6 +148,7 @@ else if (func == "Write")
 	ret = `invalid_hostname;
     else
     {
+        Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
         y2milestone("Running ntpdate to sync with %1", ntp_server);
 
         integer status = -1;
@@ -173,6 +175,7 @@ else if (func == "Write")
 	Packages::addAdditionalPackage("yast2-ntp-client");
 
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
+	Popup::ClearFeedback();
         y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
 
         if( !Stage::initial())
