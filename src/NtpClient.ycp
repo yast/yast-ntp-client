@@ -405,26 +405,32 @@ global define boolean Read() ``{
 
     integer steps = 2;
     integer sl = 500;
+
+    boolean have_progress = (Mode::normal());
+
     // We do not set help text here, because it was set outside
-    Progress::New( caption, " ", steps, [
-	    // progress stage
-	    _("Read network configuration"),
-	    // progress stage
-	    _("Read NTP settings"),
-	], [
-	    // progress step
-	    _("Reading network configuration..."),
-	    // progress step
-	    _("Reading NTP settings..."),
-	    // progress step
-	    _("Finished")
-	],
-	""
-    );
+    if ( have_progress )
+    {
+        Progress::New( caption, " ", steps, [
+                // progress stage
+                _("Read network configuration"),
+                // progress stage
+                _("Read NTP settings"),
+            ], [
+                // progress step
+                _("Reading network configuration..."),
+                // progress step
+                _("Reading NTP settings..."),
+                // progress step
+                _("Finished")
+            ],
+            ""
+        );
+    }
 
     // read network configuration
     if(Abort()) return false;
-    Progress::NextStage();
+    if (have_progress) Progress::NextStage();
 
     boolean progress_orig = Progress::set (false);
     NetworkDevices::Read ();
@@ -436,7 +442,7 @@ global define boolean Read() ``{
     GetCountryNames ();
     // read current settings
     if(Abort()) return false;
-    Progress::NextStage();
+    if (have_progress) Progress::NextStage();
 
     boolean failed = false;
 
@@ -521,8 +527,11 @@ global define boolean Read() ``{
     }
 
     if(Abort()) return false;
-    Progress::NextStage ();
-    Progress::Title (_("Finished"));
+    if (have_progress)
+    {
+        Progress::NextStage ();
+        Progress::Title (_("Finished"));
+    }
     sleep(sl);
 
     if(Abort()) return false;
@@ -658,26 +667,31 @@ global define boolean Write() ``{
     integer sl = 0;
     sleep(sl);
 
+    boolean have_progress = (Mode::normal());
+
     // We do not set help text here, because it was set outside
-    Progress::New(caption, " ", steps, [
-	    // progress stage
-	    _("Write NTP settings"),
-	    // progress stage
-	    _("Restart NTP daemon")
-	], [
-	    // progress step
-	    _("Writing the settings..."),
-	    // progress step
-	    _("Restarting NTP daemon..."),
-	    // progress step
-	    _("Finished")
-	],
-	""
-    );
+    if ( have_progress )
+    {
+        Progress::New(caption, " ", steps, [
+                // progress stage
+                _("Write NTP settings"),
+                // progress stage
+                _("Restart NTP daemon")
+            ], [
+                // progress step
+                _("Writing the settings..."),
+                // progress step
+                _("Restarting NTP daemon..."),
+                // progress step
+                _("Finished")
+            ],
+            ""
+        );
+    }
 
     // write settings
     if(Abort()) return false;
-    Progress::NextStage();
+    if ( have_progress ) Progress::NextStage();
 
     if (update_dhcp)
     {
@@ -799,7 +813,7 @@ global define boolean Write() ``{
 
     // restart daemon
     if(Abort()) return false;
-    Progress::NextStage ();
+    if (have_progress) Progress::NextStage ();
 
 //    if (change_firewall)
 //    {
@@ -829,8 +843,11 @@ global define boolean Write() ``{
     sleep(sl);
 
     if(Abort()) return false;
-    Progress::NextStage ();
-    Progress::Title (_("Finished"));
+    if ( have_progress )
+    {
+        Progress::NextStage ();
+        Progress::Title (_("Finished"));
+    }
     sleep(sl);
 
     if(Abort()) return false;
