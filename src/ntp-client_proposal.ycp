@@ -114,7 +114,12 @@ if (func == "CreateUI")
         }
 
         //does not really work ideally, need something better pkg binding :(
-        if (!Package::Available("xntp"))
+	//Check availability of xntp package
+	//case 1: installation 1st stage - Package::Installed() does not work here
+	//	   so let's check for the pkg availability only
+	//case 2: running system - check for pkg availability iff it is not 
+	//	  already installed (#328469)
+        if ( ( Stage::initial() || !Package::Installed("xntp") ) && !Package::Available("xntp") )
         {
             y2warning("xntp package is not installable, NTP synchronization will not be available");
             UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
@@ -175,8 +180,8 @@ else if (func == "Write")
 	Packages::addAdditionalPackage("yast2-ntp-client");
 
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
-	Popup::ClearFeedback();
         y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
+	Popup::ClearFeedback();
 
         if( !Stage::initial())
         {
