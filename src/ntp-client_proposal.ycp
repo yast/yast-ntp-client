@@ -16,8 +16,10 @@ import "String";
 import "Stage";
 import "Package";
 import "Packages";
+import "PackageSystem";
 import "Pkg";
 import "Popup";
+import "Report";
 
 y2milestone("----------------------------------------");
 y2milestone("Ntp client proposal started");
@@ -153,8 +155,29 @@ else if (func == "Write")
 	ret = `invalid_hostname;
     else
     {
-        Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
-        y2milestone("Running ntpdate to sync with %1", ntp_server);
+	string required_package = "xntp";
+
+        //In 1st stage, schedule packages for installation
+        if (Stage::initial())
+	{
+	    if (Package::Available(required_package))
+	    {
+	        Packages::addAdditionalPackage(required_package);
+	        // bugzilla #327050
+	        // Agent for writing /etc/ntp.conf needs to be installed
+	        // to write the settings at the end of the installation
+	        Packages::addAdditionalPackage("yast2-ntp-client");
+	    }
+	}
+	//Otherwise, prompt user for confirming pkg installation
+	else
+	{
+	   if (!PackageSystem::CheckAndInstallPackages([ required_package ]))
+	   {
+	        Report::Error(sformat( _("Synchronization with NTP server is not possible
+without having package %1 installed"), required_package));
+	   }
+	}
 
         integer status = -1;
         string service_name = "ntp";
@@ -169,19 +192,11 @@ else if (func == "Write")
 	        Service::Stop (service_name);
         }
 
-        //Schedule package for installation
-        if (Package::Available("xntp"))
-	// FIXME: later use
-	//   if (Package::Available("xntp")) { Packages::addAdditionalPackage("xntp"); }
-	Packages::addAdditionalPackage("xntp");
-	// bugzilla #327050
-	// Agent for writing /etc/ntp.conf needs to be installed
-	// to write the settings at the end of the installation
-	Packages::addAdditionalPackage("yast2-ntp-client");
+        Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
+        y2milestone("Running ntpdate to sync with %1", ntp_server);
 
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
         y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
-	Popup::ClearFeedback();
 
         if( !Stage::initial())
         {
@@ -196,7 +211,9 @@ else if (func == "Write")
 	    AddSingleServer(ntp_server);
         }
         else
-	ret = `ntpdate_failed;
+	    ret = `ntpdate_failed;
+
+	Popup::ClearFeedback();
     }
 }
 
