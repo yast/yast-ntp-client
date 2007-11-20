@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Nov 20 15:49:59 CET 2007 - kmachalkova@suse.cz
+
+- Repository scanning (Package::Available()) definitely removed 
+  (#327336)
+- Updated help text referring to xntp documentation (#340867)
+- 2.16.2 
+
+-------------------------------------------------------------------
 Wed Oct 31 13:53:04 CET 2007 - kmachalkova@suse.cz
 
 - Prompt for installing xntp package (CheckAndInstallPackages) on 
