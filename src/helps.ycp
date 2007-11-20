@@ -141,7 +141,7 @@ started. To use this host for initial synchronization, select
     "options" : _("<p><b><big>Options</big></b><br>
 To fine tune the synchronization source, write the options to the
 <b>Options</b> text field. For details, see
-<i>/usr/share/doc/packages/xntp-doc/html/confopt.htm</i>.</p>"),
+<i>/usr/share/doc/packages/xntp-doc/confopt.htm</i>.</p>"),
 
     "restrict" : _("<p><b><big>Access Control Options</big></b><br>
 Here you can define access control flags (<b><i>restrict</i></b> directive in
