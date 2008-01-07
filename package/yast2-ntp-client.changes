@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jan  7 12:02:51 CET 2008 - kmachalkova@suse.cz
+
+- Merged proofread texts
+
+-------------------------------------------------------------------
 Tue Nov 20 15:49:59 CET 2007 - kmachalkova@suse.cz
 
 - Repository scanning (Package::Available()) definitely removed 

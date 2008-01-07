@@ -50,9 +50,10 @@ By selecting the option <b>Restrict NTP Service to Configured Servers Only</b>
 you prohibit all remote hosts to view and modify NTP settings on your 
 computer. In this way NTP service is restricted only to those servers listed
 in <i>/etc/ntp.conf</i> and localhost.<br> 
-Access control flags can be fine-tuned by editing corresponding server entry 
-in servers overview table. This option is not available if NTP is 
-configured via DHCP.</p>"),
+Access control flags can be fine-tuned by editing the corresponding server entry 
+in the servers overview table. This option is not available if NTP is 
+configured via DHCP.</p>
+"),
 
     // help text 3/5
     "config_dhcp" : _("<p><b><big>Configuring via DHCP</big></b><br>
@@ -70,7 +71,8 @@ select it and click <b>Delete</b>.</p>")
     +
     // help text 5/5
     _("<p><b><big>Display Log </big></b><br>
-To view the logs of NTP daemon in new window, click on <b>Display Log</b> button.</p>"),
+To view the logs of the NTP daemon in new window, click on <b>Display Log</b> button.</p>
+"),
 
     // help text to a button
     "complex_button" : _("<p><b><big>Advanced configuration</big></b><br>
@@ -145,9 +147,9 @@ To fine tune the synchronization source, write the options to the
 
     "restrict" : _("<p><b><big>Access Control Options</big></b><br>
 Here you can define access control flags (<b><i>restrict</i></b> directive in
-<i>/etc/ntp.conf</i>) for this server, indicating which types of actions remote
+<i>/etc/ntp.conf</i>) for this server, indicating which types of actions the remote
 host can perform on your NTP daemon. By default, it is set to <i>notrap
-nomodify noquery</i> This option is only available if you have checked
+nomodify noquery</i>. This option is only available if you have checked the
 <b>Restrict NTP Service to Configured Servers Only</b> option in
 <b>Security Settings</b>.</p>
 "),
