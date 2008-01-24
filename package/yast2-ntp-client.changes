@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan 24 15:48:51 CET 2008 - mzugec@suse.cz
+
+- replace deprecated NetworkDevices by NetworkInterfaces (from yast2)
+- 2.16.3
+
+-------------------------------------------------------------------
 Mon Jan  7 12:02:51 CET 2008 - kmachalkova@suse.cz
 
 - Merged proofread texts

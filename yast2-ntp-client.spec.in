@@ -3,7 +3,8 @@
 @HEADER@
 BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
 #SLPAPI.pm 
-Requires:	yast2 >= 2.15.17 
+# yast2/NetworkDevices -> yast2/NetworkInterfaces
+Requires:	yast2 >= 2.16.23 
 Requires:	yast2-country 
 
 BuildArchitectures:	noarch

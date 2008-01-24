@@ -16,7 +16,7 @@ import "Popup";
 import "Label";
 import "LogView";
 import "SLPAPI";
-import "NetworkDevices";
+import "NetworkInterfaces";
 import "NetworkService";
 import "NtpClient";
 import "CWMFirewallInterfaces";
@@ -110,10 +110,10 @@ define symbol startHandle (string id, map event) ``{
     boolean start = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
     //All these network devices are possibly started on boot || managed by NM
     //hence do not display the message
-    list<string> d1 = NetworkDevices::Locate ("STARTMODE", "onboot");
-    list<string> d2 = NetworkDevices::Locate ("STARTMODE", "auto");
-    list<string> d3 = NetworkDevices::Locate ("STARTMODE", "nfsroot");
-    list<string> d4 = NetworkDevices::Locate ("STARTMODE", "managed");
+    list<string> d1 = NetworkInterfaces::Locate ("STARTMODE", "onboot");
+    list<string> d2 = NetworkInterfaces::Locate ("STARTMODE", "auto");
+    list<string> d3 = NetworkInterfaces::Locate ("STARTMODE", "nfsroot");
+    list<string> d4 = NetworkInterfaces::Locate ("STARTMODE", "managed");
 
     list<string> devices = (list <string>) union( union(d1,d2), union(d3,d4));
     devices = filter (string d, devices, ``(d != "lo"));

@@ -19,7 +19,7 @@ import "Directory";
 import "FileUtils";
 import "Message";
 import "Mode";
-import "NetworkDevices";
+import "NetworkInterfaces";
 import "PackageSystem";
 import "Progress";
 import "Report";
@@ -433,7 +433,7 @@ global define boolean Read() ``{
     if (have_progress) Progress::NextStage();
 
     boolean progress_orig = Progress::set (false);
-    NetworkDevices::Read ();
+    NetworkInterfaces::Read ();
     Progress::set (progress_orig);
     config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
     original_config_dhcp = config_dhcp;
