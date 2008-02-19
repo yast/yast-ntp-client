@@ -17,6 +17,7 @@ textdomain "ntp-client";
 
 import "Directory";
 import "FileUtils";
+import "Language";
 import "Message";
 import "Mode";
 import "NetworkInterfaces";
@@ -153,6 +154,7 @@ map <string, string> known_countries = $[];
  * ]
  */
 global define map <string, string> GetAllKnownCountries () {
+    //first point of dependence on yast2-country-data
     if (!countries_already_read) {
 	known_countries = (map <string, string>) eval (SCR::Read (.target.ycp, Directory::datadir + "/country.ycp"));
 	countries_already_read = true;
@@ -161,7 +163,7 @@ global define map <string, string> GetAllKnownCountries () {
 
     //workaround bug #241054: servers in United Kingdom are in domain .uk
     // domain .gb does not exist - add UK to the list of known countries
-	       if (haskey(known_countries, "GB")){
+    if (haskey(known_countries, "GB")){
 	known_countries["UK"] = known_countries["GB"]:"";
 	known_countries = remove(known_countries,"GB");
     }
@@ -175,16 +177,9 @@ global define map <string, string> GetAllKnownCountries () {
  */
 global define string GetCurrentLanguageCode (  ) {
     string lang = (string)SCR::Read (.sysconfig.language.RC_LANG);
-    if (lang != nil)
-    {
-        // remove the .UTF-8 first
-        list<string> l = splitstring (lang, ".");
-        lang = l[0]:"";
-        // remove leading language (keep country only)
-        l = splitstring (lang, "_");
-        lang = l[size (l) - 1]:lang;
-    }
-    return lang;
+
+    //second point of dependence on yast2-country-data
+    return Language::GetGivenLanguageCountry( lang );
 }
 
 /**
