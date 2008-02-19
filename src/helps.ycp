@@ -34,9 +34,9 @@ Abort the save procedure by pressing  <b>Abort</b>.
 An additional dialog will inform you whether it is safe to do so.</p>"),
 
     // help text 1/5
-    "start" : _("<p><b><big>Automatically Start NTP Daemon</big></b><br>
-Select whether to start the NTP daemon when booting the system. The
-NTP daemon resolves host names when initializing. Your
+    "start" : _("<p><b><big>Start NTP Daemon</big></b><br>
+Select whether to start the NTP daemon now and on each boot of the system. 
+The NTP daemon resolves host names when initializing. Your
 network connection must be started before the NTP daemon starts.</p>"),
 
     // help text 2/5

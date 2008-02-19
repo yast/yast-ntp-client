@@ -1186,12 +1186,12 @@ define map<string,map<string,any> > InitWidgets () ``{
 	"start" : $[
 	    "widget" : `radio_buttons,
 	    // frame
-	    "label" : _("Automatically Start NTP Daemon"),
+	    "label" : _("Start NTP Daemon"),
 	    "items" : [
 		// radio button
-		[ "never", _("N&ever") ],
+		[ "never", _("Only &Manually") ],
 		// radio button
-		[ "boot", _("During &Boot") ],
+		[ "boot", _("Now and On &Boot") ],
 	    ],
 	    "help" : HELPS["start"]:"",
 	    "init" : startInit,
