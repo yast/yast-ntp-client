@@ -91,11 +91,9 @@ if (func == "CreateUI")
             `VSpacing (0.5),
             `HBox (
                 `HSpacing (3),
-                `MinWidth (38,
-                    `ComboBox (`id (`ntp_address), `opt (`editable),
+                `ComboBox (`id (`ntp_address), `opt (`editable),
                         // combo box label
                         _("NTP Server Address")
-                    )
                 ),
                 `VBox (
                     `Label (""),
