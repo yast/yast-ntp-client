@@ -147,6 +147,9 @@ else if (func == "MakeProposal")
 else if (func == "Write")
 {
     string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
+    boolean write_settings = param["write_settings"]:false;
+    boolean ntpdate_only = param["ntpdate_only"]:false;
+
     if ( !ValidateSingleServer( ntp_server ) )
 	ret = `invalid_hostname;
     else
@@ -154,7 +157,9 @@ else if (func == "Write")
 	string required_package = "xntp";
 
         //In 1st stage, schedule packages for installation
-        if (Stage::initial())
+        //but not in case user wants to set the time only (F#302917)
+	//(ntpdate is in inst-sys so we don't need the package)
+        if (Stage::initial() && !ntpdate_only)
 	{
 	    if (Package::Available(required_package))
 	    {
@@ -203,8 +208,23 @@ without having package %1 installed"), required_package));
         if (r == 0)
         {
             ret = `success;
-	    NtpClient::modified = true;
-	    AddSingleServer(ntp_server);
+
+	    //User wants more than running ntpdate
+	    //(I hate this, it's overly complicated, but some 
+	    //things are just not explainable)
+	    if (!ntpdate_only)
+            {
+	        NtpClient::modified = true;
+	        AddSingleServer(ntp_server);
+
+	        //OK, so we stored the server address
+	        //In inst-sys we don't need to care further
+	        //ntp-client_finish will do the job
+	        //In installed system we must write the settings
+
+	        if ( !Stage::initial() && write_settings)
+		    NtpClient::Write();
+	    }
         }
         else
 	    ret = `ntpdate_failed;
