@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue Feb 19 17:51:21 CET 2008 - kmachalkova@suse.cz
+
+- Improved NTP service start wording (now & on boot vs. manually) 
+  (bnc#345340)
+- Improved NTP installation proposal layout (bnc#359209)
+- Depend on lightweight yast2-country-data instead of yast2-country
+- ntp-client_proposal made smarter (FaTE#302917)
+- 2.16.4
+
+-------------------------------------------------------------------
 Thu Jan 24 15:48:51 CET 2008 - mzugec@suse.cz
 
 - replace deprecated NetworkDevices by NetworkInterfaces (from yast2)
