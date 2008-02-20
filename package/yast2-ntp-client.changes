@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb 20 19:28:18 CET 2008 - kmachalkova@suse.cz
+
+- Added yast2-country-data into BuildRequires 
+
+-------------------------------------------------------------------
 Tue Feb 19 17:51:21 CET 2008 - kmachalkova@suse.cz
 
 - Improved NTP service start wording (now & on boot vs. manually) 
