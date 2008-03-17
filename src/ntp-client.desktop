@@ -24,3 +24,4 @@ Exec=/sbin/yast2 ntp-client
 Name=NTP Configuration
 GenericName=Configure an NTP client or server
 X-KDE-SubstituteUID=true
+StartupNotify=true

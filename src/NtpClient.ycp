@@ -30,6 +30,7 @@ import "Stage";
 import "String";
 import "Summary";
 import "SuSEFirewall";
+import "FileChanges";
 
 
 /**
@@ -462,6 +463,8 @@ global define boolean Read() ``{
 	}
     }
 
+      if (! FileChanges::CheckFiles (["/etc/ntp.conf"]))
+	failed = true;
     ProcessNtpConf();
 
     run_chroot = SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED) == "yes";
@@ -761,6 +764,8 @@ global define boolean Write() ``{
 	if (! SCR::Write (.etc.ntp_conf, nil))
 	    failed = true;
       }
+
+      FileChanges::StoreFileCheckSum ("/etc/ntp.conf");
 
       if (failed)
 	// error report
