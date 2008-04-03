@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Apr  3 17:30:40 CEST 2008 - kmachalkova@suse.cz
+
+- Display popup with icon if NTP test succeeds (#306018)
+- Require and install ntp packages (instead of obsoleted xntp),
+  correct documentation (#372417)    	
+- 2.16.5
+
+-------------------------------------------------------------------
 Mon Mar 17 12:43:32 CET 2008 - jsrain@suse.cz
 
 - added 'StartupNotify=true' to the desktop file (bnc #304964)
