@@ -1,9 +1,9 @@
 -------------------------------------------------------------------
 Thu Apr  3 17:30:40 CEST 2008 - kmachalkova@suse.cz
 
-- Display popup with icon if NTP test succeeds (#306018)
+- Display popup with icon if NTP test succeeds (bnc#306018)
 - Require and install ntp packages (instead of obsoleted xntp),
-  correct documentation (#372417)    	
+  correct documentation (bnc#372417)    	
 - 2.16.5
 
 -------------------------------------------------------------------
