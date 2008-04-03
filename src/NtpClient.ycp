@@ -1001,7 +1001,7 @@ global boolean TestNtpServer (string server, boolean silent) {
 	if (ok)
 	{
 	    // message report - result of test of connection to NTP server
-	    Popup::Notify (_("Server is reachable and responds properly."));
+	    Popup::Notify (_("Server is reachable and responds properly.")); 
 	}
 	else
 	{
