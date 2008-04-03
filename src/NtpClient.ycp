@@ -22,6 +22,7 @@ import "Message";
 import "Mode";
 import "NetworkInterfaces";
 import "PackageSystem";
+import "Popup";
 import "Progress";
 import "Report";
 import "Service";
@@ -106,7 +107,7 @@ global string ad_controller = "";
 /**
   * Required packages
   */
-global list required_packages = ["xntp"];
+global list required_packages = ["ntp"];
 
 /**
  * ports in firewall to open
@@ -443,7 +444,7 @@ global define boolean Read() ``{
     boolean failed = false;
 
     if (! Mode::testsuite () && ! Mode::installation ()
-	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["xntp"])
+	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["ntp"])
     )
     {
 	return false;
@@ -1000,7 +1001,7 @@ global boolean TestNtpServer (string server, boolean silent) {
 	if (ok)
 	{
 	    // message report - result of test of connection to NTP server
-	    Report::Message (_("Server is reachable and responds properly."));
+	    Popup::Notify (_("Server is reachable and responds properly."));
 	}
 	else
 	{

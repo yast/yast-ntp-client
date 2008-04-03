@@ -75,6 +75,7 @@ define symbol WriteDialog() ``{
     Wizard::RestoreHelp(HELPS["write"]:"");
     NtpClient::AbortFunction = PollAbort;
     boolean ret = NtpClient::Write();
+    NtpClient::AbortFunction = nil;
     return ret ? `next : `abort;
 }
 

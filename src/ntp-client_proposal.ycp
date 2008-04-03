@@ -113,13 +113,13 @@ if (func == "CreateUI")
             UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
         }
 
-	//OK, let's remove this, xntp package is available even on 1CD media so we don't need
+	//OK, let's remove this, ntp package is available even on 1CD media so we don't need
         //to check if it is available to prevent repository scanning windows from popping up 
 	//(#327336, c#21)
 
-        //if ( ( Stage::initial() || !Package::Installed("xntp") ) && !Package::Available("xntp") )
+        //if ( ( Stage::initial() || !Package::Installed("ntp") ) && !Package::Available("ntp") )
         //{
-        //    y2warning("xntp package is not installable, NTP synchronization will not be available");
+        //    y2warning("ntp package is not installable, NTP synchronization will not be available");
         //    UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
         //}
     }
@@ -154,7 +154,7 @@ else if (func == "Write")
 	ret = `invalid_hostname;
     else
     {
-	string required_package = "xntp";
+	string required_package = "ntp";
 
         //In 1st stage, schedule packages for installation
         //but not in case user wants to set the time only (F#302917)
@@ -222,7 +222,7 @@ without having package %1 installed"), required_package));
 	        //ntp-client_finish will do the job
 	        //In installed system we must write the settings
 
-	        if ( !Stage::initial() && write_settings)
+	        if ( !Stage::initial() /*&& write_settings*/)
 		    NtpClient::Write();
 	    }
         }
