@@ -8,16 +8,14 @@
 {
 textdomain "ntp-client";
 
+
 import "Address";
 import "NetworkService";
 import "NtpClient";
 import "Service";
 import "String";
 import "Stage";
-import "Package";
-import "Packages";
 import "PackageSystem";
-import "Pkg";
 import "Popup";
 import "Report";
 
@@ -86,22 +84,30 @@ boolean ValidateSingleServer( string ntp_server )
 
 if (func == "CreateUI")
 {
-   term cont =
-	`Left ( `VBox(
-            `VSpacing (0.5),
-            `HBox (
-                `HSpacing (3),
-                `ComboBox (`id (`ntp_address), `opt (`editable),
-                        // combo box label
-                        _("NTP Server Address")
-                ),
-                `VBox (
-                    `Label (""),
-                    // push button label
-                    `PushButton (`id (`ntp_configure), _("Configure..."))
-                )
-            )
-	));
+   term cont = `VBox (`VSpacing (0.5), `HBox (
+	`HSpacing (3),
+	`HWeight (1, `VBox (
+            `Left (`ComboBox (`id (`ntp_address), `opt (`editable, `hstretch),
+                // combo box label
+                _("NTP Server Address")
+	    )),
+	    `VSpacing (0.3),
+	    `HBox (
+		`HSpacing (0.5),
+		// check box label
+		`Left (`CheckBox (`id (`ntp_save), _("Save NTP Configuration")))
+	    )
+	)),
+	`HWeight (1, `VBox (
+            `Label (""),
+	    `VSpacing (0.3), // try to line up the widgets horizontally
+            // push button label
+            `Left (`PushButton (`id (`ntp_now), _("Synchronize now"))),
+	    `VSpacing (0.3),
+            // push button label
+            `Left (`PushButton (`id (`ntp_configure), _("Configure...")))
+	))
+    ));
 
     if (UI::WidgetExists(`id(`rp)))
     {
@@ -112,24 +118,27 @@ if (func == "CreateUI")
             y2warning("Network is not running, NTP synchronization will not be available");
             UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
         }
-
-	//OK, let's remove this, ntp package is available even on 1CD media so we don't need
-        //to check if it is available to prevent repository scanning windows from popping up 
-	//(#327336, c#21)
-
-        //if ( ( Stage::initial() || !Package::Installed("ntp") ) && !Package::Available("ntp") )
-        //{
-        //    y2warning("ntp package is not installable, NTP synchronization will not be available");
-        //    UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
-        //}
     }
 
     ret = true;
 }
 
+else if (func == "GetNTPEnabled")
+{
+    ret	= Service::Enabled (NtpClient::service_name);
+}
+
+
 else if (func == "GetUseNTP")
 {
-    ret = NtpClient::ntp_selected;
+    /*
+    if (param["first_time"]:false && !Stage::initial ())
+    {
+	ret	= Service::Enabled (NtpClient::service_name);
+    }
+    else
+    */
+	ret = NtpClient::ntp_selected;
 }
 
 else if (func == "SetUseNTP")
@@ -147,7 +156,6 @@ else if (func == "MakeProposal")
 else if (func == "Write")
 {
     string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
-    boolean write_settings = param["write_settings"]:false;
     boolean ntpdate_only = param["ntpdate_only"]:false;
 
     if ( !ValidateSingleServer( ntp_server ) )
@@ -161,6 +169,8 @@ else if (func == "Write")
 	//(ntpdate is in inst-sys so we don't need the package)
         if (Stage::initial() && !ntpdate_only)
 	{
+	    import "Package";
+	    import "Packages";
 	    if (Package::Available(required_package))
 	    {
 	        Packages::addAdditionalPackage(required_package);
@@ -171,7 +181,7 @@ else if (func == "Write")
 	    }
 	}
 	//Otherwise, prompt user for confirming pkg installation
-	else
+	else if (!Stage::initial ())
 	{
 	   if (!PackageSystem::CheckAndInstallPackages([ required_package ]))
 	   {
@@ -181,7 +191,7 @@ without having package %1 installed"), required_package));
 	}
 
         integer status = -1;
-        string service_name = "ntp";
+        string service_name = NtpClient::service_name;
 
         //Stop NTP service on running system (during 1st stage, we don't care)
         if( !Stage::initial())
@@ -209,9 +219,7 @@ without having package %1 installed"), required_package));
         {
             ret = `success;
 
-	    //User wants more than running ntpdate
-	    //(I hate this, it's overly complicated, but some 
-	    //things are just not explainable)
+	    // User wants to more than running ntpdate (synchronize on boot)
 	    if (!ntpdate_only)
             {
 	        NtpClient::modified = true;
@@ -221,8 +229,7 @@ without having package %1 installed"), required_package));
 	        //In inst-sys we don't need to care further
 	        //ntp-client_finish will do the job
 	        //In installed system we must write the settings
-
-	        if ( !Stage::initial() /*&& write_settings*/)
+	        if (!Stage::initial())
 		    NtpClient::Write();
 	    }
         }
@@ -242,7 +249,9 @@ else if (func == "AskUser")
     {
         string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
         AddSingleServer(ntp_server);
-        ret = (symbol) WFM::CallFunction("ntp-client");
+        boolean retval = (boolean) WFM::CallFunction("ntp-client");
+	if (retval)
+	    ret	= `next;
         ProposeSomething();
     }
 }

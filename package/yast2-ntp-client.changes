@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Apr  4 16:17:14 CEST 2008 - jsuchome@suse.cz
+
+- ntp-client_proposal: UI adapted for fate#302917 (distinguish
+  between one-time synchronization and saving the client config)
+- 2.16.6
+
+-------------------------------------------------------------------
 Thu Apr  3 17:30:40 CEST 2008 - kmachalkova@suse.cz
 
 - Display popup with icon if NTP test succeeds (bnc#306018)
