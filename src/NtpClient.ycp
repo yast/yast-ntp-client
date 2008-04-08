@@ -99,10 +99,10 @@ global map<string,any> selected_record = $[];
   */
 global string ad_controller = "";
 
-///**
-//  * Should the firewall settings be changed?
-//  */
-//global boolean change_firewall = false;
+/**
+  * Should the firewall settings be changed?
+  */
+global boolean change_firewall = false;
 
 /**
   * Required packages
@@ -464,7 +464,7 @@ global define boolean Read() ``{
 	}
     }
 
-      if (! FileChanges::CheckFiles (["/etc/ntp.conf"]))
+    if (! FileChanges::CheckFiles (["/etc/ntp.conf"]))
 	failed = true;
     ProcessNtpConf();
 
@@ -816,12 +816,12 @@ global define boolean Write() ``{
     if(Abort()) return false;
     if (have_progress) Progress::NextStage ();
 
-//    if (change_firewall)
-//    {
+    if (change_firewall)
+    {
 	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::Write ();
 	Progress::set (progress_orig);
-//    }
+    }
 
     if (! Service::Adjust (service_name,
 	run_service ? "enable" : "disable"))

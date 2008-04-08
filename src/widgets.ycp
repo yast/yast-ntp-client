@@ -136,6 +136,9 @@ the daemon might not run properly.")))
     else
 	CWMFirewallInterfaces::DisableOpenFirewallWidget ();
 
+    if (CWMFirewallInterfaces::OpenFirewallModified( "firewall" ))
+	NtpClient::change_firewall = true;
+
     return nil;
 }
 
