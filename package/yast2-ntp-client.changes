@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Apr  9 13:38:32 CEST 2008 - mvidner@suse.cz
+
+- Read the whole configuration of NTP (not only ntp.conf
+  but also e.g. firewall) on running system to initialize
+  everything correctly; do not re-read ntp.confif it has been read
+  already (bnc#375877)
+
+-------------------------------------------------------------------
 Fri Apr  4 16:17:14 CEST 2008 - jsuchome@suse.cz
 
 - ntp-client_proposal: UI adapted for fate#302917 (distinguish
