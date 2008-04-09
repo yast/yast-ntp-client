@@ -1,8 +1,6 @@
 #
-# Makefile.am for y2c_prnt/data
+# Makefile.am for ntp-client/data
 #
-
-ydatadir = /usr/share/YaST2/data
 
 ydata_DATA = \
 	ntp_servers.ycp
