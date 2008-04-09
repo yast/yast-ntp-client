@@ -287,6 +287,12 @@ global list GetNtpServersByCountry ( string country, boolean terse_output ) {
  */
 global define boolean ProcessNtpConf() ``{
 
+    if (config_has_been_read)
+    {
+	y2milestone("Configuration has been read already, skipping.");
+	return false;
+    }
+
     map conf = nil;
     if (FileUtils::Exists("/etc/ntp.conf"))
         conf = (map)SCR::Read (.etc.ntp_conf.all);
