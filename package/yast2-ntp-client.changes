@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 11 10:47:33 CEST 2008 - mvidner@suse.cz
+
+- Suggest ntp.$domain as the local server (fate#302863).
+- 2.16.7
+
+-------------------------------------------------------------------
 Wed Apr  9 13:38:32 CEST 2008 - mvidner@suse.cz
 
 - Read the whole configuration of NTP (not only ntp.conf

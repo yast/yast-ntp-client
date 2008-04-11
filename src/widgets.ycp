@@ -32,7 +32,7 @@ include "ntp-client/dialogs.ycp";
 string peer_type_selected = nil;
 
 /* List of NTP servers already found */
-list <string> found_servers_cache = [];
+list <string> found_servers_cache = nil;
 
 /* The 'Current Record' when NTP is being initialized, see bug 177575 */
 map <string, any> selected_record_during_init = $[];
@@ -1088,6 +1088,17 @@ which probably blocks the network scanning."));
  */
 void FoundServersInit (string id) {
     list <term> items = [];
+
+    // fate#302863: suggest ntp.$domain
+    if (found_servers_cache == nil) {
+	string guessed = "ntp." + Hostname::CurrentDomain ();
+	if (NtpClient::TestNtpServer (guessed, `transient_popup)) {
+	    found_servers_cache = [ guessed ];
+	}
+	else {
+	    found_servers_cache = [];
+	}
+    }
 
     foreach (string server, found_servers_cache, {
 	items = add (items, `item(`id(server), server));
