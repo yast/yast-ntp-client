@@ -957,14 +957,16 @@ global define string Summary() ``{
 /**
  * Test if specified NTP server answers
  * @param server string host name or IP address of the NTP server
- * @param silent boolean don't report the result of the detection
+ * @param verbosity `no_ui: ..., `transient_popup: pop up while scanning,
+ *                  `result_popup: also final pop up about the result
  * @return boolean true if NTP server answers properly
  */
-global boolean TestNtpServer (string server, boolean silent) {
-    UI::OpenDialog(
+global boolean TestNtpServer (string server, symbol verbosity) {
+    if (verbosity != `no_ui)
+      UI::OpenDialog(
 	// An informative popup label diring the NTP server testings
 	`Left(`Label(_("Testing the NTP server...")))
-    );
+      );
 
     integer status = -1;
     //Do not do anything to ntp service during installation
@@ -999,10 +1001,12 @@ global boolean TestNtpServer (string server, boolean silent) {
 	    Service::Start (service_name);
     }
 
-    UI::CloseDialog();
+    if (verbosity != `no_ui) {
+	UI::CloseDialog();
+    }
 
     boolean ok = (ret_IPv4 == 0 || ret_IPv6 == 0);
-    if (! silent)
+    if (verbosity == `result_popup)
     {
 	if (ok)
 	{

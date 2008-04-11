@@ -631,10 +631,10 @@ define symbol serverAddressHandle (string id, map event) {
     if (ev_id == `test_server)
     {
 	if (UI::WidgetExists(`id("use_random_servers")) && (boolean) UI::QueryWidget(`id("use_random_servers"), `Value)) {
-	    NtpClient::TestNtpServer (NtpClient::random_pool_servers[random(4)]:"0.pool.ntp.org", false);
+	    NtpClient::TestNtpServer (NtpClient::random_pool_servers[random(4)]:"0.pool.ntp.org", `result_popup);
 	} else {
 	    if (serverAddressValidate("server_address",$[]))
-		NtpClient::TestNtpServer (server, false);
+		NtpClient::TestNtpServer (server, `result_popup);
 	}
     }
     else if (ev_id == `select_local) {
@@ -928,7 +928,7 @@ symbol ServerListHandle (string id, map event) {
 	}
 	if (event["ID"]:nil == `test)
 	{
-	    NtpClient::TestNtpServer (server, false);
+	    NtpClient::TestNtpServer (server, `result_popup);
 	}
 	return nil;
     }
@@ -1088,6 +1088,7 @@ which probably blocks the network scanning."));
  */
 void FoundServersInit (string id) {
     list <term> items = [];
+
     foreach (string server, found_servers_cache, {
 	items = add (items, `item(`id(server), server));
     });
@@ -1138,7 +1139,7 @@ symbol LocalSelectTestHandle (string id, map event) {
 //    {
 //	server = (string)UI::QueryWidget (`id (`servers), `Value);
 //    }
-    NtpClient::TestNtpServer (server, false);
+    NtpClient::TestNtpServer (server, `result_popup);
     return nil;
 }
 
@@ -1152,7 +1153,7 @@ symbol PublicSelectTestHandle (string id, map event) {
 //    {
 	server = (string)UI::QueryWidget (`id (`servers), `Value);
 //    }
-    NtpClient::TestNtpServer (server, false);
+    NtpClient::TestNtpServer (server, `result_popup);
     return nil;
 }
 
