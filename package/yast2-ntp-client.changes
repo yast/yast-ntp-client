@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Apr 16 10:45:26 CEST 2008 - mvidner@suse.cz
+
+- Merged proofread texts.
+
+-------------------------------------------------------------------
 Fri Apr 11 10:47:33 CEST 2008 - mvidner@suse.cz
 
 - Suggest ntp.$domain as the local server (fate#302863).
