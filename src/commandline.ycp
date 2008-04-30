@@ -77,9 +77,9 @@ define boolean updateSyncRecord (map options) ``{
     if (haskey (options, "fudge"))
 	NtpClient::selected_record["fudge_options"] = options["fudge"]:"";
     if (haskey (options, "initial"))
-	NtpClient::selected_record["initial_sync"] = true;
+	y2warning ("option 'initial' is obsolete");
     if (haskey (options, "no-initial"))
-	NtpClient::selected_record["initial_sync"] = false;
+	y2warning ("option 'no-initial' is obsolete");
     return NtpClient::storeSyncRecord ();
 }
 
@@ -282,14 +282,6 @@ map cmdline = $[
 	    // command line help text for an option
 	    "help"	: _("Options for clock driver calibration"),
 	    "type"	: "string",
-	],
-	"initial" : $[
-	    // command line help text for an option
-	    "help"	: _("Use the server for initial synchronization"),
-	],
-	"no-initial" : $[
-	    // command line help text for an option
-	    "help"	: _("Do not use the server for initial synchronization"),
 	],
     ],
 

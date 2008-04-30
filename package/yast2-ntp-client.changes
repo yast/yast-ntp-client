@@ -1,6 +1,9 @@
 -------------------------------------------------------------------
-Wed Apr 30 11:10:27 CEST 2008 - mvidner@suse.cz
+Wed Apr 30 14:16:39 CEST 2008 - mvidner@suse.cz
 
+- /etc/sysconfig/ntp:NTPD_INITIAL_NTPDATE was removed and assumes AUTO
+  now. Removed the UI related to it, but keet CLI and AutoYaST options
+  for compatibility (bnc#381838).
 - Avoid "UI syntax error" when Write is called from the timezone
   module (bnc#384715).
 

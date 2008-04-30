@@ -78,7 +78,6 @@
 	],
 	"sysconfig" : $[
 	    "ntp" : $[
-		"NTPD_INITIAL_NTPDATE" : "AUTO-2",
 		"NTPD_RUN_CHROOTED" : "yes",
 	    ],
 	    "personal-firewall" : $[

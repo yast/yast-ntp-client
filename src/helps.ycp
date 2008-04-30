@@ -130,11 +130,7 @@ text field.</p>"),
 To set the address from which to accept broadcast packets, use 
 <b>Address</b>.</p>"),
 
-    // help text 2/4, optinal
-    "init_sync" : _("<p><b><big>Initial Synchronization</big></b><br>
-The first synchronization of the clock is performed before the NTP daemon is
-started. To use this host for initial synchronization, select
-<b>Use for Initial Synchronization</b>.</p>"),
+    // help text 2/4, was removed
 
     // help text 3/4, optional
     "options" : _("<p><b><big>Options</big></b><br>

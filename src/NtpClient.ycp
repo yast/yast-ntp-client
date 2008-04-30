@@ -474,48 +474,13 @@ global define boolean Read() ``{
 	failed = true;
     ProcessNtpConf();
 
-    run_chroot = SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED) == "yes";
+    string run_chroot_s = (string) SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED);
+    run_chroot = run_chroot_s == "yes";
 
-    string initial_sync = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
-    if (initial_sync == nil)
+    if (run_chroot_s == nil)
     {
-	initial_sync = "";
 	failed = true;
-	y2error ("Failed reading .sysconfig.ntp.NTPD_INITIAL_NTPDATE");
-    }
-
-    // mark those servers and peers that are used for initial syncing
-    if (initial_sync == "AUTO")
-    {
-	ntp_records = maplist (map<string,any> p, ntp_records, ``{
-	    p["initial_sync"] = p["type"]:"" == "server";
-	    return p;
-	});
-    }
-    else if (regexpmatch (initial_sync, "AUTO-[0-9]+"))
-    {
-	integer count = tointeger (
-	    regexpsub (initial_sync, "AUTO-([0-9]+)", "\\1"));
-	ntp_records = maplist (map<string,any> p, ntp_records, ``{
-	    if (p["type"]:"" == "server" || p["type"]:"" == "peer")
-	    {
-		count = count - 1;
-		p["initial_sync"] = count >= 0;
-	    }
-	    else
-		p["initial_sync"] = false;
-	    return p;
-	});
-    }
-    else
-    {
-	list listed = splitstring (initial_sync, " ");
-	ntp_records = maplist (map<string,any> p, ntp_records, ``{
-	    p["initial_sync"]
-		= (p["type"]:"" == "server" || p["type"]:"" == "peer")
-		    && contains (listed, p["address"]:"");
-	    return p;
-	});
+	y2error ("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED");
     }
 
     if(failed)
@@ -621,7 +586,6 @@ global define void ActivateRandomPoolServersFunction () {
 	    string one_address					= one_record["address"]:"";
 	    store_current_options[one_address]                  = $[];
 	    store_current_options[one_address, "options"]       = one_record["options"]:"";
-	    store_current_options[one_address, "initial_sync"]  = one_record["initial_sync"]:true;
 	}
     });
 
@@ -636,20 +600,17 @@ global define void ActivateRandomPoolServersFunction () {
     });
 
     foreach (string one_server, random_pool_servers, {
-	boolean one_initial_sync = true;
 	string  one_options      = "";
 	
 	if (haskey(store_current_options, one_server)) {
-	    one_initial_sync = store_current_options[one_server, "initial_sync"]:true;
 	    one_options      = store_current_options[one_server, "options"]:"";
-	    y2milestone("Leaving current configuration for server '%1', initial_sync: '%2', options '%3'",
-		one_server, one_initial_sync, one_options);
+	    y2milestone("Leaving current configuration for server '%1', options '%2'",
+		one_server, one_options);
 	}
 	
 	ntp_records = add (ntp_records, $[
 	    "address":one_server,
 	    "comment":"\n# Random pool server, see http://www.pool.ntp.org/ for more information\n",
-	    "initial_sync":one_initial_sync,
 	    "options":one_options,
 	    "type":"server"
 	]);
@@ -785,32 +746,10 @@ global define boolean Write() ``{
 	Service::RunInitScript ("network", "restart-all-dhcp-clients");
     }
 
-    list init = maplist (map<string,any> p, ntp_records, ``(
-	(p["type"]:"" == "server" || p["type"]:"" == "peer")
-	    && p["initial_sync"]:false
-		? p["address"]:""
-		: nil
-    ));
-    init = filter (any i, init, ``(i != nil));
-    string init_str = mergestring ((list<string>)init, " ");
-
-    // if DHCLIENT_MODIFY_NTP_CONF, NTPD_INITIAL = AUTO
-    if (config_dhcp) {
-	init_str = "AUTO";
-    // Don't remove the AUTO key, something should be present for initialization
-    // if there is no NTP server set explicitly
-    } else if (size (init) == 0) {
-	string orig_init = (string)SCR::Read (.sysconfig.ntp.NTPD_INITIAL_NTPDATE);
-	if (orig_init == "AUTO" || substring (orig_init, 0, 5) == "AUTO-") {
-	    init_str = orig_init;
-	}
-    }
-
     if (! (SCR::Write (.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot
 	    ? "yes"
 	    : "no")
-	&& SCR::Write (.sysconfig.ntp.NTPD_INITIAL_NTPDATE, init_str)
-	&& SCR::Write (.sysconfig.ntp, nil)))
+	   && SCR::Write (.sysconfig.ntp, nil)))
     {
 	// error report
 	Report::Error (_("Cannot write sysconfig variables."));
@@ -877,8 +816,6 @@ global define boolean Import (map settings) ``{
             {
                 p["type"] = p["key"]:"";
                 p["address"] = p["value"]:"";
-		if (haskey (p, "initial"))
-		    p["initial_sync"] = p["initial"]:false;
 		if (haskey (p, "param"))
 		    p["options"] = p["param"]:"";
                 return (p);

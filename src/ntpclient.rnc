@@ -10,6 +10,7 @@ create_symlink =
   element create_symlink { BOOLEAN }
 configure_dhcp =
   element configure_dhcp { BOOLEAN }
+# ignored since 2.16.8
 initial_sync =
   element initial_sync { BOOLEAN }
 fudge_comment = element fudge_comment { text }

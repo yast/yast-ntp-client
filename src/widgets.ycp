@@ -231,7 +231,6 @@ define symbol complexButtonHandle (string key, map event) ``{
 		y2milestone("The currently selected server is the same as when starting the module...");
 	    } else {
 		NtpClient::selected_record["type"] = "server";
-		NtpClient::selected_record["initial_sync"] = true;
 		y2milestone("Storing the current address record: %1", NtpClient::selected_record);
 		NtpClient::storeSyncRecord();
 	    }
@@ -575,7 +574,6 @@ define void addressStore (string id, map event) ``{
 	{
 	    y2milestone("Storing the server address in simple configuration");
 	    NtpClient::selected_record["type"] = "server";
-	    NtpClient::selected_record["initial_sync"] = true;
 	}
     }
 }
@@ -645,26 +643,6 @@ define symbol serverAddressHandle (string id, map event) {
     }
 
     return nil;
-}
-
-/**
- * Initialize the widget
- * @param id any widget id
- */
-define void initSyncInit (string id) ``{
-    y2milestone("Selected %1", NtpClient::selected_record);
-    UI::ChangeWidget (`id ("init_sync"), `Value,
-	NtpClient::selected_record["initial_sync"]:false);
-}
-
-/**
- * Store settings of the widget
- * @param id any widget id
- * @param event map event that caused storing process
- */
-define void initSyncStore (string id, map event) ``{
-    NtpClient::selected_record["initial_sync"]
-	= UI::QueryWidget (`id ("init_sync"), `Value);
 }
 
 /**
@@ -1366,14 +1344,6 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "handle_events" : [ "browse" ],
 	    "handle" : browseButtonHandle,
 	    "help" : " ",
-	],
-	"init_sync" : $[
-	    "widget" : `checkbox,
-	    // checkbox
-	    "label" : _("Use for &Initial Synchronization"),
-	    "init" : initSyncInit,
-	    "store" : initSyncStore,
-	    "help" : HELPS["init_sync"]:"",
 	],
 	"options" : $[
 	    "widget" : `textentry,
