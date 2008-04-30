@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 30 11:10:27 CEST 2008 - mvidner@suse.cz
+
+- Avoid "UI syntax error" when Write is called from the timezone
+  module (bnc#384715).
+
+-------------------------------------------------------------------
 Wed Apr 16 10:45:26 CEST 2008 - mvidner@suse.cz
 
 - Merged proofread texts.

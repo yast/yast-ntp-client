@@ -207,6 +207,8 @@ without having package %1 installed"), required_package));
         integer status = -1;
         string service_name = NtpClient::service_name;
 
+        Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
+
         //Stop NTP service on running system (during 1st stage, we don't care)
         if( !Stage::initial())
         {
@@ -217,7 +219,6 @@ without having package %1 installed"), required_package));
 	        Service::Stop (service_name);
         }
 
-        Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
         y2milestone("Running ntpdate to sync with %1", ntp_server);
 
         integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
@@ -228,6 +229,8 @@ without having package %1 installed"), required_package));
 	    if( status == 0 )
                 Service::Start(service_name);
         }
+
+	Popup::ClearFeedback();
 
         if (r == 0)
         {
@@ -249,8 +252,6 @@ without having package %1 installed"), required_package));
         }
         else
 	    ret = `ntpdate_failed;
-
-	Popup::ClearFeedback();
     }
 }
 
