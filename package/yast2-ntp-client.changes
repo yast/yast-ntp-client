@@ -6,6 +6,7 @@ Wed Apr 30 14:16:39 CEST 2008 - mvidner@suse.cz
   for compatibility (bnc#381838).
 - Avoid "UI syntax error" when Write is called from the timezone
   module (bnc#384715).
+- 2.16.8
 
 -------------------------------------------------------------------
 Wed Apr 16 10:45:26 CEST 2008 - mvidner@suse.cz
