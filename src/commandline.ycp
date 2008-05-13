@@ -283,6 +283,14 @@ map cmdline = $[
 	    "help"	: _("Options for clock driver calibration"),
 	    "type"	: "string",
 	],
+	"initial" : $[
+	    // command line help text for an option
+	    "help"      : _("Use the server for initial synchronization"),
+	],
+	"no-initial" : $[
+	    // command line help text for an option
+	    "help"      : _("Do not use the server for initial synchronization"),
+	],
     ],
 
     "mappings"      : $[
