@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May 16 16:40:22 CEST 2008 - jsrain@suse.cz
+
+- added categories Settings and System into desktop file
+  (bnc #382778)
+
+-------------------------------------------------------------------
 Tue May 13 13:36:47 CEST 2008 - mvidner@suse.cz
 
 - Fixed breakage caused by last change ("Command line specification
