@@ -970,7 +970,8 @@ global list<string> DetectNtpServers (symbol method) {
     {
 	string required_package = "yast2-slp";
 
-	if ( !PackageSystem::Installed(required_package) )
+	// if package is not installed (in the inst-sys, it is: bnc#399659)
+	if ( !Stage::initial() && !PackageSystem::Installed(required_package) )
 	{
 	    if ( !PackageSystem::CheckAndInstallPackages( [required_package] ) )
 	    {
