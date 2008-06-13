@@ -912,7 +912,7 @@ global boolean TestNtpServer (string server, symbol verbosity) {
         status = Service::Status (service_name); 
         //Stop service temporarily (otherwise ntpdate won't work)
         //0 means service is running
-        if ( status == 0);
+        if ( status == 0)
 	    Service::Stop (service_name);
     }
     y2milestone ("Testing reachability of server %1", server);
@@ -934,7 +934,7 @@ global boolean TestNtpServer (string server, symbol verbosity) {
     if ( !Stage::initial() )
     {
         //Start the service if it was running
-        if ( status == 0);
+        if ( status == 0)
 	    Service::Start (service_name);
     }
 

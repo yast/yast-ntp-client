@@ -4,6 +4,7 @@ Fri Jun 13 12:35:00 CEST 2008 - mvidner@suse.cz
 - yast2-slp is already present during the installation, so don't ask
   to install it when the user chooses Local NTP Server / Lookup
   (bnc#399659).
+- Do not leave ntpd running if it was not running before pressing Test.
 - 2.17.0
 
 -------------------------------------------------------------------
