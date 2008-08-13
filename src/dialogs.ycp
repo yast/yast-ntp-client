@@ -151,7 +151,10 @@ define symbol MainDialog () ``{
 	    `VBox (
 		"start",
 		`VSpacing(),
-		`Left ("config_dhcp"),
+		`HBox (
+			   "policy_combo",
+			   "custom_policy"
+			  ),
 		`VSpacing()
 	    )
 	),
@@ -182,7 +185,7 @@ define symbol MainDialog () ``{
 	"general" : $[
 	    "header" : _("General Settings"),
 	    "contents" : tab1,
-	    "widget_names" : ["start", "config_dhcp", "overview"],
+	    "widget_names" : ["start", "policy_combo", "custom_policy", "overview"],
 	],
 	"security" : $[
 	    "header" : _("Security Settings"),
@@ -639,9 +642,9 @@ define symbol StoreRecord () ``{
   * @return symbol for ws `simple or `complex
   */
 define symbol SelectConfigType () ``{
-    if (NtpClient::config_dhcp)
+    if (NtpClient::ntp_policy != "")
     {
-	y2milestone ("Configuration set via DHCP");
+	y2milestone ("No netconfig auto configuration");
 	return `complex;
     }
     list<map> peers = NtpClient::getSyncRecords ();

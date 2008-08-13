@@ -77,12 +77,16 @@ global boolean run_chroot = false;
 /**
  * NTP servers will be configured via DHCP
  */
-global boolean config_dhcp = false;
+//global boolean config_dhcp = false;
 
 /**
  * NTP servers will be configured via DHCP - value got while reading
  */
-global boolean original_config_dhcp = false;
+//global boolean original_config_dhcp = false;
+
+
+global string ntp_policy = "";
+
 
 /**
   * Index of the currently sellected item
@@ -438,8 +442,10 @@ global define boolean Read() ``{
     boolean progress_orig = Progress::set (false);
     NetworkInterfaces::Read ();
     Progress::set (progress_orig);
-    config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
-    original_config_dhcp = config_dhcp;
+    //config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
+    //original_config_dhcp = config_dhcp;
+
+	ntp_policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);	
 
     GetNtpServers ();
     GetCountryNames ();
@@ -623,7 +629,7 @@ global define void ActivateRandomPoolServersFunction () {
  */
 global define boolean Write() ``{
 
-    boolean update_dhcp = original_config_dhcp != config_dhcp;
+    //boolean update_dhcp = original_config_dhcp != config_dhcp;
 
     /* NtpClient read dialog caption */
     string caption = _("Saving NTP Client Configuration");
@@ -659,26 +665,30 @@ global define boolean Write() ``{
     if(Abort()) return false;
     if ( have_progress ) Progress::NextStage();
 
-    if (update_dhcp)
-    {
-	SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF,
-	    config_dhcp ? "yes" : "no");
-	SCR::Write (.sysconfig.network.dhcp, nil);
-	// switch DHCP udpates off before sacing the settings
-	if (! config_dhcp)
-	{
-	    // fixing bug #83918 according to the bug #61055
-	    string cmd = "cd /; /etc/init.d/network restart-all-dhcp-clients";
-	    SCR::Execute (.target.bash, cmd);
-	}
-    }
+	/*
+	  if (update_dhcp)
+	  {
+	  SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF,
+	  config_dhcp ? "yes" : "no");
+	  SCR::Write (.sysconfig.network.dhcp, nil);
+	  // switch DHCP udpates off before sacing the settings
+	  if (! config_dhcp)
+	  {
+	  // fixing bug #83918 according to the bug #61055
+	  string cmd = "cd /; /etc/init.d/network restart-all-dhcp-clients";
+	  SCR::Execute (.target.bash, cmd);
+	  }
+	  }
+	*/
 
-    if (config_dhcp && ! update_dhcp)
-    {
-	y2milestone ("Configuration was and will be DHCP, not touching /etc/dhcps.conf");
-    }
-    else
-    {
+	/*
+	  if (config_dhcp && ! update_dhcp)
+	  {
+	  y2milestone ("Configuration was and will be DHCP, not touching /etc/dhcps.conf");
+	  }
+	  else
+	  {
+	*/
       foreach (string key, map <string, any> m, restrict_map, {
 	map <string, any> ret = $[
 	   "address" : key,
@@ -737,15 +747,23 @@ global define boolean Write() ``{
 
       if (failed)
 	// error report
-	Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
-    }
+		  Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
+	  //}
 
     // if configuration via DHCP was turned on, restart DHCP clients now
-    if (update_dhcp && config_dhcp)
-    {
-	Service::RunInitScript ("network", "restart-all-dhcp-clients");
-    }
+	  /*
+		if (update_dhcp && config_dhcp)
+		{
+		Service::RunInitScript ("network", "restart-all-dhcp-clients");
+		}
+	  */
 
+	  // write policy and run netconfig command
+	  SCR::Write(.sysconfig.network.config.NETCONFIG_NTP_POLICY, ntp_policy);
+	  SCR::Write(.sysconfig.network.config, nil);
+	  
+	  SCR::Execute(.target.bash, "/sbin/netconfig update");
+	  
     if (! (SCR::Write (.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot
 	    ? "yes"
 	    : "no")
@@ -809,7 +827,8 @@ global define boolean Write() ``{
 global define boolean Import (map settings) ``{
     run_service = settings["start_at_boot"]:false;
     run_chroot = settings["start_in_chroot"]:true;
-    config_dhcp = settings["configure_dhcp"]:false;
+	//config_dhcp = settings["configure_dhcp"]:false;
+	ntp_policy = settings["ntp_policy"]:"auto";
     ntp_records = settings["peers"]:[];
     ntp_records = maplist(map<string, any> p, ntp_records, ``{
             if (haskey(p, "key") && haskey(p, "value") )
@@ -824,7 +843,7 @@ global define boolean Import (map settings) ``{
             }
             });
     modified = true;
-    original_config_dhcp = nil;
+    //original_config_dhcp = nil;
     return true;
 }
 
@@ -837,7 +856,8 @@ global define map Export () ``{
     return $[
 	"start_at_boot" : run_service,
 	"start_in_chroot" : run_chroot,
-	"configure_dhcp" : config_dhcp,
+	//"configure_dhcp" : config_dhcp,
+	"ntp_policy" : ntp_policy,
 	"peers" : ntp_records,
     ];
 }
@@ -867,13 +887,15 @@ global define string Summary() ``{
 	// summary string, %1 is list of addresses
 	"broadcastclient" : _("Accept broadcasted time information from: %1"),
     ];
-    if (config_dhcp)
-    {
-	summary = Summary::AddLine (summary,
-	    // summary string
-	    _("Configure NTP daemon via DHCP."));
-	return summary;
-    }
+	/*
+	  if (config_dhcp)
+	  {
+	  summary = Summary::AddLine (summary,
+	  // summary string
+	  _("Configure NTP daemon via DHCP."));
+	  return summary;
+	  }
+	*/
     foreach (string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
 	list<map<string,any> > l

@@ -280,10 +280,10 @@ define void chrootStore (string id, map event) ``{
 
 define void secureInit (string id) ``{
     y2milestone("Restrict %1", NtpClient::restrict_map);
-    if (NtpClient::config_dhcp)
-	UI::ChangeWidget(`id("secure"), `Enabled, false);
+    if (NtpClient::ntp_policy == "STATIC" || NtpClient::ntp_policy == "" )
+		UI::ChangeWidget(`id("secure"), `Enabled, false);
     else
-	UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
+		UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
 }
 
 define void secureStore (string id, map event) ``{
@@ -325,19 +325,61 @@ define void secureStore (string id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
-define void ConfigDhcpInit (string id) ``{
-    UI::ChangeWidget (`id (id), `Value, NtpClient::config_dhcp);
-}
+/*
+  define void ConfigDhcpInit (string id) ``{
+  UI::ChangeWidget (`id (id), `Value, NtpClient::config_dhcp);
+  }
+*/
 
 /**
  * Store settings of the widget
  * @param id any widget id
  * @param event map event that caused storing process
  */
-define void ConfigDhcpStore (string id, map event) ``{
-    NtpClient::config_dhcp = (boolean)(UI::QueryWidget (`id (id), `Value));
-    NtpClient::modified = true;
+/*
+  define void ConfigDhcpStore (string id, map event) ``{
+  NtpClient::config_dhcp = (boolean)(UI::QueryWidget (`id (id), `Value));
+  NtpClient::modified = true;
+  }
+*/
+
+define void PolicyInit(string id) ``{
+	if( NtpClient::ntp_policy == "" )
+	{
+		UI::ChangeWidget(`id("policy_combo"), `Value, `id(`nomodify));
+		UI::ChangeWidget(`id("custom_policy"), `Value, "");
+		UI::ChangeWidget(`id("custom_policy"), `Enabled, false);
+	}
+	else if( NtpClient::ntp_policy == "auto" || NtpClient::ntp_policy == "STATIC *")
+	{
+		UI::ChangeWidget(`id("policy_combo"), `Value, `id(`auto));
+		UI::ChangeWidget(`id("custom_policy"), `Value, "");
+		UI::ChangeWidget(`id("custom_policy"), `Enabled, false);
+	}
+	else
+	{
+		UI::ChangeWidget(`id("policy_combo"), `Value, `id(`custom));
+		UI::ChangeWidget(`id("custom_policy"), `Value, NtpClient::ntp_policy);
+		UI::ChangeWidget(`id("custom_policy"), `Enabled, true);
+	}
 }
+
+define void PolicyStore(string id, map event) ``{
+	if( UI::QueryWidget (`id ("policy_combo"), `Value) == `nomodify )
+	{
+		NtpClient::ntp_policy = "";
+	}
+	else if( UI::QueryWidget (`id ("policy_combo"), `Value) == `auto )
+	{
+		NtpClient::ntp_policy = "auto";
+	}
+	else
+	{
+		NtpClient::ntp_policy = (string)UI::QueryWidget (`id ("custom_policy"), `Value);
+	}
+	NtpClient::modified = true;
+}
+
 
 define void RandomServersInit (string id) {
     ntpEnabledOrDisabled(id, $[]);
@@ -473,17 +515,29 @@ define symbol overviewHandle (string id, map event) ``{
     }
     NtpClient::modified = true;
     any ev_id = event["ID"]:nil;
-    if (ev_id == "boot" || ev_id == "never" || ev_id == "config_dhcp")
+    if (ev_id == "boot" || ev_id == "never" || ev_id == "policy_combo")
     {
+		symbol pol = (symbol)UI::QueryWidget (`id ("policy_combo"), `Value);
+		
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
 	    != "never";
 //	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
-	enabled = enabled && ! (boolean)
-	    UI::QueryWidget (`id ("config_dhcp"), `Value);
+	enabled = (enabled && (pol != `nomodify));
 	UI::ChangeWidget (`id (`add), `Enabled, enabled);
 	UI::ChangeWidget (`id (`edit), `Enabled, enabled);
 	UI::ChangeWidget (`id (`delete), `Enabled, enabled);
 	UI::ChangeWidget (`id (`overview), `Enabled, enabled);
+
+	if(enabled && (pol == `custom))
+	{
+		UI::ChangeWidget (`id ("custom_policy"), `Enabled, true);
+		UI::ChangeWidget (`id ("custom_policy"), `Value, NtpClient::ntp_policy);
+	}
+	else
+	{
+		UI::ChangeWidget (`id ("custom_policy"), `Enabled, false);
+		UI::ChangeWidget (`id ("custom_policy"), `Value, "");
+	}
 	return nil;
     }
     map<string,symbol> types = $[
@@ -664,7 +718,7 @@ define void optionsStore (string id, map event) ``{
 
 define void restrictOptionsInit ( string id ) ``{
     string address = NtpClient::selected_record["address"]:"";
-    if ( NtpClient::restrict_map == $[] || NtpClient::config_dhcp)
+    if ( NtpClient::restrict_map == $[] || NtpClient::ntp_policy == "" || NtpClient::ntp_policy == "STATIC")
     {
 	UI::ChangeWidget(`id("ac_options"), `Enabled, false);
     }
@@ -1210,6 +1264,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "store"  : secureStore,
 	    "help"   : HELPS["secure"]:"",
         ],
+	/*
 	"config_dhcp" : $[
 	    "widget" : `checkbox,
 	    "opt" : [ `notify ],
@@ -1220,6 +1275,23 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "handle" : ntpEnabledOrDisabled,
 	    "help" : HELPS["config_dhcp"]:"",
 	],
+	*/
+	"policy_combo" : $[
+					   "widget" : `combobox,
+					   "opt"    : [ `notify ],
+					   "items"  : [ [`nomodify, "manual"], [`auto, "auto"], [`custom, "custom"] ],
+					   "label"  : "&Runtime Configuration Policy",
+					   "init"   : PolicyInit,
+					   "store"  : PolicyStore,
+					   "handle" : ntpEnabledOrDisabled,
+					   "help"   : HELPS["policy_combo"]:""
+					  ],
+	"custom_policy" : $[
+						"widget": `textentry,
+						"label" : "&Custom Policy",
+						"handle" : ntpEnabledOrDisabled,
+						"help"   : HELPS["custom_policy"]:""
+					   ],
 	"use_random_servers" : $[
 	    "widget" : `checkbox,
 	    "opt" : [ `notify ],

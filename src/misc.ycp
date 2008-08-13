@@ -47,12 +47,19 @@ boolean reallyExitSimple () {
 boolean sync_record_modified = false;
 
 boolean reallyExitComplex () {
+
+	string pol = "";
+	if(UI::QueryWidget (`id ("policy_combo"), `Value) == `auto)
+		pol="auto";
+	else if(UI::QueryWidget (`id ("policy_combo"), `Value) == `custom)
+		pol=(string)UI::QueryWidget (`id ("custom_policy"), `Value);
+	
+	
     if (NtpClient::run_service
 	    == (UI::QueryWidget (`id ("start"), `CurrentButton) == "boot")
         && NtpClient::run_chroot
 	    == UI::QueryWidget (`id ("run_chroot"), `Value)
-	&& NtpClient::config_dhcp
-	    == UI::QueryWidget (`id ("config_dhcp"), `Value)
+		&& NtpClient::ntp_policy == pol		
 	&& (! CWMFirewallInterfaces::OpenFirewallModified ("firewall"))
 	&& (! sync_record_modified)
     )
