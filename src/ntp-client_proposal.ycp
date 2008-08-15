@@ -47,10 +47,11 @@ void ProposeSomething()
       NtpClient::Read();
       Progress::set (progress_orig);
    }
-   else
+   // ntp_selected is true if NTP was proposed during installation (fate#303520)
+   else if (!NtpClient::ntp_selected)
       NtpClient::ProcessNtpConf();
 
-   if( NtpClient::config_has_been_read )
+   if( NtpClient::config_has_been_read || NtpClient::ntp_selected)
    {
 	ntp_items = maplist(string server, NtpClient::GetUsedNtpServers(),{
 	   return `item(`id(server), server); 
