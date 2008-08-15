@@ -169,7 +169,11 @@ else if (func == "MakeProposal")
 
 else if (func == "Write")
 {
-    string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
+    string ntp_server	= param["server"]:"";
+    if (ntp_server == "")
+	// get the value from UI only when it wasn't given as a parameter
+	ntp_server	= (string) UI::QueryWidget(`id(`ntp_address), `Value);
+
     boolean ntpdate_only = param["ntpdate_only"]:false;
 
     if ( !ValidateSingleServer( ntp_server ) )
