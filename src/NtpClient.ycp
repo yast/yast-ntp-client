@@ -74,17 +74,12 @@ global string service_name = "ntp";
   */
 global boolean run_chroot = false;
 
-/**
- * NTP servers will be configured via DHCP
- */
-//global boolean config_dhcp = false;
 
 /**
- * NTP servers will be configured via DHCP - value got while reading
+ * Netconfig policy: for merging and prioritizing static and DHCP config.
+ * FIXME get a public URL
+ * https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
  */
-//global boolean original_config_dhcp = false;
-
-
 global string ntp_policy = "";
 
 
@@ -135,6 +130,19 @@ global boolean simple_dialog = false;
 global boolean config_has_been_read = false;
 
 global boolean ntp_selected = false;
+
+
+global boolean PolicyIsAuto() {
+    return ntp_policy == "auto" || ntp_policy == "STATIC *";
+}
+
+global boolean PolicyIsNomodify() {
+    return ntp_policy == "";
+}
+
+global boolean PolicyIsNonstatic() {
+    return ntp_policy != "" && ntp_policy != "STATIC";
+}
 
 /**
  * Abort function
@@ -442,8 +450,6 @@ global define boolean Read() ``{
     boolean progress_orig = Progress::set (false);
     NetworkInterfaces::Read ();
     Progress::set (progress_orig);
-    //config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
-    //original_config_dhcp = config_dhcp;
 
     ntp_policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);
 
@@ -665,30 +671,7 @@ global define boolean Write() ``{
     if(Abort()) return false;
     if ( have_progress ) Progress::NextStage();
 
-	/*
-	  if (update_dhcp)
-	  {
-	  SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF,
-	  config_dhcp ? "yes" : "no");
-	  SCR::Write (.sysconfig.network.dhcp, nil);
-	  // switch DHCP udpates off before sacing the settings
-	  if (! config_dhcp)
-	  {
-	  // fixing bug #83918 according to the bug #61055
-	  string cmd = "cd /; /etc/init.d/network restart-all-dhcp-clients";
-	  SCR::Execute (.target.bash, cmd);
-	  }
-	  }
-	*/
-
-	/*
-	  if (config_dhcp && ! update_dhcp)
-	  {
-	  y2milestone ("Configuration was and will be DHCP, not touching /etc/dhcps.conf");
-	  }
-	  else
-	  {
-	*/
+    if (true) {
       foreach (string key, map <string, any> m, restrict_map, {
 	map <string, any> ret = $[
 	   "address" : key,
@@ -746,23 +729,16 @@ global define boolean Write() ``{
       FileChanges::StoreFileCheckSum ("/etc/ntp.conf");
 
       if (failed)
-	// error report
 	  Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
-	  //}
-
-    // if configuration via DHCP was turned on, restart DHCP clients now
-	  /*
-		if (update_dhcp && config_dhcp)
-		{
-		Service::RunInitScript ("network", "restart-all-dhcp-clients");
     }
-	  */
-
     // write policy and run netconfig command
     SCR::Write(.sysconfig.network.config.NETCONFIG_NTP_POLICY, ntp_policy);
     SCR::Write(.sysconfig.network.config, nil);
 
-	  SCR::Execute(.target.bash, "/sbin/netconfig update");
+    if (SCR::Execute(.target.bash, "/sbin/netconfig update") != 0) {
+	// error message
+	Report::Error(_("Cannot update the dynamic configuration policy."));
+    }
 
     if (! (SCR::Write (.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot
 	    ? "yes"
@@ -827,8 +803,9 @@ global define boolean Write() ``{
 global define boolean Import (map settings) ``{
     run_service = settings["start_at_boot"]:false;
     run_chroot = settings["start_in_chroot"]:true;
-	//config_dhcp = settings["configure_dhcp"]:false;
-	ntp_policy = settings["ntp_policy"]:"auto";
+    // compatibility: configure_dhcp:true translates to ntp_policy:auto
+    boolean config_dhcp = settings["configure_dhcp"]:false;
+    ntp_policy = settings["ntp_policy"]:(config_dhcp? "auto": "");
     ntp_records = settings["peers"]:[];
     ntp_records = maplist(map<string, any> p, ntp_records, ``{
             if (haskey(p, "key") && haskey(p, "value") )
@@ -843,7 +820,6 @@ global define boolean Import (map settings) ``{
             }
             });
     modified = true;
-    //original_config_dhcp = nil;
     return true;
 }
 
@@ -856,7 +832,6 @@ global define map Export () ``{
     return $[
 	"start_at_boot" : run_service,
 	"start_in_chroot" : run_chroot,
-	//"configure_dhcp" : config_dhcp,
 	"ntp_policy" : ntp_policy,
 	"peers" : ntp_records,
     ];
@@ -896,6 +871,19 @@ global define string Summary() ``{
 	  return summary;
 	  }
 	*/
+    // netconfig policy
+    if (PolicyIsAuto ()) {
+	// summary string, FIXME
+	summary = Summary::AddLine(summary, _("Combine static and DHCP configuration."));
+    } else if (PolicyIsNomodify ()) {
+	// summary string, FIXME
+	summary = Summary::AddLine(summary, _("Static configuration only."));
+    }
+    else {
+	// summary string, FIXME
+	summary = Summary::AddLine(summary, _("Custom configuration policy.")); // FIXME too generic!
+    }
+
     foreach (string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
 	list<map<string,any> > l

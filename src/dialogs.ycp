@@ -642,9 +642,9 @@ define symbol StoreRecord () ``{
   * @return symbol for ws `simple or `complex
   */
 define symbol SelectConfigType () ``{
-    if (NtpClient::ntp_policy != "")
+    if (NtpClient::PolicyIsNonstatic ())
     {
-	y2milestone ("No netconfig auto configuration");
+	y2milestone ("Netconfig nonstatic configuration");
 	return `complex;
     }
     list<map> peers = NtpClient::getSyncRecords ();

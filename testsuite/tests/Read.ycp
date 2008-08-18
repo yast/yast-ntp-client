@@ -84,6 +84,9 @@
 		"REJECT_ALL_INCOMING_CONNECTIONS" : "no",
 	    ],
 	    "network" : $[
+		"config": $[
+		    "NETCONFIG_NTP_POLICY": "",
+		],
 		"dhcp" : $[
 		    "DHCLIENT_MODIFY_NTP_CONF" : "no",
 		],

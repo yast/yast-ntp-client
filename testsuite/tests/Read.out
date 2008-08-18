@@ -1,4 +1,4 @@
-Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF "no"
+Read	.sysconfig.network.config.NETCONFIG_NTP_POLICY ""
 Read	.target.ycp "/usr/share/YaST2/data/ntp_servers.ycp" nil
 Log	Failed to read the list of NTP servers
 Read	.target.ycp "/usr/share/YaST2/data/country.ycp" nil
@@ -8,4 +8,4 @@ Read	.target.ycp "/var/lib/YaST2/ad_ntp_data.ycp" nil
 Read	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", "type":-1, "value":[$["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp1 options1"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"127.127.1.2 options_clock"], $["comment":"", "kind":"value", "name":"fudge", "type":0, "value":"127.127.1.2fudge_clock"], $["comment":"", "kind":"value", "name":"server", "type":0, "value":"ntp2 options2"], $["comment":"", "kind":"value", "name":"peer", "type":0, "value":"peer1 options_peer"]]]
 Read	.sysconfig.ntp.NTPD_RUN_CHROOTED "yes"
 Return	true
-Return	$["configure_dhcp":false, "peers":[$["address":"ntp1", "comment":"", "options":" options1", "type":"server"], $["address":"127.127.1.2", "comment":"", "options":" options_clock", "type":"__clock"], $["address":"ntp2", "comment":"", "options":" options2", "type":"server"], $["address":"peer1", "comment":"", "options":" options_peer", "type":"peer"]], "start_at_boot":false, "start_in_chroot":true]
+Return	$["ntp_policy":"", "peers":[$["address":"ntp1", "comment":"", "options":" options1", "type":"server"], $["address":"127.127.1.2", "comment":"", "options":" options_clock", "type":"__clock"], $["address":"ntp2", "comment":"", "options":" options2", "type":"server"], $["address":"peer1", "comment":"", "options":" options_peer", "type":"peer"]], "start_at_boot":false, "start_in_chroot":true]
