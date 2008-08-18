@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Aug 18 12:23:38 CEST 2008 - mvidner@suse.cz
+
+- ntp-client_proposal: do not propose new configuration when some
+  already exists; Write: get server name from argument before
+  checking UI 
+
+-------------------------------------------------------------------
 Fri Jun 13 12:35:00 CEST 2008 - mvidner@suse.cz
 
 - yast2-slp is already present during the installation, so don't ask
