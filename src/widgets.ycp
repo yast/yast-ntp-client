@@ -281,9 +281,9 @@ define void chrootStore (string id, map event) ``{
 define void secureInit (string id) ``{
     y2milestone("Restrict %1", NtpClient::restrict_map);
     if (NtpClient::ntp_policy == "STATIC" || NtpClient::ntp_policy == "" )
-		UI::ChangeWidget(`id("secure"), `Enabled, false);
+	UI::ChangeWidget(`id("secure"), `Enabled, false);
     else
-		UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
+	UI::ChangeWidget(`id("secure"), `Value, ( NtpClient::restrict_map != $[]) );
 }
 
 define void secureStore (string id, map event) ``{
@@ -345,39 +345,39 @@ define void secureStore (string id, map event) ``{
 
 define void PolicyInit(string id) ``{
 	if( NtpClient::ntp_policy == "" )
-	{
-		UI::ChangeWidget(`id("policy_combo"), `Value, `id(`nomodify));
-		UI::ChangeWidget(`id("custom_policy"), `Value, "");
-		UI::ChangeWidget(`id("custom_policy"), `Enabled, false);
-	}
+    {
+	UI::ChangeWidget(`id("policy_combo"), `Value, `id(`nomodify));
+	UI::ChangeWidget(`id("custom_policy"), `Value, "");
+	UI::ChangeWidget(`id("custom_policy"), `Enabled, false);
+    }
 	else if( NtpClient::ntp_policy == "auto" || NtpClient::ntp_policy == "STATIC *")
-	{
-		UI::ChangeWidget(`id("policy_combo"), `Value, `id(`auto));
-		UI::ChangeWidget(`id("custom_policy"), `Value, "");
-		UI::ChangeWidget(`id("custom_policy"), `Enabled, false);
-	}
-	else
-	{
-		UI::ChangeWidget(`id("policy_combo"), `Value, `id(`custom));
-		UI::ChangeWidget(`id("custom_policy"), `Value, NtpClient::ntp_policy);
-		UI::ChangeWidget(`id("custom_policy"), `Enabled, true);
-	}
+    {
+	UI::ChangeWidget(`id("policy_combo"), `Value, `id(`auto));
+	UI::ChangeWidget(`id("custom_policy"), `Value, "");
+	UI::ChangeWidget(`id("custom_policy"), `Enabled, false);
+    }
+    else
+    {
+	UI::ChangeWidget(`id("policy_combo"), `Value, `id(`custom));
+	UI::ChangeWidget(`id("custom_policy"), `Value, NtpClient::ntp_policy);
+	UI::ChangeWidget(`id("custom_policy"), `Enabled, true);
+    }
 }
 
 define void PolicyStore(string id, map event) ``{
-	if( UI::QueryWidget (`id ("policy_combo"), `Value) == `nomodify )
-	{
-		NtpClient::ntp_policy = "";
-	}
-	else if( UI::QueryWidget (`id ("policy_combo"), `Value) == `auto )
-	{
-		NtpClient::ntp_policy = "auto";
-	}
-	else
-	{
-		NtpClient::ntp_policy = (string)UI::QueryWidget (`id ("custom_policy"), `Value);
-	}
-	NtpClient::modified = true;
+    if( UI::QueryWidget (`id ("policy_combo"), `Value) == `nomodify )
+    {
+	NtpClient::ntp_policy = "";
+    }
+    else if( UI::QueryWidget (`id ("policy_combo"), `Value) == `auto )
+    {
+	NtpClient::ntp_policy = "auto";
+    }
+    else
+    {
+	NtpClient::ntp_policy = (string)UI::QueryWidget (`id ("custom_policy"), `Value);
+    }
+    NtpClient::modified = true;
 }
 
 
@@ -517,8 +517,8 @@ define symbol overviewHandle (string id, map event) ``{
     any ev_id = event["ID"]:nil;
     if (ev_id == "boot" || ev_id == "never" || ev_id == "policy_combo")
     {
-		symbol pol = (symbol)UI::QueryWidget (`id ("policy_combo"), `Value);
-		
+	symbol pol = (symbol)UI::QueryWidget (`id ("policy_combo"), `Value);
+
 	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
 	    != "never";
 //	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
@@ -528,15 +528,15 @@ define symbol overviewHandle (string id, map event) ``{
 	UI::ChangeWidget (`id (`delete), `Enabled, enabled);
 	UI::ChangeWidget (`id (`overview), `Enabled, enabled);
 
-	if(enabled && (pol == `custom))
+	if (enabled && (pol == `custom))
 	{
-		UI::ChangeWidget (`id ("custom_policy"), `Enabled, true);
-		UI::ChangeWidget (`id ("custom_policy"), `Value, NtpClient::ntp_policy);
+	    UI::ChangeWidget (`id ("custom_policy"), `Enabled, true);
+	    UI::ChangeWidget (`id ("custom_policy"), `Value, NtpClient::ntp_policy);
 	}
 	else
 	{
-		UI::ChangeWidget (`id ("custom_policy"), `Enabled, false);
-		UI::ChangeWidget (`id ("custom_policy"), `Value, "");
+	    UI::ChangeWidget (`id ("custom_policy"), `Enabled, false);
+	    UI::ChangeWidget (`id ("custom_policy"), `Value, "");
 	}
 	return nil;
     }
@@ -1277,21 +1277,21 @@ define map<string,map<string,any> > InitWidgets () ``{
 	],
 	*/
 	"policy_combo" : $[
-					   "widget" : `combobox,
-					   "opt"    : [ `notify ],
+	    "widget" : `combobox,
+	    "opt"    : [ `notify ],
 					   "items"  : [ [`nomodify, "manual"], [`auto, "auto"], [`custom, "custom"] ],
-					   "label"  : "&Runtime Configuration Policy",
-					   "init"   : PolicyInit,
-					   "store"  : PolicyStore,
-					   "handle" : ntpEnabledOrDisabled,
+	    "label"  : "&Runtime Configuration Policy",
+	    "init"   : PolicyInit,
+	    "store"  : PolicyStore,
+	    "handle" : ntpEnabledOrDisabled,
 					   "help"   : HELPS["policy_combo"]:""
-					  ],
+	    ],
 	"custom_policy" : $[
-						"widget": `textentry,
-						"label" : "&Custom Policy",
-						"handle" : ntpEnabledOrDisabled,
+	    "widget": `textentry,
+	    "label" : "&Custom Policy",
+	    "handle" : ntpEnabledOrDisabled,
 						"help"   : HELPS["custom_policy"]:""
-					   ],
+	    ],
 	"use_random_servers" : $[
 	    "widget" : `checkbox,
 	    "opt" : [ `notify ],

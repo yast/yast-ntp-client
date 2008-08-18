@@ -445,7 +445,7 @@ global define boolean Read() ``{
     //config_dhcp = tolower ((string)SCR::Read (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NTP_CONF)) == "yes";
     //original_config_dhcp = config_dhcp;
 
-	ntp_policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);	
+    ntp_policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);
 
     GetNtpServers ();
     GetCountryNames ();
@@ -747,7 +747,7 @@ global define boolean Write() ``{
 
       if (failed)
 	// error report
-		  Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
+	  Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
 	  //}
 
     // if configuration via DHCP was turned on, restart DHCP clients now
@@ -755,15 +755,15 @@ global define boolean Write() ``{
 		if (update_dhcp && config_dhcp)
 		{
 		Service::RunInitScript ("network", "restart-all-dhcp-clients");
-		}
+    }
 	  */
 
-	  // write policy and run netconfig command
-	  SCR::Write(.sysconfig.network.config.NETCONFIG_NTP_POLICY, ntp_policy);
-	  SCR::Write(.sysconfig.network.config, nil);
-	  
+    // write policy and run netconfig command
+    SCR::Write(.sysconfig.network.config.NETCONFIG_NTP_POLICY, ntp_policy);
+    SCR::Write(.sysconfig.network.config, nil);
+
 	  SCR::Execute(.target.bash, "/sbin/netconfig update");
-	  
+
     if (! (SCR::Write (.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot
 	    ? "yes"
 	    : "no")
