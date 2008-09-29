@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 29 15:13:54 CEST 2008 - visnov@suse.cz
+
+- avoid reading configuration during install (bnc #427712)
+
+-------------------------------------------------------------------
 Mon Aug 18 12:26:19 CEST 2008 - mvidner@suse.cz
 
 - Applied Netconfig patch for fine-grained merging of static and

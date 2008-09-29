@@ -56,6 +56,8 @@ void ProposeSomething()
 	ntp_items = maplist(string server, NtpClient::GetUsedNtpServers(),{
 	   return `item(`id(server), server); 
 	});
+	// avoid calling Read again (bnc #427712)
+	NtpClient::config_has_been_read = true;
    }
    if( ntp_items == [])
    {
