@@ -190,16 +190,12 @@ else if (func == "Write")
 	//(ntpdate is in inst-sys so we don't need the package)
         if (Stage::initial() && !ntpdate_only)
 	{
-	    import "Package";
-	    import "Packages";
-	    if (Package::Available(required_package))
-	    {
+		import "Packages";
 	        Packages::addAdditionalPackage(required_package);
 	        // bugzilla #327050
 	        // Agent for writing /etc/ntp.conf needs to be installed
 	        // to write the settings at the end of the installation
 	        Packages::addAdditionalPackage("yast2-ntp-client");
-	    }
 	}
 	//Otherwise, prompt user for confirming pkg installation
 	else if (!Stage::initial ())

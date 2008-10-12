@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Sun Oct 12 21:54:08 CEST 2008 - mvidner@suse.cz
+
+- Removed a check that was too expensive and made potential failures
+  silent (bnc#428026).
+- 2.17.3
+
+-------------------------------------------------------------------
 Mon Sep 29 15:13:54 CEST 2008 - visnov@suse.cz
 
 - avoid reading configuration during install (bnc #427712)
