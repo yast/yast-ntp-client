@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct 15 13:24:52 CEST 2008 - mvidner@suse.cz
+
+- Use sntp instead of ntpdate which is obsolete (bnc#431516).
+- 2.17.4
+
+-------------------------------------------------------------------
 Sun Oct 12 21:54:08 CEST 2008 - mvidner@suse.cz
 
 - Removed a check that was too expensive and made potential failures

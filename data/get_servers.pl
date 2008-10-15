@@ -1,5 +1,13 @@
 #!/usr/bin/perl -w
 
+my $sntp = "/usr/sbin/sntp";
+if (! -x $sntp) {
+    $sntp = "/usr/bin/msntp"; # debian
+    if (! -x $sntp) {
+        die "No sntp client found";
+    }
+}
+
 my $ntp_status = `LANG=C /etc/init.d/ntp status`;
 if ($ntp_status =~ /\.\.running/) {
     warn "NTP daemon is running\nPlease, turn it off before running this script...\n\n";
@@ -90,7 +98,7 @@ foreach my $url (@mills_urls) {
 #test all of them
 @servers = grep {
     my $hostname = $_->{"address"};
-    my $status = system ("sudo /usr/sbin/ntpdate -q $hostname");
+    my $status = system ("$sntp $hostname");
     $status == 0;
 } @servers;
 

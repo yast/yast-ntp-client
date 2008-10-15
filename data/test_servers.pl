@@ -3,6 +3,14 @@
 use ycp;
 use Data::Dumper;
 
+my $sntp = "/usr/sbin/sntp";
+if (! -x $sntp) {
+    $sntp = "/usr/bin/msntp"; # debian
+    if (! -x $sntp) {
+	die "No sntp client found";
+    }
+}
+
 open (IN, "ntp_servers.ycp");
 my $ok = 0;
 my $failed = 0;
@@ -14,7 +22,15 @@ while ($line = <IN>)
     if ($line =~ /\"address\".*:.*\"(.+)\"/) 
     {
 	my $server = $1;
-	my $status = system ("sudo /usr/sbin/ntpdate -q $server");
+	my $status = system ("$sntp $server");
+	if ($? & 127)
+	{
+	    if (($? & 127) == 3)
+	    {
+		exit;
+	    }
+	    print "Use SIGQUIT to quit\n";
+	}
 	if ($status == 0)
 	{
 	    print "$server is accessible.\n";

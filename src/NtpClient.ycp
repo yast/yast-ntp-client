@@ -915,38 +915,20 @@ global boolean TestNtpServer (string server, symbol verbosity) {
 	`Left(`Label(_("Testing the NTP server...")))
       );
 
-    integer status = -1;
-    //Do not do anything to ntp service during installation
-    if ( !Stage::initial() )
-    {
-        status = Service::Status (service_name); 
-        //Stop service temporarily (otherwise ntpdate won't work)
-        //0 means service is running
-        if ( status == 0)
-	    Service::Stop (service_name);
-    }
     y2milestone ("Testing reachability of server %1", server);
 
     // testing the server using IPv4 and then using IPv6 protocol
     // bug #74076, Firewall could have been blocked IPv6
     integer ret_IPv4 = (integer) SCR::Execute (.target.bash, sformat (
-	"/usr/sbin/ntpdate -4 -q %1",
+	"/usr/sbin/sntp -4 %1",
 	server
     ));
     integer ret_IPv6 = 0;
     if (ret_IPv4 != 0)
 	ret_IPv6 = (integer) SCR::Execute (.target.bash, sformat (
-	    "/usr/sbin/ntpdate -6 -q %1",
+	    "/usr/sbin/sntp -6 %1",
 	    server
 	));
-
-    //Do not do anything to ntp service during installation
-    if ( !Stage::initial() )
-    {
-        //Start the service if it was running
-        if ( status == 0)
-	    Service::Start (service_name);
-    }
 
     if (verbosity != `no_ui) {
 	UI::CloseDialog();

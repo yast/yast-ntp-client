@@ -177,6 +177,8 @@ else if (func == "Write")
 	// get the value from UI only when it wasn't given as a parameter
 	ntp_server	= (string) UI::QueryWidget(`id(`ntp_address), `Value);
 
+    // One-time adjusment without running the ntp daemon
+    // Meanwhile, ntpdate was replaced by sntp
     boolean ntpdate_only = param["ntpdate_only"]:false;
 
     if ( !ValidateSingleServer( ntp_server ) )
@@ -207,31 +209,14 @@ without having package %1 installed"), required_package));
 	   }
 	}
 
-        integer status = -1;
-        string service_name = NtpClient::service_name;
-
         Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
 
-        //Stop NTP service on running system (during 1st stage, we don't care)
-        if( !Stage::initial())
-        {
-            status = Service::Status (service_name); 
-            //Stop service temporarily (otherwise ntpdate won't work)
-            //0 means service is running
-            if ( status == 0)
-	        Service::Stop (service_name);
-        }
+        y2milestone("Running sntp to sync with %1", ntp_server);
 
-        y2milestone("Running ntpdate to sync with %1", ntp_server);
-
-        integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/ntpdate '%1'", String::Quote(ntp_server)));
-        y2milestone ("'ntpdate %1' returned %2", ntp_server, r);
-
-        if( !Stage::initial())
-        {
-	    if( status == 0 )
-                Service::Start(service_name);
-        }
+	// -r: do set the system time
+	// -P no: do not ask if time difference is too large
+        integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -r -P no '%1'", String::Quote(ntp_server)));
+        y2milestone ("'sntp %1' returned %2", ntp_server, r);
 
 	Popup::ClearFeedback();
 
@@ -239,7 +224,7 @@ without having package %1 installed"), required_package));
         {
             ret = `success;
 
-	    // User wants to more than running ntpdate (synchronize on boot)
+	    // User wants to more than running sntp (synchronize on boot)
 	    if (!ntpdate_only)
             {
 	        NtpClient::modified = true;
