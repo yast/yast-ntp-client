@@ -692,7 +692,7 @@ define symbol serverAddressHandle (string id, map event) {
  * @param id any widget id
  */
 define void optionsInit (string id) ``{
-    UI::ChangeWidget (`id ("options"), `Value, NtpClient::selected_record["options"]:"");
+    UI::ChangeWidget (`id ("options"), `Value, NtpClient::selected_record["options"]:"iburst");
 }
 
 /**
