@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Nov  6 18:31:20 CET 2008 - mvidner@suse.cz
+
+- Adjusted dialog buttons according to YaST Style Guide
+  (bnc#440532).
+- 2.17.6
+
+-------------------------------------------------------------------
 Tue Oct 28 15:47:41 CET 2008 - varkoly@suse.de
 
 - (bnc#438704) – ntp server do not work 

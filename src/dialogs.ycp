@@ -119,7 +119,7 @@ define symbol SimpleDialog () ``{
     contents = CWM::PrepareDialog (contents, w);
     Wizard::SetContentsButtons (caption, contents, help,
 	Label::BackButton (),
-        Stage::initial()? Label::AcceptButton() : Label::FinishButton ());
+        Stage::initial()? Label::AcceptButton() : Label::OKButton ());
     Wizard::HideBackButton();
     Wizard::SetAbortButton(`abort, Label::CancelButton() );
 
@@ -213,7 +213,7 @@ define symbol MainDialog () ``{
     contents = CWM::PrepareDialog (contents, w);
     Wizard::SetContentsButtons (caption, contents, help,
 	Label::BackButton (),
-        Stage::initial()? Label::AcceptButton() : Label::FinishButton ());
+        Stage::initial()? Label::AcceptButton() : Label::OKButton ());
     Wizard::HideBackButton();
     Wizard::SetAbortButton(`abort, Label::CancelButton() );
 
