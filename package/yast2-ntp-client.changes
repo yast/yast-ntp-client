@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov  7 13:54:27 CET 2008 - mvidner@suse.cz
+
+- Set a 15s timeout on one-time synchronization (bnc#442287).
+
+-------------------------------------------------------------------
 Thu Nov  6 18:31:20 CET 2008 - mvidner@suse.cz
 
 - Adjusted dialog buttons according to YaST Style Guide

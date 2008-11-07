@@ -919,14 +919,15 @@ global boolean TestNtpServer (string server, symbol verbosity) {
 
     // testing the server using IPv4 and then using IPv6 protocol
     // bug #74076, Firewall could have been blocked IPv6
+    // -c 1 -d 15: delay 15s, only one try (bnc#442287)
     integer ret_IPv4 = (integer) SCR::Execute (.target.bash, sformat (
-	"/usr/sbin/sntp -4 %1",
+	"/usr/sbin/sntp -4 -c 1 -d 15 %1",
 	server
     ));
     integer ret_IPv6 = 0;
     if (ret_IPv4 != 0)
 	ret_IPv6 = (integer) SCR::Execute (.target.bash, sformat (
-	    "/usr/sbin/sntp -6 %1",
+	    "/usr/sbin/sntp -6 -c 1 -d 15 %1",
 	    server
 	));
 
