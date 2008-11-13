@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Nov 13 16:25:33 CET 2008 - ug@suse.de
+
+- rnc file fixed
+
+-------------------------------------------------------------------
 Fri Nov  7 13:54:27 CET 2008 - mvidner@suse.cz
 
 - Set a 15s timeout on one-time synchronization (bnc#442287).
