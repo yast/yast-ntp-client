@@ -80,7 +80,7 @@ global boolean run_chroot = false;
  * FIXME get a public URL
  * https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
  */
-global string ntp_policy = "";
+global string ntp_policy = "auto";
 
 
 /**
@@ -451,7 +451,11 @@ global define boolean Read() ``{
     NetworkInterfaces::Read ();
     Progress::set (progress_orig);
 
-    ntp_policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);
+    //SCR::Read may return nil (no such value in sysconfig, file not there etc. )
+    string policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);
+    //set if not nil, otherwise use 'auto' as safe fallback (#449362)
+    if (policy != nil)
+	ntp_policy = policy;
 
     GetNtpServers ();
     GetCountryNames ();
