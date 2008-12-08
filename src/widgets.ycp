@@ -1263,7 +1263,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 		// combo box item
 		[`custom, _("Custom")],
 		],
-	    "label"  : "&Runtime Configuration Policy",
+	    "label"  : _("&Runtime Configuration Policy"),
 	    "init"   : PolicyInit,
 	    "store"  : PolicyStore,
 	    "handle" : ntpEnabledOrDisabled,
@@ -1271,7 +1271,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    ],
 	"custom_policy" : $[
 	    "widget": `textentry,
-	    "label" : "&Custom Policy",
+	    "label" : _("&Custom Policy"),
 	    "handle" : ntpEnabledOrDisabled,
 	    "help"   : HELPS["custom_policy"]:"" // FIXME
 	    ],
@@ -1410,7 +1410,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	],
         "ac_options" : $[
 	    "widget" : `textentry,
-	    "label"  : "Access Control Options ",
+	    "label"  : _("Access Control Options"),
 	    "init" : restrictOptionsInit,
 	    "store" : restrictOptionsStore,
 	    "help": HELPS["restrict"]:"",
