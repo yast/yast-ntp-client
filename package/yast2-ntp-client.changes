@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Dec 11 14:41:45 CET 2008 - mvidner@suse.cz
+
+- At install time, do not overwrite the original ntp.conf but add our
+  changes instead. Specifically netconfig needs the key config
+  preserved (bnc#449615).
+- 2.17.9
+
+-------------------------------------------------------------------
 Mon Dec  8 13:42:09 CET 2008 - kmachalkova@suse.cz
 
 - Missing strings marked for translation (bnc#446967, bnc#446969) 

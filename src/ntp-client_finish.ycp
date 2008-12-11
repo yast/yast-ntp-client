@@ -36,11 +36,25 @@ if (func == "Info")
 }
 else if (func == "Write")
 {
-    map ex = NtpClient::Export();
+    // bnc#449615, must merge the configs which Export/Import fails to do.
 
+    // User config from installation time:
+    // fortunately so far we only have the server address(es)
+    list<string> ss = NtpClient::GetUsedNtpServers();
+
+    // ntp.conf from the RPM
     NtpClient::Read();
 
-    NtpClient::Import( ex );
+    // put users server(s) back
+    foreach (string server, ss, {
+	// if not present, it adds it,
+	// otherwise it preserves what is there. uff what an API
+	integer idx = NtpClient::findSyncRecord("server", server); // -1: new
+	NtpClient::selectSyncRecord(idx);
+	NtpClient::selected_record["address"] = server;
+	NtpClient::selected_record["type"] = "server";
+	NtpClient::storeSyncRecord();
+    });
 
     NtpClient::write_only = true;
 
