@@ -3,6 +3,8 @@
  * Summary:	Installation client for ntp configuration
  * Author:	Bubli <kmachalkova@suse.cz>
  *
+ * This is used as the general interface between yast2-country
+ * (time,timezone) and yast2-ntp-client.
  */
 
 {
@@ -23,6 +25,18 @@ import "Report";
 y2milestone("----------------------------------------");
 y2milestone("Ntp client proposal started");
 y2milestone("Arguments: %1", WFM::Args());
+
+/*
+    API:
+
+Usual *_proposal functions: MakeProposal, AskUser, Write.
+(but not Description; see, it just *looks* like *_proposal)
+Additionally:
+ CreateUI	(thick and fragile interface, grr)
+ GetNTPEnabled  (queries Service::Enabled)
+ GetUseNTP      (queries NtpClient::ntp_selected, just a storage for the caller)
+ SetUseNTP [ntp_used]
+*/
 
 any ret = nil;
 string func = "";
@@ -53,6 +67,7 @@ void ProposeSomething()
 
    if( NtpClient::config_has_been_read || NtpClient::ntp_selected)
    {
+	// grr, GUNS means all of them are used and here we just pick one
 	ntp_items = maplist(string server, NtpClient::GetUsedNtpServers(),{
 	   return `item(`id(server), server); 
 	});
@@ -170,6 +185,13 @@ else if (func == "MakeProposal")
     ret = true;
 }
 
+/*
+params:
+  server (taken from UI if empty)
+  servers (intended to use all of opensuse.pool.ntp.org,
+	   but I did not have time to make it work)
+  ntpdate_only (TODO rename to onetime)
+*/
 else if (func == "Write")
 {
     string ntp_server	= param["server"]:"";
