@@ -137,7 +137,8 @@ if (func == "CreateUI")
             `Left (`PushButton (`id (`ntp_now), _("Synchronize now"))),
 	    `VSpacing (0.3),
             // push button label
-            `Left (`PushButton (`id (`ntp_configure), _("Configure...")))
+	    // bnc#449615: only simple config for inst-sys
+            Stage::initial() ? `Label("") : `Left (`PushButton (`id (`ntp_configure), _("Configure...")))
 	))
     ));
 

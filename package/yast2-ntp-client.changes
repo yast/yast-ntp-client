@@ -1,8 +1,12 @@
 -------------------------------------------------------------------
-Fri Dec 12 15:03:55 CET 2008 - mvidner@suse.cz
+Fri Dec 12 16:00:50 CET 2008 - mvidner@suse.cz
 
+- Due to yesterday's change, the Configure button at install time
+  would access settings that would be ignored. Removed it.
+  (bnc#449615 c15)
 - Reduced spacing in new server dialog to make it fit 80x24
   (bnc#458459).
+- 2.17.10
 
 -------------------------------------------------------------------
 Thu Dec 11 14:41:45 CET 2008 - mvidner@suse.cz
