@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Dec 12 15:03:55 CET 2008 - mvidner@suse.cz
+
+- Reduced spacing in new server dialog to make it fit 80x24
+  (bnc#458459).
+
+-------------------------------------------------------------------
 Thu Dec 11 14:41:45 CET 2008 - mvidner@suse.cz
 
 - At install time, do not overwrite the original ntp.conf but add our

@@ -255,7 +255,7 @@ define symbol TypeSelectDialog () ``{
  */
 define symbol ServerDialog () ``{
     term contents = `HBox (`HStretch (), `VBox (
-	`VSpacing (3),
+	`VSpacing (2),
 	`Frame( _("Server Settings"),
 	    `VBox (
 	    "server_address",
@@ -267,7 +267,7 @@ define symbol ServerDialog () ``{
 	    "ac_options",
 	    `VSpacing(0.5))
 	),
-	`VSpacing (3)
+	`VSpacing (2)
     ), `HStretch ());
 
     // dialog caption
