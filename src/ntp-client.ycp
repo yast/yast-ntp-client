@@ -33,7 +33,7 @@ include "ntp-client/wizards.ycp";
   */
 define boolean GuiHandler () ``{
     symbol ret = NtpClientSequence();
-    if (ret == `abort || ret == `back || ret == `nil)
+    if (ret == `abort || ret == `back || ret == nil)
 	return false;
     return true;
 }
