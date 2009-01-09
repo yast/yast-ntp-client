@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan  9 14:09:44 CET 2009 - mvidner@suse.cz
+
+- Offer CC.pool.ntp.org for countries that do not have any other
+  server (bnc#458917 c4).
+
+-------------------------------------------------------------------
 Fri Dec 12 16:00:50 CET 2008 - mvidner@suse.cz
 
 - Due to yesterday's change, the Configure button at install time

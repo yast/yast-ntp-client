@@ -116,7 +116,11 @@ global list<string> firewall_services = ["ntp-server"];
 
 /**
  * List of known NTP servers
- * server -> information
+ * server address -> information
+ *  address: the key repeated
+ *  country: CC (uppercase)
+ *  location: for displaying
+ *  ...: (others are unused)
  */
 map<string,map<string,string> > ntp_servers = nil;
 
@@ -196,6 +200,14 @@ global define string GetCurrentLanguageCode (  ) {
     return Language::GetGivenLanguageCountry( lang );
 }
 
+map<string, string> MakePoolRecord (string CC, string location) {
+    return $[
+	     "address" : tolower(CC) + ".pool.ntp.org",
+	     "country" : CC,
+	     "location": location,
+	     ];
+}
+
 /**
  * Get the list of known NTP servers
  * @return a list of known NTP servers
@@ -218,13 +230,10 @@ global map<string, map<string,string> > GetNtpServers () {
 		return $[ server : s ];
 	    });
 	}
-
 	foreach (string short_country, string country_name, GetAllKnownCountries(), {
-	    ntp_servers[tolower(short_country) + ".pool.ntp.org"] = $[
-		"address" : tolower(short_country) + ".pool.ntp.org",
-		"country" : short_country,
-		"location": country_name,
-	    ];
+	    // just refactored existing code
+	    map<string, string> p = MakePoolRecord(short_country, country_name);
+	    ntp_servers[p["address"]:""] = p;
 	});
     }
 
@@ -263,6 +272,9 @@ global list GetNtpServersByCountry ( string country, boolean terse_output ) {
         servers = filter (string s, map<string,string> o, servers, {
             return o["country"]:"" == country;
         });
+	// bnc#458917 add country, in case data/country.ycp does not have it
+	map<string,string> p = MakePoolRecord (country, "");
+	servers[p["address"]:""] = p;
     }
     else
     {
