@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Fri Jan  9 14:09:44 CET 2009 - mvidner@suse.cz
+Fri Jan  9 14:10:47 CET 2009 - mvidner@suse.cz
 
+- Removed a server reported nonfunctional (bnc#458917).
 - Offer CC.pool.ntp.org for countries that do not have any other
   server (bnc#458917 c4).
 
