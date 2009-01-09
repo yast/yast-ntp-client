@@ -1,6 +1,6 @@
 /**
- * File:        etc_cups_printers.scr
- * Summary:     Agent for reading /etc/cups/printers.conf file
+ * File:        etc_ntp.scr
+ * Summary:     Agent for reading /etc/ntp.conf file
  * Author:      Jiri Srain <jsrain@suse.cz>
  * Access:      read
  *
