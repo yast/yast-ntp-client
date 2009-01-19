@@ -1100,6 +1100,20 @@ global define boolean deleteSyncRecord (integer index) ``{
 }
 
 /**
+ * Ensure that selected_record["options"] contains the option.
+ * (A set operation in a string)
+ */
+global void enableOptionInSyncRecord (string option) {
+    // careful, "burst" != "iburst"
+    string old = selected_record["options"]:"";
+    list<string> old_l = splitstring (old, " \t");
+    if (!contains (old_l, option)) {
+	old_l = add (old_l, option);
+    }
+    selected_record["options"] = mergestring (old_l, " ");
+}
+
+/**
  * Return required packages for auto-installation
  * @return map of packages to be installed and to be removed
  */

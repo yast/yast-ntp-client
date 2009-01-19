@@ -1,0 +1,4 @@
+Dump	$["options":"whatever", "server":"tick.example.com", "type":"server"]
+Dump	$["options":"whatever iburst", "server":"tick.example.com", "type":"server"]
+Dump	$["options":"whatever iburst burst", "server":"tick.example.com", "type":"server"]
+Dump	$["options":"alone"]

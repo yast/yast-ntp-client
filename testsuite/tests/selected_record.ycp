@@ -1,0 +1,35 @@
+//
+{
+    include "testsuite.ycp";
+    // [COBE] why is all this necessary just to test a standalone function!
+    // testedfiles: NtpClient.ycp
+    map READ = $[
+	"target" : $[
+	    "tmpdir": "/tmp",
+	    "size": 0,
+	],
+    ];
+    map EXECUTE = $[
+	"target": $[
+	    "bash_output": $[],
+	],
+    ];
+    TESTSUITE_INIT ([READ, $[], EXECUTE], nil);
+
+    import "NtpClient";
+
+    NtpClient::selected_record = $["type": "server",
+				   "server": "tick.example.com",
+				   "options": "whatever"];
+    DUMP (NtpClient::selected_record);
+
+    NtpClient::enableOptionInSyncRecord ("iburst");
+    DUMP (NtpClient::selected_record);
+
+    NtpClient::enableOptionInSyncRecord ("burst");
+    DUMP (NtpClient::selected_record);
+
+    NtpClient::selected_record = $[];
+    NtpClient::enableOptionInSyncRecord ("alone");
+    DUMP (NtpClient::selected_record);
+}

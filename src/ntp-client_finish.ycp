@@ -53,6 +53,8 @@ else if (func == "Write")
 	NtpClient::selectSyncRecord(idx);
 	NtpClient::selected_record["address"] = server;
 	NtpClient::selected_record["type"] = "server";
+	// bnc#450418, add a recommended option
+	NtpClient::enableOptionInSyncRecord ("iburst");
 	NtpClient::storeSyncRecord();
     });
 
