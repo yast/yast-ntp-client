@@ -692,6 +692,7 @@ define symbol serverAddressHandle (string id, map event) {
  * @param id any widget id
  */
 define void optionsInit (string id) ``{
+    // bnc#438704, add a recommended option
     UI::ChangeWidget (`id ("options"), `Value, NtpClient::selected_record["options"]:"iburst");
 }
 
