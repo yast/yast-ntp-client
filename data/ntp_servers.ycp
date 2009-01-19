@@ -351,14 +351,6 @@
     "synchronization" : "NTP secondary (stratum 2), Linux 2 on Intel PIII 500MHz",
   ],
   $[
-    "address" : "ntp.ewha.net",
-    "coordinates" : "37:24:45.3N 127:07:28.5E (WGS 84)",
-    "country" : "KR",
-    "exact_location" : "KT-IDC, Bundang, Korea",
-    "stratum" : "2",
-    "synchronization" : "NTP V3 (stratum 2), i586/Linux",
-  ],
-  $[
     "access_policy" : "open access",
     "address" : "ntp.doubleukay.com",
     "country" : "MY",
