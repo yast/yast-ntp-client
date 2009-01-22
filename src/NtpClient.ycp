@@ -111,7 +111,7 @@ global list required_packages = ["ntp"];
 /**
  * ports in firewall to open
  */
-global list<string> firewall_services = ["ntp-server"];
+global list<string> firewall_services = ["service:ntp"];
 
 
 /**
