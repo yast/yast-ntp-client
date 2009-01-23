@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan 23 14:32:10 CET 2009 - mvidner@suse.cz
+
+- Fixed: the checkbox for opening/closing the firewall port would
+  have no effect (bnc#468405).
+- 2.17.13
+
+-------------------------------------------------------------------
 Mon Jan 19 14:45:26 CET 2009 - mvidner@suse.cz
 
 - Use the iburst option also for the server added during the
