@@ -771,7 +771,9 @@ global define boolean Write() ``{
     if(Abort()) return false;
     if (have_progress) Progress::NextStage ();
 
-    if (change_firewall)
+    // SuSEFirewall::Write checks on its own whether there are pending
+    // changes, so call it always. bnc#476951
+    if (true)
     {
 	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::Write ();
