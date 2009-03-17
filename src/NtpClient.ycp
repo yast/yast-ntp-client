@@ -498,7 +498,9 @@ global define boolean Read() ``{
 	}
     }
 
-    if (! FileChanges::CheckFiles (["/etc/ntp.conf"]))
+    // Stay away if the user may have made changes which we cannot parse.
+    // But bnc#456553, no pop-ups for CLI.
+    if (! Mode::commandline() && ! FileChanges::CheckFiles (["/etc/ntp.conf"]))
 	failed = true;
     ProcessNtpConf();
 
