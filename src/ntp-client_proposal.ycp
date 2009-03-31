@@ -21,10 +21,7 @@ import "PackageSystem";
 import "Popup";
 import "Progress";
 import "Report";
-
-y2milestone("----------------------------------------");
-y2milestone("Ntp client proposal started");
-y2milestone("Arguments: %1", WFM::Args());
+import "Wizard";
 
 /*
     API:
@@ -32,12 +29,9 @@ y2milestone("Arguments: %1", WFM::Args());
 Usual *_proposal functions: MakeProposal, AskUser, Write.
 (but not Description; see, it just *looks* like *_proposal)
 Additionally:
- CreateUI	(thick and fragile interface, grr)
  GetNTPEnabled  (queries Service::Enabled)
- GetUseNTP      (queries NtpClient::ntp_selected, just a storage for the caller)
  SetUseNTP [ntp_used]
 */
-
 any ret = nil;
 string func = "";
 map param = $[];
@@ -48,7 +42,69 @@ if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
 	param = (map)WFM::Args(1);
 }
 
-void ProposeSomething()
+
+string ui_help_text() {
+    // help text
+    return _("<p>Press <b>Synchronize Now</b>, to get your system time set correctly using the selected NTP server. If you want to make use of NTP permanently, enable the <b>Save NTP Configuration</b> option</p>") +
+
+    // help text, cont.
+	_("<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>") +
+
+    // help text, cont.
+    _("<p>Synchronization with the NTP server can be done only when the network is configured.</p>");
+}
+
+// FIXME must go to module to preserve value
+boolean ntp_was_used	= false;
+
+void ui_enable_disable_widgets (boolean enabled) {
+    UI::ChangeWidget (`id (`ntp_address), `Enabled, enabled);
+    UI::ChangeWidget (`id (`ntp_now), `Enabled, enabled);
+    UI::ChangeWidget (`id (`ntp_save), `Enabled, enabled);
+    if (UI::WidgetExists (`id (`ntp_configure))) // bnc#483787
+	UI::ChangeWidget (`id (`ntp_configure), `Enabled, enabled);
+}
+
+void handle_invalid_hostname( string server ) {
+    // translators: error popup
+    Popup::Error( sformat(_("Invalid NTP server hostname %1"), server) );
+}
+
+boolean GetNTPEnabled () {
+    return Service::Enabled (NtpClient::service_name);
+}
+
+boolean ValidateSingleServer( string ntp_server )
+{
+    if (!Address::Check(ntp_server) )
+    {
+        UI::SetFocus(`id(`ntp_address));
+	return false;
+    }
+
+    return true;
+}
+
+void AddSingleServer( string server )
+{
+
+   integer idx = NtpClient::findSyncRecord("server", server); 
+
+   // -1 means adding new server
+   if (idx == -1)
+   {
+        NtpClient::selected_record["address"] = server;
+        NtpClient::selected_record["type"] = "server";
+   }
+   else
+	NtpClient::selectSyncRecord(idx);
+
+   NtpClient::storeSyncRecord();
+}
+
+
+// @param cc country code
+void MakeProposal(string cc)
 {
    list ntp_items = [];
 
@@ -74,201 +130,79 @@ void ProposeSomething()
 	// avoid calling Read again (bnc #427712)
 	NtpClient::config_has_been_read = true;
    }
+/*
+ FIXME: does MakeProposal have sense?
+ would it have sense if implemented properly?
+real proposal starts here, it is ui_read before...
+*/
+
    if( ntp_items == [])
    {
-        string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
 	y2milestone("Nothing found in /etc/ntp.conf, proposing current language-based NTP server list");
         ntp_items = NtpClient::GetNtpServersByCountry( cc, true );
 	NtpClient::config_has_been_read = true;
     }
     ntp_items = add(ntp_items, "");
     UI::ChangeWidget(`id(`ntp_address), `Items, ntp_items);
-
 }
 
-void AddSingleServer( string server )
-{
-
-   integer idx = NtpClient::findSyncRecord("server", server); 
-
-   // -1 means adding new server
-   if (idx == -1)
-   {
-        NtpClient::selected_record["address"] = server;
-        NtpClient::selected_record["type"] = "server";
-   }
-   else
-	NtpClient::selectSyncRecord(idx);
-
-   NtpClient::storeSyncRecord();
-}
-
-boolean ValidateSingleServer( string ntp_server )
-{
-    if (!Address::Check(ntp_server) )
-    {
-        UI::SetFocus(`id(`ntp_address));
-	return false;
-    }
-
-    return true;
-}
-
-if (func == "CreateUI")
-{
+/**
+@param first_time when asking for first time, we check if service is running
+@return should our radio button be selected
+*/
+boolean ui_init(term rp, string country, boolean first_time) {
    term cont = `VBox (`VSpacing (0.5), `HBox (
 	`HSpacing (3),
 	`HWeight (1, `VBox (
             `Left (`ComboBox (`id (`ntp_address), `opt (`editable, `hstretch),
                 // combo box label
-                _("NTP Server Address")
+                _("&NTP Server Address")
 	    )),
 	    `VSpacing (0.3),
 	    `HBox (
 		`HSpacing (0.5),
 		// check box label
-		`Left (`CheckBox (`id (`ntp_save), _("Save NTP Configuration")))
+		`Left (`CheckBox (`id (`ntp_save), _("&Save NTP Configuration")))
 	    )
 	)),
 	`HWeight (1, `VBox (
-            `Label (""),
+	    `Label (""),
 	    `VSpacing (0.3), // try to line up the widgets horizontally
-            // push button label
-            `Left (`PushButton (`id (`ntp_now), _("Synchronize now"))),
+	    // push button label
+	    `Left (`PushButton (`id (`ntp_now), _("S&ynchronize now"))),
 	    `VSpacing (0.3),
-            // push button label
+	    // push button label
 	    // bnc#449615: only simple config for inst-sys
-            Stage::initial() ? `Label("") : `Left (`PushButton (`id (`ntp_configure), _("Configure...")))
+	    Stage::initial() ? `Label("") : `Left (`PushButton (`id (`ntp_configure), _("&Configure...")))
 	))
     ));
 
-    if (UI::WidgetExists(`id(`rp)))
-    {
-        UI::ReplaceWidget(`id(`rp), cont);
+   UI::ReplaceWidget(rp, cont);
 
-        if (!NetworkService::isNetworkRunning())
-        {
-            y2warning("Network is not running, NTP synchronization will not be available");
-            UI::ChangeWidget(`id(`ntp_content), `Enabled, false);
-        }
-    }
+   if (!NetworkService::isNetworkRunning())
+   {
+       y2warning("Network is not running, NTP synchronization will not be available");
+       UI::ChangeWidget(`id(`ntp_content), `Enabled, false); // FIXME it is outside
+   }
 
-    ret = true;
+// ^ createui0
+
+    // FIXME is it correct? move out?
+    boolean ntp_used = (first_time && !Stage::initial ()) ?
+	GetNTPEnabled () : NtpClient::ntp_selected;
+
+    if (first_time)
+	// ntp_used with first_time means that ntp service is enabled
+	UI::ChangeWidget (`id(`ntp_save), `Value, ntp_used);
+
+    // ntp_was_used	= ntp_used; 
+    if (ntp_used)
+	MakeProposal (country);
+    return ntp_used;
 }
 
-else if (func == "GetNTPEnabled")
-{
-    ret	= Service::Enabled (NtpClient::service_name);
-}
-
-
-else if (func == "GetUseNTP")
-{
-    /*
-    if (param["first_time"]:false && !Stage::initial ())
-    {
-	ret	= Service::Enabled (NtpClient::service_name);
-    }
-    else
-    */
-	ret = NtpClient::ntp_selected;
-}
-
-else if (func == "SetUseNTP")
-{
-    NtpClient::ntp_selected = param["ntp_used"]:false;
-    ret = true;
-}
-
-else if (func == "MakeProposal")
-{
-    ProposeSomething();
-    ret = true;
-}
-
-/*
-params:
-  server (taken from UI if empty)
-  servers (intended to use all of opensuse.pool.ntp.org,
-	   but I did not have time to make it work)
-  ntpdate_only (TODO rename to onetime)
-*/
-else if (func == "Write")
-{
-    string ntp_server	= param["server"]:"";
-    if (ntp_server == "")
-	// get the value from UI only when it wasn't given as a parameter
-	ntp_server	= (string) UI::QueryWidget(`id(`ntp_address), `Value);
-
-    // One-time adjusment without running the ntp daemon
-    // Meanwhile, ntpdate was replaced by sntp
-    boolean ntpdate_only = param["ntpdate_only"]:false;
-
-    if ( !ValidateSingleServer( ntp_server ) )
-	ret = `invalid_hostname;
-    else
-    {
-	string required_package = "ntp";
-
-        //In 1st stage, schedule packages for installation
-        //but not in case user wants to set the time only (F#302917)
-	//(ntpdate is in inst-sys so we don't need the package)
-        if (Stage::initial() && !ntpdate_only)
-	{
-		import "Packages";
-	        Packages::addAdditionalPackage(required_package);
-	        // bugzilla #327050
-	        // Agent for writing /etc/ntp.conf needs to be installed
-	        // to write the settings at the end of the installation
-	        Packages::addAdditionalPackage("yast2-ntp-client");
-	}
-	//Otherwise, prompt user for confirming pkg installation
-	else if (!Stage::initial ())
-	{
-	   if (!PackageSystem::CheckAndInstallPackages([ required_package ]))
-	   {
-	        Report::Error(sformat( _("Synchronization with NTP server is not possible
-without having package %1 installed"), required_package));
-	   }
-	}
-
-        Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
-
-        y2milestone("Running sntp to sync with %1", ntp_server);
-
-	// -r: do set the system time
-	// -P no: do not ask if time difference is too large
-	// -c 1 -d 15: delay 15s, only one try (bnc#442287)
-        integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -c 1 -d 15 -r -P no '%1'", String::Quote(ntp_server)));
-        y2milestone ("'sntp %1' returned %2", ntp_server, r);
-
-	Popup::ClearFeedback();
-
-        if (r == 0)
-        {
-            ret = `success;
-
-	    // User wants to more than running sntp (synchronize on boot)
-	    if (!ntpdate_only)
-            {
-	        NtpClient::modified = true;
-	        AddSingleServer(ntp_server);
-
-	        //OK, so we stored the server address
-	        //In inst-sys we don't need to care further
-	        //ntp-client_finish will do the job
-	        //In installed system we must write the settings
-	        if (!Stage::initial())
-		    NtpClient::Write();
-	    }
-        }
-        else
-	    ret = `ntpdate_failed;
-    }
-}
-
-else if (func == "AskUser")
-{
+symbol AskUser () {
+    symbol ret = nil;
     string ntp_server = (string) UI::QueryWidget(`id(`ntp_address), `Value);
     if ( !ValidateSingleServer( ntp_server ) )
 	ret = `invalid_hostname;
@@ -279,13 +213,206 @@ else if (func == "AskUser")
         boolean retval = (boolean) WFM::CallFunction("ntp-client");
 	if (retval)
 	    ret	= `next;
-        ProposeSomething();
+        string cc = NtpClient::GetCurrentLanguageCode();
+        MakeProposal(cc);
     }
+    return ret;
 }
 
-y2milestone("Ntp client proposal finished");
-y2milestone("----------------------------------------");
+/*
+params:
+  server (taken from UI if empty)
+  servers (intended to use all of opensuse.pool.ntp.org,
+	   but I did not have time to make it work)
+  ntpdate_only (TODO rename to onetime)
+return:
+  `success, `invalid_hostname or `ntpdate_failed
+*/
+symbol Write(map param) {
+    symbol ret = nil;
+    string ntp_server	= param["server"]:"";
+    if (ntp_server == "")
+	// get the value from UI only when it wasn't given as a parameter
+	ntp_server	= (string) UI::QueryWidget(`id(`ntp_address), `Value);
+    if ( !ValidateSingleServer( ntp_server ) )
+	return `invalid_hostname;
+
+    // One-time adjusment without running the ntp daemon
+    // Meanwhile, ntpdate was replaced by sntp
+    boolean ntpdate_only = param["ntpdate_only"]:false;
+
+    string required_package = "ntp";
+
+    //In 1st stage, schedule packages for installation
+    //but not in case user wants to set the time only (F#302917)
+    //(ntpdate is in inst-sys so we don't need the package)
+    if (Stage::initial() && !ntpdate_only)
+    {
+	import "Packages";
+	Packages::addAdditionalPackage(required_package);
+	// bugzilla #327050
+	// Agent for writing /etc/ntp.conf needs to be installed
+	// to write the settings at the end of the installation
+	Packages::addAdditionalPackage("yast2-ntp-client");
+    }
+    //Otherwise, prompt user for confirming pkg installation
+    else if (!Stage::initial ())
+    {
+	if (!PackageSystem::CheckAndInstallPackages([ required_package ]))
+	{
+	    Report::Error(sformat( _("Synchronization with NTP server is not possible
+without having package %1 installed"), required_package));
+	}
+    }
+
+    Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
+
+    y2milestone("Running sntp to sync with %1", ntp_server);
+
+    // -r: do set the system time
+    // -P no: do not ask if time difference is too large
+    // -c 1 -d 15: delay 15s, only one try (bnc#442287)
+    integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -c 1 -d 15 -r -P no '%1'", String::Quote(ntp_server)));
+    y2milestone ("'sntp %1' returned %2", ntp_server, r);
+
+    Popup::ClearFeedback();
+
+    if (r != 0)
+	return `ntpdate_failed;
+
+    // User wants to more than running sntp (synchronize on boot)
+    if (!ntpdate_only)
+    {
+	NtpClient::modified = true;
+	AddSingleServer(ntp_server);
+
+	//OK, so we stored the server address
+	//In inst-sys we don't need to care further
+	//ntp-client_finish will do the job
+	//In installed system we must write the settings
+	if (!Stage::initial()) {
+	    Wizard::OpenAcceptDialog(); // FIXME so that the progress does not disturb the dialog to be returned to
+	    NtpClient::Write();
+	    Wizard::CloseDialog();
+	}
+    }
+
+    return `success;
+}
+
+// ui = UI::UserInput
+symbol ui_handle(any ui) {
+    boolean redraw = false;
+    if (ui == `ntp_configure)
+    {
+	symbol rv = AskUser ();
+	if( rv == `invalid_hostname)
+	{
+	    handle_invalid_hostname (
+		(string) UI::QueryWidget (`id (`ntp_address), `Value));
+	}
+	else if (rv == `next && !Stage::initial ())
+	{
+	    // show the 'save' status after configuration
+	    UI::ChangeWidget (`id(`ntp_save), `Value, GetNTPEnabled ());
+	}
+    }
+    if (ui == `ntp_now)
+    {
+	symbol rv = Write ($["ntpdate_only" : true]);
+	if( rv == `invalid_hostname)
+	{
+	    handle_invalid_hostname (
+		(string) UI::QueryWidget (`id (`ntp_address), `Value));
+	}
+	else if (rv == `success)
+	{
+	    redraw = true;	// update time widgets
+	}
+    }
+
+    return redraw? `redraw : nil;
+}
+
+boolean ui_try_save() {
+    map argmap	= $[];
+    if (UI::QueryWidget (`id (`ntp_save), `Value) == false)
+	argmap["ntpdate_only"]	= true;
+
+    symbol rv = Write (argmap);
+
+    string server = (string) UI::QueryWidget (`id(`ntp_address),`Value);
+
+    if (rv == `invalid_hostname)
+    {
+	handle_invalid_hostname( server );
+	return false;	// loop on
+    }
+    else if ( rv == `ntpdate_failed)
+    {
+	// Translators: yes-no popup,
+	// ntpdate is a command, %1 is the server address
+	if (Popup::YesNo( sformat(_("'ntpdate %1' failed. Revisit NTP server configuration?"), server) ))
+	{
+	    return false; // loop on
+	}
+    }
+    // success, exit
+    return true;
+}
+
+
+
+if (false)
+{
+    return;
+}
+else if (func == "GetNTPEnabled")
+{
+    ret	= GetNTPEnabled ();
+}
+
+
+else if (func == "SetUseNTP")
+{
+    NtpClient::ntp_selected = param["ntp_used"]:false;
+    ret = true;
+}
+
+else if (func == "MakeProposal")
+{
+    string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
+    ret = MakeProposal(cc);
+}
+
+else if (func == "Write")
+{
+    ret = Write (param);
+}
+
+else if (func == "ui_help_text")
+{
+    ret = ui_help_text();
+}
+else if (func == "ui_init")
+{
+    term rp = param["replace_point"]:`id(`rp);
+    string cc = param["country"]:NtpClient::GetCurrentLanguageCode();
+    boolean ft = param["first_time"]:false;
+    ret = ui_init(rp, cc, ft);
+}
+else if (func == "ui_try_save")
+{
+    ret = ui_try_save();
+}
+else if (func == "ui_enable_disable_widgets")
+{
+    ret = ui_enable_disable_widgets(param["enabled"]:false);
+}
+else if (func == "ui_handle")
+{
+    ret = ui_handle(param["ui"]:nil);
+}
+
 return ret;
 }
-
-

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Mar 31 16:52:04 CEST 2009 - mvidner@suse.cz
+
+- Moved more code dealing with NTP setup from yast2-country
+  to yast2-ntp-client to make the API less fragile (bnc#483787).
+- 2.18.0
+
+-------------------------------------------------------------------
 Tue Mar 17 14:01:57 CET 2009 - mvidner@suse.cz
 
 - Do not pop up with questions in CLI mode (bnc#456553).
