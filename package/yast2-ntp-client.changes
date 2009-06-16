@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jun 16 14:27:45 CEST 2009 - mvidner@suse.cz
+
+- Using autodocs-ycp.ami, which contains a fix for automake 1.11.
+
+-------------------------------------------------------------------
 Tue Mar 31 16:52:04 CEST 2009 - mvidner@suse.cz
 
 - Moved more code dealing with NTP setup from yast2-country
