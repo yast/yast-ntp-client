@@ -10,7 +10,7 @@ Requires:	yast2-country-data
 
 BuildArchitectures:	noarch
 
-Summary:	Configuration of ntp-client
+Summary:	YaST2 - NTP Client Configuration
 
 %description
 -
