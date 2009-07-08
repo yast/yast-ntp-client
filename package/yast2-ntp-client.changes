@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jul  8 13:30:06 CEST 2009 - ug@suse.de
+
+- RNC file less strict
+
+-------------------------------------------------------------------
 Tue Jun 16 14:27:45 CEST 2009 - mvidner@suse.cz
 
 - Using autodocs-ycp.ami, which contains a fix for automake 1.11.

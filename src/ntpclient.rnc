@@ -4,7 +4,11 @@ namespace config = "http://www.suse.com/1.0/configns"
 
 ntp-client =
   element ntp-client {
-    configure_dhcp?, peers, start_at_boot, start_in_chroot?, ntp_policy?
+    configure_dhcp? &
+    peers? &
+    start_at_boot? &
+    start_in_chroot? &
+    ntp_policy?
   }
 
 ntp_policy =
