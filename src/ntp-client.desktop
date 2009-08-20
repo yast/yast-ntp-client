@@ -17,6 +17,7 @@ X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=ntp-client
 X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-AutoInstSchema=ntpclient.rnc
+X-SuSE-YaST-Keywords=time,sync,synchronization,NTP
 
 Icon=yast-ntp-client
 Exec=/sbin/yast2 ntp-client 
