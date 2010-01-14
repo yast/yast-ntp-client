@@ -20,9 +20,8 @@ X-SuSE-YaST-AutoInstSchema=ntpclient.rnc
 X-SuSE-YaST-Keywords=time,sync,synchronization,NTP
 
 Icon=yast-ntp-client
-Exec=/sbin/yast2 ntp-client 
+Exec=xdg-su -c "/sbin/yast2 ntp-client"
 
 Name=NTP Configuration
 GenericName=Configure an NTP client or server
-X-KDE-SubstituteUID=true
 StartupNotify=true
