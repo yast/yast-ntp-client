@@ -86,7 +86,7 @@ define symbol WriteDialog() ``{
 define symbol SimpleDialog () ``{
     NtpClient::simple_dialog = true;
 
-    list<map<string,any> > w = CWM::CreateWidgets (["start", "server_address", "use_random_servers", "complex_button"],
+    list<map<string,any> > w = CWM::CreateWidgets (["start", "interval", "server_address", "use_random_servers", "complex_button"],
 	GetWidgets ());
     term contents = `HBox (`HSpacing (1), `VBox (
 	`VStretch (),
@@ -95,6 +95,8 @@ define symbol SimpleDialog () ``{
 	    "start",
 	    `HStretch ()
 	),
+	`VStretch (),
+	"interval",
 	`VStretch (),
 	`HBox (
 	    `HStretch (),
@@ -155,6 +157,8 @@ define symbol MainDialog () ``{
 			   "policy_combo",
 			   "custom_policy"
 			  ),
+		`VSpacing(),
+		"interval",
 		`VSpacing()
 	    )
 	),
@@ -185,7 +189,7 @@ define symbol MainDialog () ``{
 	"general" : $[
 	    "header" : _("General Settings"),
 	    "contents" : tab1,
-	    "widget_names" : ["start", "policy_combo", "custom_policy", "overview"],
+	    "widget_names" : ["start", "policy_combo", "custom_policy", "interval", "overview"],
 	],
 	"security" : $[
 	    "header" : _("Security Settings"),

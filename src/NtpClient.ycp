@@ -65,6 +65,21 @@ global map <string, map <string,any> > restrict_map = $[];
 global boolean run_service = true;
 
 /**
+  * Should the time synchronized periodicaly?
+  */
+global boolean synchronize_time = false;
+
+/**
+  * The interval of synchronization in minutes.
+  */
+global integer sync_interval = 5;
+
+/**
+  * The cron file name for the synchronization.
+  */
+global string cron_file = "/etc/cron.d/novell.ntp-synchronize";
+
+/**
  * Service name of the NTP daemon
  */
 global string service_name = "ntp";
@@ -503,6 +518,15 @@ global define boolean Read() ``{
     if (! Mode::commandline() && ! FileChanges::CheckFiles (["/etc/ntp.conf"]))
 	failed = true;
     ProcessNtpConf();
+    list crontab = (list)SCR::Read(.cron, cron_file, "");
+    y2milestone("CRONTAB %1", crontab);
+    string tmp       = (string) crontab[0,"events",0,"active"]:"0";
+    synchronize_time = tmp == "1";
+    tmp              = (string) crontab[0,"events",0,"minute"]:"*/5";
+    y2milestone("MINUTE %1", tmp);
+    tmp              = regexpsub(tmp,"\\*/","");
+    sync_interval    = tointeger(tmp);
+    y2milestone("SYNC_INTERVAL %1", sync_interval);
 
     string run_chroot_s = (string) SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED);
     run_chroot = run_chroot_s == "yes";
@@ -799,6 +823,14 @@ global define boolean Write() ``{
     {
 	Service::RunInitScript(service_name, "stop");
     }
+    if (synchronize_time)
+    {
+	SCR::Write (.target.string,cron_file,"-*/"+sync_interval+" * * * * root /etc/init.d/ntp ntptimeset &>/dev/null");
+    }
+    else
+    {
+	SCR::Execute (.target.bash,"test -e "+cron_file+"  && rm "+cron_file+";");
+    }
 
     sleep(sl);
 
@@ -821,6 +853,8 @@ global define boolean Write() ``{
  * @return boolean True on success
  */
 global define boolean Import (map settings) ``{
+    synchronize_time = settings["synchronize_time"]:false;
+    sync_interval = settings["sync_interval"]:5;
     run_service = settings["start_at_boot"]:false;
     run_chroot = settings["start_in_chroot"]:true;
     // compatibility: configure_dhcp:true translates to ntp_policy:auto
@@ -850,10 +884,12 @@ global define boolean Import (map settings) ``{
  */
 global define map Export () ``{
     return $[
-	"start_at_boot" : run_service,
-	"start_in_chroot" : run_chroot,
-	"ntp_policy" : ntp_policy,
-	"peers" : ntp_records,
+	"synchronize_time" : synchronize_time,
+	"sync_interval"    : sync_interval,
+	"start_at_boot"    : run_service,
+	"start_in_chroot"  : run_chroot,
+	"ntp_policy"       : ntp_policy,
+	"peers"            : ntp_records,
     ];
 }
 

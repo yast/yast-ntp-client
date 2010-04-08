@@ -74,10 +74,24 @@ define void showLogPopup () ``{
  */
 define symbol ntpEnabledOrDisabled (string id, map event) ``{
     any ev_id = event["ID"]:nil;
-    if (ev_id == "boot" || ev_id == "never")
+    if (ev_id == "boot" || ev_id == "never" || ev_id == "sync" )
     {
-	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton)
-	    != "never";
+	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton) != "never";
+	UI::ChangeWidget (`id (id), `Enabled, enabled);
+    }
+}
+
+/**
+ * Handle function of the widget
+ * @param id string widget id
+ * @param event map event that caused storing process
+ * @return symbol always nil
+ */
+define symbol timeSyncOrNo (string id, map event) ``{
+    any ev_id = event["ID"]:nil;
+    if (ev_id == "boot" || ev_id == "never" || ev_id == "sync" )
+    {
+	boolean enabled = UI::QueryWidget (`id ("start"), `CurrentButton) == "sync";
 	UI::ChangeWidget (`id (id), `Enabled, enabled);
     }
 }
@@ -86,9 +100,36 @@ define symbol ntpEnabledOrDisabled (string id, map event) ``{
  * Initialize the widget
  * @param id any widget id
  */
+define void intervalInit (string id) ``{
+	UI::ChangeWidget (`id ("interval"), `Value, NtpClient::sync_interval);
+}
+
+/**
+ * Store settings of the widget
+ * @param id any widget id
+ * @param event map event that caused storing process
+ */
+define void intervalStore (string id, map event) ``{
+    NtpClient::sync_interval      = (integer)UI::QueryWidget (`id ("interval"), `Value);
+}
+
+/**
+ * Initialize the widget
+ * @param id any widget id
+ */
 define void startInit (string id) ``{
-    UI::ChangeWidget (`id ("start"), `CurrentButton,
-	NtpClient::run_service ? "boot" : "never");
+    if( NtpClient::synchronize_time )
+    {
+        UI::ChangeWidget (`id ("start"), `CurrentButton, "sync");
+    }
+    else if( NtpClient::run_service )
+    {
+        UI::ChangeWidget (`id ("start"), `CurrentButton, "boot");
+    }
+    else
+    {
+        UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
+    }
 }
 
 /**
@@ -97,7 +138,8 @@ define void startInit (string id) ``{
  * @param event map event that caused storing process
  */
 define void startStore (string id, map event) ``{
-    NtpClient::run_service = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+    NtpClient::run_service      = UI::QueryWidget (`id ("start"), `CurrentButton) == "boot";
+    NtpClient::synchronize_time = UI::QueryWidget (`id ("start"), `CurrentButton) == "sync";
 }
 
 /**
@@ -384,7 +426,7 @@ define void RandomServersInit (string id) {
     } else {
 	// Random servers function is disabled
 	UI::ChangeWidget(`id ("use_random_servers"), `Value, false);
-	if (NtpClient::run_service) {
+	if (NtpClient::run_service || NtpClient::synchronize_time) {
 	    UI::ChangeWidget(`id ("server_address"), `Enabled, true);
 	    UI::ChangeWidget(`id (`select_server), `Enabled, true);
 	} else {
@@ -503,7 +545,7 @@ define symbol overviewHandle (string id, map event) ``{
     }
     NtpClient::modified = true;
     any ev_id = event["ID"]:nil;
-    if (ev_id == "boot" || ev_id == "never" || ev_id == "policy_combo")
+    if (ev_id == "boot" || ev_id == "never" || ev_id == "sync" || ev_id == "policy_combo" )
     {
 	symbol pol = (symbol)UI::QueryWidget (`id ("policy_combo"), `Value);
 
@@ -1219,6 +1261,16 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "handle_events" : [ "fudge_button" ],
 	    "handle" : fudgeButtonHandle,
 	],
+	"interval" : $[
+	    "widget" : `intfield,
+	    "label" : _("&Interval of the Synchronization in Minutes"),
+	    "minimum" : 1,
+	    "maximum" : 60,
+	    "init"    : intervalInit,
+	    "store"   : intervalStore,
+	    "help"    : HELPS["start"]:"",
+	    "handle"  : timeSyncOrNo,
+	],
 	"start" : $[
 	    "widget" : `radio_buttons,
 	    // frame
@@ -1227,13 +1279,15 @@ define map<string,map<string,any> > InitWidgets () ``{
 		// radio button
 		[ "never", _("Only &Manually") ],
 		// radio button
+		[ "sync", _("&Synchronize without Daemon") ],
+		// radio button
 		[ "boot", _("Now and On &Boot") ],
 	    ],
 	    "help" : HELPS["start"]:"",
 	    "init" : startInit,
 	    "store" : startStore,
 	    "handle" : startHandle,
-	    "handle_events" : [ "boot", "never" ],
+	    "handle_events" : [ "boot", "never","sync" ],
 	    "opt" : [`notify],
 	],
 	"run_chroot" : $[
