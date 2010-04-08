@@ -1,3 +1,9 @@
+-------------------------------------------------------------------
+Thu Apr  8 15:48:00 CEST 2010 - mvidner@suse.cz
+
+- Added a write_only parameter to ntp-client_proposal:Write,
+  to fix disabling NTP without trying to sync with it (bnc#589296)
+
 ------------------------------------------------------------------
 Wed Jan 13 18:56:03 CET 2010 - kmachalkova@suse.cz
 

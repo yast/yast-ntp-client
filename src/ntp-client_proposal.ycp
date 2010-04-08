@@ -219,11 +219,29 @@ symbol AskUser () {
     return ret;
 }
 
+boolean WriteNtpSettings (string ntp_server) {
+
+    NtpClient::modified = true;
+    AddSingleServer(ntp_server);
+
+    //OK, so we stored the server address
+    //In inst-sys we don't need to care further
+    //ntp-client_finish will do the job
+    //In installed system we must write the settings
+    if (!Stage::initial()) {
+	Wizard::OpenAcceptDialog(); // FIXME so that the progress does not disturb the dialog to be returned to
+        NtpClient::Write();
+        Wizard::CloseDialog();
+    }
+    return true;
+}
+
 /*
 params:
   server (taken from UI if empty)
   servers (intended to use all of opensuse.pool.ntp.org,
 	   but I did not have time to make it work)
+  write_only (bnc#589296)
   ntpdate_only (TODO rename to onetime)
 return:
   `success, `invalid_hostname or `ntpdate_failed
@@ -236,6 +254,12 @@ symbol Write(map param) {
 	ntp_server	= (string) UI::QueryWidget(`id(`ntp_address), `Value);
     if ( !ValidateSingleServer( ntp_server ) )
 	return `invalid_hostname;
+
+    if (param["write_only"]:false)
+    {
+	WriteNtpSettings (ntp_server);
+	return `success;
+    }
 
     // One-time adjusment without running the ntp daemon
     // Meanwhile, ntpdate was replaced by sntp
@@ -283,18 +307,7 @@ without having package %1 installed"), required_package));
     // User wants to more than running sntp (synchronize on boot)
     if (!ntpdate_only)
     {
-	NtpClient::modified = true;
-	AddSingleServer(ntp_server);
-
-	//OK, so we stored the server address
-	//In inst-sys we don't need to care further
-	//ntp-client_finish will do the job
-	//In installed system we must write the settings
-	if (!Stage::initial()) {
-	    Wizard::OpenAcceptDialog(); // FIXME so that the progress does not disturb the dialog to be returned to
-	    NtpClient::Write();
-	    Wizard::CloseDialog();
-	}
+	WriteNtpSettings (ntp_server);
     }
 
     return `success;
