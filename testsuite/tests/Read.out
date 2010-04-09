@@ -9,4 +9,4 @@ Read	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", "
 Read	.cron "/etc/cron.d/novell.ntp-synchronize" nil
 Read	.sysconfig.ntp.NTPD_RUN_CHROOTED "yes"
 Return	true
-Return	$["ntp_policy":"", "peers":[$["address":"ntp1", "comment":"", "options":" options1", "type":"server"], $["address":"127.127.1.2", "comment":"", "options":" options_clock", "type":"__clock"], $["address":"ntp2", "comment":"", "options":" options2", "type":"server"], $["address":"peer1", "comment":"", "options":" options_peer", "type":"peer"]], "start_at_boot":false, "start_in_chroot":true, "sync_interval":nil, "synchronize_time":false]
+Return	$["ntp_policy":"", "peers":[$["address":"ntp1", "comment":"", "options":" options1", "type":"server"], $["address":"127.127.1.2", "comment":"", "options":" options_clock", "type":"__clock"], $["address":"ntp2", "comment":"", "options":" options2", "type":"server"], $["address":"peer1", "comment":"", "options":" options_peer", "type":"peer"]], "start_at_boot":false, "start_in_chroot":true, "sync_interval":5, "synchronize_time":false]
