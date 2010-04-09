@@ -7,4 +7,5 @@ Write	.sysconfig.network.config nil true
 Execute	.target.bash "/sbin/netconfig update" 0
 Write	.sysconfig.ntp.NTPD_RUN_CHROOTED "yes" true
 Write	.sysconfig.ntp nil true
+Execute	.target.bash "test -e /etc/cron.d/novell.ntp-synchronize  && rm /etc/cron.d/novell.ntp-synchronize;" 0
 Return	true

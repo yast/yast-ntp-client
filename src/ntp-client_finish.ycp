@@ -43,7 +43,7 @@ else if (func == "Write")
     list<string> ss = NtpClient::GetUsedNtpServers();
 
     // ntp.conf from the RPM
-    NtpClient::Read();
+    NtpClient::ProcessNtpConf();
 
     // put users server(s) back
     foreach (string server, ss, {

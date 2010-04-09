@@ -45,13 +45,17 @@ if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
 
 string ui_help_text() {
     // help text
-    return _("<p>Press <b>Synchronize Now</b>, to get your system time set correctly using the selected NTP server. If you want to make use of NTP permanently, enable the <b>Save NTP Configuration</b> option</p>") +
+    string tmp = _("<p>Press <b>Synchronize Now</b>, to get your system time set correctly using the selected NTP server. If you want to make use of NTP permanently, enable the <b>Save NTP Configuration</b> option</p>");
+
+    tmp = tmp + _("<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be started as deamon. Otherwise the system time will be synchronized periodicaly. The default interval is 15 min. You can change it after installation with the <b>yast2 ntp-client module</b>.</p>");
 
     // help text, cont.
-	_("<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>") +
+    if( ! Stage::initial() )
+	tmp = tmp + _("<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>");
 
     // help text, cont.
-    _("<p>Synchronization with the NTP server can be done only when the network is configured.</p>");
+    tmp = tmp + _("<p>Synchronization with the NTP server can be done only when the network is configured.</p>");
+    return tmp;
 }
 
 // FIXME must go to module to preserve value
@@ -59,6 +63,7 @@ boolean ntp_was_used	= false;
 
 void ui_enable_disable_widgets (boolean enabled) {
     UI::ChangeWidget (`id (`ntp_address), `Enabled, enabled);
+    UI::ChangeWidget (`id (`run_service), `Enabled, enabled);
     UI::ChangeWidget (`id (`ntp_now), `Enabled, enabled);
     UI::ChangeWidget (`id (`ntp_save), `Enabled, enabled);
     if (UI::WidgetExists (`id (`ntp_configure))) // bnc#483787
@@ -162,6 +167,11 @@ boolean ui_init(term rp, string country, boolean first_time) {
 	    `HBox (
 		`HSpacing (0.5),
 		// check box label
+		`Left (`CheckBox (`id (`run_service), _("&Run NTP as daemon")))
+	    ),
+	    `HBox (
+		`HSpacing (0.5),
+		// check box label
 		`Left (`CheckBox (`id (`ntp_save), _("&Save NTP Configuration")))
 	    )
 	)),
@@ -173,7 +183,8 @@ boolean ui_init(term rp, string country, boolean first_time) {
 	    `VSpacing (0.3),
 	    // push button label
 	    // bnc#449615: only simple config for inst-sys
-	    Stage::initial() ? `Label("") : `Left (`PushButton (`id (`ntp_configure), _("&Configure...")))
+	    Stage::initial() ? `Label("") : `Left (`PushButton (`id (`ntp_configure), _("&Configure..."))),
+	   `Label("")
 	))
     ));
 
@@ -182,7 +193,8 @@ boolean ui_init(term rp, string country, boolean first_time) {
    if (!NetworkService::isNetworkRunning())
    {
        y2warning("Network is not running, NTP synchronization will not be available");
-       UI::ChangeWidget(`id(`ntp_content), `Enabled, false); // FIXME it is outside
+// If network not running we have to be able to configure ntp nevertheless
+//       UI::ChangeWidget(`id(`ntp_content), `Enabled, false); // FIXME it is outside
    }
 
 // ^ createui0
@@ -219,10 +231,16 @@ symbol AskUser () {
     return ret;
 }
 
-boolean WriteNtpSettings (string ntp_server) {
+boolean WriteNtpSettings (string ntp_server,boolean run_service) {
 
     NtpClient::modified = true;
     AddSingleServer(ntp_server);
+    if( ! run_service )
+    {
+        NtpClient::synchronize_time=true;
+	NtpClient::run_service=false;
+	NtpClient::sync_interval=15;
+    }
 
     //OK, so we stored the server address
     //In inst-sys we don't need to care further
@@ -249,6 +267,7 @@ return:
 symbol Write(map param) {
     symbol ret = nil;
     string ntp_server	= param["server"]:"";
+    boolean run_service	= param["run_service"]:true;
     if (ntp_server == "")
 	// get the value from UI only when it wasn't given as a parameter
 	ntp_server	= (string) UI::QueryWidget(`id(`ntp_address), `Value);
@@ -257,7 +276,7 @@ symbol Write(map param) {
 
     if (param["write_only"]:false)
     {
-	WriteNtpSettings (ntp_server);
+	WriteNtpSettings (ntp_server,run_service);
 	return `success;
     }
 
@@ -307,7 +326,7 @@ without having package %1 installed"), required_package));
     // User wants to more than running sntp (synchronize on boot)
     if (!ntpdate_only)
     {
-	WriteNtpSettings (ntp_server);
+	WriteNtpSettings (ntp_server,run_service);
     }
 
     return `success;
@@ -349,8 +368,12 @@ symbol ui_handle(any ui) {
 
 boolean ui_try_save() {
     map argmap	= $[];
+    argmap["ntpdate_only"]	= false;
+    argmap["run_service"]	= false;
     if (UI::QueryWidget (`id (`ntp_save), `Value) == false)
 	argmap["ntpdate_only"]	= true;
+    if (UI::QueryWidget (`id (`run_service), `Value) == true)
+	argmap["run_service"]	= true;
 
     symbol rv = Write (argmap);
 
@@ -368,6 +391,10 @@ boolean ui_try_save() {
 	if (Popup::YesNo( sformat(_("'ntpdate %1' failed. Revisit NTP server configuration?"), server) ))
 	{
 	    return false; // loop on
+	}
+	else if (!argmap["ntpdate_only"]:false)
+	{
+	    WriteNtpSettings (server,argmap["run_service"]:false); //may be the server is realy not accessable
 	}
     }
     // success, exit
