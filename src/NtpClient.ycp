@@ -524,8 +524,9 @@ global define boolean Read() ``{
     synchronize_time = tmp == "1";
     tmp              = (string) crontab[0,"events",0,"minute"]:"*/5";
     y2milestone("MINUTE %1", tmp);
-    tmp              = regexpsub(tmp,"\\*/","");
-    sync_interval    = tointeger(tmp);
+    list pos  = regexppos(tmp, "[0-9]+");
+    string tmp2 = substring(tmp,pos[0]:0,pos[1]:0);
+    sync_interval    = tointeger(tmp2);
     y2milestone("SYNC_INTERVAL %1", sync_interval);
 
     string run_chroot_s = (string) SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED);
