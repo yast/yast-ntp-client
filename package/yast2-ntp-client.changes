@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Apr  9 15:24:42 UTC 2010 - varkoly@novell.com
+
+- Initial version of time synchronization without running ntp as deamon
+- NTP configuration is possible in first stage even no network is
+  configured.
+- In the NTP proposal now it is possible to select if the NTP service
+  will be started as deamon or not 
+
+-------------------------------------------------------------------
 Thu Apr  8 15:48:00 CEST 2010 - mvidner@suse.cz
 
 - Added a write_only parameter to ntp-client_proposal:Write,
