@@ -264,8 +264,6 @@ define symbol ServerDialog () ``{
 	    `VBox (
 	    "server_address",
 	    `VSpacing (0.5),
-	    `Left ("init_sync"),
-	    `VSpacing (0.5),
 	    "options",
 	    `VSpacing(0.5),
 	    "ac_options",
@@ -278,7 +276,7 @@ define symbol ServerDialog () ``{
     string caption = _("NTP Server");
 
     return CWM::ShowAndRun ($[
-	"widget_names" : ["server_address", "init_sync", "options", "ac_options"],
+	"widget_names" : ["server_address", "options", "ac_options"],
 	"widget_descr" : GetWidgets (),
 	"contents" : contents,
 	"caption" : caption,
@@ -389,8 +387,6 @@ define symbol PeerDialog () ``{
 	`VSpacing (3),
 	"paddress",
 	`VSpacing (1),
-	`Left ("init_sync"),
-	`VSpacing (1),
 	"options",
 	`VSpacing (3)
     ), `HStretch ());
@@ -399,7 +395,7 @@ define symbol PeerDialog () ``{
     string caption = _("NTP Peer");
 
     return CWM::ShowAndRun ($[
-	"widget_names" : ["paddress", "init_sync", "options"],
+	"widget_names" : ["paddress", "options"],
 	"widget_descr" : GetWidgets (),
 	"contents" : contents,
 	"caption" : caption,
