@@ -42,6 +42,7 @@ if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
 	param = (map)WFM::Args(1);
 }
 
+y2milestone("ntp-client_proposal called func %1 param %2",func,param);
 
 string ui_help_text() {
     // help text
@@ -128,6 +129,7 @@ void MakeProposal(string cc)
 
    if( NtpClient::config_has_been_read || NtpClient::ntp_selected)
    {
+	y2milestone("ntp_items will be filled from /etc/ntp.conf");
 	// grr, GUNS means all of them are used and here we just pick one
 	ntp_items = maplist(string server, NtpClient::GetUsedNtpServers(),{
 	   return `item(`id(server), server); 
@@ -140,7 +142,7 @@ void MakeProposal(string cc)
  would it have sense if implemented properly?
 real proposal starts here, it is ui_read before...
 */
-
+   y2milestone("ntp_items :%1", ntp_items);
    if( ntp_items == [])
    {
 	y2milestone("Nothing found in /etc/ntp.conf, proposing current language-based NTP server list");
@@ -172,7 +174,7 @@ boolean ui_init(term rp, string country, boolean first_time) {
 	    `HBox (
 		`HSpacing (0.5),
 		// check box label
-		`Left (`CheckBox (`id (`ntp_save), _("&Save NTP Configuration")))
+		`Left (`CheckBox (`id (`ntp_save), _("&Save NTP Configuration"), true ))
 	    )
 	)),
 	`HWeight (1, `VBox (
@@ -203,13 +205,7 @@ boolean ui_init(term rp, string country, boolean first_time) {
     boolean ntp_used = (first_time && !Stage::initial ()) ?
 	GetNTPEnabled () : NtpClient::ntp_selected;
 
-    if (first_time)
-	// ntp_used with first_time means that ntp service is enabled
-	UI::ChangeWidget (`id(`ntp_save), `Value, ntp_used);
-
-    // ntp_was_used	= ntp_used; 
-    if (ntp_used)
-	MakeProposal (country);
+    MakeProposal (country);
     return ntp_used;
 }
 
