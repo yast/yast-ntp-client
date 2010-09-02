@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep  2 11:21:09 CEST 2010 - jsuchome@suse.cz
+
+- provide public API for info about time synchronization without
+  daemon running (bnc#627818)
+- 2.20.0 
+
+-------------------------------------------------------------------
 Fri Apr  9 15:24:42 UTC 2010 - varkoly@novell.com
 
 - Initial version of time synchronization without running ntp as deamon

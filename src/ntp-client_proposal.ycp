@@ -77,7 +77,11 @@ void handle_invalid_hostname( string server ) {
 }
 
 boolean GetNTPEnabled () {
-    return Service::Enabled (NtpClient::service_name);
+
+    if (!Stage::initial())
+	NtpClient::ReadSynchronization ();
+
+    return NtpClient::synchronize_time || Service::Enabled (NtpClient::service_name);
 }
 
 boolean ValidateSingleServer( string ntp_server )
