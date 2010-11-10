@@ -11,6 +11,11 @@ Thu Sep  2 11:21:09 CEST 2010 - jsuchome@suse.cz
 - 2.20.0 
 
 -------------------------------------------------------------------
+Thu Jun 24 06:00:41 UTC 2010 - varkoly@novell.com
+
+- bnc#598856 - empty NTP server list on time setup
+
+-------------------------------------------------------------------
 Wed Apr 21 16:39:38 CEST 2010 - varkoly@suse.de
 
 - Remove missleading depracated input field
