@@ -216,8 +216,14 @@ global define string GetCurrentLanguageCode (  ) {
 }
 
 map<string, string> MakePoolRecord (string CC, string location) {
+    string mycc = tolower(CC);
+    //There is no gb.pool.ntp.org only uk.pool.ntp.org
+    if ( mycc == "gb" ) 
+    {
+	mycc="uk";
+    }
     return $[
-	     "address" : tolower(CC) + ".pool.ntp.org",
+	     "address" : mycc + ".pool.ntp.org",
 	     "country" : CC,
 	     "location": location,
 	     ];
