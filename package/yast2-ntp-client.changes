@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Wed Nov 10 15:11:04 CEST 2010 - varkoly@novell.com
+
+- bnc#619782 Time zone configuration during initial installation.
+
+-------------------------------------------------------------------
+Wed Apr 21 16:39:38 CEST 2010 - varkoly@suse.de
+
+- Remove missleading depracated input field
+
+-------------------------------------------------------------------
 Thu Sep  2 11:21:09 CEST 2010 - jsuchome@suse.cz
 
 - provide public API for info about time synchronization without
