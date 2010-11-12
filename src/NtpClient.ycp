@@ -846,7 +846,7 @@ global define boolean Write() ``{
     }
     if (synchronize_time)
     {
-	SCR::Write (.target.string,cron_file,"-*/"+sync_interval+" * * * * root /etc/init.d/ntp ntptimeset &>/dev/null");
+	SCR::Write (.target.string,cron_file,"-*/"+sync_interval+" * * * * root /etc/init.d/ntp ntptimeset &>/dev/null\n");
     }
     else
     {
