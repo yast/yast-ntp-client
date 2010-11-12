@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov 12 08:38:53 CEST 2010 - varkoly@novell.com
+
+- bnc#650879 - Missing newline makes /etc/cron.d/novell.ntp-synchronize not work
+
+-------------------------------------------------------------------
 Wed Nov 10 15:11:04 CEST 2010 - varkoly@novell.com
 
 - bnc#619782 Time zone configuration during initial installation.
