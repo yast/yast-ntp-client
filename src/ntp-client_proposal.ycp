@@ -312,10 +312,9 @@ without having package %1 installed"), required_package));
 
     y2milestone("Running sntp to sync with %1", ntp_server);
 
-    // -r: do set the system time
-    // -P no: do not ask if time difference is too large
-    // -c 1 -d 15: delay 15s, only one try (bnc#442287)
-    integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -c 1 -d 15 -r -P no '%1'", String::Quote(ntp_server)));
+    // -s: do set the system time
+    // -t 15: timeout 15s per one of 5 tries
+    integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -t 15 -s '%1'", String::Quote(ntp_server)));
     y2milestone ("'sntp %1' returned %2", ntp_server, r);
 
     Popup::ClearFeedback();

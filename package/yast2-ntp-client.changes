@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb  3 17:02:54 CET 2011 - mvidner@suse.cz
+
+- Fixed one-time setting and testing by adjusting to the changed sntp
+  syntax (bnc#661865).
+- 2.20.2
+
+-------------------------------------------------------------------
 Fri Nov 12 08:38:53 CEST 2010 - varkoly@novell.com
 
 - bnc#650879 - Missing newline makes /etc/cron.d/novell.ntp-synchronize not work
