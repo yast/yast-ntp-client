@@ -231,10 +231,19 @@ symbol AskUser () {
     return ret;
 }
 
-boolean WriteNtpSettings (string ntp_server,boolean run_service) {
+boolean WriteNtpSettings (list ntp_servers, string ntp_server, boolean run_service) {
 
     NtpClient::modified = true;
-    AddSingleServer(ntp_server);
+    if ( ntp_servers  != [] )
+    {
+	foreach (string server, ntp_servers, {
+		AddSingleServer(server);
+	});
+    }
+    else
+    {
+	AddSingleServer(ntp_server);
+    }
     if( ! run_service )
     {
         NtpClient::synchronize_time=true;
@@ -266,6 +275,7 @@ return:
 */
 symbol Write(map param) {
     symbol ret = nil;
+    list   ntp_servers	= param["servers"]:[];
     string ntp_server	= param["server"]:"";
     boolean run_service	= param["run_service"]:true;
     if (ntp_server == "")
@@ -276,7 +286,7 @@ symbol Write(map param) {
 
     if (param["write_only"]:false)
     {
-	WriteNtpSettings (ntp_server,run_service);
+	WriteNtpSettings (ntp_servers,ntp_server,run_service);
 	return `success;
     }
 
@@ -325,7 +335,7 @@ without having package %1 installed"), required_package));
     // User wants to more than running sntp (synchronize on boot)
     if (!ntpdate_only)
     {
-	WriteNtpSettings (ntp_server,run_service);
+	WriteNtpSettings (ntp_servers,ntp_server,run_service);
     }
 
     return `success;
@@ -393,7 +403,7 @@ boolean ui_try_save() {
 	}
 	else if (!argmap["ntpdate_only"]:false)
 	{
-	    WriteNtpSettings (server,argmap["run_service"]:false); //may be the server is realy not accessable
+	    WriteNtpSettings ([],server,argmap["run_service"]:false); //may be the server is realy not accessable
 	}
     }
     // success, exit
