@@ -231,7 +231,7 @@ symbol AskUser () {
     return ret;
 }
 
-boolean WriteNtpSettings (list ntp_servers, string ntp_server, boolean run_service) {
+boolean WriteNtpSettings (list<string> ntp_servers, string ntp_server, boolean run_service) {
 
     NtpClient::modified = true;
     if ( ntp_servers  != [] )
@@ -275,7 +275,7 @@ return:
 */
 symbol Write(map param) {
     symbol ret = nil;
-    list   ntp_servers	= param["servers"]:[];
+    list<string>   ntp_servers	= param["servers"]:[];
     string ntp_server	= param["server"]:"";
     boolean run_service	= param["run_service"]:true;
     if (ntp_server == "")
