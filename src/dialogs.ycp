@@ -311,7 +311,7 @@ define symbol LocalServerSelectionDialog () {
 		)
 	    ),
 	    `VSpacing (1),
-	    `HBox (
+	    `ButtonBox (
 		`PushButton( `id(`next), Label::OKButton() ),
 		`PushButton( `id(`back), Label::CancelButton() )
 	    )
@@ -357,7 +357,7 @@ define symbol PublicServerSelectionDialog () {
 		)
 	    ),
 	    `VSpacing (1),
-	    `HBox (
+	    `ButtonBox (
 		`PushButton( `id(`next), Label::OKButton() ),
 		`PushButton( `id(`back), Label::CancelButton() )
 	    )
