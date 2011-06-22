@@ -397,7 +397,7 @@ boolean ui_try_save() {
     {
 	// Translators: yes-no popup,
 	// ntpdate is a command, %1 is the server address
-	if (Popup::YesNo( sformat(_("'ntpdate %1' failed. Revisit NTP server configuration?"), server) ))
+	if (Popup::YesNo( sformat(_("'Test query to server '%1' failed. If server is not yet accessible or network is not configured clink 'No' to ignore. Revisit NTP server configuration?"), server) ))
 	{
 	    return false; // loop on
 	}
