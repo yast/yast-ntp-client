@@ -798,7 +798,7 @@ global define boolean Write() ``{
     SCR::Write(.sysconfig.network.config.NETCONFIG_NTP_POLICY, ntp_policy);
     SCR::Write(.sysconfig.network.config, nil);
 
-    if (SCR::Execute(.target.bash, "/sbin/netconfig update") != 0) {
+    if (SCR::Execute(.target.bash, "/sbin/netconfig update -m ntp") != 0) {
 	// error message
 	Report::Error(_("Cannot update the dynamic configuration policy."));
     }
