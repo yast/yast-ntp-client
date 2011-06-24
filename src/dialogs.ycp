@@ -132,10 +132,6 @@ define symbol SimpleDialog () ``{
 	// yes-no popup
 	 $[`abort : reallyExitSimple ]);
 
-    // and now store the settings if needed
-    if (ret != `abort && ret != `back && ret != `cancel)
-    {
-    }
     y2milestone ("Simple dialog: Returning %1", ret);
     return ret;
 }
