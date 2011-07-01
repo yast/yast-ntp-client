@@ -48,7 +48,7 @@ string ui_help_text() {
     // help text
     string tmp = _("<p>Press <b>Synchronize Now</b>, to get your system time set correctly using the selected NTP server. If you want to make use of NTP permanently, enable the <b>Save NTP Configuration</b> option</p>");
 
-    tmp = tmp + _("<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be started as deamon. Otherwise the system time will be synchronized periodicaly. The default interval is 15 min. You can change it after installation with the <b>yast2 ntp-client module</b>.</p>");
+    tmp = tmp + _("<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be started as daemon. Otherwise the system time will be synchronized periodically. The default interval is 15 min. You can change it after installation with the <b>yast2 ntp-client module</b>.</p>");
 
     // help text, cont.
     if( ! Stage::initial() )
@@ -397,7 +397,7 @@ boolean ui_try_save() {
     {
 	// Translators: yes-no popup,
 	// ntpdate is a command, %1 is the server address
-	if (Popup::YesNo( sformat(_("'Test query to server '%1' failed. If server is not yet accessible or network is not configured clink 'No' to ignore. Revisit NTP server configuration?"), server) ))
+	if (Popup::YesNo( sformat(_("'Test query to server '%1' failed. If server is not yet accessible or network is not configured click 'No' to ignore. Revisit NTP server configuration?"), server) ))
 	{
 	    return false; // loop on
 	}

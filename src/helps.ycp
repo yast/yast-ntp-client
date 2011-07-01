@@ -49,7 +49,7 @@ is more secure and strongly recommended.</p>"),
     "secure" : _("<p><b><big>Secure NTP Configuration</big></b><br>
 By selecting <b>Restrict NTP Service to Configured Servers Only</b>, remote hosts will not be able to view and modify NTP settings on your 
 computer. The NTP service is restricted to servers in the <tt>/etc/ntp.conf</tt> file and to localhost.<br> 
-Access control flags can be fine-tunded in the servers overview table. This option is not available if NTP is configured via DHCP.</p>
+Access control flags can be fine-tuded in the servers overview table. This option is not available if NTP is configured via DHCP.</p>
 "),
 
     // help text 3/5
