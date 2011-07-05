@@ -317,17 +317,20 @@ symbol Write(map param) {
 without having package %1 installed"), required_package));
 	}
     }
+    integer r = 0;
+    if (NetworkService::isNetworkRunning()) {
+       //Only if network is running try to synchronize the ntp server
+       Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
 
-    Popup::ShowFeedback("", _("Synchronizing with NTP server..."));
+       y2milestone("Running sntp to sync with %1", ntp_server);
 
-    y2milestone("Running sntp to sync with %1", ntp_server);
+       // -s: do set the system time
+       // -t 15: timeout 5s per one of 5 tries
+       integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -t 5 -s '%1'", String::Quote(ntp_server)));
+       y2milestone ("'sntp %1' returned %2", ntp_server, r);
+       Popup::ClearFeedback();
+    }
 
-    // -s: do set the system time
-    // -t 15: timeout 15s per one of 5 tries
-    integer r = (integer) SCR::Execute (.target.bash, sformat ("/usr/sbin/sntp -t 15 -s '%1'", String::Quote(ntp_server)));
-    y2milestone ("'sntp %1' returned %2", ntp_server, r);
-
-    Popup::ClearFeedback();
 
     if (r != 0)
 	return `ntpdate_failed;

@@ -997,13 +997,13 @@ global boolean TestNtpServer (string server, symbol verbosity) {
     // testing the server using IPv4 and then using IPv6 protocol
     // bug #74076, Firewall could have been blocked IPv6
     integer ret_IPv4 = (integer) SCR::Execute (.target.bash, sformat (
-	"/usr/sbin/sntp -4 -t 15 %1",
+	"/usr/sbin/sntp -4 -t 5 %1",
 	server
     ));
     integer ret_IPv6 = 0;
     if (ret_IPv4 != 0)
 	ret_IPv6 = (integer) SCR::Execute (.target.bash, sformat (
-	    "/usr/sbin/sntp -6 -t 15 %1",
+	    "/usr/sbin/sntp -6 -t 5 %1",
 	    server
 	));
 
