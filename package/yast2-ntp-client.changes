@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jul  5 10:18:01 UTC 2011 - varkoly@novell.com
+
+- bnc#680764 - ntp synchronization before i can configure the source
+
+-------------------------------------------------------------------
 Fri Jun 17 12:49:42 UTC 2011 - jreidinger@novell.com
 
 - fix button order (bnc#571961) 
