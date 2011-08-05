@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug  5 12:34:26 CEST 2011 - tgoettlicher@suse.de
+
+- fixed .desktop file (bnc #681249)
+
+-------------------------------------------------------------------
 Tue Jul  5 10:18:01 UTC 2011 - varkoly@novell.com
 
 - bnc#680764 - ntp synchronization before i can configure the source
