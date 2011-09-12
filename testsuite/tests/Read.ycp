@@ -102,6 +102,7 @@
     map EXEC = $[
 	"target" : $[
 	    "bash_output" : $[],
+	    "bash" : 1,
 	],
     ];
 
