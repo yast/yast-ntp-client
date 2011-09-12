@@ -4,7 +4,7 @@ Write	.etc.ntp_conf.all $["comment":"", "file":-1, "kind":"section", "name":"", 
 Write	.etc.ntp_conf nil true
 Write	.sysconfig.network.config.NETCONFIG_NTP_POLICY "" true
 Write	.sysconfig.network.config nil true
-Execute	.target.bash "/sbin/netconfig update" 0
+Execute	.target.bash "/sbin/netconfig update -m ntp" 0
 Write	.sysconfig.ntp.NTPD_RUN_CHROOTED "yes" true
 Write	.sysconfig.ntp nil true
 Execute	.target.bash "test -e /etc/cron.d/novell.ntp-synchronize  && rm /etc/cron.d/novell.ntp-synchronize;" 0
