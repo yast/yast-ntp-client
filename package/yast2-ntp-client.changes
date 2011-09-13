@@ -20,6 +20,12 @@ Fri Jun 17 12:49:42 UTC 2011 - jreidinger@novell.com
 - fix button order (bnc#571961) 
 
 -------------------------------------------------------------------
+Wed Feb  9 13:10:23 UTC 2011 - varkoly@novell.com
+
+- bnc#665761 - VUL-0: default NTP configuration
+  Now we provide adding more ntp servers"^C
+
+-------------------------------------------------------------------
 Thu Feb  3 17:02:54 CET 2011 - mvidner@suse.cz
 
 - Fixed one-time setting and testing by adjusting to the changed sntp
