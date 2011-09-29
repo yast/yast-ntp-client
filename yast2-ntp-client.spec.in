@@ -7,7 +7,8 @@ BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-t
 BuildRequires:	yast2-country-data
 #SLPAPI.pm 
 # Hostname::CurrentDomain
-Requires:	yast2 >= 2.16.48
+# Wizard::SetDesktopTitleAndIcon
+Requires:	yast2 >= 2.21.22
 Requires:	yast2-country-data 
 
 BuildArchitectures:	noarch
