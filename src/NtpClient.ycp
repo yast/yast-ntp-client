@@ -186,10 +186,10 @@ map <string, string> known_countries = $[];
  *   ...
  * ]
  */
-global define map <string, string> GetAllKnownCountries () {
+global define map <string, string> GetAllKnownCountries() {
     //first point of dependence on yast2-country-data
     if (!countries_already_read) {
-	known_countries = (map <string, string>) eval (SCR::Read (.target.ycp, Directory::datadir + "/country.ycp"));
+	known_countries = (map <string, string>) eval (SCR::Read(.target.ycp, Directory::datadir + "/country.ycp"));
 	countries_already_read = true;
 	if (known_countries == nil) known_countries = $[];
     }
@@ -208,14 +208,14 @@ global define map <string, string> GetAllKnownCountries () {
  * Read current language (RC_LANG from sysconfig)
  * @return two-letter language code (cs_CZ.UTF-8 -> CZ)
  */
-global define string GetCurrentLanguageCode (  ) {
-    string lang = (string)SCR::Read (.sysconfig.language.RC_LANG);
+global define string GetCurrentLanguageCode(  ) {
+    string lang = (string)SCR::Read(.sysconfig.language.RC_LANG);
 
     //second point of dependence on yast2-country-data
     return Language::GetGivenLanguageCountry( lang );
 }
 
-map<string, string> MakePoolRecord (string CC, string location) {
+map<string, string> MakePoolRecord(string CC, string location) {
     string mycc = tolower(CC);
     //There is no gb.pool.ntp.org only uk.pool.ntp.org
     if ( mycc == "gb" ) 
@@ -233,25 +233,25 @@ map<string, string> MakePoolRecord (string CC, string location) {
  * Get the list of known NTP servers
  * @return a list of known NTP servers
  */
-global map<string, map<string,string> > GetNtpServers () {
+global map<string, map<string,string> > GetNtpServers() {
     if (ntp_servers == nil)
     {
 	ntp_servers = $[];
-	list<map<string,string> > servers = (list<map<string,string> >)
-	    SCR::Read (.target.ycp, Directory::datadir + "/ntp_servers.ycp");
+	list<map<string,string> > servers =(list<map<string,string> >)
+	    SCR::Read(.target.ycp, Directory::datadir + "/ntp_servers.ycp");
 	if (servers == nil)
 	{
-	    y2error ("Failed to read the list of NTP servers");
+	    y2error("Failed to read the list of NTP servers");
 	}
 	else
 	{
-	    y2milestone ("%1 known NTP servers read", size (servers));
-	    ntp_servers = listmap (map<string,string> s, servers, {
+	    y2milestone("%1 known NTP servers read", size(servers));
+	    ntp_servers = listmap(map<string,string> s, servers, {
 		string server = s["address"]:"";
 		return $[ server : s ];
 	    });
 	}
-	foreach (string short_country, string country_name, GetAllKnownCountries(), {
+	foreach(string short_country, string country_name, GetAllKnownCountries(), {
 	    // just refactored existing code
 	    map<string, string> p = MakePoolRecord(short_country, country_name);
 	    ntp_servers[p["address"]:""] = p;
@@ -265,7 +265,7 @@ global map<string, map<string,string> > GetNtpServers () {
  * Get the mapping between country codea and names ("CZ" -> "Czech Republic")
  * @return a map the country codes and names mapping
  */
-global map<string, string> GetCountryNames () {
+global map<string, string> GetCountryNames() {
     if (country_names == nil)
     {
 	country_names = (map<string,string>)
@@ -273,7 +273,7 @@ global map<string, string> GetCountryNames () {
     }
     if (country_names == nil)
     {
-	y2error ("Failed to read country names");
+	y2error("Failed to read country names");
 	country_names = $[];
     }
     return country_names;
@@ -285,24 +285,24 @@ global map<string, string> GetCountryNames () {
  * @param terse_output display additional data (location etc.)
  * @return list of servers (usable as combo-box items)
  */
-global list GetNtpServersByCountry ( string country, boolean terse_output ) {
+global list GetNtpServersByCountry( string country, boolean terse_output ) {
     map<string,string> country_names = $[];
-    map<string,map<string,string> > servers = GetNtpServers ();
+    map<string,map<string,string> > servers = GetNtpServers();
     if (country != "")
     {
-        servers = filter (string s, map<string,string> o, servers, {
+        servers = filter(string s, map<string,string> o, servers, {
             return o["country"]:"" == country;
         });
 	// bnc#458917 add country, in case data/country.ycp does not have it
-	map<string,string> p = MakePoolRecord (country, "");
+	map<string,string> p = MakePoolRecord(country, "");
 	servers[p["address"]:""] = p;
     }
     else
     {
-        country_names = GetCountryNames ();
+        country_names = GetCountryNames();
     }
 
-    list items = maplist (string s, map<string,string> o, servers, {
+    list items = maplist(string s, map<string,string> o, servers, {
 	string label = o["location"]:"";
         string l_country = o["country"]:"";
         if (country != "")
@@ -310,16 +310,16 @@ global list GetNtpServersByCountry ( string country, boolean terse_output ) {
         else
             l_country = country_names[l_country]:l_country;
         if (label != "" && l_country != "")
-            label = sformat ("%1 (%2, %3)", s, label, l_country);
+            label = sformat("%1 (%2, %3)", s, label, l_country);
         else if (label == "" && l_country == "")
             label = s;
         else
-            label = sformat ("%1 (%2%3)", s, label, l_country);
+            label = sformat("%1 (%2%3)", s, label, l_country);
 
 	if (terse_output)
-	    return `item (`id(s), s);
+	    return `item(`id(s), s);
 	else
-            return `item (`id (s), label);
+            return `item(`id(s), label);
     });
 
     return items;
@@ -340,7 +340,7 @@ global define boolean ProcessNtpConf() ``{
 
     map conf = nil;
     if (FileUtils::Exists("/etc/ntp.conf"))
-        conf = (map)SCR::Read (.etc.ntp_conf.all);
+        conf = (map)SCR::Read(.etc.ntp_conf.all);
 
     if (conf == nil )
     {
@@ -351,21 +351,21 @@ global define boolean ProcessNtpConf() ``{
     config_has_been_read = true;
     list<map<string, any> > value = conf["value"]:[];
     integer index = -1;
-    ntp_records = maplist (map<string, any> m, value, ``{
+    ntp_records = maplist(map<string, any> m, value, ``{
 	index = index + 1;
 	string type = m["name"]:"";
 	string address = m["value"]:"";
 	string options = "";
-	if (contains ([
+	if (contains([
 	    "server", "peer", "broadcast", "broadcastclient", "manycast",
 	    "manycastclient", "fudge", "restrict" ],
 	    type))
 	{
-	    list<string> l = splitstring (address, " \t");
-	    l = (list<string>)filter (string s, l, ``(s != ""));
+	    list<string> l = splitstring(address, " \t");
+	    l = (list<string>)filter(string s, l, ``(s != ""));
 	    address = l[0]:"";
 	    l[0] = "";
-	    options = mergestring (l, " ");
+	    options = mergestring(l, " ");
 	}
 	map<string,any> entry = $[
 	    "type" : type,
@@ -375,20 +375,20 @@ global define boolean ProcessNtpConf() ``{
 	];
 	return entry;
     });
-    list<map<string, any> > fudge_records = filter (map<string,any> m, ntp_records, ``(
+    list<map<string, any> > fudge_records = filter(map<string,any> m, ntp_records, ``(
 	m["type"]:"" == "fudge"
     ));
-    map <string, map<string, any> > fudge_map = (map <string, map<string, any> >)listmap (map m, fudge_records,
+    map <string, map<string, any> > fudge_map = (map <string, map<string, any> >)listmap(map m, fudge_records,
     ``{
 	string key = m["address"]:"";
 	return $[key: m];
     });
 
-    list<map<string, any> > restrict_records = filter (map<string,any> m, ntp_records, ``(
+    list<map<string, any> > restrict_records = filter(map<string,any> m, ntp_records, ``(
 	m["type"]:"" == "restrict"
     ));
 
-    restrict_map = (map <string, map <string,any> > )listmap (map m, restrict_records,
+    restrict_map = (map <string, map <string,any> > )listmap(map m, restrict_records,
     {
 	string key = m["address"]:"";
 	map value = $[];
@@ -408,16 +408,16 @@ global define boolean ProcessNtpConf() ``{
 	return $[key: value];
     });
 
-    ntp_records = filter (map<string,any> m, ntp_records, ``(
+    ntp_records = filter(map<string,any> m, ntp_records, ``(
 	m["type"]:"" != "fudge"
     ));
 
-    ntp_records = filter (map<string,any> m, ntp_records, ``(
+    ntp_records = filter(map<string,any> m, ntp_records, ``(
 	m["type"]:"" != "restrict"
     ));
 
-    ntp_records = (list<map<string,any> >)maplist (map m, ntp_records, ``{
-	if (haskey (fudge_map, m["address"]:""))
+    ntp_records = (list<map<string,any> >)maplist(map m, ntp_records, ``{
+	if (haskey(fudge_map, m["address"]:""))
 	{
 	    m["fudge_options"] = fudge_map[m["address"]:"", "options"]:"";
 	    m["fudge_comment"] = fudge_map[m["address"]:"", "comment"]:"";
@@ -426,9 +426,9 @@ global define boolean ProcessNtpConf() ``{
     });
 
     // mark local clock to be local clock and not real servers
-    ntp_records = maplist (map<string,any> p, ntp_records, ``{
+    ntp_records = maplist(map<string,any> p, ntp_records, ``{
 	if (p["type"]:"" == "server"
-	    && regexpmatch (p["address"]:"", "^127\.127\.[0-9]+.[0-9]+$"))
+	    && regexpmatch(p["address"]:"", "^127\.127\.[0-9]+.[0-9]+$"))
 	{
 	    p["type"] = "__clock";
 	}
@@ -444,7 +444,7 @@ global define boolean ProcessNtpConf() ``{
  * synchronize_time and sync_interval variables
  * Return updated value of synchronize_time
  */
-global boolean ReadSynchronization () {
+global boolean ReadSynchronization() {
 
     list crontab = (list)SCR::Read(.cron, cron_file, "");
     y2milestone("CRONTAB %1", crontab);
@@ -502,32 +502,32 @@ global define boolean Read() ``{
     if(Abort()) return false;
     if (have_progress) Progress::NextStage();
 
-    boolean progress_orig = Progress::set (false);
-    NetworkInterfaces::Read ();
-    Progress::set (progress_orig);
+    boolean progress_orig = Progress::set(false);
+    NetworkInterfaces::Read();
+    Progress::set(progress_orig);
 
     //SCR::Read may return nil (no such value in sysconfig, file not there etc. )
-    string policy = (string)SCR::Read (.sysconfig.network.config.NETCONFIG_NTP_POLICY);
+    string policy = (string)SCR::Read(.sysconfig.network.config.NETCONFIG_NTP_POLICY);
     //set if not nil, otherwise use 'auto' as safe fallback (#449362)
     if (policy != nil)
 	ntp_policy = policy;
 
-    GetNtpServers ();
-    GetCountryNames ();
+    GetNtpServers();
+    GetCountryNames();
     // read current settings
     if(Abort()) return false;
     if (have_progress) Progress::NextStage();
 
     boolean failed = false;
 
-    if (! Mode::testsuite () && ! Mode::installation ()
-	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["ntp"])
+    if (! Mode::testsuite() && ! Mode::installation()
+	&& ! PackageSystem::CheckAndInstallPackagesInteractive(["ntp"])
     )
     {
 	return false;
     }
 
-    run_service = Service::Enabled (service_name);
+    run_service = Service::Enabled(service_name);
 
     //Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
     string ad_ntp_file = Directory::vardir + "/ad_ntp_data.ycp";
@@ -543,39 +543,39 @@ global define boolean Read() ``{
 
     // Stay away if the user may have made changes which we cannot parse.
     // But bnc#456553, no pop-ups for CLI.
-    if (! Mode::commandline() && ! FileChanges::CheckFiles (["/etc/ntp.conf"]))
+    if (! Mode::commandline() && ! FileChanges::CheckFiles(["/etc/ntp.conf"]))
 	failed = true;
     ProcessNtpConf();
 
-    ReadSynchronization ();
+    ReadSynchronization();
 
-    string run_chroot_s = (string) SCR::Read (.sysconfig.ntp.NTPD_RUN_CHROOTED);
+    string run_chroot_s = (string) SCR::Read(.sysconfig.ntp.NTPD_RUN_CHROOTED);
     run_chroot = run_chroot_s == "yes";
 
     if (run_chroot_s == nil)
     {
 	failed = true;
-	y2error ("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED");
+	y2error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED");
     }
 
     if(failed)
     {
 	// error report
-	Report::Error (Message::CannotReadCurrentSettings ());
+	Report::Error(Message::CannotReadCurrentSettings());
     }
 
-    if (! Mode::testsuite ())
+    if (! Mode::testsuite())
     {
-	boolean progress_orig = Progress::set (false);
-	SuSEFirewall::Read ();
-	Progress::set (progress_orig);
+	boolean progress_orig = Progress::set(false);
+	SuSEFirewall::Read();
+	Progress::set(progress_orig);
     }
 
     if(Abort()) return false;
     if (have_progress)
     {
-        Progress::NextStage ();
-        Progress::Title (_("Finished"));
+        Progress::NextStage();
+        Progress::Title(_("Finished"));
     }
     sleep(sl);
 
@@ -589,10 +589,10 @@ global define boolean Read() ``{
  *
  * @return list <string> of servers
  */
-global list <string> GetUsedNtpServers () {
+global list <string> GetUsedNtpServers() {
     list <string> used_servers = [];
-    foreach (map <string, any> record, ntp_records, {
-	if (record["type"]:"" == "server") used_servers = add (used_servers, record["address"]:"");
+    foreach(map <string, any> record, ntp_records, {
+	if (record["type"]:"" == "server") used_servers = add(used_servers, record["address"]:"");
     });
 
     return used_servers;
@@ -611,14 +611,14 @@ global list <string> random_pool_servers = ["0.pool.ntp.org", "1.pool.ntp.org", 
  *
  * @return boolean true if enabled
  */
-global boolean IsRandomServersServiceEnabled () {
+global boolean IsRandomServersServiceEnabled() {
     // all servers needed by pool.ntp.org service, before checking false == not used
     map <string, boolean> needed_servers = $[];
-    foreach (string server_name, random_pool_servers, {
+    foreach(string server_name, random_pool_servers, {
 	needed_servers[server_name] = false;
     });
 
-    foreach (string used_server, GetUsedNtpServers(), {
+    foreach(string used_server, GetUsedNtpServers(), {
 	// if server is needed by pool.ntp.org and matches
 	if (needed_servers[used_server]:nil != nil) {
 	    needed_servers[used_server] = true;
@@ -626,7 +626,7 @@ global boolean IsRandomServersServiceEnabled () {
     });
 
     boolean ret = true;
-    foreach (string nserver_name, boolean ns_value, needed_servers, {
+    foreach(string nserver_name, boolean ns_value, needed_servers, {
 	if (ns_value != true) ret = false;
     });
     return ret;
@@ -636,9 +636,9 @@ global boolean IsRandomServersServiceEnabled () {
  * Removes all servers contained in the random_pool_servers list
  * from the current configuration.
  */
-global define void DeActivateRandomPoolServersFunction () {
-    foreach (string random_pool_server, random_pool_servers, {
-	ntp_records = filter (map <string, any> one_record, ntp_records, {
+global define void DeActivateRandomPoolServersFunction() {
+    foreach(string random_pool_server, random_pool_servers, {
+	ntp_records = filter(map <string, any> one_record, ntp_records, {
 	    return (
 		// do not filter out not-servers
 		one_record["type"]:"" != "server"
@@ -653,10 +653,10 @@ global define void DeActivateRandomPoolServersFunction () {
  * Add servers needed for random_pool_servers function
  * into the current configuration.
  */
-global define void ActivateRandomPoolServersFunction () {
+global define void ActivateRandomPoolServersFunction() {
     // leave the current configuration if any
     map <string, map <string, any> > store_current_options = $[];
-    foreach (map <string, any> one_record, ntp_records, {
+    foreach(map <string, any> one_record, ntp_records, {
 	if (one_record["type"]:"" == "server" && one_record["address"]:"" != "") {
 	    string one_address					= one_record["address"]:"";
 	    store_current_options[one_address]                  = $[];
@@ -667,23 +667,23 @@ global define void ActivateRandomPoolServersFunction () {
     // remove all old ones
     DeActivateRandomPoolServersFunction();
 
-    ntp_records = filter (map <string, any> one_record, ntp_records, {
+    ntp_records = filter(map <string, any> one_record, ntp_records, {
 	return (
 	    // filter out all servers
 	    one_record["type"]:"" != "server"
 	);
     });
 
-    foreach (string one_server, random_pool_servers, {
+    foreach(string one_server, random_pool_servers, {
 	string  one_options      = "";
-	
+
 	if (haskey(store_current_options, one_server)) {
 	    one_options      = store_current_options[one_server, "options"]:"";
 	    y2milestone("Leaving current configuration for server '%1', options '%2'",
 		one_server, one_options);
 	}
-	
-	ntp_records = add (ntp_records, $[
+
+	ntp_records = add(ntp_records, $[
 	    "address":one_server,
 	    "comment":"\n# Random pool server, see http://www.pool.ntp.org/ for more information\n",
 	    "options":one_options,
@@ -735,7 +735,7 @@ global define boolean Write() ``{
     if ( have_progress ) Progress::NextStage();
 
     if (true) {
-      foreach (string key, map <string, any> m, restrict_map, {
+      foreach(string key, map <string, any> m, restrict_map, {
 	map <string, any> ret = $[
 	   "address" : key,
 	   "comment" : m["comment"]:"",
@@ -746,9 +746,9 @@ global define boolean Write() ``{
 	ntp_records = add(ntp_records, ret);
       });
 
-      y2milestone ("Writing settings %1", ntp_records);
+      y2milestone("Writing settings %1", ntp_records);
 
-      list<map<string, any> > save2 = (list<map<string, any> >)flatten (maplist(
+      list<map<string, any> > save2 = (list<map<string, any> >)flatten(maplist(
 	map<string, any> r, ntp_records,
       {
 	map<string,any> s1 = $[
@@ -772,10 +772,10 @@ global define boolean Write() ``{
 	}
 	return [ s1, s2 ];
       }));
-      save2 = filter (map<string, any> m, save2, ``(m != nil));
+      save2 = filter(map<string, any> m, save2, ``(m != nil));
 
       boolean failed = false;
-      map conf = (map)SCR::Read (.etc.ntp_conf.all);
+      map conf = (map)SCR::Read(.etc.ntp_conf.all);
       if (conf == nil)
       {
         failed = true;
@@ -783,16 +783,16 @@ global define boolean Write() ``{
       else
       {
 	conf["value"] = save2;
-	if (! SCR::Write (.etc.ntp_conf.all, conf))
+	if (! SCR::Write(.etc.ntp_conf.all, conf))
 	    failed = true;
-	if (! SCR::Write (.etc.ntp_conf, nil))
+	if (! SCR::Write(.etc.ntp_conf, nil))
 	    failed = true;
       }
 
-      FileChanges::StoreFileCheckSum ("/etc/ntp.conf");
+      FileChanges::StoreFileCheckSum("/etc/ntp.conf");
 
       if (failed)
-	  Report::Error (Message::CannotWriteSettingsTo ("/etc/ntp.conf"));
+	  Report::Error(Message::CannotWriteSettingsTo("/etc/ntp.conf"));
     }
     // write policy and run netconfig command
     SCR::Write(.sysconfig.network.config.NETCONFIG_NTP_POLICY, ntp_policy);
@@ -803,42 +803,34 @@ global define boolean Write() ``{
 	Report::Error(_("Cannot update the dynamic configuration policy."));
     }
 
-    if (! (SCR::Write (.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot
-	    ? "yes"
-	    : "no")
-	   && SCR::Write (.sysconfig.ntp, nil)))
-    {
-	// error report
-	Report::Error (_("Cannot write sysconfig variables."));
-    }
+    SCR::Write(.sysconfig.ntp.NTPD_RUN_CHROOTED, run_chroot ? "yes" : "no");
+    SCR::Write(.sysconfig.ntp, nil);
 
     sleep(sl);
 
     // restart daemon
     if(Abort()) return false;
-    if (have_progress) Progress::NextStage ();
+    if (have_progress) Progress::NextStage();
 
     // SuSEFirewall::Write checks on its own whether there are pending
     // changes, so call it always. bnc#476951
     if (true)
     {
-	boolean progress_orig = Progress::set (false);
-	SuSEFirewall::Write ();
-	Progress::set (progress_orig);
+	boolean progress_orig = Progress::set(false);
+	SuSEFirewall::Write();
+	Progress::set(progress_orig);
     }
 
-    if (! Service::Adjust (service_name,
-	run_service ? "enable" : "disable"))
+    if (! Service::Adjust(service_name, run_service ? "enable" : "disable"))
     {
 	// error report
-	Report::Error (Message::CannotAdjustService ("NTP"));
+	Report::Error(Message::CannotAdjustService("NTP"));
     }
 
-    if (run_service && (! write_only)
-	&& 0 != Service::RunInitScript(service_name, "restart"))
+    if (run_service && (! write_only) && 0 != Service::RunInitScript(service_name, "restart"))
     {
 	// error report
-	Report::Error (_("Cannot restart the NTP daemon."));
+	Report::Error(_("Cannot restart the NTP daemon."));
     }
     if (! run_service)
     {
@@ -846,11 +838,11 @@ global define boolean Write() ``{
     }
     if (synchronize_time)
     {
-	SCR::Write (.target.string,cron_file,"-*/"+sync_interval+" * * * * root /etc/init.d/ntp ntptimeset &>/dev/null\n");
+	SCR::Write(.target.string,cron_file,"-*/"+sync_interval+" * * * * root /etc/init.d/ntp ntptimeset &>/dev/null\n");
     }
     else
     {
-	SCR::Execute (.target.bash,"test -e "+cron_file+"  && rm "+cron_file+";");
+	SCR::Execute(.target.bash,"test -e "+cron_file+"  && rm "+cron_file+";");
     }
 
     sleep(sl);
@@ -858,8 +850,8 @@ global define boolean Write() ``{
     if(Abort()) return false;
     if ( have_progress )
     {
-        Progress::NextStage ();
-        Progress::Title (_("Finished"));
+        Progress::NextStage();
+        Progress::Title(_("Finished"));
     }
     sleep(sl);
 
@@ -873,7 +865,7 @@ global define boolean Write() ``{
  * @param settings The YCP structure to be imported.
  * @return boolean True on success
  */
-global define boolean Import (map settings) ``{
+global define boolean Import(map settings) ``{
     synchronize_time = settings["synchronize_time"]:false;
     sync_interval = settings["sync_interval"]:5;
     run_service = settings["start_at_boot"]:false;
@@ -883,11 +875,11 @@ global define boolean Import (map settings) ``{
     ntp_policy = settings["ntp_policy"]:(config_dhcp? "auto": "");
     ntp_records = settings["peers"]:[];
     ntp_records = maplist(map<string, any> p, ntp_records, ``{
-            if (haskey(p, "key") && haskey(p, "value") )
+            if(haskey(p, "key") && haskey(p, "value") )
             {
                 p["type"] = p["key"]:"";
                 p["address"] = p["value"]:"";
-		if (haskey (p, "param"))
+		if(haskey(p, "param"))
 		    p["options"] = p["param"]:"";
                 return (p);
             } else {
@@ -903,7 +895,7 @@ global define boolean Import (map settings) ``{
  * (For use by autoinstallation.)
  * @return map Dumped settings (later acceptable by Import ())
  */
-global define map Export () ``{
+global define map Export() ``{
     return $[
 	"synchronize_time" : synchronize_time,
 	"sync_interval"    : sync_interval,
@@ -949,10 +941,10 @@ global define string Summary() ``{
 	  }
 	*/
     // netconfig policy
-    if (PolicyIsAuto ()) {
+    if (PolicyIsAuto()) {
 	// summary string, FIXME
 	summary = Summary::AddLine(summary, _("Combine static and DHCP configuration."));
-    } else if (PolicyIsNomodify ()) {
+    } else if (PolicyIsNomodify()) {
 	// summary string, FIXME
 	summary = Summary::AddLine(summary, _("Static configuration only."));
     }
@@ -961,18 +953,16 @@ global define string Summary() ``{
 	summary = Summary::AddLine(summary, _("Custom configuration policy.")); // FIXME too generic!
     }
 
-    foreach (string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
+    foreach(string t, ["server", "__clock", "peer", "broadcast", "broadcastclient" ],
     ``{
 	list<map<string,any> > l
-	    = filter (map<string,any> p, ntp_records, ``(p["type"]:"" == t));
+	    = filter(map<string,any> p, ntp_records, ``(p["type"]:"" == t));
 	list<string> names
-	    = maplist (map<string,any> i, l, ``(i["address"]:""));
-	names = filter (string n, names, ``(n != ""));
-	if (size (names) > 0)
+	    = maplist(map<string,any> i, l, ``(i["address"]:""));
+	names = filter(string n, names, ``(n != ""));
+	if (size(names) > 0)
 	{
-	    summary = Summary::AddLine (summary, sformat (
-		types[t]:"", mergestring ((list<string>)names, ", ")
-	    ));
+	    summary = Summary::AddLine(summary, sformat( types[t]:"", mergestring((list<string>)names, ", ")));
 	}
     });
     return summary;
@@ -985,27 +975,21 @@ global define string Summary() ``{
  *                  `result_popup: also final pop up about the result
  * @return boolean true if NTP server answers properly
  */
-global boolean TestNtpServer (string server, symbol verbosity) {
+global boolean TestNtpServer(string server, symbol verbosity) {
     if (verbosity != `no_ui)
       UI::OpenDialog(
 	// An informative popup label diring the NTP server testings
 	`Left(`Label(_("Testing the NTP server...")))
       );
 
-    y2milestone ("Testing reachability of server %1", server);
+    y2milestone("Testing reachability of server %1", server);
 
     // testing the server using IPv4 and then using IPv6 protocol
     // bug #74076, Firewall could have been blocked IPv6
-    integer ret_IPv4 = (integer) SCR::Execute (.target.bash, sformat (
-	"/usr/sbin/sntp -4 -t 5 %1",
-	server
-    ));
+    integer ret_IPv4 = (integer) SCR::Execute(.target.bash, sformat( "/usr/sbin/sntp -4 -t 5 %1", server));
     integer ret_IPv6 = 0;
     if (ret_IPv4 != 0)
-	ret_IPv6 = (integer) SCR::Execute (.target.bash, sformat (
-	    "/usr/sbin/sntp -6 -t 5 %1",
-	    server
-	));
+	ret_IPv6 = (integer) SCR::Execute(.target.bash, sformat( "/usr/sbin/sntp -6 -t 5 %1", server));
 
     if (verbosity != `no_ui) {
 	UI::CloseDialog();
@@ -1017,13 +1001,13 @@ global boolean TestNtpServer (string server, symbol verbosity) {
 	if (ok)
 	{
 	    // message report - result of test of connection to NTP server
-	    Popup::Notify (_("Server is reachable and responds properly.")); 
+	    Popup::Notify(_("Server is reachable and responds properly.")); 
 	}
 	else
 	{
 	    // error message  - result of test of connection to NTP server
             // report error instead of simple message (#306018)
-	    Report::Error (_("Server is unreachable or does not respond properly."));
+	    Report::Error(_("Server is unreachable or does not respond properly."));
 	}
     }
     return ok;
@@ -1034,7 +1018,7 @@ global boolean TestNtpServer (string server, symbol verbosity) {
  * @param method symbol method of the detection (only `slp suported ATM)
  * @return a list of found NTP servers
  */
-global list<string> DetectNtpServers (symbol method) {
+global list<string> DetectNtpServers(symbol method) {
     if (method == `slp)
     {
 	string required_package = "yast2-slp";
@@ -1055,14 +1039,14 @@ without having package %1 installed."), required_package) );
 	    }
 	}
 
-	list<map> servers = SLPAPI::FindSrvs ("service:ntp", "");
-	list<string> server_names = maplist (map m, servers, ``(
+	list<map> servers = SLPAPI::FindSrvs("service:ntp", "");
+	list<string> server_names = maplist(map m, servers, ``(
 	    (string)(m["pcHost"]:"")
 	));
-	server_names = filter (string s, server_names, ``(s != ""));
+	server_names = filter(string s, server_names, ``(s != ""));
 	return server_names;
     }
-    y2error ("Unknown detection method: %1", method);
+    y2error("Unknown detection method: %1", method);
     return [];
 }
 
@@ -1070,12 +1054,12 @@ without having package %1 installed."), required_package) );
   * Get the list of synchronization-related records
   * @return a list of maps with keys type (eg. "server"), address and index.
   */
-global define list<map<string,any> >getSyncRecords () ``{
+global define list<map<string,any> >getSyncRecords() ``{
     integer index = -1;
-    list<map<string,any> > ret = maplist (map m, ntp_records, ``{
+    list<map<string,any> > ret = maplist(map m, ntp_records, ``{
 	index = index + 1;
 	string type = m["type"]:"";
-	if (! contains (["server", "peer", "broadcast",
+	if (! contains(["server", "peer", "broadcast",
 	    "broadcastclient", "__clock"], type))
 	{
 	    return nil;
@@ -1087,7 +1071,7 @@ global define list<map<string,any> >getSyncRecords () ``{
 	    "device" : m["device"]:"",
 	];
     });
-    ret = filter (map<string,any> m, ret, ``(m != nil));
+    ret = filter(map<string,any> m, ret, ``(m != nil));
     return ret;
 }
 
@@ -1096,11 +1080,11 @@ global define list<map<string,any> >getSyncRecords () ``{
   * @param index integer, -1 for creating a new record
   * @return boolean true on success
   */
-global define boolean selectSyncRecord (integer index) ``{
+global define boolean selectSyncRecord(integer index) ``{
     boolean ret = true;
-    if (index >= size (ntp_records) || index < -1)
+    if (index >= size(ntp_records) || index < -1)
     {
-	y2error ("Record with index %1 doesn't exist, creating new", index);
+	y2error("Record with index %1 doesn't exist, creating new", index);
 	index = -1;
 	ret = false;
     }
@@ -1118,10 +1102,10 @@ global define boolean selectSyncRecord (integer index) ``{
   * @param address string address
   * @return integer index of the record if found, -1 otherwise
   */
-global define integer findSyncRecord (string type, string address) ``{
+global define integer findSyncRecord(string type, string address) ``{
     integer index = -1;
     integer ret = -1;
-    foreach (map<string,any> m, ntp_records, ``{
+    foreach(map<string,any> m, ntp_records, ``{
 	index = index + 1;
 	if (type == m["type"]:"" && address == m["address"]:"")
 	    ret = index;
@@ -1133,9 +1117,9 @@ global define integer findSyncRecord (string type, string address) ``{
   * Store currently sellected synchronization record
   * @return boolean true on success
   */
-global define boolean storeSyncRecord () ``{
+global define boolean storeSyncRecord() ``{
     if (selected_index == -1)
-	ntp_records = add (ntp_records, selected_record);
+	ntp_records = add(ntp_records, selected_record);
     else
 	ntp_records[selected_index] = selected_record;
     modified = true;
@@ -1147,14 +1131,14 @@ global define boolean storeSyncRecord () ``{
   * @param index integer index of record to delete
   * @return boolean true on success
   */
-global define boolean deleteSyncRecord (integer index) ``{
-    if (index >= size (ntp_records) || index <= -1)
+global define boolean deleteSyncRecord(integer index) ``{
+    if (index >= size(ntp_records) || index <= -1)
     {
-	y2error ("Record with index %1 doesn't exist", index);
+	y2error("Record with index %1 doesn't exist", index);
 	return false;
     }
     ntp_records[index] = nil;
-    ntp_records = filter (map<string,any> r, ntp_records, ``(r != nil));
+    ntp_records = filter(map<string,any> r, ntp_records, ``(r != nil));
     modified = true;
     return true;
 }
@@ -1163,14 +1147,14 @@ global define boolean deleteSyncRecord (integer index) ``{
  * Ensure that selected_record["options"] contains the option.
  * (A set operation in a string)
  */
-global void enableOptionInSyncRecord (string option) {
+global void enableOptionInSyncRecord(string option) {
     // careful, "burst" != "iburst"
     string old = selected_record["options"]:"";
-    list<string> old_l = splitstring (old, " \t");
-    if (!contains (old_l, option)) {
-	old_l = add (old_l, option);
+    list<string> old_l = splitstring(old, " \t");
+    if (!contains(old_l, option)) {
+	old_l = add(old_l, option);
     }
-    selected_record["options"] = mergestring (old_l, " ");
+    selected_record["options"] = mergestring(old_l, " ");
 }
 
 /**
