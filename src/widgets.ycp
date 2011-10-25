@@ -171,7 +171,10 @@ the daemon might not run properly.")))
 	UI::ChangeWidget (`id ("start"), `CurrentButton, "never");
 
     if (start != NtpClient::run_service)
+    {
+	y2milestone("set modified from %1 to true 1", NtpClient::modified);
 	NtpClient::modified = true;
+    }
 
     if (start)
 	CWMFirewallInterfaces::EnableOpenFirewallWidget ();
@@ -206,7 +209,7 @@ define boolean CheckCurrentSimpleConfiguration (boolean check_the_server) {
     if (regexpmatch(server_2, "(.*)\.$")) {
 	server_2 = regexpsub (server_2, "(.*)\.$", "\\1");
     }
-    
+
     if (
 	(!Hostname::Check(server_1) && !Hostname::CheckFQ(server_1) && !IP::Check(server_1))
 	&&
@@ -316,8 +319,12 @@ define void chrootInit (string id) ``{
  * @param event map event that caused storing process
  */
 define void chrootStore (string id, map event) ``{
+    boolean tmp = NtpClient::run_chroot;
     NtpClient::run_chroot = (boolean)(UI::QueryWidget (`id (id), `Value));
-    NtpClient::modified = true;
+    if( tmp != NtpClient::run_chroot ) {
+	y2milestone("set modified from %1 to true 2", NtpClient::modified);
+	NtpClient::modified = true;
+    }
 }
 
 define void secureInit (string id) ``{
@@ -395,6 +402,7 @@ void PolicyInit(string id) {
  * @param event map event that caused storing process
  */
 void PolicyStore(string id, map event) {
+    string tmp = NtpClient::ntp_policy;
     if( UI::QueryWidget (`id ("policy_combo"), `Value) == `nomodify )
     {
 	NtpClient::ntp_policy = "";
@@ -407,7 +415,11 @@ void PolicyStore(string id, map event) {
     {
 	NtpClient::ntp_policy = (string)UI::QueryWidget (`id ("custom_policy"), `Value);
     }
-    NtpClient::modified = true;
+    if( tmp != NtpClient::ntp_policy )
+    {
+	y2milestone("set modified to true 3");
+        NtpClient::modified = true;
+    }
 }
 
 
@@ -543,7 +555,6 @@ define symbol overviewHandle (string id, map event) ``{
 	showLogPopup ();
 	return nil;
     }
-    NtpClient::modified = true;
     any ev_id = event["ID"]:nil;
     if (ev_id == "boot" || ev_id == "never" || ev_id == "sync" || ev_id == "policy_combo" )
     {
@@ -568,6 +579,8 @@ define symbol overviewHandle (string id, map event) ``{
 	    UI::ChangeWidget (`id ("custom_policy"), `Enabled, false);
 	    UI::ChangeWidget (`id ("custom_policy"), `Value, "");
 	}
+	y2milestone("set modified from %1 to true 4.1 id %2 map %3", NtpClient::modified, id, event);
+	NtpClient::modified = true;
 	return nil;
     }
     map<string,symbol> types = $[
@@ -581,6 +594,8 @@ define symbol overviewHandle (string id, map event) ``{
     {
 	NtpClient::selectSyncRecord (-1);
 	peer_type_selected = nil;
+	y2milestone("set modified from %1 to true 4.2 id %2 map %3", NtpClient::modified, id, event);
+	NtpClient::modified = true;
 	return `add;
     }
     else if (event["ID"]:nil == `edit || event["ID"]:nil == `overview)
@@ -589,6 +604,8 @@ define symbol overviewHandle (string id, map event) ``{
 	    (integer)(UI::QueryWidget (`id (`overview), `CurrentItem))
 	);
 	string type = NtpClient::selected_record["type"]:"";
+	y2milestone("set modified from %1 to true 4.3 id %2 map %3", NtpClient::modified, id, event);
+	NtpClient::modified = true;
 	return types[type]:nil;
     }
     else if (event["ID"]:nil == `delete)
@@ -601,6 +618,8 @@ define symbol overviewHandle (string id, map event) ``{
 	    );
 	    overviewRedraw ();
 	    sync_record_modified = true;
+	    y2milestone("set modified from %1 to true 4.4 id %2 map %3", NtpClient::modified, id, event);
+	    NtpClient::modified = true;
 	}
     }
     return nil;
@@ -611,8 +630,10 @@ define symbol overviewHandle (string id, map event) ``{
  * @param id any widget id
  */
 define void overviewInit (string id) ``{
+    boolean tmp = NtpClient::modified;
     overviewRedraw ();
     overviewHandle (id, $["ID" : "boot"]);
+    NtpClient::modified = tmp;
 }
 
 /**
