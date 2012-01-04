@@ -79,8 +79,15 @@ void handle_invalid_hostname( string server ) {
 boolean GetNTPEnabled () {
 
     if (!Stage::initial())
+    {
+        boolean progress_orig = Progress::set (false);
+        NtpClient::Read();
+        Progress::set (progress_orig);
 	NtpClient::ReadSynchronization ();
+    }
 
+y2milestone("synchronize_time %1",NtpClient::synchronize_time);
+y2milestone("run_service %1",     NtpClient::run_service);
     return NtpClient::synchronize_time || Service::Enabled (NtpClient::service_name);
 }
 
@@ -173,7 +180,7 @@ boolean ui_init(term rp, string country, boolean first_time) {
 	    `HBox (
 		`HSpacing (0.5),
 		// check box label
-		`Left (`CheckBox (`id (`run_service), _("&Run NTP as daemon")))
+		`Left (`CheckBox (`id (`run_service), _("&Run NTP as daemon"), NtpClient::run_service ))
 	    ),
 	    `HBox (
 		`HSpacing (0.5),
@@ -244,10 +251,10 @@ boolean WriteNtpSettings (list<string> ntp_servers, string ntp_server, boolean r
     {
 	AddSingleServer(ntp_server);
     }
+    NtpClient::run_service=run_service;
     if( ! run_service )
     {
         NtpClient::synchronize_time=true;
-	NtpClient::run_service=false;
 	NtpClient::sync_interval=15;
     }
 
@@ -284,9 +291,9 @@ symbol Write(map param) {
     if ( !ValidateSingleServer( ntp_server ) )
 	return `invalid_hostname;
 
+    WriteNtpSettings (ntp_servers,ntp_server,run_service);
     if (param["write_only"]:false)
     {
-	WriteNtpSettings (ntp_servers,ntp_server,run_service);
 	return `success;
     }
 
@@ -391,6 +398,7 @@ boolean ui_try_save() {
 
     string server = (string) UI::QueryWidget (`id(`ntp_address),`Value);
 
+y2milestone("ui_try_save argmap %1", argmap);
     if (rv == `invalid_hostname)
     {
 	handle_invalid_hostname( server );
