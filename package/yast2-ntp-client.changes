@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan  5 07:26:54 UTC 2012 - varkoly@suse.com
+
+- bnc#707408 - Additional NTP server entries for NTP client Configuration 
+
+-------------------------------------------------------------------
 Wed Jan  4 12:33:27 UTC 2012 - varkoly@suse.com
 
 - bnc#724762 - bad yast2 timezone NTP config 
