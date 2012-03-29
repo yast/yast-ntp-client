@@ -1029,7 +1029,8 @@ global list<string> DetectNtpServers(symbol method) {
 	    if ( !PackageSystem::CheckAndInstallPackages( [required_package] ) )
 	    {
 		Report::Error( sformat(_("Cannot search for NTP server in local network
-without having package %1 installed."), required_package) );
+without package %1 installed.
+"), required_package) );
 		y2warning("Not searching for local NTP servers via SLP");
 		return [];
 	    }

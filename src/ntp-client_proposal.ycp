@@ -321,7 +321,8 @@ symbol Write(map param) {
 	if (!PackageSystem::CheckAndInstallPackages([ required_package ]))
 	{
 	    Report::Error(sformat( _("Synchronization with NTP server is not possible
-without having package %1 installed"), required_package));
+without package %1 installed.
+"), required_package));
 	}
     }
     integer r = 0;

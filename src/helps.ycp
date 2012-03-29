@@ -134,9 +134,10 @@ To set the address from which to accept broadcast packets, use
 
     // help text 3/4, optional
     "options" : _("<p><b><big>Options</big></b><br>
-To fine tune the synchronization source, write the options to the
+To fine-tune the synchronization source, enter the respective options in the
 <b>Options</b> text field. For details, see
-<i>/usr/share/doc/packages/ntp-doc/confopt.htm</i>.</p>"),
+<i>/usr/share/doc/packages/ntp-doc/confopt.htm</i>.</p>
+"),
 
     "restrict" : _("<p><b><big>Access Control Options</big></b><br>
 Define the access control flags (<b><tt>restrict</tt></b> directive in
@@ -219,9 +220,9 @@ options can be set. The meaning of particular options depends on the particular
 driver. Some drivers do not use all the options.</p>")
     +
     // help text 2/2
-    _("For information about the meaning of the options, install package
-<i>ntp-doc</i> and see
-<i>/usr/share/doc/packages/ntp-doc/html/refclock.htm</i></p>");
+    _("To learn more about available options, install the package
+<i>ntp-doc</i> and see <i>/usr/share/doc/packages/ntp-doc/html/refclock.htm</i>.</p>
+");
 }
 
 /* EOF */

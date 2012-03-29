@@ -1302,7 +1302,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 		// radio button
 		[ "sync", _("&Synchronize without Daemon") ],
 		// radio button
-		[ "boot", _("Now and On &Boot") ],
+		[ "boot", _("Now and on &Boot") ],
 	    ],
 	    "help" : HELPS["start"]:"",
 	    "init" : startInit,
