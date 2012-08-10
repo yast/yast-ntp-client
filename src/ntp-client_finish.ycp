@@ -21,9 +21,9 @@ if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
 	param = (map)WFM::Args(1);
 }
 
-y2milestone ("starting ntp-client_finish");
-y2debug("func=%1", func);
-y2debug("param=%1", param);
+y2milestone("starting ntp-client_finish");
+y2milestone("func=%1", func);
+y2milestone("param=%1", param);
 
 if (func == "Info")
 {
@@ -43,7 +43,9 @@ else if (func == "Write")
     list<string> ss = NtpClient::GetUsedNtpServers();
 
     // ntp.conf from the RPM
+    NtpClient::config_has_been_read = false;
     NtpClient::Read();
+    y2milestone("ntp-client_finish NtpClient::Read::ntp_records %1", NtpClient::ntp_records);
 
     // put users server(s) back
     foreach (string server, ss, {
