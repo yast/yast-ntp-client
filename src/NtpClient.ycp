@@ -481,7 +481,7 @@ global define boolean Read() ``{
 	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["ntp"])
     )
     {
-        y2milestone("Mode::testsuite %1 Mode::installation %2 PackageSystem::CheckAndInstallPackagesInteractive %3",Mode::testsuite(),Mode::installation(),PackageSystem::CheckAndInstallPackagesInteractive(["ntp"]));
+        y2milestone("PackageSystem::CheckAndInstallPackagesInteractive failed");
 	return false;
     }
 
