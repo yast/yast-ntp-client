@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 22 13:20:47 CET 2013 - mvidner@suse.cz
+
+- fix ntp.conf config merging: do reread the config from disk (bnc#773201)
+- 2.17.15
+
+-------------------------------------------------------------------
 Wed Apr 21 16:39:38 CEST 2010 - varkoly@suse.de
 
 - Remove missleading depracated input field
