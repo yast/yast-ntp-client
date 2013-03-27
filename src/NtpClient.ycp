@@ -326,7 +326,7 @@ global define boolean ProcessNtpConf() ``{
 	y2error("Failed to read /etc/ntp.conf, either it doesn't exist or contains no data");
 	return false;
     }
-
+y2milestone("Raw ntp conf %1",conf);
     config_has_been_read = true;
     list<map<string, any> > value = conf["value"]:[];
     integer index = -1;
@@ -481,6 +481,7 @@ global define boolean Read() ``{
 	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["ntp"])
     )
     {
+        y2milestone("PackageSystem::CheckAndInstallPackagesInteractive failed");
 	return false;
     }
 
