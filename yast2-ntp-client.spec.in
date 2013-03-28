@@ -1,16 +1,20 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-BuildRequires:	yast2-country-data
+BuildRequires:  perl-XML-Writer
+BuildRequires:  update-desktop-files
+BuildRequires:  yast2
+BuildRequires:  yast2-country-data
+BuildRequires:  yast2-devtools
+BuildRequires:  yast2-testsuite
 #SLPAPI.pm 
 # Hostname::CurrentDomain
-Requires:	yast2 >= 2.16.48
-Requires:	yast2-country-data 
+Requires:       yast2 >= 2.16.48
+Requires:       yast2-country-data
 
-BuildArchitectures:	noarch
+BuildArch:      noarch
 
-Summary:	YaST2 - NTP Client Configuration
+Summary:        YaST2 - NTP Client Configuration
 
 %description
 This package contains the YaST2 component for NTP client configuration.
@@ -36,3 +40,5 @@ This package contains the YaST2 component for NTP client configuration.
 @ydatadir@/ntp_servers.ycp
 %doc @docdir@
 @schemadir@/autoyast/rnc/ntpclient.rnc
+
+%changelog
