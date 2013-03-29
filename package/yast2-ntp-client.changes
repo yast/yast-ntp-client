@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 22 13:20:47 CET 2013 - mvidner@suse.cz
+
+- fix ntp.conf config merging: do reread the config from disk (bnc#773201)
+- 2.21.3
+
+-------------------------------------------------------------------
 Thu Mar 29 15:32:06 CEST 2012 - jsuchome@suse.cz
 
 - merged proofread texts 
