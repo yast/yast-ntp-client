@@ -19,6 +19,7 @@ ynclude_DATA =			\
 	widgets.ycp		\
 	misc.ycp		\
 	clocktypes.ycp		\
+        ntp_servers.ycp         \
 	commandline.ycp
 
 desktop_DATA =			\
