@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr 25 09:05:31 UTC 2013 - lslezak@suse.cz
+
+- convert data/ntp_servers.ycp to an include file
+  (needed for the future ruby conversion)
+- 2.24.0
+
+-------------------------------------------------------------------
 Thu Mar 29 15:32:06 CEST 2012 - jsuchome@suse.cz
 
 - merged proofread texts 

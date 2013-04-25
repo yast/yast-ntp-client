@@ -33,6 +33,8 @@ import "Summary";
 import "SuSEFirewall";
 import "FileChanges";
 
+include "ntp-client/ntp_servers.ycp";
+
 
 /**
  * Abort function
@@ -237,20 +239,13 @@ global map<string, map<string,string> > GetNtpServers() {
     if (ntp_servers == nil)
     {
 	ntp_servers = $[];
-	list<map<string,string> > servers =(list<map<string,string> >)
-	    SCR::Read(.target.ycp, Directory::datadir + "/ntp_servers.ycp");
-	if (servers == nil)
-	{
-	    y2error("Failed to read the list of NTP servers");
-	}
-	else
-	{
-	    y2milestone("%1 known NTP servers read", size(servers));
-	    ntp_servers = listmap(map<string,string> s, servers, {
-		string server = s["address"]:"";
-		return $[ server : s ];
-	    });
-	}
+
+        y2milestone("%1 known NTP servers read", size(servers));
+        ntp_servers = listmap(map<string,string> s, servers, {
+            string server = s["address"]:"";
+            return $[ server : s ];
+        });
+
 	foreach(string short_country, string country_name, GetAllKnownCountries(), {
 	    // just refactored existing code
 	    map<string, string> p = MakePoolRecord(short_country, country_name);

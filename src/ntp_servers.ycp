@@ -1,3 +1,7 @@
+{
+
+list<map<string,string> > servers =
+
 [
   $[
     "access_policy" : "open access, please send a message to notify",
@@ -1819,4 +1823,7 @@
     "stratum" : "1",
     "synchronization" : "ACTS Dial-up and lockclock algorithm, DEC Alpha/UNIX",
   ],
-]
+];
+
+}
+

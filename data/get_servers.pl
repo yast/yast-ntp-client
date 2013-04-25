@@ -103,6 +103,9 @@ foreach my $url (@mills_urls) {
 } @servers;
 
 open (OUT, ">ntp_servers.ycp");
+
+print OUT "{\nlist<map<string,string> > servers =\n\n";
+
 print OUT "[\n";
 foreach my $sr (@servers) {
     print OUT "  \$[\n";
@@ -114,7 +117,7 @@ foreach my $sr (@servers) {
     }
     print OUT "  ],\n";
 }
-print OUT "]\n";
+print OUT "];\n}\n";
 close (OUT);
 
 
