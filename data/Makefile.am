@@ -3,7 +3,7 @@
 #
 
 ydata_DATA = \
-	ntp_servers.ycp
+	ntp_servers.xml
 
 
 EXTRA_DIST = $(ydata_DATA)
