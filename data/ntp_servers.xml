@@ -1,0 +1,1826 @@
+<?xml version="1.0"?>
+<!DOCTYPE productDefines SYSTEM "/usr/share/YaST2/control/control.dtd">
+<ntp_database xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <ntp_servers config:type="list">
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>tick.nap.com.ar</address>
+      <country>AR</country>
+      <exact_location>Network Access Point, Buenos Aires, Argentina</exact_location>
+      <location>Argentina</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Cisco IOS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>time.sinectis.com.ar</address>
+      <coordinates>3432'S, 5820'W</coordinates>
+      <country>AR</country>
+      <exact_location>Sinectis S.A., Buenos Aires (Argentina)</exact_location>
+      <location>Argentina</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), i686/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>tock.nap.com.ar</address>
+      <country>AR</country>
+      <exact_location>Network Access Point, Buenos Aires, Argentina</exact_location>
+      <location>Argentina</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Cisco IOS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.belbone.be</address>
+      <country>BE</country>
+      <exact_location>Brussels, Belgium</exact_location>
+      <location>European Union</location>
+      <stratum>2</stratum>
+      <synchronization>xntpd (stratum 2), linux/unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.belbone.be</address>
+      <country>BE</country>
+      <exact_location>Brussels, Belgium</exact_location>
+      <location>European Union</location>
+      <stratum>2</stratum>
+      <synchronization>xntpd (stratum 2), linux/unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access to stratum 3 server. Please, send a mail to notify.</access_policy>
+      <address>ntp.pop-pr.rnp.br</address>
+      <country>BR</country>
+      <exact_location>PoP-PR/Brazilian Research Network (RNP)</exact_location>
+      <location>Brazil</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 Secondary (stratum 2), IBM RS6000 - 43P-240 /Debian GNU Linux with IPv6 Support</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp1.pucpr.br</address>
+      <country>BR</country>
+      <exact_location>Brazilian / Pontificia Universidade Catolica do Parana</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2),</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>a.ntp.br</address>
+      <country>BR</country>
+      <exact_location>Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2),</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>b.ntp.br</address>
+      <country>BR</country>
+      <exact_location>Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2),</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>c.ntp.br</address>
+      <country>BR</country>
+      <exact_location>Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2),</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>pool.ntp.br</address>
+      <country>BR</country>
+      <exact_location>Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2),</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.cpsc.ucalgary.ca</address>
+      <country>CA</country>
+      <exact_location>University of Calgary, Calgary, Alberta, Canada</exact_location>
+      <location>Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 Secondary, i686/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.cmc.ec.gc.ca</address>
+      <country>CA</country>
+      <exact_location>Canadian Meteorological Centre, Dorval, Qu&#xE9;bec, Canada</exact_location>
+      <location>Eastern Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary SGI/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.cmc.ec.gc.ca</address>
+      <country>CA</country>
+      <exact_location>Canadian Meteorological Centre, Dorval, Qu&#xE9;bec, Canada</exact_location>
+      <location>Eastern Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary SGI/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, send email to notify.</access_policy>
+      <address>tick.utoronto.ca</address>
+      <country>CA</country>
+      <exact_location>University of Toronto, Toronto, Ontario, CANADA</exact_location>
+      <location>Eastern Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sparc 10, Solaris 2.5.1</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>time.chu.nrc.ca</address>
+      <coordinates>45:17:41N, 75:45:27W</coordinates>
+      <country>CA</country>
+      <exact_location>National Research Council of Canada, Ottawa, Ontario, Canada</exact_location>
+      <location>Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>time.nrc.ca</address>
+      <coordinates>45:27N, 75:37W</coordinates>
+      <country>CA</country>
+      <exact_location>National Research Council of Canada, Ottawa, Ontario, Canada</exact_location>
+      <location>Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>timelord.uregina.ca</address>
+      <coordinates>50:25N , 104:35:20 W</coordinates>
+      <country>CA</country>
+      <exact_location>University of Regina, Regina, Saskatchewan, Canada</exact_location>
+      <location>SASK#net, CA*net, Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun Sparc 5</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, send email to notify.</access_policy>
+      <address>tock.utoronto.ca</address>
+      <country>CA</country>
+      <exact_location>University of Toronto, Toronto, Ontario, CANADA</exact_location>
+      <location>Eastern Canada</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sparc 5, Solaris 2.5</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.cgi.cz</address>
+      <country>CZ</country>
+      <exact_location>Prague, The Czech Republic</exact_location>
+      <location>Czech Republic</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), PC/FreebSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.karpo.cz</address>
+      <country>CZ</country>
+      <exact_location>Prague, The Czech Republic</exact_location>
+      <location>Czech Republic</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.contactel.cz</address>
+      <country>CZ</country>
+      <exact_location>Prague, The Czech Republic</exact_location>
+      <location>Czech Republic</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>tick.fh-augsburg.de</address>
+      <country>DE</country>
+      <exact_location>Augsburg University of Applied Sciences (FH), Augsburg, Bavaria, Germany</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), i486/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>tock.fh-augsburg.de</address>
+      <country>DE</country>
+      <exact_location>Augsburg University of Applied Sciences (FH), Augsburg, Bavaria, Germany</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), i486/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Public (glad to receive a note)</access_policy>
+      <address>hora.oxixares.com</address>
+      <country>ES</country>
+      <exact_location>Ogijares (Granada/SPAIN)</exact_location>
+      <location>Spain</location>
+      <stratum>2</stratum>
+      <synchronization>ntp v4.1.1 secondary (stratum 2)/athlon XP 2500+/SuSE Linux 8.2</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>tick.keso.fi</address>
+      <country>FI</country>
+      <exact_location>Keski-Savon Oppimiskeskus, Pieksamaki, Finland, Europe</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP-3, i686/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>tock.keso.fi</address>
+      <country>FI</country>
+      <exact_location>Keski-Savon Oppimiskeskus, Pieksamaki, Finland, Europe</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP-3, i586/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, but please send a message to notify</access_policy>
+      <address>ntp.obspm.fr</address>
+      <country>FR</country>
+      <exact_location>BNM-SYRTE, Observatoire de Paris, Paris, France</exact_location>
+      <location>France/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum-2), i386/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, no need to notify</access_policy>
+      <address>ntp.tuxfamily.net</address>
+      <country>FR</country>
+      <exact_location>SFINX or TeleHouse2, Paris, France</exact_location>
+      <location>France/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum-2), Debian GNU/Linux ix86</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.univ-lyon1.fr</address>
+      <country>FR</country>
+      <exact_location>CISM, Lyon, France</exact_location>
+      <location>France, Switzerland, Italy, Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun SS10</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access/GR, please send a message to notify.</access_policy>
+      <address>ntp.mfa.gr</address>
+      <country>GR</country>
+      <exact_location>Athens, GR</exact_location>
+      <location>Greece</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), i686/FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>os.ntp.carnet.hr</address>
+      <country>HR</country>
+      <exact_location>CARNet (Croatian Academic and Research Network), Osijek, Croatia</exact_location>
+      <location>Croatia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Intel x86/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>ri.ntp.carnet.hr</address>
+      <country>HR</country>
+      <exact_location>CARNet (Croatian Academic and Research Network), Rijeka, Croatia</exact_location>
+      <location>Croatia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Sun Sparc/UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>st.ntp.carnet.hr</address>
+      <country>HR</country>
+      <exact_location>CARNet (Croatian Academic and Research Network), Split, Croatia</exact_location>
+      <location>Croatia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Sun Sparc/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>zg1.ntp.carnet.hr</address>
+      <country>HR</country>
+      <exact_location>CARNet (Croatian Academic and Research Network), Zagreb, Croatia</exact_location>
+      <location>Croatia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Sun Sparc/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>zg2.ntp.carnet.hr</address>
+      <country>HR</country>
+      <exact_location>CARNet (Croatian Academic and Research Network), Zagreb, Croatia</exact_location>
+      <location>Croatia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Intel x86/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, send email to notify.</access_policy>
+      <address>time.kfki.hu</address>
+      <country>HU</country>
+      <exact_location>KFKI Research Institute for Particle and Nuclear Physics, Budapest, Hungary</exact_location>
+      <location>HUNGARNET</location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>ntp.maths.tcd.ie</address>
+      <country>IE</country>
+      <exact_location>School of Mathematics, Trinity College, Dublin, Ireland.</exact_location>
+      <location>Ireland, UK</location>
+      <stratum>2</stratum>
+      <synchronization>NTPV4 secondary (stratum 2), Intel, FreeBSD 2.2</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>fartein.ifi.uio.no</address>
+      <coordinates>59:56:32N, 10:43:22E</coordinates>
+      <country>NO</country>
+      <exact_location>University of Oslo, Norway</exact_location>
+      <location>NORDUnet</location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), DEC Alpha OSF/1 V4.0</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access within New Zealand, send email to notify.</access_policy>
+      <address>ntp.iprolink.co.nz</address>
+      <country>NZ</country>
+      <exact_location>Iprolink, CBD, Auckland, New Zealand</exact_location>
+      <location>New Zealand</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access within New Zealand</access_policy>
+      <address>ntp.massey.ac.nz</address>
+      <country>NZ</country>
+      <exact_location>Massey University, Palmerston North, New Zealand</exact_location>
+      <location>New Zealand</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access within New Zealand, send email to notify.</access_policy>
+      <address>ntp.public.otago.ac.nz</address>
+      <country>NZ</country>
+      <exact_location>University of Otago, Dunedin, New Zealand</exact_location>
+      <location>New Zealand</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access within New Zealand, send email to notify.</access_policy>
+      <address>tk1.ihug.co.nz</address>
+      <country>NZ</country>
+      <exact_location>ihug, Central city, Auckland, New Zealand</exact_location>
+      <location>New Zealand</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <address>info.cyf-kr.edu.pl</address>
+      <country>PL</country>
+      <exact_location>Academic Computer Centre, CYFRONET, Krakow, Poland</exact_location>
+      <location>Poland/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), HP/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp.psn.ru</address>
+      <coordinates>54:50N, 37:37E</coordinates>
+      <country>RU</country>
+      <exact_location>Pushchino, Moscow region, Russia</exact_location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Alpha/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, send email to notify. Please limit access to one or two hosts per site (large sites should set up their own ntp server)</access_policy>
+      <address>ntp.lth.se</address>
+      <country>SE</country>
+      <exact_location>Lund Institute of Technology, Lund, Sweden</exact_location>
+      <location>Sweden, NORDUnet</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access</access_policy>
+      <address>time.flygplats.net</address>
+      <country>SE</country>
+      <exact_location>flygplats.net, Sigtuna, Sweden</exact_location>
+      <location>Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary, i386, FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>biofiz.mf.uni-lj.si</address>
+      <coordinates>46:03:09N, 14:30:40E</coordinates>
+      <country>SI</country>
+      <exact_location>Institute of Biophysics, University of Ljubljana, Slovenia</exact_location>
+      <location>Slovenia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), IBM/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access with some restrictions (see &lt;a href="http://www.arnes.si/english/ntp_access.html"&gt;http://www.arnes.si/english/ntp_access.html&lt;/a&gt;)</access_policy>
+      <address>ntp1.arnes.si</address>
+      <country>SI</country>
+      <exact_location>ARNES (Academic and Research Network of Slovenia), Ljubljana, Slovenia</exact_location>
+      <location>Slovenia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Sun Sparc/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access with some restrictions (see &lt;a href="http://www.arnes.si/english/ntp_access.html"&gt;http://www.arnes.si/english/ntp_access.html&lt;/a&gt;)</access_policy>
+      <address>ntp2.arnes.si</address>
+      <country>SI</country>
+      <exact_location>ARNES (Academic and Research Network of Slovenia), Ljubljana, Slovenia</exact_location>
+      <location>Slovenia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Sun Sparc/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>time.ijs.si</address>
+      <coordinates>46:02:35N, 14:29:17E (WGS84)</coordinates>
+      <country>SI</country>
+      <exact_location>J. Stefan Institute, Ljubljana, Slovenia</exact_location>
+      <location>Slovenia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), DEC Alpha / Digital Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, glad to receive a note</access_policy>
+      <address>time.ijs.si</address>
+      <country>SI</country>
+      <exact_location>J. Stefan Institute, Ljubljana, SloveniaGeographic Coordinates: 46&#xB0; 2.517'N, 14&#xB0;; 29.241'E (WGS84)</exact_location>
+      <location>Slovenia/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Compaq (DEC) Alpha / Tru64 Unix with &lt;a href="http://www.unix.digital.com/faqs/publications/base_doc/DOCUMENTATI%20ON/HTML/APS33DTE_html/DOCU_007.HTM#high-res-clock-sec"&gt;MICRO_TIME kernel option&lt;/a&gt;</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>a.ntp.alphazed.net</address>
+      <country>GB</country>
+      <exact_location>Telehouse, London E14</exact_location>
+      <location>all areas</location>
+      <stratum>2</stratum>
+      <synchronization>NTP 4, FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access Please, send a mail to notify.</access_policy>
+      <address>time.deu.edu.tr</address>
+      <country>TR</country>
+      <exact_location>Dokuz Eylul University, Izmir, Turkey</exact_location>
+      <location>Turkey</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 Secondary (stratum 2), Sun SPARC10/Solaris,</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.cis.strath.ac.uk</address>
+      <coordinates>04:14W, 55:52N</coordinates>
+      <country>GB</country>
+      <exact_location>Dept. Computer and Information Sciences, University of Strathclyde, Glasgow, Scotland.</exact_location>
+      <location>UK/Europe</location>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open Access</access_policy>
+      <address>ntp2a.mcc.ac.uk</address>
+      <country>GB</country>
+      <exact_location>University of Manchester, Manchester, England</exact_location>
+      <location>GB</location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (S2), Sun/SunOS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open Access</access_policy>
+      <address>ntp2b.mcc.ac.uk</address>
+      <country>GB</country>
+      <exact_location>University of Manchester, Manchester, England</exact_location>
+      <location>GB</location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (S2), PC/FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open Access</access_policy>
+      <address>ntp2c.mcc.ac.uk</address>
+      <country>GB</country>
+      <exact_location>University of Manchester, Manchester, England</exact_location>
+      <location>GB</location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (S2), PC/FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open Access</access_policy>
+      <address>ntp2d.mcc.ac.uk</address>
+      <country>GB</country>
+      <exact_location>University of Manchester, Manchester, England</exact_location>
+      <location>GB</location>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (S2), SGI/Irix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp</address>
+      <country>GB</country>
+      <exact_location>Telehouse Europe, London E14.Geographic Coordinates: 51&#xB0;;30.71'N 0&#xB0;;00.08'W</exact_location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Semi-open access. A service intended for use by Virgin Media customers who may use it without asking.</access_policy>
+      <address>ntp.virginmedia.com</address>
+      <country>GB</country>
+      <exact_location>Unknown, UK</exact_location>
+      <location>Virgin media; UK</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Semi-open access. These are primarily for use by UUNET customers who may use them without asking, but others are welcome to peer if they give notice.</access_policy>
+      <address>ntp0.uk.uu.net</address>
+      <country>GB</country>
+      <exact_location>Cambridge, UK</exact_location>
+      <location>UUNET (formerly known in the UK as PIPEX); UK</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Semi-open access. These are primarily for use by UUNET customers who may use them without asking, but others are welcome to peer if they give notice.</access_policy>
+      <address>ntp1.uk.uu.net</address>
+      <country>GB</country>
+      <exact_location>Cambridge, UK</exact_location>
+      <location>UUNET (formerly known in the UK as PIPEX); UK</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Semi-open access. These are primarily for use by UUNET customers who may use them without asking, but others are welcome to peer if they give notice.</access_policy>
+      <address>ntp2.uk.uu.net</address>
+      <country>GB</country>
+      <exact_location>London, UK</exact_location>
+      <location>UUNET (formerly known in the UK as PIPEX); UK</location>
+      <stratum>2</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access. Please limit access to one or two hosts per site (large sites should set up their own ntp server)</access_policy>
+      <address>dewey.lib.ci.phoenix.az.us</address>
+      <country>US</country>
+      <exact_location>Phoenix, AZ</exact_location>
+      <location>North America</location>
+      <state>AZ </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2) P-III/Linux 2.4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.sjc.he.net</address>
+      <country>US</country>
+      <exact_location>Hurricane Electric, San Jose, California</exact_location>
+      <location>all areas</location>
+      <state>CA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 primary (CDMA), Endrun Praecis CNTP</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>ntp.ucsd.edu</address>
+      <country>US</country>
+      <exact_location>UCSD Academic Computing Services/Network Operations, San Diego, CA</exact_location>
+      <location>CERFNET; NSFNET, SDSC region and nearby</location>
+      <state>CA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>ntp1.sf-bay.org</address>
+      <country>US</country>
+      <exact_location>San Jose, CA</exact_location>
+      <location>North America: Northern California and Pacific Northwest</location>
+      <state>CA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>ntp2.sf-bay.org</address>
+      <country>US</country>
+      <exact_location>Los Angeles, CA</exact_location>
+      <location>North America: Southern California</location>
+      <state>CA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>ntp.ucsd.edu</address>
+      <country>US</country>
+      <exact_location>UCSD Academic Computing Services/Network Operations, San Diego, CA</exact_location>
+      <location>CERFNET; NSFNET, SDSC region and nearby</location>
+      <state>CA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to stratum 2 servers, others upon request.</access_policy>
+      <address>reloj.kjsl.com</address>
+      <country>US</country>
+      <exact_location>Salinas, CA, USA</exact_location>
+      <state>CA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), MultiNet on VMS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access.</access_policy>
+      <address>ntp1.tummy.com</address>
+      <country>US</country>
+      <exact_location>tummy.com, ltd., Fort Collins, CO</exact_location>
+      <location>US</location>
+      <state>CO </state>
+      <stratum>2</stratum>
+      <synchronization>NTP Secondary (stratum 2), i686/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>louie.udel.edu</address>
+      <country>US</country>
+      <exact_location>University of Delaware, Newark, DE</exact_location>
+      <location>CAIRN, Abilene/vBNS</location>
+      <state>DE </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun SPARC10/Solaris 2.6</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message with the hostname and/or address of your NTP client to notify.</access_policy>
+      <address>rolex.usg.edu</address>
+      <country>US</country>
+      <exact_location>University System of Georgia NOC, Atlanta, GA</exact_location>
+      <location>PeachNet (Georgia)</location>
+      <state>GA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message with the hostname and/or address of your NTP client to notify.</access_policy>
+      <address>timex.usg.edu</address>
+      <country>US</country>
+      <exact_location>University System of Georgia NOC, Atlanta, GA</exact_location>
+      <location>PeachNet (Georgia)</location>
+      <state>GA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-0.cso.uiuc.edu</address>
+      <country>US</country>
+      <exact_location>University of Illinois, Urbana-Champaign, IL</exact_location>
+      <location>CICNET, Midwest, NCSA region</location>
+      <state>IL </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Cisco-ASM/4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-1.cso.uiuc.edu</address>
+      <country>US</country>
+      <exact_location>University of Illinois, Urbana-Champaign, IL</exact_location>
+      <location>CICNET, Midwest, NCSA region</location>
+      <state>IL </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Cisco-ASM/4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp-1.mcs.anl.gov</address>
+      <country>US</country>
+      <exact_location>Argonne National Laboratory, near Chicago, IL</exact_location>
+      <location>NSF/ANSNet, CICNet, NetIllinois, ESNet, others welcome</location>
+      <state>IL </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun Sparcstation</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-2.cso.uiuc.edu</address>
+      <country>US</country>
+      <exact_location>University of Illinois, Urbana-Champaign, IL</exact_location>
+      <location>CICNET, Midwest, NCSA region</location>
+      <state>IL </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Cisco-ASM/4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>ntp-2.mcs.anl.gov</address>
+      <country>US</country>
+      <exact_location>Argonne National Laboratory, near Chicago, IL</exact_location>
+      <location>NSF/ANSNet, CICNet, NetIllinois, ESNet, others welcome</location>
+      <state>IL </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun Sparcstation 2</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access but please see our &lt;a href="http://ntp.cerias.purdue.edu"&gt;ntp WWW page&lt;/a&gt;.</access_policy>
+      <address>tick.cerias.purdue.edu</address>
+      <coordinates>40:25:33.2N, 86:54:54.7W (GPS)</coordinates>
+      <country>US</country>
+      <exact_location>CERIAS, Purdue University, West Lafayette, IN</exact_location>
+      <location>Internet2, CIC and midwest US</location>
+      <state>IN </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3/V4 stratum 2 servers</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp1.kansas.net</address>
+      <country>US</country>
+      <exact_location>KansasNet OnLine Services, Manhattan, KS</exact_location>
+      <state>KS </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Linux on Intel</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp2.kansas.net</address>
+      <country>US</country>
+      <exact_location>KansasNet OnLine Services, Manhattan, KS</exact_location>
+      <state>KS </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Linux on Intel</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>ns.nts.umn.edu</address>
+      <country>US</country>
+      <exact_location>Minneapolis, MN</exact_location>
+      <location>CICNET region</location>
+      <state>MN </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun/SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>nss.nts.umn.edu</address>
+      <country>US</country>
+      <exact_location>St Paul, MN</exact_location>
+      <location>CICNET region</location>
+      <state>MN </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun/SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>time-ext.missouri.edu</address>
+      <country>US</country>
+      <exact_location>University of Missouri-Columbia, Columbia, MO, USA</exact_location>
+      <location>MOREnet</location>
+      <state>MO </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Linux/Intel</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send message to notify</access_policy>
+      <address>chronos1.umt.edu</address>
+      <country>US</country>
+      <exact_location>University of Montana, Missoula, Montana</exact_location>
+      <location>Northwest USA, Internet 2</location>
+      <state>MT </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Cisco 7507</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send message to notify</access_policy>
+      <address>chronos2.umt.edu</address>
+      <country>US</country>
+      <exact_location>University of Montana, Missoula, Montana</exact_location>
+      <location>Northwest USA, Internet 2</location>
+      <state>MT </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Cisco 7507</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send message to notify</access_policy>
+      <address>chronos3.umt.edu</address>
+      <country>US</country>
+      <exact_location>University of Montana, Missoula, Montana</exact_location>
+      <location>Northwest USA, Internet 2</location>
+      <state>MT </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Cisco 7507</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>CONCERT region, others by prior arrangement</access_policy>
+      <address>clock1.unc.edu</address>
+      <coordinates>35:54N, 79:03W</coordinates>
+      <country>US</country>
+      <exact_location>University of North Carolina-Chapel Hill, Chapel Hill, NC</exact_location>
+      <location>CONCERT region</location>
+      <state>NC </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun4/SunOS/xntpd (V3)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access; please send a message to notify.</access_policy>
+      <address>tick.jrc.us</address>
+      <coordinates>41 00.975 N, 74 15.262 W</coordinates>
+      <country>US</country>
+      <exact_location>Jensen Research Corporation, Oakland NJ</exact_location>
+      <location>Eastern US</location>
+      <state>NJ </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Cisco 3620 IOS 12.2</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access; please send a message to notify.</access_policy>
+      <address>tock.jrc.us</address>
+      <coordinates>41 00.975 N, 74 15.262 W</coordinates>
+      <country>US</country>
+      <exact_location>Jensen Research Corporation, Oakland NJ</exact_location>
+      <location>Eastern US</location>
+      <state>NJ </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary (stratum 2), Intel PIII/866 Win2K</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send message to notify</access_policy>
+      <address>cuckoo.nevada.edu</address>
+      <country>US</country>
+      <exact_location>University of Nevada System Computing Services, Las Vegas,NV</exact_location>
+      <location>NevadaNet, NSFNET, SDSC region</location>
+      <state>NV </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), DEC Alpha/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.nyc.he.net</address>
+      <country>US</country>
+      <exact_location>Hurricane Electric, New York City, New York</exact_location>
+      <location>all areas</location>
+      <state>NY </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 primary (CMDA), Endrun Praecis CNTP</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp0.cornell.edu</address>
+      <country>US</country>
+      <exact_location>Cornell University, Ithaca, NY</exact_location>
+      <location>NYSERNet, NYSERNet 2000, Internet2/Abilene, vBNS</location>
+      <state>NY </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access; please use name rather than address.</access_policy>
+      <address>sundial.columbia.edu</address>
+      <country>US</country>
+      <exact_location>Morningside Campus, Columbia University, New York, NY</exact_location>
+      <location>NYSERnet</location>
+      <state>NY </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun Sparc10 model 40</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, authenticated NTP (DES/MD5) available</access_policy>
+      <address>timex.cs.columbia.edu</address>
+      <country>US</country>
+      <exact_location>Columbia University Computer Science Department, New York City, NY</exact_location>
+      <location>PSINET; NSFNET, NYSER region</location>
+      <state>NY </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>semi-open access; for use only by prior arrangement</access_policy>
+      <address>clock-1.cs.cmu.edu</address>
+      <country>US</country>
+      <exact_location>Carnegie Mellon University Computer Science, Pittsburgh, PA</exact_location>
+      <location>PSC region</location>
+      <state>PA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun Sparc/Solaris 2.5.1</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>semi-open access; for use only by prior arrangement</access_policy>
+      <address>clock-2.cs.cmu.edu</address>
+      <country>US</country>
+      <exact_location>Carnegie Mellon University Computer Science, Pittsburgh, PA</exact_location>
+      <location>PSC region</location>
+      <state>PA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun Sparc/SunOS 4.1.4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.psu.edu</address>
+      <coordinates>40:47:58.1N, 77:51:44.8W (USGS 40077-G7-TF-024)</coordinates>
+      <country>US</country>
+      <exact_location>Penn State University, University Park, PA</exact_location>
+      <location>Internet2, vBNS, CERFnet(AT &amp; T IP Services), PSC/NCNE, CASC.</location>
+      <state>PA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Sun/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>fuzz.psc.edu</address>
+      <country>US</country>
+      <exact_location>Pittsburgh Supercomputing Center, Pittsburgh, PA</exact_location>
+      <state>PA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), DEC5000/200</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-1.ece.cmu.edu</address>
+      <coordinates>40:26N, 79:57W</coordinates>
+      <country>US</country>
+      <exact_location>Carnegie Mellon Electrical and Computer Engineering, Pittsburgh, PA</exact_location>
+      <location>PREPNET, PSC region</location>
+      <state>PA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Solaris 9</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-2.ece.cmu.edu</address>
+      <coordinates>40:26N, 79:57W</coordinates>
+      <country>US</country>
+      <exact_location>Carnegie Mellon Electrical and Computer Engineering, Pittsburgh, PA</exact_location>
+      <location>PREPNET, PSC region</location>
+      <state>PA </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V3 secondary (stratum 2), Solaris 9</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to other stratum 2 servers and upstream for statum 3 servers;not to be used for individual servers;please notify before use</access_policy>
+      <address>ntp.tmc.edu</address>
+      <country>US</country>
+      <exact_location>Baylor College of Medicine, Houston, TX</exact_location>
+      <location>NSFNET, SESQUI region</location>
+      <state>TX </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Sun/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntppub.tamu.edu</address>
+      <country>US</country>
+      <exact_location>Texas A&amp;M University, College Station, TX</exact_location>
+      <state>TX </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2, ver. 3), SPARCstation 10/Solaris 1.x</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for any server with 50+ clients</access_policy>
+      <address>tick.greyware.com</address>
+      <country>US</country>
+      <exact_location>Greyware Automation Products, Plano, TX</exact_location>
+      <location>South-Central US, others by arrangement</location>
+      <state>TX </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Windows NT</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for any server with 50+ clients</access_policy>
+      <address>tock.greyware.com</address>
+      <country>US</country>
+      <exact_location>Greyware Automation Products, Plano, TX</exact_location>
+      <location>South-Central US, others by arrangement</location>
+      <state>TX </state>
+      <stratum>2</stratum>
+      <synchronization>NTP secondary (stratum 2), Windows NT</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-1.vt.edu</address>
+      <country>US</country>
+      <exact_location>Virginia Tech, Blacksburg, Virginia, USA</exact_location>
+      <location>US southeastern region, Abilene</location>
+      <state>VA </state>
+      <stratum>2</stratum>
+      <synchronization>V3 Stratum 2 synced to local GPS primary servers</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-2.vt.edu</address>
+      <country>US</country>
+      <exact_location>Virginia Tech, Blacksburg, Virginia, USA</exact_location>
+      <location>US southeastern region, Abilene</location>
+      <state>VA </state>
+      <stratum>2</stratum>
+      <synchronization>V3 Stratum 2 synced to local GPS primary servers</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-3.vt.edu</address>
+      <country>US</country>
+      <exact_location>Virginia Tech, Blacksburg, Virginia, USA</exact_location>
+      <location>US southeastern region, Abilene</location>
+      <state>VA </state>
+      <stratum>2</stratum>
+      <synchronization>V3 Stratum 2 synced to local GPS primary servers</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp-4.vt.edu</address>
+      <country>US</country>
+      <exact_location>Virginia Tech, Blacksburg, Virginia, USA</exact_location>
+      <location>US southeastern region, Abilene</location>
+      <state>VA </state>
+      <stratum>2</stratum>
+      <synchronization>V3 Stratum 2 synced to local GPS primary servers</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.cs.wisc.edu</address>
+      <coordinates>89:24:30W, 43:08:00N</coordinates>
+      <country>US</country>
+      <exact_location>Computer Science Department, University of Wisconsin-Madison</exact_location>
+      <location>US/any</location>
+      <state>WI </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary Solaris 2.7</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp3.cs.wisc.edu</address>
+      <coordinates>89:24:30W, 43:08:00N</coordinates>
+      <country>US</country>
+      <exact_location>Computer Science Department, University of Wisconsin-Madison</exact_location>
+      <location>US/any</location>
+      <state>WI </state>
+      <stratum>2</stratum>
+      <synchronization>NTP V4 secondary Solaris 2.7</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>ntp0.cs.mu.OZ.AU</address>
+      <coordinates>37:48:09.60S 144:57:29.50E</coordinates>
+      <country>AU</country>
+      <exact_location>The University of Melbourne, Melbourne, Australia</exact_location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (Trimble Acutime GPS), i386/NetBSD 1.6</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access, please limit to two peer hosts (preferentially stratum 2 servers) per domain. Clients (end-users) should use only stratum 2 servers for synchronization.</access_policy>
+      <address>ntps1.pads.ufrj.br</address>
+      <country>BR</country>
+      <exact_location>Laboratory for the Processing of Analog and Digital Signals (PADS), Federal University of Rio de Janeiro (UFRJ), Rio de Janeiro, Brazil.Geographic Coordinates: Lat: 22&#xB0;;51.7031'S. Lon: 043&#xB0;;13.7045'W. Alt: 25m.</exact_location>
+      <location>Brazil, Latin America and Caribbean.</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 Primary (Garmin Etrex GPS with RA-46 system and 1 PPS external stabilized oscillator), PC/Linux with nanokernel.</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open to stratum2 time servers, others by arrangement.</access_policy>
+      <address>clock.uregina.ca</address>
+      <coordinates>50:25N , 104:35W</coordinates>
+      <country>CA</country>
+      <exact_location>University of Regina, Regina, Saskatchewan, Canada</exact_location>
+      <location>SASK#net, CA*net, Canada</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 Primary (GPS clock), PC/FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>ntp.metas.ch</address>
+      <coordinates>N 46:55:25 E 07:27:51</coordinates>
+      <country>CH</country>
+      <exact_location>Federal Office of Metrology and Accreditation Switzerland (METAS), Bern, Switzerland</exact_location>
+      <location>Switzerland, others by arrangement</location>
+      <stratum>1</stratum>
+      <synchronization>radiosynchronized receiver locked to HBG transmitter and ACTS dial-up link to METAS T&amp;lab UTC(CH)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>swisstime.ethz.ch</address>
+      <coordinates>47:23N, 8:32E</coordinates>
+      <country>CH</country>
+      <exact_location>Integrated Systems Laboratory, Swiss Fed. Inst. of Technology, CH 8092 Zurich, Switzerland</exact_location>
+      <location>Switzerland/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (DCF77 clock), Sun-4/SunOS 4.1.4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.shoa.cl</address>
+      <country>CL</country>
+      <location>Chile</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (GPS Clock), i386 Redhat Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open to servers providing synchronization to ten or more hosts, others by arrangement</access_policy>
+      <address>ntp.cesnet.cz</address>
+      <country>CZ</country>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (Garmin GPS35), PC / Linux with nanokernel&lt;br&gt;Service Area: Czech Republic and Slovakia, European academic community</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntps1-0.cs.tu-berlin.de</address>
+      <coordinates>52.518N 13.326E</coordinates>
+      <country>DE</country>
+      <exact_location>Technische Universitaet Berlin, D-10587 Berlin, FRG</exact_location>
+      <location>Germany/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Meinberg GPS 166), Sun 4/65 SunOS4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntps1-1.cs.tu-berlin.de</address>
+      <coordinates>52.518N 13.326E</coordinates>
+      <country>DE</country>
+      <exact_location>Technische Universitaet Berlin, D-10587 Berlin, FRG</exact_location>
+      <location>Germany/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Meinberg GPS 166), SunS10-402 SunOS5.4</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>ptbtime1.ptb.de</address>
+      <country>DE</country>
+      <exact_location>Physikalisch-Technische Bundesanstalt (PTB), Braunschweig, Germany</exact_location>
+      <location>Germany/Europe, others by arrangement</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Primary standards CS1, CS2), HP9000/744/HP-UX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify.</access_policy>
+      <address>ptbtime2.ptb.de</address>
+      <country>DE</country>
+      <exact_location>Physikalisch-Technische Bundesanstalt (PTB), Braunschweig, Germany</exact_location>
+      <location>Germany/Europe, others by arrangement</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (PTB's primary standards CS1, CS2), HP9000/744/HP-UX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open, preferred for stratum-2 servers providing synchronization to local networks; appreciate email notification</access_policy>
+      <address>rustime01.rus.uni-stuttgart.de</address>
+      <coordinates>48:47N, 9:10E</coordinates>
+      <country>DE</country>
+      <exact_location>Computer Center University of Stuttgart, D-70550 Stuttgart, Germany</exact_location>
+      <location>Germany/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Meinberg DCF-77 PZF 535/TCXO), IBM RS6000-250, AIX 4.x</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to stratum-2 servers, send a message to notify</access_policy>
+      <address>chronos.cru.fr</address>
+      <country>FR</country>
+      <exact_location>University of Rennes 1, Britany, France</exact_location>
+      <location>France/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3, Datum TymServe 2100L with GPS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to stratum-2 servers, but please send a message to notify</access_policy>
+      <address>ntp-p1.obspm.fr</address>
+      <country>FR</country>
+      <exact_location>BNM-SYRTE, Observatoire de Paris, Paris, France</exact_location>
+      <location>France/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3, Datum TymServe 2100 with 1PPS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open to servers providing synchronization to reasonnable size networks (&gt;10 hosts).</access_policy>
+      <address>ntp-sop.inria.fr</address>
+      <country>FR</country>
+      <exact_location>INRIA, Sophia Antipolis (French Riviera, near Nice), France</exact_location>
+      <location>RENATER, R3T2, France/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, please send a message to notify</access_policy>
+      <address>ntp-galway.hea.net</address>
+      <country>IE</country>
+      <exact_location>Dept. of Information Technology, National University of Ireland, Galway, Ireland</exact_location>
+      <location>Ireland, UK</location>
+      <stratum>1</stratum>
+      <synchronization>NTPV4 primary (Trimble Acutime GPS), Intel, Linux 6.2</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, pick one of ntp{1,2}.ien.it; please send a message to notify</access_policy>
+      <address>ntp1.ien.it</address>
+      <country>IT</country>
+      <exact_location>IEN Galileo Ferraris, Torino, Italy</exact_location>
+      <location>Italy/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (Cesium Beam Frequency Standard), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access, pick one of ntp{1,2}.ien.it; please send a message to notify</access_policy>
+      <address>ntp2.ien.it</address>
+      <country>IT</country>
+      <exact_location>IEN Galileo Ferraris, Torino, Italy</exact_location>
+      <location>Italy/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (Cesium Beam Frequency Standard), PC/Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.nc.fukuoka-u.ac.jp</address>
+      <country>JP</country>
+      <exact_location>Fukuoka university, Fukuoka, Japan</exact_location>
+      <location>Japan/Pacific area</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3.3 primary (GPS clock), Heliostation 400/SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.tl.fukuoka-u.ac.jp</address>
+      <country>JP</country>
+      <exact_location>Fukuoka university, Fukuoka, Japan</exact_location>
+      <location>Japan/Pacific area</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3.3 primary (GPS clock), Heliostation 400/SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>cronos.cenam.mx</address>
+      <country>MX</country>
+      <exact_location>Centro Nacional de Metrologia, Queretaro, Mexico</exact_location>
+      <location>All Mexico and USA</location>
+      <stratum>1</stratum>
+      <synchronization>Interlock algorithm with direct 1 pps from rimary</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp0.nl.net</address>
+      <country>NL</country>
+      <exact_location>NLnet, Amsterdam, The Netherlands</exact_location>
+      <location>The Netherlands/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (GPS), Sun/Unix SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.nl.net</address>
+      <country>NL</country>
+      <exact_location>NLnet, Amsterdam, The Netherlands</exact_location>
+      <location>The Netherlands/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (GPS), Sun/Unix SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.nl.net</address>
+      <country>NL</country>
+      <exact_location>NLnet, Amsterdam, The Netherlands</exact_location>
+      <location>The Netherlands/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (GPS), Sun/Unix SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>semi-open access, prior arrangment required</access_policy>
+      <address>time.service.uit.no</address>
+      <country>NO</country>
+      <exact_location>The EDB Centre, University of Tromsoe, Norway</exact_location>
+      <location>NORDUnet</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS clock), HP-UX/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp.certum.pl</address>
+      <coordinates>53:26:15N 14:31:58E</coordinates>
+      <country>PL</country>
+      <exact_location>Unizeto Sp. z o.o., ul. Krolowej Korony Polskiej 21, 70-486 Szczecin</exact_location>
+      <location>Poland/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (Meinberg GPS 167/PPS), Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>vega.cbk.poznan.pl</address>
+      <country>PL</country>
+      <exact_location>Astrogeodynamical Observatory, Space Research Centre, Borowiec, Poland</exact_location>
+      <location>Poland/Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Caesium clock), PC Pentium, RedHat Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.gbg.netnod.se</address>
+      <country>SE</country>
+      <exact_location>Netnod Internet Exchange i Sverige AB, Stockholm, SWEDEN (Exchange point Gothenburg, Sweden)</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.gbg.netnod.se</address>
+      <country>SE</country>
+      <exact_location>Netnod Internet Exchange i Sverige AB, Stockholm, SWEDEN (Exchange point Gothenburg, Sweden)</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.mmo.netnod.se</address>
+      <country>SE</country>
+      <exact_location>Netnod Internet Exchange i Sverige AB, Stockholm, SWEDEN (Exchange point Malmoe, Sweden)</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.mmo.netnod.se</address>
+      <country>SE</country>
+      <exact_location>Netnod Internet Exchange i Sverige AB, Stockholm, SWEDEN (Exchange point Malmoe, Sweden)</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.sp.se</address>
+      <country>SE</country>
+      <exact_location>SP Swedish National Testing and Research Institute, BORAS, SWEDEN</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.sp.se</address>
+      <country>SE</country>
+      <exact_location>SP Swedish National Testing and Research Institute, BORAS, SWEDEN</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp1.sth.netnod.se</address>
+      <country>SE</country>
+      <exact_location>Netnod Internet Exchange i Sverige AB, Stockholm, SWEDEN (Exchange point Stockholm, Sweden)</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>ntp2.sth.netnod.se</address>
+      <country>SE</country>
+      <exact_location>Netnod Internet Exchange i Sverige AB, Stockholm, SWEDEN (Exchange point Stockholm, Sweden)</exact_location>
+      <location>all areas</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV), FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>time1.stupi.se</address>
+      <country>SE</country>
+      <exact_location>Stupi AB, Stockholm, SWEDEN</exact_location>
+      <location>SUnet, NORDUnet</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Saphir Cesium Beam Standard/GPS), BSDI Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>time2.stupi.se</address>
+      <country>SE</country>
+      <exact_location>Stupi AB, Stockholm, SWEDEN</exact_location>
+      <location>Europe</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (HP5071, FreeBSD)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to stratum-2 servers and others by arrangement</access_policy>
+      <address>nets.org.sg</address>
+      <country>SG</country>
+      <exact_location>SPRING Singapore</exact_location>
+      <location>Singapore and Asia</location>
+      <stratum>1</stratum>
+      <synchronization>ACTS dial-up using lockclock algorithm; Compaq Alpha UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>restricted to servers providing synchronization to ten or more hosts, please send notification before regular use</access_policy>
+      <address>goodtime.ijs.si</address>
+      <country>SI</country>
+      <exact_location>J. Stefan Institute, Ljubljana, SloveniaGeographic Coordinates: 46&#xB0;; 2.517' N, 14&#xB0;; 29.241' E, +363 m (WGS84)</exact_location>
+      <location>Slovenia, European academic community, others by arrangement</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (&lt;a href="http://www.trimble.com/products/catalog/timing/ntp.html"&gt;Trimble Palisade GPS&lt;/a&gt;), Compaq (DEC) Alpha / Tru64 Unix with &lt;a href="http://www.unix.digital.com/faqs/publications/base_doc/DOCUMENTATI%20ON/HTML/APS33DTE_html/DOCU_007.HTM#high-res-clock-sec"&gt;MICRO_TIME kernel option&lt;/a&gt;</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>closed access, see notes below.</access_policy>
+      <address>ntp2.ja.net</address>
+      <country>GB</country>
+      <exact_location>University of London Computer Centre, UK</exact_location>
+      <location>JANET</location>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (MSF clock), Sun/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers</access_policy>
+      <address>ntp.alaska.edu</address>
+      <country>US</country>
+      <exact_location>University of Alaska, Fairbanks, AK (147 50 59.7W 64 51 27.3N WGS84)</exact_location>
+      <state>AK </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clepsydra.dec.com</address>
+      <country>US</country>
+      <exact_location>HP Western Research Laboratory, Palo Alto, CA</exact_location>
+      <location>NSFNET, BARR region</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (GPS)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.isc.org</address>
+      <coordinates>122 9 41 W / 37 26 35 N</coordinates>
+      <country>US</country>
+      <exact_location>Internet Software Consortium, Palo Alto, CA</exact_location>
+      <location>BARRnet, Alternet-west, CIX-west</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (GOES clock), BSD UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>clock.via.net</address>
+      <country>US</country>
+      <exact_location>ViaNet Communications, Palo Alto, CA, USA</exact_location>
+      <location>All areas</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 with Trimble Pasisade GPS receiver/FreeBSD</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers</access_policy>
+      <address>montpelier.ilan.caltech.edu</address>
+      <contacts>Rich Schmidt, US Naval Observatory (res@tuttle.usno.navy.mil),</contacts>
+      <country>US</country>
+      <exact_location>California Institute of Technology, Pasadena, CA</exact_location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS clock)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open access for up to 20 queries per hour (one-day average) from any one address, others by arrangment</access_policy>
+      <address>nist1.aol-ca.truetime.com</address>
+      <country>US</country>
+      <exact_location>AOL Time Warner facility, Sunnyvale, California</exact_location>
+      <location>Western US</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to stratum-2 servers and others by arrangement.</access_policy>
+      <address>nist1.symmetricom.com</address>
+      <country>US</country>
+      <exact_location>Datum Inc., Bancomm-Timing Division, San Jose, California</exact_location>
+      <location>Primarily networks in Western US</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>ACTS dial-up using lockclock algorithm; DEC Alpha UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>prior permission required</access_policy>
+      <address>ntp.nasa.gov</address>
+      <country>US</country>
+      <exact_location>NASA Ames Research Center, Moffett Field, CA</exact_location>
+      <location>NSFNET, BARR region, NASA NSN, DOE ESNET, DDN</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary GPS Clock</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>tick.ucla.edu</address>
+      <country>US</country>
+      <exact_location>UCLA, Los Angeles, CA</exact_location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS) HP9000/747i</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>timekeeper.isi.edu</address>
+      <coordinates>33:58:49N, 118:26:20W (USGS map NAD27)</coordinates>
+      <country>US</country>
+      <exact_location>USC Information Sciences Institute, Marina del Rey, CA</exact_location>
+      <location>CalRen2, Los Nettos region</location>
+      <state>CA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary Datum Tymserve 2100-GPS</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>time-a.nist.gov</address>
+      <country>US</country>
+      <state>CO </state>
+      <stratum>1</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to stratum-2 servers, others by arrangement; please use only one of the servers as primary with the other as a backup.</access_policy>
+      <address>time-a.timefreq.bldrdoc.gov</address>
+      <country>US</country>
+      <exact_location>NIST Boulder Laboratories, Boulder, Colorado</exact_location>
+      <location>NSFnet, WESTnet</location>
+      <state>CO </state>
+      <stratum>1</stratum>
+      <synchronization>Direct 1 pps from clock ensemble; lockclock algorithm and ACTS dial-up as backup; DEC Alpha/UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to stratum-2 servers, others by arrangement; please use only one of the servers as primary with the other as a backup.</access_policy>
+      <address>time-b.timefreq.bldrdoc.gov</address>
+      <country>US</country>
+      <exact_location>NIST Boulder Laboratories, Boulder, Colorado</exact_location>
+      <location>NSFnet, WESTnet</location>
+      <state>CO </state>
+      <stratum>1</stratum>
+      <synchronization>Direct 1 pps from clock ensemble; lockclock algorithm and ACTS dial-up as backup; DEC Alpha/UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to servers with at least 10 clients; others by arrangement. please use only one of these servers primary with the other as backup.</access_policy>
+      <address>time-c.timefreq.bldrdoc.gov</address>
+      <country>US</country>
+      <exact_location>NIST Boulder Laboratories, Boulder, Colorado</exact_location>
+      <location>NSFnet, WESTnet</location>
+      <state>CO </state>
+      <stratum>1</stratum>
+      <synchronization>Direct 1 pps from clock ensemble; lockclock algorithm and ACTS dial-up as backup; DEC Alpha/UNIX.</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open to stratum-2 servers and others by arrangement</access_policy>
+      <address>time.nist.gov</address>
+      <coordinates>39:58:43.44N 254:43:32.5E +1840m (WGS 84)</coordinates>
+      <country>US</country>
+      <exact_location>National Center for Atmospheric Research, Boulder, Colorado</exact_location>
+      <state>CO </state>
+      <stratum>1</stratum>
+      <synchronization>ACTS dial-up with NTP backup, DEC Alpha UNIX Service Area: NSFnet, WESTnet</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to All Colorado users, other stratum-2 servers; others by arrangement</access_policy>
+      <address>utcnist.colorado.edu</address>
+      <country>US</country>
+      <exact_location>JILA Laboratory, University of Colorado</exact_location>
+      <location>Western US</location>
+      <state>CO </state>
+      <stratum>1</stratum>
+      <synchronization>ACTS dial-up using lockclock algorithm; DEC Alpha UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers</access_policy>
+      <address>ntp2.usno.navy.mil</address>
+      <coordinates>77 03 57.7W 38 55 14.1N WGS84</coordinates>
+      <country>US</country>
+      <exact_location>U.S. Naval Observatory, Washington, DC</exact_location>
+      <state>DC </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (USNO Master Clocks 1,2, and GPS)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>tick.usno.navy.mil</address>
+      <coordinates>38:55:14.01 77:03:58.03 (GPS WGS84)</coordinates>
+      <country>US</country>
+      <exact_location>U.S. Naval Observatory, Washington, DC</exact_location>
+      <location>NSFNET</location>
+      <state>DC </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (USNO Master Clock 2, H-maser), HP9000/747i</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>tock.usno.navy.mil</address>
+      <coordinates>38:55:14.01 77:03:58.03 (GPS WGS84)</coordinates>
+      <country>US</country>
+      <exact_location>U.S. Naval Observatory, Washington, DC</exact_location>
+      <location>NSFNET</location>
+      <state>DC </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (USNO Master Clock 2, H-maser), HP9000/747i</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>closed access, except for stratum-2 servers providing synchronization to local networks of ten or more hosts</access_policy>
+      <address>rackety.udel.edu</address>
+      <coordinates>39:40:48.425N, 75:45:02.392W (GPS WGS84)</coordinates>
+      <country>US</country>
+      <exact_location>University of Delaware, Newark, DE</exact_location>
+      <location>CAIRN, Abilene/vBNS</location>
+      <state>DE </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (GPS clock), Sun IPC/SunOS 4.1.3</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers and UFL clients,others by arrangement</access_policy>
+      <address>ntp-s1.cise.ufl.edu</address>
+      <contacts>&lt;a href="mailto:res@tuttle.usno.navy.mil"&gt;Rich Schmidt, US Naval Observatory&lt;/a&gt;</contacts>
+      <country>US</country>
+      <exact_location>University of Florida, Gainesville, FL</exact_location>
+      <state>FL </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (TrueTime GPS-VME)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers</access_policy>
+      <address>navobs1.gatech.edu</address>
+      <coordinates>84 23 40.9W 33 46 30.0N WGS84</coordinates>
+      <country>US</country>
+      <exact_location>Georgia Institute of Technology, Atlanta, GA</exact_location>
+      <state>GA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS clock)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>time.twc.weather.com</address>
+      <coordinates>33:53:39.94N, 84:27:47.98W</coordinates>
+      <country>US</country>
+      <exact_location>The Weather Channel, Atlanta GA</exact_location>
+      <state>GA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (CMDA), Sun/Solaris</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers</access_policy>
+      <address>tick.mhpcc.hpc.mil</address>
+      <coordinates>20 44.9286 N, 156 26.4070 W</coordinates>
+      <country>US</country>
+      <exact_location>Maui High Performance Computing Center</exact_location>
+      <state>HI </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Brandywine/Motorola Oncore GPS)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers and ANL clients,others by arrangement</access_policy>
+      <address>ntp0.mcs.anl.gov</address>
+      <country>US</country>
+      <exact_location>Argonne National Laboratories, Chicago, IL</exact_location>
+      <state>IL </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (Brandywine Syncclock32/Oncore GPS)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to significant stratum 2 servers in the service areas.</access_policy>
+      <address>tick.cerias.purdue.edu</address>
+      <coordinates>40:25:33.2N, 86:54:54.7W (GPS)</coordinates>
+      <country>US</country>
+      <exact_location>CERIAS, Purdue University, West Lafayette, IN Synchronization: NTP V3/V4</exact_location>
+      <location>Internet2, CIC, and midwest US</location>
+      <state>IN </state>
+      <stratum>1</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to significant stratum 2 servers in the service areas. Please send a message to notify, and see our ntp WWW page.</access_policy>
+      <address>tock.cerias.purdue.edu</address>
+      <coordinates>40:25:33.2N, 86:54:54.7W (GPS)</coordinates>
+      <country>US</country>
+      <exact_location>CERIAS, Purdue University, West Lafayette, IN Synchronization: NTP V3/V4 primary (GPS), Symmetricom TymServe 2100L</exact_location>
+      <location>Internet2, CIC, and midwest US</location>
+      <state>IN </state>
+      <stratum>1</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>bonehed.lcs.mit.edu</address>
+      <country>US</country>
+      <exact_location>Massachusetts Institute of Technology, Cambridge, MA</exact_location>
+      <location>Eastern US</location>
+      <state>MA </state>
+      <stratum>1</stratum>
+      <synchronization>Motorola Oncore UT+ GPS, xntp3-5.90, FreeBSD 3.2</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers, please notify</access_policy>
+      <address>ntp.quidnet.com</address>
+      <country>US</country>
+      <exact_location>Concord, MA</exact_location>
+      <location>Eastern US</location>
+      <state>MA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary, Motorola Oncore VP GPS, Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>time.keneli.org</address>
+      <country>US</country>
+      <exact_location>Cambridge, MA</exact_location>
+      <location>Eastern US</location>
+      <state>MA </state>
+      <stratum>1</stratum>
+      <synchronization>Motorola Oncore UT+ GPS, Linux</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Open to stratum-2 servers, others by arrangement; please use one of the servers as primary with the other as a backup.</access_policy>
+      <address>time-b.nist.gov</address>
+      <country>US</country>
+      <exact_location>NIST Central Computer Facility, Gaithersburg, Maryland</exact_location>
+      <location>NSFnet, SURAnet</location>
+      <state>MD </state>
+      <stratum>1</stratum>
+      <synchronization>ACTS dial-up using lockclock algorithm, DEC Alpha/UNIX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access for stratum 2 servers</access_policy>
+      <address>ntp.colby.edu</address>
+      <contacts>Rich Schmidt, US Naval Observatory (res@tuttle.usno.navy.mil), Jeff Earickson, Colby College (jaearick@colby.edu)</contacts>
+      <coordinates>69 39 42.0 W, 44 33 48 N WGS84</coordinates>
+      <country>US</country>
+      <exact_location>Colby College, Waterville, ME</exact_location>
+      <state>ME </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>navobs1.wustl.edu</address>
+      <country>US</country>
+      <exact_location>Washington University, St. Louis, MO</exact_location>
+      <state>MO </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS) HP9000/747i</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>Closed access, except for stratum-2 servers providing synchronization to local networks of ten or more hosts; others by arrangement only. Please send a message to notify.</access_policy>
+      <address>ntp0.jensenresearch.com</address>
+      <coordinates>41 00.975 N, 74 15.262 W&lt;br&gt;Synchronization: NTP V4 primary; Pr&#xE6;cis Ct CDMA clock; Intel PIII/866 Win2K</coordinates>
+      <country>US</country>
+      <exact_location>Jensen Research Corporation, Oakland NJ</exact_location>
+      <location>Eastern US</location>
+      <state>NJ </state>
+      <stratum>1</stratum>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>now.okstate.edu</address>
+      <country>US</country>
+      <exact_location>Oklahoma State University, Stillwater, OKGeographic Coordinates: 97 04 17.0 W, 36 07 19.7 N WGS84</exact_location>
+      <state>OK </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V4 primary (Motorola UT+)</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>closed access, except for stratum-2 servers providing synchronization to local networks of ten or more hosts; others by arrangement only</access_policy>
+      <address>gps1.otc.psu.edu</address>
+      <coordinates>40:47:58.1N, 77:51:44.8W (USGS 40077-G7-TF-024)</coordinates>
+      <country>US</country>
+      <exact_location>Penn State University, University Park, PA</exact_location>
+      <location>Internet2, vBNS, CERFnet(AT&amp; T IP Services), PSC/NCNE, CASC.</location>
+      <state>PA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS), &lt;a href="http://www.truetime.com/DOCS/PDTS/xl_dc.html"&gt;TrueTime XL/DC&lt;/a&gt; NTP module</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>otc1.psu.edu</address>
+      <country>US</country>
+      <exact_location>Penn State University, University Park, PA</exact_location>
+      <location>NSFNET, PREPNET, JvNCnet</location>
+      <state>PA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (WWV clock), Sun/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>wwv.otc.psu.edu</address>
+      <coordinates>40:47:58.1N, 77:51:44.8W (USGS 40077-G7-TF-024)</coordinates>
+      <country>US</country>
+      <exact_location>Penn State University, University Park, PA</exact_location>
+      <location>Internet2, vBNS, CERFnet(AT&amp; T IP Services), PSC/NCNE, CASC.</location>
+      <state>PA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (&lt;a href="http://www.webworldinc.com/idc-%20traffic/1010.html"&gt;Traconex&lt;/a&gt;/PSTI-1020 WWV clock), Sun/Unix</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to stratum-2 servers and to UH clients</access_policy>
+      <address>tick.uh.edu</address>
+      <coordinates>29:43:37N,95:20:22W</coordinates>
+      <country>US</country>
+      <exact_location>University of Houston, Houston, TX</exact_location>
+      <location>US Central time zone, others on request</location>
+      <state>TX </state>
+      <stratum>1</stratum>
+      <synchronization>NTP V3 primary (GPS) HP9000/747i</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access</access_policy>
+      <address>time.xmission.com</address>
+      <country>US</country>
+      <exact_location>XMission Internet, Salt Lake City, Utah</exact_location>
+      <location>Western US</location>
+      <state>UT </state>
+      <stratum>1</stratum>
+      <synchronization>Motorola Oncore UT+ GPS, ntp-4.1.1a, Linux 2.4.18-nano</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <access_policy>open access to Pacific Time Zone stratum 2's and to Univ. of Washington clients; others by arrangement</access_policy>
+      <address>bigben.cac.washington.edu</address>
+      <country>US</country>
+      <exact_location>University of Washington, Seattle, WA</exact_location>
+      <location>Pacific Northwest</location>
+      <state>WA </state>
+      <stratum>1</stratum>
+      <synchronization>NTP primary (GPS clock), HP9000/747i HPUX</synchronization>
+    </ntp_server>
+    <ntp_server>
+      <address>time-nw.nist.gov</address>
+      <country>US</country>
+      <exact_location>Microsoft Corporation, Redmond, Washington</exact_location>
+      <location>NorthWestNet, NSFnet</location>
+      <state>WA </state>
+      <stratum>1</stratum>
+      <synchronization>ACTS Dial-up and lockclock algorithm, DEC Alpha/UNIX</synchronization>
+    </ntp_server>
+  </ntp_servers>
+</ntp_database>

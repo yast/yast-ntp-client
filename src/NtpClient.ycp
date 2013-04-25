@@ -32,6 +32,7 @@ import "String";
 import "Summary";
 import "SuSEFirewall";
 import "FileChanges";
+import "XML";
 
 
 /**
@@ -237,8 +238,7 @@ global map<string, map<string,string> > GetNtpServers() {
     if (ntp_servers == nil)
     {
 	ntp_servers = $[];
-	list<map<string,string> > servers =(list<map<string,string> >)
-	    SCR::Read(.target.ycp, Directory::datadir + "/ntp_servers.ycp");
+	list<map<string,string> > servers = XML::XMLToYCPFile(Directory::datadir + "/ntp_servers.xml")["ntp_servers"]:[];
 	if (servers == nil)
 	{
 	    y2error("Failed to read the list of NTP servers");
