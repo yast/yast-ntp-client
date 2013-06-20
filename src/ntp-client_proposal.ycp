@@ -216,6 +216,8 @@ boolean ui_init(term rp, string country, boolean first_time) {
     boolean ntp_used = (first_time && !Stage::initial ()) ?
 	GetNTPEnabled () : NtpClient::ntp_selected;
 
+    UI::ChangeWidget (`id(`ntp_save), `Value, ntp_used);
+
     MakeProposal (country);
     return ntp_used;
 }
