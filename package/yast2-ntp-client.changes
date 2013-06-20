@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jun 20 08:34:17 CEST 2013 - jsuchome@suse.cz
+
+- remove duplicated help text (bnc#795856) 
+- remember value of "Save NTP Configuration" checkbox (bnc#815165)
+- 2.24.0
+
+-------------------------------------------------------------------
 Fri Mar 22 13:20:47 CET 2013 - mvidner@suse.cz
 
 - fix ntp.conf config merging: do reread the config from disk (bnc#773201)
