@@ -1289,7 +1289,7 @@ define map<string,map<string,any> > InitWidgets () ``{
 	    "maximum" : 60,
 	    "init"    : intervalInit,
 	    "store"   : intervalStore,
-	    "help"    : HELPS["start"]:"",
+	    "help"    : "",
 	    "handle"  : timeSyncOrNo,
 	],
 	"start" : $[
