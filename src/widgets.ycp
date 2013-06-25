@@ -788,6 +788,12 @@ define void restrictOptionsStore (string id, map event ) ``{
     string address = NtpClient::selected_record["address"]:"";
     string opts = (string) UI::QueryWidget(`id("ac_options"), `Value);
 
+    if( address == "" ) 
+        return;
+    if( NtpClient::PolicyIsNonstatic() ) {
+        NtpClient::restrict_map = $[];
+        return;
+    }
     if( haskey( NtpClient::restrict_map, address) )
         NtpClient::restrict_map[address, "options"] = opts;
     else
