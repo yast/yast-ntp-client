@@ -12,6 +12,17 @@ Fri Mar 22 13:20:47 CET 2013 - mvidner@suse.cz
 - 2.21.3
 
 -------------------------------------------------------------------
+Wed Aug 15 08:06:07 UTC 2012 - varkoly@suse.com
+
+- bnc#775926 - During installation ntp is not configured correctly after accessing the Change Date and Time screen
+
+-------------------------------------------------------------------
+Wed Jul 18 14:14:03 UTC 2012 - varkoly@suse.com
+
+- bnc#771340 - Configuring NTP in YaST2 the service does not start
+- bnc#753936 - yast2 ntp-client creates ntp.conf with syntax error
+
+-------------------------------------------------------------------
 Thu Mar 29 15:32:06 CEST 2012 - jsuchome@suse.cz
 
 - merged proofread texts 
