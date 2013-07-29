@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 29 11:45:52 UTC 2013 - ftake@geeko.jp
+
+- replace NTP servers in Japan
+  * remove NTP servers in Fukuoka University
+  * add public NTP servers hosted by NICT
+
+-------------------------------------------------------------------
 Thu Jun 20 08:34:17 CEST 2013 - jsuchome@suse.cz
 
 - remove duplicated help text (bnc#795856) 
