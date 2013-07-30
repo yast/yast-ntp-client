@@ -17,6 +17,8 @@ Requires:       yast2-country-data
 
 BuildArch:      noarch
 
+Requires:       yast2-ruby-bindings >= 1.0.0
+
 Summary:        YaST2 - NTP Client Configuration
 
 %description
@@ -34,11 +36,11 @@ This package contains the YaST2 component for NTP client configuration.
 %defattr(-,root,root)
 %dir @yncludedir@/ntp-client
 @yncludedir@/ntp-client/*
-@clientdir@/ntp-client.ycp
-@clientdir@/ntp-client_*.ycp
+@clientdir@/ntp-client.rb
+@clientdir@/ntp-client_*.rb
 @scrconfdir@/cfg_ntp.scr
 @scrconfdir@/etc_ntp.scr
-@moduledir@/*.y*
+@moduledir@/*.rb
 @desktopdir@/ntp-client.desktop
 @ydatadir@/ntp_servers.ycp
 %doc @docdir@
