@@ -1,44 +1,38 @@
-#
-# Makefile.am for devtools/devtools/skeletons/config/src
-#
+# Sources for ntp-client
 
-YCPCFLAGS = -I .
+module_DATA = \
+  modules/NtpClient.rb
+
+client_DATA = \
+  clients/ntp-client.rb \
+  clients/ntp-client_auto.rb \
+  clients/ntp-client_finish.rb \
+  clients/ntp-client_proposal.rb
 
 yncludedir = @yncludedir@/ntp-client
+ynclude_DATA = \
+  include/ntp-client/widgets.rb \
+  include/ntp-client/wizards.rb \
+  include/ntp-client/commandline.rb \
+  include/ntp-client/misc.rb \
+  include/ntp-client/dialogs.rb \
+  include/ntp-client/helps.rb \
+  include/ntp-client/clocktypes.rb
 
-client_DATA =			\
-	ntp-client.ycp		\
-	ntp-client_auto.ycp     \
-        ntp-client_proposal.ycp \
-        ntp-client_finish.ycp
+scrconf_DATA = \
+  scrconf/cfg_ntp.scr \
+  scrconf/etc_ntp.scr
 
-ynclude_DATA =			\
-	helps.ycp		\
-	wizards.ycp		\
-	dialogs.ycp		\
-	widgets.ycp		\
-	misc.ycp		\
-	clocktypes.ycp		\
-	commandline.ycp
+schemafilesdir = $(schemadir)/autoyast/rnc
+schemafiles_DATA = \
+  autoyast-rnc/ntpclient.rnc
 
-desktop_DATA =			\
-	ntp-client.desktop
+ydata_DATA = \
+  data/ntp_servers.ycp
 
-module_DATA =			\
-	NtpClient.ycp
+desktop_DATA = \
+  desktop/ntp-client.desktop
 
-rncdir= $(schemadir)/autoyast/rnc/
-rnc_DATA =			\
-	ntpclient.rnc
-
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA) $(rnc_DATA)
-
-
-ntp-client:
-	test -L ntp-client || ln -sf . ntp-client
-
-ycpchook = ntp-client
-
+EXTRA_DIST = $(module_DATA) $(client_DATA) $(ynclude_DATA) $(scrconf_DATA) $(schemafiles_DATA) $(ydata_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
-
