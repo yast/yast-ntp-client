@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jul 31 08:22:59 UTC 2013 - yast-devel@opensuse.org
+
+- converted from YCP to Ruby by YCP Killer
+  (https://github.com/yast/ycp-killer)
+- version 3.0.0
+
+-------------------------------------------------------------------
 Mon Jul 29 11:45:52 UTC 2013 - ftake@geeko.jp
 
 - replace NTP servers in Japan
