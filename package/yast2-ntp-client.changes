@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug  2 07:04:14 UTC 2013 - lslezak@suse.cz
+
+- convert data file from YCP to YAML format (ntp_servers.ycp ->
+  ntp_servers.yml)
+
+-------------------------------------------------------------------
 Wed Jul 31 08:22:59 UTC 2013 - yast-devel@opensuse.org
 
 - converted from YCP to Ruby by YCP Killer
