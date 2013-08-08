@@ -1,4 +1,5 @@
 ---
+
 - access_policy: open access, please send a message to notify
   address: tick.nap.com.ar
   country: AR
@@ -6,6 +7,7 @@
   location: Argentina
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Cisco IOS
+
 - access_policy: open access, please send a message to notify.
   address: time.sinectis.com.ar
   coordinates: 3432'S, 5820'W
@@ -14,6 +16,7 @@
   location: Argentina
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), i686/Linux
+
 - access_policy: open access, please send a message to notify
   address: tock.nap.com.ar
   country: AR
@@ -21,6 +24,7 @@
   location: Argentina
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Cisco IOS
+
 - access_policy: open access
   address: ntp1.belbone.be
   country: BE
@@ -28,6 +32,7 @@
   location: European Union
   stratum: '2'
   synchronization: xntpd (stratum 2), linux/unix
+
 - access_policy: open access
   address: ntp2.belbone.be
   country: BE
@@ -35,6 +40,7 @@
   location: European Union
   stratum: '2'
   synchronization: xntpd (stratum 2), linux/unix
+
 - access_policy: Open access to stratum 3 server. Please, send a mail to notify.
   address: ntp.pop-pr.rnp.br
   country: BR
@@ -43,31 +49,37 @@
   stratum: '2'
   synchronization: NTP V4 Secondary (stratum 2), IBM RS6000 - 43P-240 /Debian GNU
     Linux with IPv6 Support
+
 - address: ntp1.pucpr.br
   country: BR
   exact_location: Brazilian / Pontificia Universidade Catolica do Parana
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2),
+
 - address: a.ntp.br
   country: BR
   exact_location: Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2),
+
 - address: b.ntp.br
   country: BR
   exact_location: Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2),
+
 - address: c.ntp.br
   country: BR
   exact_location: Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2),
+
 - address: pool.ntp.br
   country: BR
   exact_location: Brazilian - NTP.br - A Hora Legal Brasileira, via Internet.
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2),
+
 - access_policy: open access
   address: ntp.cpsc.ucalgary.ca
   country: CA
@@ -75,6 +87,7 @@
   location: Canada
   stratum: '2'
   synchronization: NTP V4 Secondary, i686/Solaris
+
 - access_policy: open access
   address: ntp1.cmc.ec.gc.ca
   country: CA
@@ -82,6 +95,7 @@
   location: Eastern Canada
   stratum: '2'
   synchronization: NTP V4 secondary SGI/Unix
+
 - access_policy: open access
   address: ntp2.cmc.ec.gc.ca
   country: CA
@@ -89,6 +103,7 @@
   location: Eastern Canada
   stratum: '2'
   synchronization: NTP V4 secondary SGI/Unix
+
 - access_policy: open access, send email to notify.
   address: tick.utoronto.ca
   country: CA
@@ -96,6 +111,7 @@
   location: Eastern Canada
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sparc 10, Solaris 2.5.1
+
 - access_policy: open access
   address: time.chu.nrc.ca
   coordinates: 45:17:41N, 75:45:27W
@@ -104,6 +120,7 @@
   location: Canada
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), PC/Linux
+
 - access_policy: open access
   address: time.nrc.ca
   coordinates: 45:27N, 75:37W
@@ -112,6 +129,7 @@
   location: Canada
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), PC/Linux
+
 - access_policy: open access
   address: timelord.uregina.ca
   coordinates: 50:25N , 104:35:20 W
@@ -120,6 +138,7 @@
   location: SASK#net, CA*net, Canada
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc 5
+
 - access_policy: open access, send email to notify.
   address: tock.utoronto.ca
   country: CA
@@ -127,6 +146,7 @@
   location: Eastern Canada
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sparc 5, Solaris 2.5
+
 - access_policy: open access
   address: ntp.cgi.cz
   country: CZ
@@ -134,6 +154,7 @@
   location: Czech Republic
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), PC/FreebSD
+
 - access_policy: open access
   address: ntp.karpo.cz
   country: CZ
@@ -141,6 +162,7 @@
   location: Czech Republic
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), PC/Linux
+
 - access_policy: open access
   address: ntp2.contactel.cz
   country: CZ
@@ -148,18 +170,21 @@
   location: Czech Republic
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), PC/Linux
+
 - address: tick.fh-augsburg.de
   country: DE
   exact_location: Augsburg University of Applied Sciences (FH), Augsburg, Bavaria,
     Germany
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), i486/Linux
+
 - address: tock.fh-augsburg.de
   country: DE
   exact_location: Augsburg University of Applied Sciences (FH), Augsburg, Bavaria,
     Germany
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), i486/Linux
+
 - access_policy: Public (glad to receive a note)
   address: hora.oxixares.com
   country: ES
@@ -167,16 +192,19 @@
   location: Spain
   stratum: '2'
   synchronization: ntp v4.1.1 secondary (stratum 2)/athlon XP 2500+/SuSE Linux 8.2
+
 - address: tick.keso.fi
   country: FI
   exact_location: Keski-Savon Oppimiskeskus, Pieksamaki, Finland, Europe
   stratum: '2'
   synchronization: NTP-3, i686/Linux
+
 - address: tock.keso.fi
   country: FI
   exact_location: Keski-Savon Oppimiskeskus, Pieksamaki, Finland, Europe
   stratum: '2'
   synchronization: NTP-3, i586/Linux
+
 - access_policy: open access, but please send a message to notify
   address: ntp.obspm.fr
   country: FR
@@ -184,6 +212,7 @@
   location: France/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum-2), i386/Linux
+
 - access_policy: open access, no need to notify
   address: ntp.tuxfamily.net
   country: FR
@@ -191,6 +220,7 @@
   location: France/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum-2), Debian GNU/Linux ix86
+
 - access_policy: open access
   address: ntp.univ-lyon1.fr
   country: FR
@@ -198,6 +228,7 @@
   location: France, Switzerland, Italy, Europe
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun SS10
+
 - access_policy: open access/GR, please send a message to notify.
   address: ntp.mfa.gr
   country: GR
@@ -205,6 +236,7 @@
   location: Greece
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), i686/FreeBSD
+
 - access_policy: open access, glad to receive a note
   address: os.ntp.carnet.hr
   country: HR
@@ -212,6 +244,7 @@
   location: Croatia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Intel x86/Linux
+
 - access_policy: open access, glad to receive a note
   address: ri.ntp.carnet.hr
   country: HR
@@ -219,6 +252,7 @@
   location: Croatia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Sun Sparc/UNIX
+
 - access_policy: open access, glad to receive a note
   address: st.ntp.carnet.hr
   country: HR
@@ -226,6 +260,7 @@
   location: Croatia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Sun Sparc/Solaris
+
 - access_policy: open access, glad to receive a note
   address: zg1.ntp.carnet.hr
   country: HR
@@ -233,6 +268,7 @@
   location: Croatia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Sun Sparc/Solaris
+
 - access_policy: open access, glad to receive a note
   address: zg2.ntp.carnet.hr
   country: HR
@@ -240,6 +276,7 @@
   location: Croatia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Intel x86/Linux
+
 - access_policy: open access, send email to notify.
   address: time.kfki.hu
   country: HU
@@ -248,6 +285,7 @@
   location: HUNGARNET
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Solaris
+
 - access_policy: open access, please send a message to notify.
   address: ntp.maths.tcd.ie
   country: IE
@@ -255,6 +293,7 @@
   location: Ireland, UK
   stratum: '2'
   synchronization: NTPV4 secondary (stratum 2), Intel, FreeBSD 2.2
+
 - access_policy: open access
   address: fartein.ifi.uio.no
   coordinates: 59:56:32N, 10:43:22E
@@ -263,42 +302,49 @@
   location: NORDUnet
   stratum: '2'
   synchronization: NTP secondary (stratum 2), DEC Alpha OSF/1 V4.0
+
 - access_policy: Open access within New Zealand, send email to notify.
   address: ntp.iprolink.co.nz
   country: NZ
   exact_location: Iprolink, CBD, Auckland, New Zealand
   location: New Zealand
   stratum: '2'
+
 - access_policy: Open access within New Zealand
   address: ntp.massey.ac.nz
   country: NZ
   exact_location: Massey University, Palmerston North, New Zealand
   location: New Zealand
   stratum: '2'
+
 - access_policy: Open access within New Zealand, send email to notify.
   address: ntp.public.otago.ac.nz
   country: NZ
   exact_location: University of Otago, Dunedin, New Zealand
   location: New Zealand
   stratum: '2'
+
 - access_policy: Open access within New Zealand, send email to notify.
   address: tk1.ihug.co.nz
   country: NZ
   exact_location: ihug, Central city, Auckland, New Zealand
   location: New Zealand
   stratum: '2'
+
 - address: info.cyf-kr.edu.pl
   country: PL
   exact_location: Academic Computer Centre, CYFRONET, Krakow, Poland
   location: Poland/Europe
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), HP/Unix
+
 - address: ntp.psn.ru
   coordinates: 54:50N, 37:37E
   country: RU
   exact_location: Pushchino, Moscow region, Russia
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Alpha/Linux
+
 - access_policy: open access, send email to notify. Please limit access to one or
     two hosts per site (large sites should set up their own ntp server)
   address: ntp.lth.se
@@ -307,6 +353,7 @@
   location: Sweden, NORDUnet
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun/Solaris
+
 - access_policy: Open access
   address: time.flygplats.net
   country: SE
@@ -314,6 +361,7 @@
   location: Europe
   stratum: '2'
   synchronization: NTP V4 secondary, i386, FreeBSD
+
 - access_policy: open access, please send a message to notify
   address: biofiz.mf.uni-lj.si
   coordinates: 46:03:09N, 14:30:40E
@@ -322,6 +370,7 @@
   location: Slovenia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), IBM/Linux
+
 - access_policy: open access with some restrictions (see <a href="http://www.arnes.si/english/ntp_access.html">http://www.arnes.si/english/ntp_access.html</a>)
   address: ntp1.arnes.si
   country: SI
@@ -329,6 +378,7 @@
   location: Slovenia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Sun Sparc/Solaris
+
 - access_policy: open access with some restrictions (see <a href="http://www.arnes.si/english/ntp_access.html">http://www.arnes.si/english/ntp_access.html</a>)
   address: ntp2.arnes.si
   country: SI
@@ -336,6 +386,7 @@
   location: Slovenia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Sun Sparc/Solaris
+
 - access_policy: open access, glad to receive a note
   address: time.ijs.si
   coordinates: 46:02:35N, 14:29:17E (WGS84)
@@ -344,6 +395,7 @@
   location: Slovenia/Europe
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), DEC Alpha / Digital Unix
+
 - access_policy: open access, glad to receive a note
   address: time.ijs.si
   country: SI
@@ -354,6 +406,7 @@
   synchronization: NTP V4 secondary (stratum 2), Compaq (DEC) Alpha / Tru64 Unix with
     <a href="http://www.unix.digital.com/faqs/publications/base_doc/DOCUMENTATI%20ON/HTML/APS33DTE_html/DOCU_007.HTM#high-res-clock-sec">MICRO_TIME
     kernel option</a>
+
 - access_policy: open access
   address: a.ntp.alphazed.net
   country: GB
@@ -361,6 +414,7 @@
   location: all areas
   stratum: '2'
   synchronization: NTP 4, FreeBSD
+
 - access_policy: Open access Please, send a mail to notify.
   address: time.deu.edu.tr
   country: TR
@@ -368,6 +422,7 @@
   location: Turkey
   stratum: '2'
   synchronization: NTP V4 Secondary (stratum 2), Sun SPARC10/Solaris,
+
 - access_policy: open access
   address: ntp.cis.strath.ac.uk
   coordinates: 04:14W, 55:52N
@@ -377,6 +432,7 @@
   location: UK/Europe
   stratum: '2'
   synchronization: NTP V4 secondary
+
 - access_policy: Open Access
   address: ntp2a.mcc.ac.uk
   country: GB
@@ -384,6 +440,7 @@
   location: GB
   stratum: '2'
   synchronization: NTP secondary (S2), Sun/SunOS
+
 - access_policy: Open Access
   address: ntp2b.mcc.ac.uk
   country: GB
@@ -391,6 +448,7 @@
   location: GB
   stratum: '2'
   synchronization: NTP secondary (S2), PC/FreeBSD
+
 - access_policy: Open Access
   address: ntp2c.mcc.ac.uk
   country: GB
@@ -398,6 +456,7 @@
   location: GB
   stratum: '2'
   synchronization: NTP secondary (S2), PC/FreeBSD
+
 - access_policy: Open Access
   address: ntp2d.mcc.ac.uk
   country: GB
@@ -405,11 +464,13 @@
   location: GB
   stratum: '2'
   synchronization: NTP secondary (S2), SGI/Irix
+
 - address: ntp
   country: GB
   exact_location: ! 'Telehouse Europe, London E14.Geographic Coordinates: 51°30.71''N
     0°00.08''W'
   stratum: '2'
+
 - access_policy: Semi-open access. A service intended for use by Virgin Media customers
     who may use it without asking.
   address: ntp.virginmedia.com
@@ -417,6 +478,7 @@
   exact_location: Unknown, UK
   location: Virgin media; UK
   stratum: '2'
+
 - access_policy: Semi-open access. These are primarily for use by UUNET customers
     who may use them without asking, but others are welcome to peer if they give notice.
   address: ntp0.uk.uu.net
@@ -424,6 +486,7 @@
   exact_location: Cambridge, UK
   location: UUNET (formerly known in the UK as PIPEX); UK
   stratum: '2'
+
 - access_policy: Semi-open access. These are primarily for use by UUNET customers
     who may use them without asking, but others are welcome to peer if they give notice.
   address: ntp1.uk.uu.net
@@ -431,6 +494,7 @@
   exact_location: Cambridge, UK
   location: UUNET (formerly known in the UK as PIPEX); UK
   stratum: '2'
+
 - access_policy: Semi-open access. These are primarily for use by UUNET customers
     who may use them without asking, but others are welcome to peer if they give notice.
   address: ntp2.uk.uu.net
@@ -438,6 +502,7 @@
   exact_location: London, UK
   location: UUNET (formerly known in the UK as PIPEX); UK
   stratum: '2'
+
 - access_policy: Open access. Please limit access to one or two hosts per site (large
     sites should set up their own ntp server)
   address: dewey.lib.ci.phoenix.az.us
@@ -447,6 +512,7 @@
   state: AZ
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2) P-III/Linux 2.4
+
 - access_policy: open access
   address: clock.sjc.he.net
   country: US
@@ -455,6 +521,7 @@
   state: CA
   stratum: '2'
   synchronization: NTP V4 primary (CDMA), Endrun Praecis CNTP
+
 - access_policy: open access, please send a message to notify.
   address: ntp.ucsd.edu
   country: US
@@ -464,6 +531,7 @@
   state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
+
 - access_policy: open access, please send a message to notify
   address: ntp1.sf-bay.org
   country: US
@@ -472,6 +540,7 @@
   state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2), FreeBSD
+
 - access_policy: open access, please send a message to notify
   address: ntp2.sf-bay.org
   country: US
@@ -480,6 +549,7 @@
   state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2), FreeBSD
+
 - access_policy: open access, please send a message to notify.
   address: ntp.ucsd.edu
   country: US
@@ -489,6 +559,7 @@
   state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
+
 - access_policy: Open to stratum 2 servers, others upon request.
   address: reloj.kjsl.com
   country: US
@@ -496,6 +567,7 @@
   state: CA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), MultiNet on VMS
+
 - access_policy: open access.
   address: ntp1.tummy.com
   country: US
@@ -504,6 +576,7 @@
   state: CO
   stratum: '2'
   synchronization: NTP Secondary (stratum 2), i686/Linux
+
 - access_policy: open access
   address: louie.udel.edu
   country: US
@@ -512,6 +585,7 @@
   state: DE
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun SPARC10/Solaris 2.6
+
 - access_policy: open access, please send a message with the hostname and/or address
     of your NTP client to notify.
   address: rolex.usg.edu
@@ -521,6 +595,7 @@
   state: GA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
+
 - access_policy: open access, please send a message with the hostname and/or address
     of your NTP client to notify.
   address: timex.usg.edu
@@ -530,6 +605,7 @@
   state: GA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
+
 - access_policy: open access
   address: ntp-0.cso.uiuc.edu
   country: US
@@ -538,6 +614,7 @@
   state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco-ASM/4
+
 - access_policy: open access
   address: ntp-1.cso.uiuc.edu
   country: US
@@ -546,6 +623,7 @@
   state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco-ASM/4
+
 - address: ntp-1.mcs.anl.gov
   country: US
   exact_location: Argonne National Laboratory, near Chicago, IL
@@ -553,6 +631,7 @@
   state: IL
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparcstation
+
 - access_policy: open access
   address: ntp-2.cso.uiuc.edu
   country: US
@@ -561,6 +640,7 @@
   state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco-ASM/4
+
 - access_policy: open access, please send a message to notify
   address: ntp-2.mcs.anl.gov
   country: US
@@ -569,6 +649,7 @@
   state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun Sparcstation 2
+
 - access_policy: Open access but please see our <a href="http://ntp.cerias.purdue.edu">ntp
     WWW page</a>.
   address: tick.cerias.purdue.edu
@@ -579,18 +660,21 @@
   state: IN
   stratum: '2'
   synchronization: NTP V3/V4 stratum 2 servers
+
 - address: ntp1.kansas.net
   country: US
   exact_location: KansasNet OnLine Services, Manhattan, KS
   state: KS
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Linux on Intel
+
 - address: ntp2.kansas.net
   country: US
   exact_location: KansasNet OnLine Services, Manhattan, KS
   state: KS
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Linux on Intel
+
 - access_policy: open access, please send a message to notify.
   address: ns.nts.umn.edu
   country: US
@@ -599,6 +683,7 @@
   state: MN
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/SunOS 4.1.3
+
 - access_policy: open access, please send a message to notify.
   address: nss.nts.umn.edu
   country: US
@@ -607,6 +692,7 @@
   state: MN
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/SunOS 4.1.3
+
 - access_policy: open access, please send a message to notify
   address: time-ext.missouri.edu
   country: US
@@ -615,6 +701,7 @@
   state: MO
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Linux/Intel
+
 - access_policy: open access, please send message to notify
   address: chronos1.umt.edu
   country: US
@@ -623,6 +710,7 @@
   state: MT
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco 7507
+
 - access_policy: open access, please send message to notify
   address: chronos2.umt.edu
   country: US
@@ -631,6 +719,7 @@
   state: MT
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco 7507
+
 - access_policy: open access, please send message to notify
   address: chronos3.umt.edu
   country: US
@@ -639,6 +728,7 @@
   state: MT
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco 7507
+
 - access_policy: CONCERT region, others by prior arrangement
   address: clock1.unc.edu
   coordinates: 35:54N, 79:03W
@@ -648,6 +738,7 @@
   state: NC
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun4/SunOS/xntpd (V3)
+
 - access_policy: Open access; please send a message to notify.
   address: tick.jrc.us
   coordinates: 41 00.975 N, 74 15.262 W
@@ -657,6 +748,7 @@
   state: NJ
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Cisco 3620 IOS 12.2
+
 - access_policy: Open access; please send a message to notify.
   address: tock.jrc.us
   coordinates: 41 00.975 N, 74 15.262 W
@@ -666,6 +758,7 @@
   state: NJ
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Intel PIII/866 Win2K
+
 - access_policy: open access, please send message to notify
   address: cuckoo.nevada.edu
   country: US
@@ -674,6 +767,7 @@
   state: NV
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), DEC Alpha/Unix
+
 - access_policy: open access
   address: clock.nyc.he.net
   country: US
@@ -682,6 +776,7 @@
   state: NY
   stratum: '2'
   synchronization: NTP V4 primary (CMDA), Endrun Praecis CNTP
+
 - access_policy: open access
   address: ntp0.cornell.edu
   country: US
@@ -690,6 +785,7 @@
   state: NY
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Unix
+
 - access_policy: open access; please use name rather than address.
   address: sundial.columbia.edu
   country: US
@@ -698,6 +794,7 @@
   state: NY
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc10 model 40
+
 - access_policy: open access, authenticated NTP (DES/MD5) available
   address: timex.cs.columbia.edu
   country: US
@@ -707,6 +804,7 @@
   state: NY
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Unix
+
 - access_policy: semi-open access; for use only by prior arrangement
   address: clock-1.cs.cmu.edu
   country: US
@@ -715,6 +813,7 @@
   state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc/Solaris 2.5.1
+
 - access_policy: semi-open access; for use only by prior arrangement
   address: clock-2.cs.cmu.edu
   country: US
@@ -723,6 +822,7 @@
   state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc/SunOS 4.1.4
+
 - access_policy: open access
   address: clock.psu.edu
   coordinates: 40:47:58.1N, 77:51:44.8W (USGS 40077-G7-TF-024)
@@ -732,12 +832,14 @@
   state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun/Unix
+
 - address: fuzz.psc.edu
   country: US
   exact_location: Pittsburgh Supercomputing Center, Pittsburgh, PA
   state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), DEC5000/200
+
 - access_policy: open access
   address: ntp-1.ece.cmu.edu
   coordinates: 40:26N, 79:57W
@@ -748,6 +850,7 @@
   state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Solaris 9
+
 - access_policy: open access
   address: ntp-2.ece.cmu.edu
   coordinates: 40:26N, 79:57W
@@ -758,6 +861,7 @@
   state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Solaris 9
+
 - access_policy: open access to other stratum 2 servers and upstream for statum 3
     servers;not to be used for individual servers;please notify before use
   address: ntp.tmc.edu
@@ -767,12 +871,14 @@
   state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Solaris
+
 - address: ntppub.tamu.edu
   country: US
   exact_location: Texas A&M University, College Station, TX
   state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2, ver. 3), SPARCstation 10/Solaris 1.x
+
 - access_policy: open access for any server with 50+ clients
   address: tick.greyware.com
   country: US
@@ -781,6 +887,7 @@
   state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Windows NT
+
 - access_policy: open access for any server with 50+ clients
   address: tock.greyware.com
   country: US
@@ -789,6 +896,7 @@
   state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Windows NT
+
 - access_policy: open access
   address: ntp-1.vt.edu
   country: US
@@ -797,6 +905,7 @@
   state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
+
 - access_policy: open access
   address: ntp-2.vt.edu
   country: US
@@ -805,6 +914,7 @@
   state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
+
 - access_policy: open access
   address: ntp-3.vt.edu
   country: US
@@ -813,6 +923,7 @@
   state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
+
 - access_policy: open access
   address: ntp-4.vt.edu
   country: US
@@ -821,6 +932,7 @@
   state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
+
 - access_policy: open access
   address: ntp1.cs.wisc.edu
   coordinates: 89:24:30W, 43:08:00N
@@ -830,6 +942,7 @@
   state: WI
   stratum: '2'
   synchronization: NTP V4 secondary Solaris 2.7
+
 - access_policy: open access
   address: ntp3.cs.wisc.edu
   coordinates: 89:24:30W, 43:08:00N
@@ -839,12 +952,14 @@
   state: WI
   stratum: '2'
   synchronization: NTP V4 secondary Solaris 2.7
+
 - address: ntp0.cs.mu.OZ.AU
   coordinates: 37:48:09.60S 144:57:29.50E
   country: AU
   exact_location: The University of Melbourne, Melbourne, Australia
   stratum: '1'
   synchronization: NTP V4 primary (Trimble Acutime GPS), i386/NetBSD 1.6
+
 - access_policy: Open access, please limit to two peer hosts (preferentially stratum
     2 servers) per domain. Clients (end-users) should use only stratum 2 servers for
     synchronization.
@@ -857,6 +972,7 @@
   stratum: '1'
   synchronization: NTP V4 Primary (Garmin Etrex GPS with RA-46 system and 1 PPS external
     stabilized oscillator), PC/Linux with nanokernel.
+
 - access_policy: open to stratum2 time servers, others by arrangement.
   address: clock.uregina.ca
   coordinates: 50:25N , 104:35W
@@ -865,6 +981,7 @@
   location: SASK#net, CA*net, Canada
   stratum: '1'
   synchronization: NTP V4 Primary (GPS clock), PC/FreeBSD
+
 - access_policy: open access, please send a message to notify
   address: ntp.metas.ch
   coordinates: N 46:55:25 E 07:27:51
@@ -875,6 +992,7 @@
   stratum: '1'
   synchronization: radiosynchronized receiver locked to HBG transmitter and ACTS dial-up
     link to METAS T&lab UTC(CH)
+
 - access_policy: open access
   address: swisstime.ethz.ch
   coordinates: 47:23N, 8:32E
@@ -884,12 +1002,14 @@
   location: Switzerland/Europe
   stratum: '1'
   synchronization: NTP primary (DCF77 clock), Sun-4/SunOS 4.1.4
+
 - access_policy: open access
   address: ntp.shoa.cl
   country: CL
   location: Chile
   stratum: '1'
   synchronization: NTP V4 primary (GPS Clock), i386 Redhat Linux
+
 - access_policy: open to servers providing synchronization to ten or more hosts, others
     by arrangement
   address: ntp.cesnet.cz
@@ -897,6 +1017,7 @@
   stratum: '1'
   synchronization: ! 'NTP V4 primary (Garmin GPS35), PC / Linux with nanokernel, Service
     Area: Czech Republic and Slovakia, European academic community'
+
 - access_policy: open access
   address: ntps1-0.cs.tu-berlin.de
   coordinates: 52.518N 13.326E
@@ -905,6 +1026,7 @@
   location: Germany/Europe
   stratum: '1'
   synchronization: NTP V3 primary (Meinberg GPS 166), Sun 4/65 SunOS4.1.3
+
 - access_policy: open access
   address: ntps1-1.cs.tu-berlin.de
   coordinates: 52.518N 13.326E
@@ -913,6 +1035,7 @@
   location: Germany/Europe
   stratum: '1'
   synchronization: NTP V3 primary (Meinberg GPS 166), SunS10-402 SunOS5.4
+
 - access_policy: open access, please send a message to notify.
   address: ptbtime1.ptb.de
   country: DE
@@ -920,6 +1043,7 @@
   location: Germany/Europe, others by arrangement
   stratum: '1'
   synchronization: NTP V3 primary (Primary standards CS1, CS2), HP9000/744/HP-UX
+
 - access_policy: open access, please send a message to notify.
   address: ptbtime2.ptb.de
   country: DE
@@ -927,6 +1051,7 @@
   location: Germany/Europe, others by arrangement
   stratum: '1'
   synchronization: NTP V3 primary (PTB's primary standards CS1, CS2), HP9000/744/HP-UX
+
 - access_policy: open, preferred for stratum-2 servers providing synchronization to
     local networks; appreciate email notification
   address: rustime01.rus.uni-stuttgart.de
@@ -937,6 +1062,7 @@
   stratum: '1'
   synchronization: NTP V3 primary (Meinberg DCF-77 PZF 535/TCXO), IBM RS6000-250,
     AIX 4.x
+
 - access_policy: open access to stratum-2 servers, send a message to notify
   address: chronos.cru.fr
   country: FR
@@ -944,6 +1070,7 @@
   location: France/Europe
   stratum: '1'
   synchronization: NTP V3, Datum TymServe 2100L with GPS
+
 - access_policy: open access to stratum-2 servers, but please send a message to notify
   address: ntp-p1.obspm.fr
   country: FR
@@ -951,6 +1078,7 @@
   location: France/Europe
   stratum: '1'
   synchronization: NTP V3, Datum TymServe 2100 with 1PPS
+
 - access_policy: open to servers providing synchronization to reasonnable size networks
     (>10 hosts).
   address: ntp-sop.inria.fr
@@ -959,6 +1087,7 @@
   location: RENATER, R3T2, France/Europe
   stratum: '1'
   synchronization: NTP V3 primary (GPS), PC/Linux
+
 - access_policy: open access, please send a message to notify
   address: ntp-galway.hea.net
   country: IE
@@ -967,6 +1096,7 @@
   location: Ireland, UK
   stratum: '1'
   synchronization: NTPV4 primary (Trimble Acutime GPS), Intel, Linux 6.2
+
 - access_policy: open access, pick one of ntp{1,2}.ien.it; please send a message to
     notify
   address: ntp1.ien.it
@@ -975,6 +1105,7 @@
   location: Italy/Europe
   stratum: '1'
   synchronization: NTP primary (Cesium Beam Frequency Standard), PC/Linux
+
 - access_policy: open access, pick one of ntp{1,2}.ien.it; please send a message to
     notify
   address: ntp2.ien.it
@@ -983,6 +1114,7 @@
   location: Italy/Europe
   stratum: '1'
   synchronization: NTP primary (Cesium Beam Frequency Standard), PC/Linux
+
 - access_policy: open access
   address: ntp.nict.jp
   country: JP
@@ -991,12 +1123,14 @@
   location: Japan/Pacific area
   stratum: '1'
   synchronization: SNTP, Versatile High-speed Network Module (FPGA)
+
 - address: cronos.cenam.mx
   country: MX
   exact_location: Centro Nacional de Metrologia, Queretaro, Mexico
   location: All Mexico and USA
   stratum: '1'
   synchronization: Interlock algorithm with direct 1 pps from rimary
+
 - access_policy: open access
   address: ntp0.nl.net
   country: NL
@@ -1004,6 +1138,7 @@
   location: The Netherlands/Europe
   stratum: '1'
   synchronization: NTP primary (GPS), Sun/Unix SunOS 4.1.3
+
 - access_policy: open access
   address: ntp1.nl.net
   country: NL
@@ -1011,6 +1146,7 @@
   location: The Netherlands/Europe
   stratum: '1'
   synchronization: NTP primary (GPS), Sun/Unix SunOS 4.1.3
+
 - access_policy: open access
   address: ntp2.nl.net
   country: NL
@@ -1018,6 +1154,7 @@
   location: The Netherlands/Europe
   stratum: '1'
   synchronization: NTP primary (GPS), Sun/Unix SunOS 4.1.3
+
 - access_policy: semi-open access, prior arrangment required
   address: time.service.uit.no
   country: 'NO'
@@ -1025,6 +1162,7 @@
   location: NORDUnet
   stratum: '1'
   synchronization: NTP V3 primary (GPS clock), HP-UX/Unix
+
 - access_policy: open access
   address: ntp.certum.pl
   coordinates: 53:26:15N 14:31:58E
@@ -1033,6 +1171,7 @@
   location: Poland/Europe
   stratum: '1'
   synchronization: NTP V4 primary (Meinberg GPS 167/PPS), Linux
+
 - access_policy: open access
   address: vega.cbk.poznan.pl
   country: PL
@@ -1041,6 +1180,7 @@
   location: Poland/Europe
   stratum: '1'
   synchronization: NTP V3 primary (Caesium clock), PC Pentium, RedHat Linux
+
 - access_policy: open access
   address: ntp1.gbg.netnod.se
   country: SE
@@ -1049,6 +1189,7 @@
   location: all areas
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),FreeBSD
+
 - access_policy: open access
   address: ntp2.gbg.netnod.se
   country: SE
@@ -1058,6 +1199,7 @@
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),
     FreeBSD
+
 - access_policy: open access
   address: ntp1.mmo.netnod.se
   country: SE
@@ -1067,6 +1209,7 @@
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),
     FreeBSD
+
 - access_policy: open access
   address: ntp2.mmo.netnod.se
   country: SE
@@ -1076,6 +1219,7 @@
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),
     FreeBSD
+
 - access_policy: open access
   address: ntp1.sp.se
   country: SE
@@ -1083,6 +1227,7 @@
   location: all areas
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale), FreeBSD
+
 - access_policy: open access
   address: ntp2.sp.se
   country: SE
@@ -1090,6 +1235,7 @@
   location: all areas
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale), FreeBSD
+
 - access_policy: open access
   address: ntp1.sth.netnod.se
   country: SE
@@ -1099,6 +1245,7 @@
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),
     FreeBSD
+
 - access_policy: open access
   address: ntp2.sth.netnod.se
   country: SE
@@ -1108,6 +1255,7 @@
   stratum: '1'
   synchronization: NTP V4 primary (UTC(SP) Swedish National Time Scale via GPS CV),
     FreeBSD
+
 - access_policy: open access
   address: time1.stupi.se
   country: SE
@@ -1115,6 +1263,7 @@
   location: SUnet, NORDUnet
   stratum: '1'
   synchronization: NTP V3 primary (Saphir Cesium Beam Standard/GPS), BSDI Unix
+
 - access_policy: open access
   address: time2.stupi.se
   country: SE
@@ -1122,6 +1271,7 @@
   location: Europe
   stratum: '1'
   synchronization: NTP V4 primary (HP5071, FreeBSD)
+
 - access_policy: Open to stratum-2 servers and others by arrangement
   address: nets.org.sg
   country: SG
@@ -1129,6 +1279,7 @@
   location: Singapore and Asia
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm; Compaq Alpha UNIX
+
 - access_policy: restricted to servers providing synchronization to ten or more hosts,
     please send notification before regular use
   address: goodtime.ijs.si
@@ -1140,6 +1291,7 @@
   synchronization: NTP V4 primary (<a href="http://www.trimble.com/products/catalog/timing/ntp.html">Trimble
     Palisade GPS</a>), Compaq (DEC) Alpha / Tru64 Unix with <a href="http://www.unix.digital.com/faqs/publications/base_doc/DOCUMENTATI%20ON/HTML/APS33DTE_html/DOCU_007.HTM#high-res-clock-sec">MICRO_TIME
     kernel option</a>
+
 - access_policy: closed access, see notes below.
   address: ntp2.ja.net
   country: GB
@@ -1147,6 +1299,7 @@
   location: JANET
   stratum: '1'
   synchronization: NTP V3 primary (MSF clock), Sun/Unix
+
 - access_policy: open access for stratum 2 servers
   address: ntp.alaska.edu
   country: US
@@ -1154,6 +1307,7 @@
   state: AK
   stratum: '1'
   synchronization: NTP V3 primary (GPS)
+
 - access_policy: open access
   address: clepsydra.dec.com
   country: US
@@ -1162,6 +1316,7 @@
   state: CA
   stratum: '1'
   synchronization: NTP V4 primary (GPS)
+
 - access_policy: open access
   address: clock.isc.org
   coordinates: 122 9 41 W / 37 26 35 N
@@ -1171,6 +1326,7 @@
   state: CA
   stratum: '1'
   synchronization: NTP primary (GOES clock), BSD UNIX
+
 - access_policy: open access
   address: clock.via.net
   country: US
@@ -1179,6 +1335,7 @@
   state: CA
   stratum: '1'
   synchronization: NTP V3 with Trimble Pasisade GPS receiver/FreeBSD
+
 - access_policy: open access for stratum 2 servers
   address: montpelier.ilan.caltech.edu
   contacts: Rich Schmidt, US Naval Observatory (res@tuttle.usno.navy.mil),
@@ -1187,6 +1344,7 @@
   state: CA
   stratum: '1'
   synchronization: NTP V3 primary (GPS clock)
+
 - access_policy: Open access for up to 20 queries per hour (one-day average) from
     any one address, others by arrangment
   address: nist1.aol-ca.truetime.com
@@ -1195,6 +1353,7 @@
   location: Western US
   state: CA
   stratum: '1'
+
 - access_policy: Open to stratum-2 servers and others by arrangement.
   address: nist1.symmetricom.com
   country: US
@@ -1203,6 +1362,7 @@
   state: CA
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm; DEC Alpha UNIX
+
 - access_policy: prior permission required
   address: ntp.nasa.gov
   country: US
@@ -1211,12 +1371,14 @@
   state: CA
   stratum: '1'
   synchronization: NTP V3 primary GPS Clock
+
 - address: tick.ucla.edu
   country: US
   exact_location: UCLA, Los Angeles, CA
   state: CA
   stratum: '1'
   synchronization: NTP V3 primary (GPS) HP9000/747i
+
 - access_policy: open access
   address: timekeeper.isi.edu
   coordinates: 33:58:49N, 118:26:20W (USGS map NAD27)
@@ -1226,10 +1388,12 @@
   state: CA
   stratum: '1'
   synchronization: NTP V3 primary Datum Tymserve 2100-GPS
+
 - address: time-a.nist.gov
   country: US
   state: CO
   stratum: '1'
+
 - access_policy: Open to stratum-2 servers, others by arrangement; please use only
     one of the servers as primary with the other as a backup.
   address: time-a.timefreq.bldrdoc.gov
@@ -1240,6 +1404,7 @@
   stratum: '1'
   synchronization: Direct 1 pps from clock ensemble; lockclock algorithm and ACTS
     dial-up as backup; DEC Alpha/UNIX
+
 - access_policy: Open to stratum-2 servers, others by arrangement; please use only
     one of the servers as primary with the other as a backup.
   address: time-b.timefreq.bldrdoc.gov
@@ -1250,6 +1415,7 @@
   stratum: '1'
   synchronization: Direct 1 pps from clock ensemble; lockclock algorithm and ACTS
     dial-up as backup; DEC Alpha/UNIX
+
 - access_policy: Open to servers with at least 10 clients; others by arrangement.
     please use only one of these servers primary with the other as backup.
   address: time-c.timefreq.bldrdoc.gov
@@ -1260,6 +1426,7 @@
   stratum: '1'
   synchronization: Direct 1 pps from clock ensemble; lockclock algorithm and ACTS
     dial-up as backup; DEC Alpha/UNIX.
+
 - access_policy: open to stratum-2 servers and others by arrangement
   address: time.nist.gov
   coordinates: 39:58:43.44N 254:43:32.5E +1840m (WGS 84)
@@ -1269,6 +1436,7 @@
   stratum: '1'
   synchronization: ! 'ACTS dial-up with NTP backup, DEC Alpha UNIX Service Area: NSFnet,
     WESTnet'
+
 - access_policy: Open to All Colorado users, other stratum-2 servers; others by arrangement
   address: utcnist.colorado.edu
   country: US
@@ -1277,6 +1445,7 @@
   state: CO
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm; DEC Alpha UNIX
+
 - access_policy: open access for stratum 2 servers
   address: ntp2.usno.navy.mil
   coordinates: 77 03 57.7W 38 55 14.1N WGS84
@@ -1285,6 +1454,7 @@
   state: DC
   stratum: '1'
   synchronization: NTP V3 primary (USNO Master Clocks 1,2, and GPS)
+
 - access_policy: open access
   address: tick.usno.navy.mil
   coordinates: 38:55:14.01 77:03:58.03 (GPS WGS84)
@@ -1294,6 +1464,7 @@
   state: DC
   stratum: '1'
   synchronization: NTP V3 primary (USNO Master Clock 2, H-maser), HP9000/747i
+
 - access_policy: open access
   address: tock.usno.navy.mil
   coordinates: 38:55:14.01 77:03:58.03 (GPS WGS84)
@@ -1303,6 +1474,7 @@
   state: DC
   stratum: '1'
   synchronization: NTP V3 primary (USNO Master Clock 2, H-maser), HP9000/747i
+
 - access_policy: closed access, except for stratum-2 servers providing synchronization
     to local networks of ten or more hosts
   address: rackety.udel.edu
@@ -1313,6 +1485,7 @@
   state: DE
   stratum: '1'
   synchronization: NTP V4 primary (GPS clock), Sun IPC/SunOS 4.1.3
+
 - access_policy: open access for stratum 2 servers and UFL clients,others by arrangement
   address: ntp-s1.cise.ufl.edu
   contacts: <a href="mailto:res@tuttle.usno.navy.mil">Rich Schmidt, US Naval Observatory</a>
@@ -1321,6 +1494,7 @@
   state: FL
   stratum: '1'
   synchronization: NTP V3 primary (TrueTime GPS-VME)
+
 - access_policy: open access for stratum 2 servers
   address: navobs1.gatech.edu
   coordinates: 84 23 40.9W 33 46 30.0N WGS84
@@ -1329,6 +1503,7 @@
   state: GA
   stratum: '1'
   synchronization: NTP V3 primary (GPS clock)
+
 - address: time.twc.weather.com
   coordinates: 33:53:39.94N, 84:27:47.98W
   country: US
@@ -1336,6 +1511,7 @@
   state: GA
   stratum: '1'
   synchronization: NTP V4 primary (CMDA), Sun/Solaris
+
 - access_policy: open access for stratum 2 servers
   address: tick.mhpcc.hpc.mil
   coordinates: 20 44.9286 N, 156 26.4070 W
@@ -1344,6 +1520,7 @@
   state: HI
   stratum: '1'
   synchronization: NTP V3 primary (Brandywine/Motorola Oncore GPS)
+
 - access_policy: open access for stratum 2 servers and ANL clients,others by arrangement
   address: ntp0.mcs.anl.gov
   country: US
@@ -1351,6 +1528,7 @@
   state: IL
   stratum: '1'
   synchronization: NTP V3 primary (Brandywine Syncclock32/Oncore GPS)
+
 - access_policy: open access to significant stratum 2 servers in the service areas.
   address: tick.cerias.purdue.edu
   coordinates: 40:25:33.2N, 86:54:54.7W (GPS)
@@ -1360,6 +1538,7 @@
   location: Internet2, CIC, and midwest US
   state: IN
   stratum: '1'
+
 - access_policy: open access to significant stratum 2 servers in the service areas.
     Please send a message to notify, and see our ntp WWW page.
   address: tock.cerias.purdue.edu
@@ -1370,6 +1549,7 @@
   location: Internet2, CIC, and midwest US
   state: IN
   stratum: '1'
+
 - access_policy: open access
   address: bonehed.lcs.mit.edu
   country: US
@@ -1378,6 +1558,7 @@
   state: MA
   stratum: '1'
   synchronization: Motorola Oncore UT+ GPS, xntp3-5.90, FreeBSD 3.2
+
 - access_policy: open access for stratum 2 servers, please notify
   address: ntp.quidnet.com
   country: US
@@ -1386,6 +1567,7 @@
   state: MA
   stratum: '1'
   synchronization: NTP V4 primary, Motorola Oncore VP GPS, Linux
+
 - access_policy: open access
   address: time.keneli.org
   country: US
@@ -1394,6 +1576,7 @@
   state: MA
   stratum: '1'
   synchronization: Motorola Oncore UT+ GPS, Linux
+
 - access_policy: Open to stratum-2 servers, others by arrangement; please use one
     of the servers as primary with the other as a backup.
   address: time-b.nist.gov
@@ -1403,6 +1586,7 @@
   state: MD
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm, DEC Alpha/UNIX
+
 - access_policy: open access for stratum 2 servers
   address: ntp.colby.edu
   contacts: Rich Schmidt, US Naval Observatory (res@tuttle.usno.navy.mil), Jeff Earickson,
@@ -1413,6 +1597,7 @@
   state: ME
   stratum: '1'
   synchronization: NTP V3 primary (GPS)
+
 - access_policy: open access
   address: navobs1.wustl.edu
   country: US
@@ -1420,6 +1605,7 @@
   state: MO
   stratum: '1'
   synchronization: NTP V3 primary (GPS) HP9000/747i
+
 - access_policy: Closed access, except for stratum-2 servers providing synchronization
     to local networks of ten or more hosts; others by arrangement only. Please send
     a message to notify.
@@ -1431,6 +1617,7 @@
   location: Eastern US
   state: NJ
   stratum: '1'
+
 - access_policy: open access
   address: now.okstate.edu
   country: US
@@ -1439,6 +1626,7 @@
   state: OK
   stratum: '1'
   synchronization: NTP V4 primary (Motorola UT+)
+
 - access_policy: closed access, except for stratum-2 servers providing synchronization
     to local networks of ten or more hosts; others by arrangement only
   address: gps1.otc.psu.edu
@@ -1450,6 +1638,7 @@
   stratum: '1'
   synchronization: NTP V3 primary (GPS), <a href="http://www.truetime.com/DOCS/PDTS/xl_dc.html">TrueTime
     XL/DC</a> NTP module
+
 - access_policy: open access
   address: otc1.psu.edu
   country: US
@@ -1458,6 +1647,7 @@
   state: PA
   stratum: '1'
   synchronization: NTP V3 primary (WWV clock), Sun/Unix
+
 - access_policy: open access
   address: wwv.otc.psu.edu
   coordinates: 40:47:58.1N, 77:51:44.8W (USGS 40077-G7-TF-024)
@@ -1468,6 +1658,7 @@
   stratum: '1'
   synchronization: NTP V3 primary (<a href="http://www.webworldinc.com/idc-%20traffic/1010.html">Traconex</a>/PSTI-1020
     WWV clock), Sun/Unix
+
 - access_policy: open access to stratum-2 servers and to UH clients
   address: tick.uh.edu
   coordinates: 29:43:37N,95:20:22W
@@ -1477,6 +1668,7 @@
   state: TX
   stratum: '1'
   synchronization: NTP V3 primary (GPS) HP9000/747i
+
 - access_policy: open access
   address: time.xmission.com
   country: US
@@ -1485,6 +1677,7 @@
   state: UT
   stratum: '1'
   synchronization: Motorola Oncore UT+ GPS, ntp-4.1.1a, Linux 2.4.18-nano
+
 - access_policy: open access to Pacific Time Zone stratum 2's and to Univ. of Washington
     clients; others by arrangement
   address: bigben.cac.washington.edu
@@ -1494,6 +1687,7 @@
   state: WA
   stratum: '1'
   synchronization: NTP primary (GPS clock), HP9000/747i HPUX
+
 - address: time-nw.nist.gov
   country: US
   exact_location: Microsoft Corporation, Redmond, Washington
