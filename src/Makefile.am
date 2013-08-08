@@ -28,7 +28,7 @@ schemafiles_DATA = \
   autoyast-rnc/ntpclient.rnc
 
 ydata_DATA = \
-  data/ntp_servers.ycp
+  data/ntp_servers.yml
 
 desktop_DATA = \
   desktop/ntp-client.desktop

@@ -10,6 +10,7 @@
 # Representation of the configuration of ntp-client.
 # Input and output routines.
 require "yast"
+require "yaml"
 
 module Yast
   class NtpClientClass < Module
@@ -209,14 +210,7 @@ module Yast
     def GetNtpServers
       if @ntp_servers == nil
         @ntp_servers = {}
-        servers = Convert.convert(
-          SCR.Read(
-            path(".target.ycp"),
-            Ops.add(Directory.datadir, "/ntp_servers.ycp")
-          ),
-          :from => "any",
-          :to   => "list <map <string, string>>"
-        )
+        servers = YAML.load_file(Directory.datadir + "/ntp_servers.yml") rescue nil
         if servers == nil
           Builtins.y2error("Failed to read the list of NTP servers")
         else
