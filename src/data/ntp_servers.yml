@@ -444,7 +444,7 @@
   country: US
   exact_location: Phoenix, AZ
   location: North America
-  state: ! 'AZ '
+  state: AZ
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2) P-III/Linux 2.4
 - access_policy: open access
@@ -452,7 +452,7 @@
   country: US
   exact_location: Hurricane Electric, San Jose, California
   location: all areas
-  state: ! 'CA '
+  state: CA
   stratum: '2'
   synchronization: NTP V4 primary (CDMA), Endrun Praecis CNTP
 - access_policy: open access, please send a message to notify.
@@ -461,7 +461,7 @@
   exact_location: UCSD Academic Computing Services/Network Operations, San Diego,
     CA
   location: CERFNET; NSFNET, SDSC region and nearby
-  state: ! 'CA '
+  state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
 - access_policy: open access, please send a message to notify
@@ -469,7 +469,7 @@
   country: US
   exact_location: San Jose, CA
   location: ! 'North America: Northern California and Pacific Northwest'
-  state: ! 'CA '
+  state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2), FreeBSD
 - access_policy: open access, please send a message to notify
@@ -477,7 +477,7 @@
   country: US
   exact_location: Los Angeles, CA
   location: ! 'North America: Southern California'
-  state: ! 'CA '
+  state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2), FreeBSD
 - access_policy: open access, please send a message to notify.
@@ -486,14 +486,14 @@
   exact_location: UCSD Academic Computing Services/Network Operations, San Diego,
     CA
   location: CERFNET; NSFNET, SDSC region and nearby
-  state: ! 'CA '
+  state: CA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
 - access_policy: Open to stratum 2 servers, others upon request.
   address: reloj.kjsl.com
   country: US
   exact_location: Salinas, CA, USA
-  state: ! 'CA '
+  state: CA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), MultiNet on VMS
 - access_policy: open access.
@@ -501,7 +501,7 @@
   country: US
   exact_location: tummy.com, ltd., Fort Collins, CO
   location: US
-  state: ! 'CO '
+  state: CO
   stratum: '2'
   synchronization: NTP Secondary (stratum 2), i686/Linux
 - access_policy: open access
@@ -509,7 +509,7 @@
   country: US
   exact_location: University of Delaware, Newark, DE
   location: CAIRN, Abilene/vBNS
-  state: ! 'DE '
+  state: DE
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun SPARC10/Solaris 2.6
 - access_policy: open access, please send a message with the hostname and/or address
@@ -518,7 +518,7 @@
   country: US
   exact_location: University System of Georgia NOC, Atlanta, GA
   location: PeachNet (Georgia)
-  state: ! 'GA '
+  state: GA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
 - access_policy: open access, please send a message with the hostname and/or address
@@ -527,7 +527,7 @@
   country: US
   exact_location: University System of Georgia NOC, Atlanta, GA
   location: PeachNet (Georgia)
-  state: ! 'GA '
+  state: GA
   stratum: '2'
   synchronization: NTP secondary (stratum 2)
 - access_policy: open access
@@ -535,7 +535,7 @@
   country: US
   exact_location: University of Illinois, Urbana-Champaign, IL
   location: CICNET, Midwest, NCSA region
-  state: ! 'IL '
+  state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco-ASM/4
 - access_policy: open access
@@ -543,14 +543,14 @@
   country: US
   exact_location: University of Illinois, Urbana-Champaign, IL
   location: CICNET, Midwest, NCSA region
-  state: ! 'IL '
+  state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco-ASM/4
 - address: ntp-1.mcs.anl.gov
   country: US
   exact_location: Argonne National Laboratory, near Chicago, IL
   location: NSF/ANSNet, CICNet, NetIllinois, ESNet, others welcome
-  state: ! 'IL '
+  state: IL
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparcstation
 - access_policy: open access
@@ -558,7 +558,7 @@
   country: US
   exact_location: University of Illinois, Urbana-Champaign, IL
   location: CICNET, Midwest, NCSA region
-  state: ! 'IL '
+  state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco-ASM/4
 - access_policy: open access, please send a message to notify
@@ -566,7 +566,7 @@
   country: US
   exact_location: Argonne National Laboratory, near Chicago, IL
   location: NSF/ANSNet, CICNet, NetIllinois, ESNet, others welcome
-  state: ! 'IL '
+  state: IL
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun Sparcstation 2
 - access_policy: Open access but please see our <a href="http://ntp.cerias.purdue.edu">ntp
@@ -576,19 +576,19 @@
   country: US
   exact_location: CERIAS, Purdue University, West Lafayette, IN
   location: Internet2, CIC and midwest US
-  state: ! 'IN '
+  state: IN
   stratum: '2'
   synchronization: NTP V3/V4 stratum 2 servers
 - address: ntp1.kansas.net
   country: US
   exact_location: KansasNet OnLine Services, Manhattan, KS
-  state: ! 'KS '
+  state: KS
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Linux on Intel
 - address: ntp2.kansas.net
   country: US
   exact_location: KansasNet OnLine Services, Manhattan, KS
-  state: ! 'KS '
+  state: KS
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Linux on Intel
 - access_policy: open access, please send a message to notify.
@@ -596,7 +596,7 @@
   country: US
   exact_location: Minneapolis, MN
   location: CICNET region
-  state: ! 'MN '
+  state: MN
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/SunOS 4.1.3
 - access_policy: open access, please send a message to notify.
@@ -604,7 +604,7 @@
   country: US
   exact_location: St Paul, MN
   location: CICNET region
-  state: ! 'MN '
+  state: MN
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/SunOS 4.1.3
 - access_policy: open access, please send a message to notify
@@ -612,7 +612,7 @@
   country: US
   exact_location: University of Missouri-Columbia, Columbia, MO, USA
   location: MOREnet
-  state: ! 'MO '
+  state: MO
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Linux/Intel
 - access_policy: open access, please send message to notify
@@ -620,7 +620,7 @@
   country: US
   exact_location: University of Montana, Missoula, Montana
   location: Northwest USA, Internet 2
-  state: ! 'MT '
+  state: MT
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco 7507
 - access_policy: open access, please send message to notify
@@ -628,7 +628,7 @@
   country: US
   exact_location: University of Montana, Missoula, Montana
   location: Northwest USA, Internet 2
-  state: ! 'MT '
+  state: MT
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco 7507
 - access_policy: open access, please send message to notify
@@ -636,7 +636,7 @@
   country: US
   exact_location: University of Montana, Missoula, Montana
   location: Northwest USA, Internet 2
-  state: ! 'MT '
+  state: MT
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Cisco 7507
 - access_policy: CONCERT region, others by prior arrangement
@@ -645,7 +645,7 @@
   country: US
   exact_location: University of North Carolina-Chapel Hill, Chapel Hill, NC
   location: CONCERT region
-  state: ! 'NC '
+  state: NC
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun4/SunOS/xntpd (V3)
 - access_policy: Open access; please send a message to notify.
@@ -654,7 +654,7 @@
   country: US
   exact_location: Jensen Research Corporation, Oakland NJ
   location: Eastern US
-  state: ! 'NJ '
+  state: NJ
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Cisco 3620 IOS 12.2
 - access_policy: Open access; please send a message to notify.
@@ -663,7 +663,7 @@
   country: US
   exact_location: Jensen Research Corporation, Oakland NJ
   location: Eastern US
-  state: ! 'NJ '
+  state: NJ
   stratum: '2'
   synchronization: NTP V4 secondary (stratum 2), Intel PIII/866 Win2K
 - access_policy: open access, please send message to notify
@@ -671,7 +671,7 @@
   country: US
   exact_location: University of Nevada System Computing Services, Las Vegas,NV
   location: NevadaNet, NSFNET, SDSC region
-  state: ! 'NV '
+  state: NV
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), DEC Alpha/Unix
 - access_policy: open access
@@ -679,7 +679,7 @@
   country: US
   exact_location: Hurricane Electric, New York City, New York
   location: all areas
-  state: ! 'NY '
+  state: NY
   stratum: '2'
   synchronization: NTP V4 primary (CMDA), Endrun Praecis CNTP
 - access_policy: open access
@@ -687,7 +687,7 @@
   country: US
   exact_location: Cornell University, Ithaca, NY
   location: NYSERNet, NYSERNet 2000, Internet2/Abilene, vBNS
-  state: ! 'NY '
+  state: NY
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Unix
 - access_policy: open access; please use name rather than address.
@@ -695,7 +695,7 @@
   country: US
   exact_location: Morningside Campus, Columbia University, New York, NY
   location: NYSERnet
-  state: ! 'NY '
+  state: NY
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc10 model 40
 - access_policy: open access, authenticated NTP (DES/MD5) available
@@ -704,7 +704,7 @@
   exact_location: Columbia University Computer Science Department, New York City,
     NY
   location: PSINET; NSFNET, NYSER region
-  state: ! 'NY '
+  state: NY
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Unix
 - access_policy: semi-open access; for use only by prior arrangement
@@ -712,7 +712,7 @@
   country: US
   exact_location: Carnegie Mellon University Computer Science, Pittsburgh, PA
   location: PSC region
-  state: ! 'PA '
+  state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc/Solaris 2.5.1
 - access_policy: semi-open access; for use only by prior arrangement
@@ -720,7 +720,7 @@
   country: US
   exact_location: Carnegie Mellon University Computer Science, Pittsburgh, PA
   location: PSC region
-  state: ! 'PA '
+  state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun Sparc/SunOS 4.1.4
 - access_policy: open access
@@ -729,13 +729,13 @@
   country: US
   exact_location: Penn State University, University Park, PA
   location: Internet2, vBNS, CERFnet(AT&T IP Services), PSC/NCNE, CASC.
-  state: ! 'PA '
+  state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Sun/Unix
 - address: fuzz.psc.edu
   country: US
   exact_location: Pittsburgh Supercomputing Center, Pittsburgh, PA
-  state: ! 'PA '
+  state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), DEC5000/200
 - access_policy: open access
@@ -745,7 +745,7 @@
   exact_location: Carnegie Mellon Electrical and Computer Engineering, Pittsburgh,
     PA
   location: PREPNET, PSC region
-  state: ! 'PA '
+  state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Solaris 9
 - access_policy: open access
@@ -755,7 +755,7 @@
   exact_location: Carnegie Mellon Electrical and Computer Engineering, Pittsburgh,
     PA
   location: PREPNET, PSC region
-  state: ! 'PA '
+  state: PA
   stratum: '2'
   synchronization: NTP V3 secondary (stratum 2), Solaris 9
 - access_policy: open access to other stratum 2 servers and upstream for statum 3
@@ -764,13 +764,13 @@
   country: US
   exact_location: Baylor College of Medicine, Houston, TX
   location: NSFNET, SESQUI region
-  state: ! 'TX '
+  state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Sun/Solaris
 - address: ntppub.tamu.edu
   country: US
   exact_location: Texas A&M University, College Station, TX
-  state: ! 'TX '
+  state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2, ver. 3), SPARCstation 10/Solaris 1.x
 - access_policy: open access for any server with 50+ clients
@@ -778,7 +778,7 @@
   country: US
   exact_location: Greyware Automation Products, Plano, TX
   location: South-Central US, others by arrangement
-  state: ! 'TX '
+  state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Windows NT
 - access_policy: open access for any server with 50+ clients
@@ -786,7 +786,7 @@
   country: US
   exact_location: Greyware Automation Products, Plano, TX
   location: South-Central US, others by arrangement
-  state: ! 'TX '
+  state: TX
   stratum: '2'
   synchronization: NTP secondary (stratum 2), Windows NT
 - access_policy: open access
@@ -794,7 +794,7 @@
   country: US
   exact_location: Virginia Tech, Blacksburg, Virginia, USA
   location: US southeastern region, Abilene
-  state: ! 'VA '
+  state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
 - access_policy: open access
@@ -802,7 +802,7 @@
   country: US
   exact_location: Virginia Tech, Blacksburg, Virginia, USA
   location: US southeastern region, Abilene
-  state: ! 'VA '
+  state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
 - access_policy: open access
@@ -810,7 +810,7 @@
   country: US
   exact_location: Virginia Tech, Blacksburg, Virginia, USA
   location: US southeastern region, Abilene
-  state: ! 'VA '
+  state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
 - access_policy: open access
@@ -818,7 +818,7 @@
   country: US
   exact_location: Virginia Tech, Blacksburg, Virginia, USA
   location: US southeastern region, Abilene
-  state: ! 'VA '
+  state: VA
   stratum: '2'
   synchronization: V3 Stratum 2 synced to local GPS primary servers
 - access_policy: open access
@@ -827,7 +827,7 @@
   country: US
   exact_location: Computer Science Department, University of Wisconsin-Madison
   location: US/any
-  state: ! 'WI '
+  state: WI
   stratum: '2'
   synchronization: NTP V4 secondary Solaris 2.7
 - access_policy: open access
@@ -836,7 +836,7 @@
   country: US
   exact_location: Computer Science Department, University of Wisconsin-Madison
   location: US/any
-  state: ! 'WI '
+  state: WI
   stratum: '2'
   synchronization: NTP V4 secondary Solaris 2.7
 - address: ntp0.cs.mu.OZ.AU
@@ -1151,7 +1151,7 @@
   address: ntp.alaska.edu
   country: US
   exact_location: University of Alaska, Fairbanks, AK (147 50 59.7W 64 51 27.3N WGS84)
-  state: ! 'AK '
+  state: AK
   stratum: '1'
   synchronization: NTP V3 primary (GPS)
 - access_policy: open access
@@ -1159,7 +1159,7 @@
   country: US
   exact_location: HP Western Research Laboratory, Palo Alto, CA
   location: NSFNET, BARR region
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP V4 primary (GPS)
 - access_policy: open access
@@ -1168,7 +1168,7 @@
   country: US
   exact_location: Internet Software Consortium, Palo Alto, CA
   location: BARRnet, Alternet-west, CIX-west
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP primary (GOES clock), BSD UNIX
 - access_policy: open access
@@ -1176,7 +1176,7 @@
   country: US
   exact_location: ViaNet Communications, Palo Alto, CA, USA
   location: All areas
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP V3 with Trimble Pasisade GPS receiver/FreeBSD
 - access_policy: open access for stratum 2 servers
@@ -1184,7 +1184,7 @@
   contacts: Rich Schmidt, US Naval Observatory (res@tuttle.usno.navy.mil),
   country: US
   exact_location: California Institute of Technology, Pasadena, CA
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP V3 primary (GPS clock)
 - access_policy: Open access for up to 20 queries per hour (one-day average) from
@@ -1193,14 +1193,14 @@
   country: US
   exact_location: AOL Time Warner facility, Sunnyvale, California
   location: Western US
-  state: ! 'CA '
+  state: CA
   stratum: '1'
 - access_policy: Open to stratum-2 servers and others by arrangement.
   address: nist1.symmetricom.com
   country: US
   exact_location: Datum Inc., Bancomm-Timing Division, San Jose, California
   location: Primarily networks in Western US
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm; DEC Alpha UNIX
 - access_policy: prior permission required
@@ -1208,13 +1208,13 @@
   country: US
   exact_location: NASA Ames Research Center, Moffett Field, CA
   location: NSFNET, BARR region, NASA NSN, DOE ESNET, DDN
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP V3 primary GPS Clock
 - address: tick.ucla.edu
   country: US
   exact_location: UCLA, Los Angeles, CA
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP V3 primary (GPS) HP9000/747i
 - access_policy: open access
@@ -1223,12 +1223,12 @@
   country: US
   exact_location: USC Information Sciences Institute, Marina del Rey, CA
   location: CalRen2, Los Nettos region
-  state: ! 'CA '
+  state: CA
   stratum: '1'
   synchronization: NTP V3 primary Datum Tymserve 2100-GPS
 - address: time-a.nist.gov
   country: US
-  state: ! 'CO '
+  state: CO
   stratum: '1'
 - access_policy: Open to stratum-2 servers, others by arrangement; please use only
     one of the servers as primary with the other as a backup.
@@ -1236,7 +1236,7 @@
   country: US
   exact_location: NIST Boulder Laboratories, Boulder, Colorado
   location: NSFnet, WESTnet
-  state: ! 'CO '
+  state: CO
   stratum: '1'
   synchronization: Direct 1 pps from clock ensemble; lockclock algorithm and ACTS
     dial-up as backup; DEC Alpha/UNIX
@@ -1246,7 +1246,7 @@
   country: US
   exact_location: NIST Boulder Laboratories, Boulder, Colorado
   location: NSFnet, WESTnet
-  state: ! 'CO '
+  state: CO
   stratum: '1'
   synchronization: Direct 1 pps from clock ensemble; lockclock algorithm and ACTS
     dial-up as backup; DEC Alpha/UNIX
@@ -1256,7 +1256,7 @@
   country: US
   exact_location: NIST Boulder Laboratories, Boulder, Colorado
   location: NSFnet, WESTnet
-  state: ! 'CO '
+  state: CO
   stratum: '1'
   synchronization: Direct 1 pps from clock ensemble; lockclock algorithm and ACTS
     dial-up as backup; DEC Alpha/UNIX.
@@ -1265,7 +1265,7 @@
   coordinates: 39:58:43.44N 254:43:32.5E +1840m (WGS 84)
   country: US
   exact_location: National Center for Atmospheric Research, Boulder, Colorado
-  state: ! 'CO '
+  state: CO
   stratum: '1'
   synchronization: ! 'ACTS dial-up with NTP backup, DEC Alpha UNIX Service Area: NSFnet,
     WESTnet'
@@ -1274,7 +1274,7 @@
   country: US
   exact_location: JILA Laboratory, University of Colorado
   location: Western US
-  state: ! 'CO '
+  state: CO
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm; DEC Alpha UNIX
 - access_policy: open access for stratum 2 servers
@@ -1282,7 +1282,7 @@
   coordinates: 77 03 57.7W 38 55 14.1N WGS84
   country: US
   exact_location: U.S. Naval Observatory, Washington, DC
-  state: ! 'DC '
+  state: DC
   stratum: '1'
   synchronization: NTP V3 primary (USNO Master Clocks 1,2, and GPS)
 - access_policy: open access
@@ -1291,7 +1291,7 @@
   country: US
   exact_location: U.S. Naval Observatory, Washington, DC
   location: NSFNET
-  state: ! 'DC '
+  state: DC
   stratum: '1'
   synchronization: NTP V3 primary (USNO Master Clock 2, H-maser), HP9000/747i
 - access_policy: open access
@@ -1300,7 +1300,7 @@
   country: US
   exact_location: U.S. Naval Observatory, Washington, DC
   location: NSFNET
-  state: ! 'DC '
+  state: DC
   stratum: '1'
   synchronization: NTP V3 primary (USNO Master Clock 2, H-maser), HP9000/747i
 - access_policy: closed access, except for stratum-2 servers providing synchronization
@@ -1310,7 +1310,7 @@
   country: US
   exact_location: University of Delaware, Newark, DE
   location: CAIRN, Abilene/vBNS
-  state: ! 'DE '
+  state: DE
   stratum: '1'
   synchronization: NTP V4 primary (GPS clock), Sun IPC/SunOS 4.1.3
 - access_policy: open access for stratum 2 servers and UFL clients,others by arrangement
@@ -1318,7 +1318,7 @@
   contacts: <a href="mailto:res@tuttle.usno.navy.mil">Rich Schmidt, US Naval Observatory</a>
   country: US
   exact_location: University of Florida, Gainesville, FL
-  state: ! 'FL '
+  state: FL
   stratum: '1'
   synchronization: NTP V3 primary (TrueTime GPS-VME)
 - access_policy: open access for stratum 2 servers
@@ -1326,14 +1326,14 @@
   coordinates: 84 23 40.9W 33 46 30.0N WGS84
   country: US
   exact_location: Georgia Institute of Technology, Atlanta, GA
-  state: ! 'GA '
+  state: GA
   stratum: '1'
   synchronization: NTP V3 primary (GPS clock)
 - address: time.twc.weather.com
   coordinates: 33:53:39.94N, 84:27:47.98W
   country: US
   exact_location: The Weather Channel, Atlanta GA
-  state: ! 'GA '
+  state: GA
   stratum: '1'
   synchronization: NTP V4 primary (CMDA), Sun/Solaris
 - access_policy: open access for stratum 2 servers
@@ -1341,14 +1341,14 @@
   coordinates: 20 44.9286 N, 156 26.4070 W
   country: US
   exact_location: Maui High Performance Computing Center
-  state: ! 'HI '
+  state: HI
   stratum: '1'
   synchronization: NTP V3 primary (Brandywine/Motorola Oncore GPS)
 - access_policy: open access for stratum 2 servers and ANL clients,others by arrangement
   address: ntp0.mcs.anl.gov
   country: US
   exact_location: Argonne National Laboratories, Chicago, IL
-  state: ! 'IL '
+  state: IL
   stratum: '1'
   synchronization: NTP V3 primary (Brandywine Syncclock32/Oncore GPS)
 - access_policy: open access to significant stratum 2 servers in the service areas.
@@ -1358,7 +1358,7 @@
   exact_location: ! 'CERIAS, Purdue University, West Lafayette, IN Synchronization:
     NTP V3/V4'
   location: Internet2, CIC, and midwest US
-  state: ! 'IN '
+  state: IN
   stratum: '1'
 - access_policy: open access to significant stratum 2 servers in the service areas.
     Please send a message to notify, and see our ntp WWW page.
@@ -1368,14 +1368,14 @@
   exact_location: ! 'CERIAS, Purdue University, West Lafayette, IN Synchronization:
     NTP V3/V4 primary (GPS), Symmetricom TymServe 2100L'
   location: Internet2, CIC, and midwest US
-  state: ! 'IN '
+  state: IN
   stratum: '1'
 - access_policy: open access
   address: bonehed.lcs.mit.edu
   country: US
   exact_location: Massachusetts Institute of Technology, Cambridge, MA
   location: Eastern US
-  state: ! 'MA '
+  state: MA
   stratum: '1'
   synchronization: Motorola Oncore UT+ GPS, xntp3-5.90, FreeBSD 3.2
 - access_policy: open access for stratum 2 servers, please notify
@@ -1383,7 +1383,7 @@
   country: US
   exact_location: Concord, MA
   location: Eastern US
-  state: ! 'MA '
+  state: MA
   stratum: '1'
   synchronization: NTP V4 primary, Motorola Oncore VP GPS, Linux
 - access_policy: open access
@@ -1391,7 +1391,7 @@
   country: US
   exact_location: Cambridge, MA
   location: Eastern US
-  state: ! 'MA '
+  state: MA
   stratum: '1'
   synchronization: Motorola Oncore UT+ GPS, Linux
 - access_policy: Open to stratum-2 servers, others by arrangement; please use one
@@ -1400,7 +1400,7 @@
   country: US
   exact_location: NIST Central Computer Facility, Gaithersburg, Maryland
   location: NSFnet, SURAnet
-  state: ! 'MD '
+  state: MD
   stratum: '1'
   synchronization: ACTS dial-up using lockclock algorithm, DEC Alpha/UNIX
 - access_policy: open access for stratum 2 servers
@@ -1410,14 +1410,14 @@
   coordinates: 69 39 42.0 W, 44 33 48 N WGS84
   country: US
   exact_location: Colby College, Waterville, ME
-  state: ! 'ME '
+  state: ME
   stratum: '1'
   synchronization: NTP V3 primary (GPS)
 - access_policy: open access
   address: navobs1.wustl.edu
   country: US
   exact_location: Washington University, St. Louis, MO
-  state: ! 'MO '
+  state: MO
   stratum: '1'
   synchronization: NTP V3 primary (GPS) HP9000/747i
 - access_policy: Closed access, except for stratum-2 servers providing synchronization
@@ -1429,14 +1429,14 @@
   country: US
   exact_location: Jensen Research Corporation, Oakland NJ
   location: Eastern US
-  state: ! 'NJ '
+  state: NJ
   stratum: '1'
 - access_policy: open access
   address: now.okstate.edu
   country: US
   exact_location: ! 'Oklahoma State University, Stillwater, OKGeographic Coordinates:
     97 04 17.0 W, 36 07 19.7 N WGS84'
-  state: ! 'OK '
+  state: OK
   stratum: '1'
   synchronization: NTP V4 primary (Motorola UT+)
 - access_policy: closed access, except for stratum-2 servers providing synchronization
@@ -1446,7 +1446,7 @@
   country: US
   exact_location: Penn State University, University Park, PA
   location: Internet2, vBNS, CERFnet(AT&T IP Services), PSC/NCNE, CASC.
-  state: ! 'PA '
+  state: PA
   stratum: '1'
   synchronization: NTP V3 primary (GPS), <a href="http://www.truetime.com/DOCS/PDTS/xl_dc.html">TrueTime
     XL/DC</a> NTP module
@@ -1455,7 +1455,7 @@
   country: US
   exact_location: Penn State University, University Park, PA
   location: NSFNET, PREPNET, JvNCnet
-  state: ! 'PA '
+  state: PA
   stratum: '1'
   synchronization: NTP V3 primary (WWV clock), Sun/Unix
 - access_policy: open access
@@ -1464,7 +1464,7 @@
   country: US
   exact_location: Penn State University, University Park, PA
   location: Internet2, vBNS, CERFnet(AT&T IP Services), PSC/NCNE, CASC.
-  state: ! 'PA '
+  state: PA
   stratum: '1'
   synchronization: NTP V3 primary (<a href="http://www.webworldinc.com/idc-%20traffic/1010.html">Traconex</a>/PSTI-1020
     WWV clock), Sun/Unix
@@ -1474,7 +1474,7 @@
   country: US
   exact_location: University of Houston, Houston, TX
   location: US Central time zone, others on request
-  state: ! 'TX '
+  state: TX
   stratum: '1'
   synchronization: NTP V3 primary (GPS) HP9000/747i
 - access_policy: open access
@@ -1482,7 +1482,7 @@
   country: US
   exact_location: XMission Internet, Salt Lake City, Utah
   location: Western US
-  state: ! 'UT '
+  state: UT
   stratum: '1'
   synchronization: Motorola Oncore UT+ GPS, ntp-4.1.1a, Linux 2.4.18-nano
 - access_policy: open access to Pacific Time Zone stratum 2's and to Univ. of Washington
@@ -1491,13 +1491,13 @@
   country: US
   exact_location: University of Washington, Seattle, WA
   location: Pacific Northwest
-  state: ! 'WA '
+  state: WA
   stratum: '1'
   synchronization: NTP primary (GPS clock), HP9000/747i HPUX
 - address: time-nw.nist.gov
   country: US
   exact_location: Microsoft Corporation, Redmond, Washington
   location: NorthWestNet, NSFnet
-  state: ! 'WA '
+  state: WA
   stratum: '1'
   synchronization: ACTS Dial-up and lockclock algorithm, DEC Alpha/UNIX
