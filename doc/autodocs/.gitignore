@@ -1,3 +1,7 @@
 Makefile.in
 Makefile
+.yardoc
 *.html
+js
+css
+Yast

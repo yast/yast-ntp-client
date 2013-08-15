@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug 15 07:36:40 UTC 2013 - lslezak@suse.cz
+
+- move the development documentation to devel-doc subpackage
+- 3.0.1
+
+-------------------------------------------------------------------
 Fri Aug  2 07:04:14 UTC 2013 - lslezak@suse.cz
 
 - convert data file from YCP to YAML format (ntp_servers.ycp ->

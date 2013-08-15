@@ -24,6 +24,15 @@ Summary:        YaST2 - NTP Client Configuration
 %description
 This package contains the YaST2 component for NTP client configuration.
 
+%package devel-doc
+Requires:       yast2-ntp-client = %version
+Group:          System/YaST
+Summary:        YaST2 - NTP Client - Development Documentation
+
+%description devel-doc
+This package contains development documentation for using the API
+provided by yast2-ntp-client package.
+
 @PREP@
 
 @BUILD@
@@ -43,7 +52,16 @@ This package contains the YaST2 component for NTP client configuration.
 @moduledir@/*.rb
 @desktopdir@/ntp-client.desktop
 @ydatadir@/ntp_servers.yml
-%doc @docdir@
 @schemadir@/autoyast/rnc/ntpclient.rnc
+
+%dir @docdir@
+%doc @docdir@/README
+%doc @docdir@/COPYING
+%doc @docdir@/TODO
+%doc @docdir@/spec.txt
+
+%files devel-doc
+%doc @docdir@/autodocs
+%doc @docdir@/ntp.conf_agent.txt
 
 %changelog
