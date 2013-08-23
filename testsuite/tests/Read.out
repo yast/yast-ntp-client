@@ -1,5 +1,4 @@
 Read	.sysconfig.network.config.NETCONFIG_NTP_POLICY ""
-Read	.target.ycp "/usr/share/YaST2/data/country.ycp" nil
 Read	.target.yast2 "country.ycp" nil
 Log	Failed to read country names
 Read	.target.ycp "/var/lib/YaST2/ad_ntp_data.ycp" nil
