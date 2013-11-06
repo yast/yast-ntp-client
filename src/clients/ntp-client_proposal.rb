@@ -411,12 +411,13 @@ module Yast
         Builtins.y2milestone("Running sntp to sync with %1", ntp_server)
 
         # -s: do set the system time
-        # -t 15: timeout 5s per one of 5 tries
+        # -t 5: timeout of 5 seconds
+        # -l <file>: log to a file to not mess text mode installation
         r2 = Convert.to_integer(
           SCR.Execute(
             path(".target.bash"),
             Builtins.sformat(
-              "/usr/sbin/sntp -t 5 -s '%1'",
+              "/usr/sbin/sntp -l /var/log/YaST2/sntp.log -t 5 -s '%1'",
               String.Quote(ntp_server)
             )
           )
