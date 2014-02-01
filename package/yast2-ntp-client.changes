@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Sat Feb  1 21:17:29 UTC 2014 - mfilka@suse.com
+
+- bnc#861560
+  - adapted to new API provided by NetworkService module
+- 3.1.2 
+
+-------------------------------------------------------------------
 Wed Nov  6 12:47:35 UTC 2013 - lslezak@suse.cz
 
 - log sntp output to /var/log/YaST2/sntp.log (to avoid messing
