@@ -172,7 +172,7 @@ module Yast
       )
       devices = Builtins.filter(devices) { |d| d != "lo" }
       #Do not display this warning if we use NetworkManager (#299666)
-      if start && !NetworkService.IsManaged && Builtins.size(devices) == 0 &&
+      if start && !NetworkService.is_network_manager && Builtins.size(devices) == 0 &&
           Ops.get_string(event, "EventReason", "") != "" &&
           !# continue-cancel popup
           Popup.ContinueCancel(
