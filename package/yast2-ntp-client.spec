@@ -28,14 +28,14 @@ Group:          System/YaST
 License:        GPL-2.0+
 BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
-BuildRequires:  yast2
+BuildRequires:  yast2 >= 3.1.11
 BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  yast2-testsuite
 #SLPAPI.pm 
 # Hostname::CurrentDomain
 # Wizard::SetDesktopTitleAndIcon
-Requires:       yast2 >= 2.21.22
+Requires:       yast2 >= 3.1.11
 Requires:       yast2-country-data 
 
 BuildArch:      noarch
