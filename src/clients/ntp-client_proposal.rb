@@ -23,6 +23,7 @@ module Yast
       Yast.import "Popup"
       Yast.import "Progress"
       Yast.import "Report"
+      Yast.import "Timezone"
       Yast.import "Wizard"
 
       #     API:
@@ -64,21 +65,15 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       elsif @func == "MakeProposal"
-        @cc = Ops.get_string(@param, "country") do
-          NtpClient.GetCurrentLanguageCode
-        end
-        @ret = MakeProposal(@cc)
+        @ret = MakeProposal()
       elsif @func == "Write"
         @ret = Write(@param)
       elsif @func == "ui_help_text"
         @ret = ui_help_text
       elsif @func == "ui_init"
         @rp = Ops.get_term(@param, "replace_point") { Id(:rp) }
-        @cc = Ops.get_string(@param, "country") do
-          NtpClient.GetCurrentLanguageCode
-        end
         @ft = Ops.get_boolean(@param, "first_time", false)
-        @ret = ui_init(@rp, @cc, @ft)
+        @ret = ui_init(@rp,@ft)
       elsif @func == "ui_try_save"
         @ret = ui_try_save
       elsif @func == "ui_enable_disable_widgets"
@@ -183,8 +178,7 @@ module Yast
     end
 
 
-    # @param cc country code
-    def MakeProposal(cc)
+    def MakeProposal()
       ntp_items = []
 
       #on the running system, read all the data, otherwise firewall
@@ -208,18 +202,15 @@ module Yast
         # avoid calling Read again (bnc #427712)
         NtpClient.config_has_been_read = true
       end
-      #  FIXME: does MakeProposal have sense?
-      #  would it have sense if implemented properly?
-      # real proposal starts here, it is ui_read before...
-      Builtins.y2milestone("ntp_items :%1", ntp_items)
       if ntp_items == []
         Builtins.y2milestone(
-          "Nothing found in /etc/ntp.conf, proposing current language-based NTP server list"
+          "Nothing found in /etc/ntp.conf, proposing current timezone-based NTP server list"
         )
-        ntp_items = NtpClient.GetNtpServersByCountry(cc, true)
+        ntp_items = NtpClient.GetNtpServersByCountry(Timezone.GetCountryForTimezone(Timezone.timezone), true)
         NtpClient.config_has_been_read = true
       end
       ntp_items = Builtins.add(ntp_items, "")
+      Builtins.y2milestone("ntp_items :%1", ntp_items)
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       nil
@@ -227,7 +218,7 @@ module Yast
 
     # @param [Boolean] first_time when asking for first time, we check if service is running
     # @return should our radio button be selected
-    def ui_init(rp, country, first_time)
+    def ui_init(rp, first_time)
       rp = deep_copy(rp)
       cont = VBox(
         VSpacing(0.5),
@@ -303,7 +294,7 @@ module Yast
 
       UI.ChangeWidget(Id(:ntp_save), :Value, ntp_used)
 
-      MakeProposal(country)
+      MakeProposal()
       ntp_used
     end
 
@@ -319,8 +310,7 @@ module Yast
         AddSingleServer(ntp_server2)
         retval = Convert.to_boolean(WFM.CallFunction("ntp-client"))
         ret = :next if retval
-        cc = NtpClient.GetCurrentLanguageCode
-        MakeProposal(cc)
+        MakeProposal()
       end
       ret
     end
