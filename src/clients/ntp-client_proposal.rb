@@ -123,7 +123,11 @@ module Yast
     def ui_enable_disable_widgets(enabled)
       UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
       UI.ChangeWidget(Id(:run_service), :Enabled, enabled)
-      UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
+      if !NetworkService.isNetworkRunning
+	UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
+      else
+        UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
+      end
       UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
       if UI.WidgetExists(Id(:ntp_configure)) # bnc#483787
         UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled)
@@ -278,11 +282,7 @@ module Yast
       UI.ReplaceWidget(rp, cont)
 
       if !NetworkService.isNetworkRunning
-        Builtins.y2warning(
-          "Network is not running, NTP synchronization will not be available"
-        ) 
-        # If network not running we have to be able to configure ntp nevertheless
-        #       UI::ChangeWidget(`id(`ntp_content), `Enabled, false); // FIXME it is outside
+	UI.ChangeWidget(Id(:ntp_now),:Enabled,false);
       end
 
       # ^ createui0
