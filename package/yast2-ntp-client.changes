@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 28 13:31:07 UTC 2014 - vmoravec@suse.com
+
+- Fix failing testsuite
+- 3.1.5
+
+-------------------------------------------------------------------
 Thu Mar 27 14:25:29 UTC 2014 - varkoly@suse.com
 
 - bnc#866313 - NTP in Installer: Offers remote functionality, but no network is configured

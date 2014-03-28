@@ -84,7 +84,16 @@ module Yast
         "target"    => { "string" => "", "tmpdir" => "/tmp", "size" => 0 }
       }
       @WRITE = {}
-      @EXEC = { "target" => { "bash_output" => {}, "bash" => 1 } }
+      @EXEC = {
+        "target" => {
+          "bash_output" => {
+            "exit" => 0,
+            "stdout" => "",
+            "stderr" => ""
+          }
+        },
+        "bash" => 1
+      }
 
       TESTSUITE_INIT([@READ, @WRITE, @EXEC], nil)
 
