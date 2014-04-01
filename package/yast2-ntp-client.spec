@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-ntp-client
 #
-# Copyright (c) 2013 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2014 SUSE LINUX Products GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -17,15 +17,13 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.1.5
+Version:        3.1.6
 Release:        0
-
+Summary:        YaST2 - NTP Client Configuration
+License:        GPL-2.0+
+Group:          System/YaST
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
-
-
-Group:          System/YaST
-License:        GPL-2.0+
 BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 3.1.11
@@ -36,21 +34,18 @@ BuildRequires:  yast2-testsuite
 # Hostname::CurrentDomain
 # Wizard::SetDesktopTitleAndIcon
 Requires:       yast2 >= 3.1.11
-Requires:       yast2-country-data 
-
+Requires:       yast2-country-data
+Requires:       yast2-ruby-bindings >= 1.0.0
 BuildArch:      noarch
 
-Requires:       yast2-ruby-bindings >= 1.0.0
-
-Summary:        YaST2 - NTP Client Configuration
 
 %description
 This package contains the YaST2 component for NTP client configuration.
 
 %package devel-doc
 Requires:       yast2-ntp-client = %version
-Group:          System/YaST
 Summary:        YaST2 - NTP Client - Development Documentation
+Group:          System/YaST
 
 %description devel-doc
 This package contains development documentation for using the API
@@ -64,7 +59,6 @@ provided by yast2-ntp-client package.
 
 %install
 %yast_install
-
 
 %files
 %defattr(-,root,root)
