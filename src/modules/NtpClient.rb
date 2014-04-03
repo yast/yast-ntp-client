@@ -67,7 +67,7 @@ module Yast
       @cron_file = "/etc/cron.d/novell.ntp-synchronize"
 
       # Service name of the NTP daemon
-      @service_name = "ntp"
+      @service_name = "ntpd"
 
       # Should the daemon be started in chroot environment?
       @run_chroot = false
@@ -858,17 +858,23 @@ module Yast
         Progress.set(progress_orig)
       end
 
-      if !Service.Adjust(@service_name, @run_service ? "enable" : "disable")
+      adjusted = false
+      if @run_service && Service.Enable(@service_name)
+        adjusted = true
+      end
+      if !@run_service && Service.Disable(@service_name)
+        adjusted = true
+      end
+      unless adjusted
         # error report
         Report.Error(Message.CannotAdjustService("NTP"))
       end
 
-      if @run_service && !@write_only &&
-          0 != Service.RunInitScript(@service_name, "restart")
+      if @run_service && !@write_only && Service.Restart(@service_name)
         # error report
         Report.Error(_("Cannot restart the NTP daemon."))
       end
-      Service.RunInitScript(@service_name, "stop") if !@run_service
+      Service.Stop(@service_name) if !@run_service
       if @synchronize_time
         SCR.Write(
           path(".target.string"),
