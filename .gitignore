@@ -29,3 +29,9 @@ Makefile.am.common
 tmp.*
 *.log
 *.ybc
+/testsuite/config/
+/testsuite/run/
+/testsuite/site.bak
+/testsuite/site.exp
+/testsuite/yast2-ntp-client.sum
+/testsuite/yast2-ntp-client.test/
