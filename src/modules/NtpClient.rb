@@ -873,7 +873,7 @@ module Yast
         SCR.Write(
           path(".target.string"),
           @cron_file,
-          "-*/#{@sync_interval} * * * * root /etc/init.d/ntp ntptimeset &>/dev/null\n"
+          "-*/#{@sync_interval} * * * * root /usr/sbin/start-ntpd ntptimeset &>/dev/null\n"
         )
       else
         SCR.Execute(
