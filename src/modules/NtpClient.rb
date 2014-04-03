@@ -873,10 +873,7 @@ module Yast
         SCR.Write(
           path(".target.string"),
           @cron_file,
-          Ops.add(
-            Ops.add("-*/", @sync_interval),
-            " * * * * root /etc/init.d/ntp ntptimeset &>/dev/null\n"
-          )
+          "-*/#{@sync_interval} * * * * root /etc/init.d/ntp ntptimeset &>/dev/null\n"
         )
       else
         SCR.Execute(
