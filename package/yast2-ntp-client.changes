@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 15 09:58:18 CEST 2014 - locilka@suse.com
+
+- Fixed evaluation of starting the NTP service (bnc#872389)
+- 3.1.8
+
+-------------------------------------------------------------------
 Thu Apr  3 11:52:14 UTC 2014 - jreidinger@suse.com
 
 - change path for ntptimeset(bnc#871367)

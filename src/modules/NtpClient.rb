@@ -870,11 +870,15 @@ module Yast
         Report.Error(Message.CannotAdjustService("NTP"))
       end
 
-      if @run_service && !@write_only && Service.Restart(@service_name)
-        # error report
-        Report.Error(_("Cannot restart the NTP daemon."))
+      if @run_service
+        unless @write_only
+          # error report
+          Report.Error(_("Cannot restart the NTP daemon.")) unless Service.Restart(@service_name)
+        end
+      else
+        Service.Stop(@service_name)
       end
-      Service.Stop(@service_name) if !@run_service
+
       if @synchronize_time
         SCR.Write(
           path(".target.string"),
