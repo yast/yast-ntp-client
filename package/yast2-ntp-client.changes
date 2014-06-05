@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jun  5 09:45:40 UTC 2014 - varkoly@suse.com
+
+- bnc#881026 - YaST ntp-client: "sync without daemon" not documented in help
+  3.1.9
+
+-------------------------------------------------------------------
 Tue Apr 15 09:58:18 CEST 2014 - locilka@suse.com
 
 - Fixed evaluation of starting the NTP service (bnc#872389)

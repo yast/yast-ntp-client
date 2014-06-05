@@ -40,7 +40,7 @@ module Yast
         )
 	+
 	_("Selecting <b>Synchronize without Daemon</b> the ntp daemon will not be activated. \n" +
-	  "The system time will be set periodically. The interval is 15 minutes.\n " +
+	  "The system time will be set periodically. The interval is configurable. It is 15 minutes by default.\n " +
 	  "You can change this when the system was set up."
 	),
         # help text 2/5
