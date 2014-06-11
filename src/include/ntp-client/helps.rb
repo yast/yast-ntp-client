@@ -37,7 +37,12 @@ module Yast
             "Select whether to start the NTP daemon now and on every system boot. \n" +
             "The NTP daemon resolves host names when initializing. Your\n" +
             "network connection must be started before the NTP daemon starts.</p>\n"
-        ),
+        )
+	+
+	_("Selecting <b>Synchronize without Daemon</b> the ntp daemon will not be activated. \n" +
+	  "The system time will be set periodically. The interval is configurable. It is 15 minutes by default.\n " +
+	  "You can change this when the system was set up."
+	),
         # help text 2/5
         "chroot_environment" => _(
           "<p><b><big>Chroot Jail</big></b><br>\n" +
