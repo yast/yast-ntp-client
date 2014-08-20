@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug 20 16:27:49 CEST 2014 - schubi@suse.de
+
+- Autoyast cloning: Do not show error popup if ntp server has not
+  installed. (bnc#891422)
+- 3.1.10
+
+-------------------------------------------------------------------
 Thu Jun  5 09:45:40 UTC 2014 - varkoly@suse.com
 
 - bnc#881026 - YaST ntp-client: "sync without daemon" not documented in help
