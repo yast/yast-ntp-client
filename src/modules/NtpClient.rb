@@ -578,8 +578,11 @@ module Yast
       end
 
       if failed
-        # error report
-        Report.Error(Message.CannotReadCurrentSettings)
+        # While calling "yast clone_system" it is possible that
+        # the ntp server has not already been installed at that time.
+        # (This would be done if yast2-ntp-client will be called in the UI)
+        # In that case the error popup will not be shown. (bnc#889557)
+        Report.Error(Message.CannotReadCurrentSettings) unless Mode.config
       end
 
       if !Mode.testsuite
