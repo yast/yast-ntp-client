@@ -350,23 +350,21 @@ module Yast
     # return:
     #   `success, `invalid_hostname or `ntpdate_failed
     def Write(param)
-      param = deep_copy(param)
-      ret = nil
-      ntp_servers = Ops.get_list(param, "servers", [])
-      ntp_server = Ops.get_string(param, "server", "")
-      run_service = Ops.get_boolean(param, "run_service", true)
+      ntp_servers = param["servers"] || []
+      ntp_server = param["server"] || ""
+      run_service = param["run_service"] || true
       if ntp_server == ""
         # get the value from UI only when it wasn't given as a parameter
-        ntp_server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
+        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
       end
       return :invalid_hostname if !ValidateSingleServer(ntp_server)
 
       WriteNtpSettings(ntp_servers, ntp_server, run_service)
-      return :success if Ops.get_boolean(param, "write_only", false)
+      return :success if param["write_only"]
 
       # One-time adjusment without running the ntp daemon
       # Meanwhile, ntpdate was replaced by sntp
-      ntpdate_only = Ops.get_boolean(param, "ntpdate_only", false)
+      ntpdate_only = param["ntpdate_only"]
 
       required_package = "ntp"
 
@@ -384,16 +382,14 @@ module Yast
       elsif !Stage.initial
         if !PackageSystem.CheckAndInstallPackages([required_package])
           Report.Error(
-            Builtins.sformat(
               _(
-                "Synchronization with NTP server is not possible\nwithout package %1 installed."
-              ),
-              required_package
-            )
+                "Synchronization with NTP server is not possible\nwithout package #{required_package} installed."
+              )
           )
         end
       end
-      r = 0
+
+      ret = 0
       if NetworkService.isNetworkRunning
         #Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
@@ -403,21 +399,16 @@ module Yast
         # -s: do set the system time
         # -t 5: timeout of 5 seconds
         # -l <file>: log to a file to not mess text mode installation
-        r2 = Convert.to_integer(
-          SCR.Execute(
-            path(".target.bash"),
-            Builtins.sformat(
-              "/usr/sbin/sntp -l /var/log/YaST2/sntp.log -t 5 -s '%1'",
-              String.Quote(ntp_server)
-            )
-          )
-        )
-        Builtins.y2milestone("'sntp %1' returned %2", ntp_server, r2)
+        ret = SCR.Execute(
+                path(".target.bash"),
+                "/usr/sbin/sntp -l /var/log/YaST2/sntp.log -t 5 -s '#{String.Quote(ntp_server)}'"
+              )
+        Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
         Popup.ClearFeedback
       end
 
 
-      return :ntpdate_failed if r != 0
+      return :ntpdate_failed if ret != 0
 
       # User wants to more than running sntp (synchronize on boot)
       WriteNtpSettings(ntp_servers, ntp_server, run_service) if !ntpdate_only
@@ -427,13 +418,12 @@ module Yast
 
     # ui = UI::UserInput
     def ui_handle(ui)
-      ui = deep_copy(ui)
       redraw = false
       if ui == :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname
           handle_invalid_hostname(
-            Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
+            UI.QueryWidget(Id(:ntp_address), :Value)
           )
         elsif rv == :next && !Stage.initial
           # show the 'save' status after configuration
@@ -443,11 +433,11 @@ module Yast
       if ui == :ntp_now
         rv = Write({ "ntpdate_only" => true })
         if rv == :invalid_hostname
-          handle_invalid_hostname(
-            Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
-          )
+          handle_invalid_hostname(UI.QueryWidget(Id(:ntp_address), :Value))
         elsif rv == :success
           redraw = true # update time widgets
+        else
+          Popup.Error(_("Connection to selected NTP server failed."))
         end
       end
 
