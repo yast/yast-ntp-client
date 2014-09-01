@@ -231,6 +231,7 @@ module Yast
           HWeight(
             1,
             VBox(
+              VSpacing(0.5),
               Left(
                 ComboBox(
                   Id(:ntp_address),
@@ -264,7 +265,6 @@ module Yast
             1,
             VBox(
               Label(""),
-              VSpacing(0.3), # try to line up the widgets horizontally
               # push button label
               Left(PushButton(Id(:ntp_now), _("S&ynchronize now"))),
               VSpacing(0.3),
