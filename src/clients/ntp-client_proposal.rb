@@ -436,7 +436,7 @@ module Yast
         elsif rv == :success
           redraw = true # update time widgets
         else
-          Popup.Error(_("Connection to selected NTP server failed."))
+          Report.Error(_("Connection to selected NTP server failed."))
         end
       end
 
