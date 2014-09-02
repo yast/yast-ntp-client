@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Sep  1 15:34:23 UTC 2014 - cwh@suse.com
+
+- Aligned "Synchronize now" button and "NTP Server Address" box (bnc#893065)
+- Fixed checking of return value of "sntp -s" (bnc#893094)
+- 3.1.11
+
+-------------------------------------------------------------------
 Wed Aug 20 16:27:49 CEST 2014 - schubi@suse.de
 
 - Autoyast cloning: Do not show error popup if ntp server has not
