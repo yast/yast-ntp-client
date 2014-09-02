@@ -382,9 +382,12 @@ module Yast
       elsif !Stage.initial
         if !PackageSystem.CheckAndInstallPackages([required_package])
           Report.Error(
+            Builtins.sformat(
               _(
-                "Synchronization with NTP server is not possible\nwithout package #{required_package} installed."
-              )
+                "Synchronization with NTP server is not possible\nwithout package %1 installed."
+              ),
+              required_package
+            )
           )
         end
       end
@@ -437,7 +440,7 @@ module Yast
         elsif rv == :success
           redraw = true # update time widgets
         else
-          Popup.Error(_("Connection to selected NTP server failed."))
+          Report.Error(_("Connection to selected NTP server failed."))
         end
       end
 
@@ -469,7 +472,9 @@ module Yast
         if Popup.YesNo(
             Builtins.sformat(
               _(
-                "'Test query to server '%1' failed. If server is not yet accessible or network is not configured click 'No' to ignore. Revisit NTP server configuration?"
+                "Test query to server '%1' failed.\n" +
+                "If server is not yet accessible or network is not configured\n"+
+                "click 'No' to ignore. Revisit NTP server configuration?"
               ),
               server
             )

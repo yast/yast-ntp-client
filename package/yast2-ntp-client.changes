@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Sep  2 10:00:18 UTC 2014 - cwh@suse.com
+
+- Using Report.Error to be autoyast-proof
+- Fixed variable replacement int gettext string;
+- Added linebreaks in too long popup content (bnc#894573)
+- 3.1.12
+
+-------------------------------------------------------------------
 Mon Sep  1 15:34:23 UTC 2014 - cwh@suse.com
 
 - Aligned "Synchronize now" button and "NTP Server Address" box (bnc#893065)
