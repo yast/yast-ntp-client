@@ -382,9 +382,8 @@ module Yast
       elsif !Stage.initial
         if !PackageSystem.CheckAndInstallPackages([required_package])
           Report.Error(
-              _(
-                "Synchronization with NTP server is not possible\nwithout package #{required_package} installed."
-              )
+            _("Synchronization with NTP server is not possible\nwithout package %s installed.") %
+            required_package
           )
         end
       end
@@ -467,12 +466,9 @@ module Yast
         # Translators: yes-no popup,
         # ntpdate is a command, %1 is the server address
         if Popup.YesNo(
-            Builtins.sformat(
-              _(
-                "'Test query to server '%1' failed. If server is not yet accessible or network is not configured click 'No' to ignore. Revisit NTP server configuration?"
-              ),
-              server
-            )
+             _("Test query to server '%s' failed.\n" +
+               "If server is not yet accessible or network is not configured\n" +
+               "click 'No' to ignore. Revisit NTP server configuration?") % server
           )
           return false # loop on
         elsif !Ops.get_boolean(argmap, "ntpdate_only", false)
