@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Dec  4 09:50:34 UTC 2014 - jreidinger@suse.com
+
+- remove X-KDE-Library from desktop file (bnc#899104)
+
+-------------------------------------------------------------------
 Tue Sep  2 10:00:18 UTC 2014 - cwh@suse.com
 
 - Using Report.Error to be autoyast-proof
