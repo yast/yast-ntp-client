@@ -16,10 +16,15 @@
 # @return [Hash] edited settings, Summary or boolean on success depending on called function
 # @example map mm = $[ "FAIL_DELAY" : "77" ];
 # @example map ret = WFM::CallFunction ("ntp-client_auto", [ "Summary", mm ]);
+
+require "fileutils"
+
 module Yast
   class NtpClientAutoClient < Client
     def main
       Yast.import "UI"
+      Yast.import "Mode"
+      Yast.import "Stage"
 
       textdomain "ntp-client"
 
@@ -63,6 +68,19 @@ module Yast
         @ret = NtpClient.Import(@param)
       # Return actual state
       elsif @func == "Export"
+        # The ntp.conf has to be read after the
+        # package has been installed in the installation
+        # mode (bnc#928987)
+        # Mode.config : true during the installation when
+        #               cloning the just installed system
+        if Mode.config && Stage.initial
+          ntp_conf = "/etc/ntp.conf"
+          # copy ntp.conf from the installed system to
+          # running system
+          `/usr/bin/cp #{File.join(Installation.destdir, ntp_conf)} #{ntp_conf}"`
+          # read ntp.conf
+          NtpClient.ProcessNtpConf
+        end
         @ret = NtpClient.Export
       # did configuration change
       elsif @func == "GetModified"
