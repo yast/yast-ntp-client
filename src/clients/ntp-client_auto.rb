@@ -25,6 +25,7 @@ module Yast
       Yast.import "UI"
       Yast.import "Mode"
       Yast.import "Stage"
+      Yast.import "Installation"
 
       textdomain "ntp-client"
 
@@ -77,7 +78,7 @@ module Yast
           ntp_conf = "/etc/ntp.conf"
           # copy ntp.conf from the installed system to
           # running system
-          `/usr/bin/cp #{File.join(Installation.destdir, ntp_conf)} #{ntp_conf}`
+          ::FileUtils.cp File.join(Installation.destdir, ntp_conf), ntp_conf
           # read ntp.conf
           NtpClient.ProcessNtpConf
         end
