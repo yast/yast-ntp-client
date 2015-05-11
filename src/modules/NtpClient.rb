@@ -944,7 +944,8 @@ module Yast
           next deep_copy(p)
         end
       end
-
+      # restricts is a list of entries whereas restrict_map
+      # is a map with target key (ip, ipv4-tag, ipv6-tag,...).
       restricts = settings["restricts"] || []
       @restrict_map = {}
       restricts.each do |entry|
@@ -959,6 +960,9 @@ module Yast
     # (For use by autoinstallation.)
     # @return [Hash] Dumped settings (later acceptable by Import ())
     def Export
+      # restrict_map is a map with the key ip,ipv4-tag or ipv6-tag.
+      # This will be converted into a list in order to use it in
+      # autoyast XML file properly.
       restricts = @restrict_map.collect do |target, values|
         values["target"] = target
         values
