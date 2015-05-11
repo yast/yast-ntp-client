@@ -92,6 +92,26 @@ module Yast
                 "type"         => "peer"
               }
             ],
+            "restricts"         => [
+              {
+                "mask"         => "",
+                "options"      => "default kod notrap nomodify nopeer noquery",
+                "comment"      => "",
+                "target"       => "-6"
+              },
+              {
+                "mask"         => "",
+                "options"      => "",
+                "comment"      => "\n# Local users may interrogate the ntp server more closely.\n",
+                "target"       => "127.0.0.1"
+              },
+              {
+                "mask"         => "",
+                "options"      => "",
+                "comment"      => "",
+                "target"       => "::1"
+              }
+            ],
             "start_at_boot"   => false,
             "start_in_chroot" => true,
             "configure_dhcp"  => false
