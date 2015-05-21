@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Thu May 21 13:44:06 CEST 2015 - schubi@suse.de
+
+- AutoYaST (bnc#928987):
+  -- Read ntp.conf again before generating autoinst.xml file
+  (after the ntp rpm has been installed)
+  -- New section "restricts"
+- 3.1.12.1
+
+-------------------------------------------------------------------
 Tue Sep  2 10:00:18 UTC 2014 - cwh@suse.com
 
 - Using Report.Error to be autoyast-proof
