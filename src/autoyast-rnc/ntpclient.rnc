@@ -6,6 +6,7 @@ ntp-client =
   element ntp-client {
     configure_dhcp? &
     peers? &
+    restricts? &
     start_at_boot? &
     start_in_chroot? &
     ntp_policy?
@@ -47,6 +48,25 @@ peers =
     LIST,
     peer*
   }
+
+restrict =
+  element restrict {
+    (restrict_mask
+     | restrict_comment
+     | restrict_options
+     | restrict_target)*
+  }
+restrict_mask = element type { text }
+restrict_comment = element options { text }
+restrict_options = element device  { text }
+restrict_target = element comment { text }
+
+restricts =
+  element restricts {
+    LIST,
+    restrict*
+  }
+
 start_at_boot =
   element start_at_boot { BOOLEAN }
 start_in_chroot =
