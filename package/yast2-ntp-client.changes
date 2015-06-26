@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jun 26 11:34:00 UTC 2015 - jreidinger@suse.com
+
+- do not crash if ntp is not installed to target system during
+  cloning (bnc#936178)
+- 3.1.15
+
+-------------------------------------------------------------------
 Fri May  8 09:39:11 CEST 2015 - schubi@suse.de
 
 - AutoYaST (bnc#928987):
