@@ -78,7 +78,7 @@ module Yast
           ntp_conf = "/etc/ntp.conf"
           installed_ntp_conf = File.join(Installation.destdir, ntp_conf)
           # if ntp is not installed at all we cannot copy it, so return empty values
-          if !::FileUtils.exist?(installed_ntp_conf)
+          if !::File.exist?(installed_ntp_conf)
             Builtins.y2milestone("Ntp is not installed, so return empty hash")
             return {}
           end
