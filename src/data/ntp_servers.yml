@@ -1063,14 +1063,6 @@
   synchronization: NTP V3 primary (Meinberg DCF-77 PZF 535/TCXO), IBM RS6000-250,
     AIX 4.x
 
-- access_policy: open access to stratum-2 servers, send a message to notify
-  address: chronos.cru.fr
-  country: FR
-  exact_location: University of Rennes 1, Britany, France
-  location: France/Europe
-  stratum: '1'
-  synchronization: NTP V3, Datum TymServe 2100L with GPS
-
 - access_policy: open access to stratum-2 servers, but please send a message to notify
   address: ntp-p1.obspm.fr
   country: FR
