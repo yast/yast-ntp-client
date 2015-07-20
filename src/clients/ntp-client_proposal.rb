@@ -399,12 +399,13 @@ module Yast
 
         Builtins.y2milestone("Running sntp to sync with %1", ntp_server)
 
-        # -s: do set the system time
+        # -S: do set the system time
         # -t 5: timeout of 5 seconds
         # -l <file>: log to a file to not mess text mode installation
+        # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
         ret = SCR.Execute(
                 path(".target.bash"),
-                "/usr/sbin/sntp -l /var/log/YaST2/sntp.log -t 5 -s '#{String.Quote(ntp_server)}'"
+                "/usr/sbin/sntp -S -l /var/log/YaST2/sntp.log -t 5 -c '#{String.Quote(ntp_server)}'"
               )
         Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
         Popup.ClearFeedback
