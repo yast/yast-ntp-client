@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Aug  4 15:30:03 UTC 2015 - mvidner@suse.com
+
+- Moved clients/ntp-client_proposal.rb to yast2-country:
+  clients/timezone_ntp.rb (boo#938951).
+- 3.1.17
+
+-------------------------------------------------------------------
 Mon Jul 20 10:38:30 UTC 2015 - ancor@suse.com
 
 - Calls to sntp adjusted to the syntax of ntp 4.2.8

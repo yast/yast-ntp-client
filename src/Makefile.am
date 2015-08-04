@@ -6,8 +6,7 @@ module_DATA = \
 client_DATA = \
   clients/ntp-client.rb \
   clients/ntp-client_auto.rb \
-  clients/ntp-client_finish.rb \
-  clients/ntp-client_proposal.rb
+  clients/ntp-client_finish.rb
 
 yncludedir = @yncludedir@/ntp-client
 ynclude_DATA = \
