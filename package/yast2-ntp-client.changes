@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug  7 12:35:42 UTC 2015 - varkoly@suse.com
+
+- bnc#799473 - at some moments ntp revert to chronos.cru.fr that don't works
+  chronos.cru.fr is not realy free accessable: Access policy : accès sous conditions
+- 3.1.18
+
+-------------------------------------------------------------------
 Thu Aug  6 08:51:13 UTC 2015 - mvidner@suse.com
 
 - If Install Recommended Packages is disabled during system
