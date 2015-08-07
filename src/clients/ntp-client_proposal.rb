@@ -369,17 +369,11 @@ module Yast
       required_package = "ntp"
 
       #In 1st stage, schedule packages for installation
-      #but not in case user wants to set the time only (F#302917)
-      #(ntpdate is in inst-sys so we don't need the package)
-      if Stage.initial && !ntpdate_only
+      if Stage.initial
         Yast.import "Packages"
         Packages.addAdditionalPackage(required_package)
-        # bugzilla #327050
-        # Agent for writing /etc/ntp.conf needs to be installed
-        # to write the settings at the end of the installation
-        Packages.addAdditionalPackage("yast2-ntp-client")
       #Otherwise, prompt user for confirming pkg installation
-      elsif !Stage.initial
+      else
         if !PackageSystem.CheckAndInstallPackages([required_package])
           Report.Error(
             Builtins.sformat(

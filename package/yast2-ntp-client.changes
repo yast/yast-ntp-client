@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Aug  6 08:51:13 UTC 2015 - mvidner@suse.com
+
+- If Install Recommended Packages is disabled during system
+  installation, explicitly install ntp.rpm, avoiding error pop-up
+  "Cannot adjust 'NTP' service" (boo#938951).
+- 3.1.17
+
+-------------------------------------------------------------------
 Mon Jul 20 10:38:30 UTC 2015 - ancor@suse.com
 
 - Calls to sntp adjusted to the syntax of ntp 4.2.8
