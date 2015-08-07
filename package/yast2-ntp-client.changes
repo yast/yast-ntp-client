@@ -1,9 +1,9 @@
 -------------------------------------------------------------------
-Mon Jul 13 13:40:43 UTC 2015 - varkoly@suse.com
+Fri Aug  7 12:35:42 UTC 2015 - varkoly@suse.com
 
 - bnc#799473 - at some moments ntp revert to chronos.cru.fr that don't works
   chronos.cru.fr is not realy free accessable: Access policy : accès sous conditions
-- 3.1.16 
+- 3.1.18
 
 -------------------------------------------------------------------
 Fri Jun 26 11:34:00 UTC 2015 - jreidinger@suse.com
