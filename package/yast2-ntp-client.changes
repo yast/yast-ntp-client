@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug 13 14:08:21 UTC 2015 - ancor@suse.com
+
+- Always use a server from pool.ntp.org as default (bnc#940881)
+- 2.17.17
+
+-------------------------------------------------------------------
 Mon Feb  9 14:56:37 UTC 2015 - ancor@suse.com
 
 - Calls to sntp adjusted to the syntax of ntp 4.2.8 (bnc#916617)
