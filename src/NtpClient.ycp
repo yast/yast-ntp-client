@@ -281,6 +281,8 @@ global list GetNtpServersByCountry ( string country, boolean terse_output ) {
         country_names = GetCountryNames ();
     }
 
+    boolean default_already_chosen = false;
+    boolean selected = false;
     list items = maplist (string s, map<string,string> o, servers, {
 	string label = o["location"]:"";
         string l_country = o["country"]:"";
@@ -295,10 +297,19 @@ global list GetNtpServersByCountry ( string country, boolean terse_output ) {
         else
             label = sformat ("%1 (%2%3)", s, label, l_country);
 
+        // Select the first occurrence of pool.ntp.org as the default option
+        // (bnc#940881)
+        if (default_already_chosen) {
+            selected = false;
+        } else {
+            selected = regexpmatch(s, "pool.ntp.org$");
+            default_already_chosen = selected;
+        }
+
 	if (terse_output)
-	    return `item (`id(s), s);
+	    return `item (`id(s), s, selected);
 	else
-            return `item (`id (s), label);
+            return `item (`id (s), label, selected);
     });
 
     return items;
