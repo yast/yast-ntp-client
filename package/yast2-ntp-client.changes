@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 17 15:57:24 UTC 2015 - ancor@suse.com
+
+- Always use a server from pool.ntp.org as default (bnc#940881)
+- 3.1.12.2
+
+-------------------------------------------------------------------
 Thu May 21 13:44:06 CEST 2015 - schubi@suse.de
 
 - AutoYaST (bnc#928987):
