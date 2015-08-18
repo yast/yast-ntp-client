@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 17 15:57:24 UTC 2015 - ancor@suse.com
+
+- Always use a server from pool.ntp.org as default (bnc#940881)
+- 3.1.19
+
+-------------------------------------------------------------------
 Fri Aug  7 12:35:42 UTC 2015 - varkoly@suse.com
 
 - bnc#799473 - Do not use chronos.cru.fr which is is not really
