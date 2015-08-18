@@ -271,6 +271,7 @@ module Yast
         country_names = GetCountryNames()
       end
 
+      default_already_chosen = false
       items = Builtins.maplist(servers) do |s, o|
         label = Ops.get(o, "location", "")
         l_country = Ops.get(o, "country", "")
@@ -286,10 +287,18 @@ module Yast
         else
           label = Builtins.sformat("%1 (%2%3)", s, label, l_country)
         end
-        if terse_output
-          next Item(Id(s), s)
+
+        # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
+        if default_already_chosen
+          selected = false
         else
-          next Item(Id(s), label)
+          selected = default_already_chosen = s.end_with?("pool.ntp.org")
+        end
+
+        if terse_output
+          next Item(Id(s), s, selected)
+        else
+          next Item(Id(s), label, selected)
         end
       end
 
