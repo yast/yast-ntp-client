@@ -345,6 +345,7 @@ module Yast
     #   server (taken from UI if empty)
     #   servers (intended to use all of opensuse.pool.ntp.org,
     # 	   but I did not have time to make it work)
+    #   run_service (set to true if empty)
     #   write_only (bnc#589296)
     #   ntpdate_only (TODO rename to onetime)
     # return:
@@ -352,7 +353,7 @@ module Yast
     def Write(param)
       ntp_servers = param["servers"] || []
       ntp_server = param["server"] || ""
-      run_service = param["run_service"] || true
+      run_service = param.fetch("run_service", true)
       if ntp_server == ""
         # get the value from UI only when it wasn't given as a parameter
         ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
