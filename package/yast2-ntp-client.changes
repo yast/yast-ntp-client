@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 29 12:05:53 UTC 2015 - ancor@suse.com
+
+- Fixed an error in the "run NTP as daemon" checkbox (bsc#952144)
+- 3.1.20
+
+-------------------------------------------------------------------
 Mon Aug 17 15:57:24 UTC 2015 - ancor@suse.com
 
 - Always use a server from pool.ntp.org as default (bnc#940881)
