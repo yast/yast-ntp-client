@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov  4 09:51:04 UTC 2015 - igonzalezsosa@suse.com
+
+- Fix validation of AutoYaST profiles (bsc#805275)
+- 2.17.16
+
+-------------------------------------------------------------------
 Fri Mar 22 13:20:47 CET 2013 - mvidner@suse.cz
 
 - fix ntp.conf config merging: do reread the config from disk (bnc#773201)
