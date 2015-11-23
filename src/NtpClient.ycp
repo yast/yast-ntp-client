@@ -1084,14 +1084,52 @@ global define integer findSyncRecord (string type, string address) ``{
 }
 
 /**
+ * Remove the "restrict" option for the server if it is not used anymore (bsc#954442)
+ * @param string removed_server Address of the server
+ */
+define void removeRestrictServerOption(string removed_server)
+{
+    if (removed_server == nil || removed_server == "")
+    {
+        return;
+    }
+
+    list<map> servers = filter (map<string,any> r, ntp_records, {
+        return r["type"]:"" == "server" && r["address"]:"" == removed_server;
+    });
+
+    // remove it unless another server record is present
+    if (size(servers) <= 1)
+    {
+        y2milestone("Removing restrict option for %1", removed_server);
+        restrict_map = remove(restrict_map, removed_server);
+    }
+}
+
+/**
   * Store currently sellected synchronization record
   * @return boolean true on success
   */
 global define boolean storeSyncRecord () ``{
     if (selected_index == -1)
-	ntp_records = add (ntp_records, selected_record);
+    {
+        y2milestone("Adding a new record: %1", selected_record);
+        ntp_records = add (ntp_records, selected_record);
+    }
     else
-	ntp_records[selected_index] = selected_record;
+    {
+        string old_address = ntp_records[selected_index, "address"]:"";
+
+        // when changing the server remove the "restrict" option for the old server
+        if (selected_record["type"]:"" == "server" &&
+          selected_record["address"]:"" != old_address)
+        {
+            removeRestrictServerOption(old_address);
+        }
+
+        y2milestone("Updating record at %1 to: %2", selected_index, selected_record);
+        ntp_records[selected_index] = selected_record;
+    }
     modified = true;
     return true;
 }
@@ -1107,8 +1145,19 @@ global define boolean deleteSyncRecord (integer index) ``{
 	y2error ("Record with index %1 doesn't exist", index);
 	return false;
     }
+
+    y2milestone("Removing record at index %1: %2", index, ntp_records[index]:nil);
+
+    // server removal?
+    if (ntp_records[index,"type"]:"" == "server")
+    {
+        string address = ntp_records[index,"address"]:"";
+        removeRestrictServerOption(address);
+    }
+
     ntp_records[index] = nil;
     ntp_records = filter (map<string,any> r, ntp_records, ``(r != nil));
+
     modified = true;
     return true;
 }

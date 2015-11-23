@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Nov 13 11:55:05 UTC 2015 - lslezak@suse.cz
+
+- Also remove the "restrict" server option from /etc/ntp.conf when
+  a server is removed or changed, do not leave unused values
+  (bsc#954442)
+- 2.17.19
+
+-------------------------------------------------------------------
 Wed Nov  4 09:51:04 UTC 2015 - igonzalezsosa@suse.com
 
 - Fix validation of AutoYaST profiles (bsc#805275)
