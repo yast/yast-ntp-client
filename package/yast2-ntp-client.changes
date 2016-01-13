@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Nov 13 10:59:21 UTC 2015 - igonzalezsosa@suse.com
+
+- Fix validation of AutoYaST profiles (bsc#954412)
+- 3.1.21
+
+-------------------------------------------------------------------
 Thu Oct 29 12:05:53 UTC 2015 - ancor@suse.com
 
 - Fixed an error in the "run NTP as daemon" checkbox (bsc#952144)
