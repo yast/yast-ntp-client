@@ -9,7 +9,9 @@ ntp-client =
     restricts? &
     start_at_boot? &
     start_in_chroot? &
-    ntp_policy?
+    ntp_policy? &
+    sync_interval? &
+    synchronize_time?
   }
 
 ntp_policy =
@@ -56,10 +58,10 @@ restrict =
      | restrict_options
      | restrict_target)*
   }
-restrict_mask = element type { text }
-restrict_comment = element options { text }
-restrict_options = element device  { text }
-restrict_target = element comment { text }
+restrict_mask = element mask { text }
+restrict_comment = element comment { text }
+restrict_options = element options  { text }
+restrict_target = element target { text }
 
 restricts =
   element restricts {
@@ -71,3 +73,8 @@ start_at_boot =
   element start_at_boot { BOOLEAN }
 start_in_chroot =
   element start_in_chroot { BOOLEAN }
+
+sync_interval =
+  element sync_interval { INTEGER }
+synchronize_time =
+  element synchronize_time { BOOLEAN }
