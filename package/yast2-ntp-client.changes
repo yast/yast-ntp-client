@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan 22 10:20:37 CET 2016 - schubi@suse.de
+
+- Sntp uses '-K /dev/null' because the kod file could not exist.
+  (bnc#960455)
+- 2.17.20
+
+-------------------------------------------------------------------
 Fri Nov 13 11:55:05 UTC 2015 - lslezak@suse.cz
 
 - Also remove the "restrict" server option from /etc/ntp.conf when
