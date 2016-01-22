@@ -238,11 +238,12 @@ without having package %1 installed"), required_package));
 
 	// -S: do set the system time
 	// -t 5: timeout of 5 seconds
+        // -K /dev/null: use /dev/null as KoD history file (if not specified, /var/db/ntp-kod will be used and it doesn't exist)
 	// -l <file>: log to a file to not mess text mode installation
 	// -c: causes all IP addresses to which %1 resolves to be queried in parallel
         integer r = (integer) SCR::Execute (
 		.target.bash,
-		sformat("/usr/sbin/sntp -S -l /var/log/YaST2/sntp.log -t 5 -c '%1'", String::Quote(ntp_server))
+		sformat("/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log -t 5 -c '%1'", String::Quote(ntp_server))
 	);
         y2milestone ("'sntp %1' returned %2", ntp_server, r);
 
