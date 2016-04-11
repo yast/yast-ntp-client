@@ -1,16 +1,22 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-BuildRequires:	yast2-country-data
+BuildRequires:  perl-XML-Writer
+BuildRequires:  update-desktop-files
+BuildRequires:  yast2
+BuildRequires:  yast2-country-data
+BuildRequires:  yast2-devtools
+BuildRequires:  yast2-testsuite
 #SLPAPI.pm 
 # Hostname::CurrentDomain
-Requires:	yast2 >= 2.16.48
-Requires:	yast2-country-data 
+Requires:       yast2 >= 2.16.48
+Requires:       yast2-country-data
+# New sntp command line syntax
+Conflicts:      ntp < 4.2.8
 
 BuildArchitectures:	noarch
 
-Summary:	Configuration of ntp-client
+Summary:        YaST2 - NTP Client Configuration
 
 %description
 -
