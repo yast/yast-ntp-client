@@ -11,6 +11,8 @@ BuildRequires:  yast2-testsuite
 # Hostname::CurrentDomain
 Requires:       yast2 >= 2.16.48
 Requires:       yast2-country-data
+# New sntp command line syntax
+Conflicts:      ntp < 4.2.8
 
 BuildArch:      noarch
 
