@@ -1087,20 +1087,13 @@ module Yast
 
       # testing the server using IPv4 and then using IPv6 protocol
       # bug #74076, Firewall could have been blocked IPv6
-      ret_IPv4 = Convert.to_integer(
-        SCR.Execute(
-          path(".target.bash"),
-          Builtins.sformat("/usr/sbin/sntp -4 -t 5 %1", server)
-        )
-      )
+      # -K /dev/null: use /dev/null as KoD history file (if not specified,
+      #               /var/db/ntp-kod will be used and it doesn't exist)
+      # -c: concurrently query all IPs; -t 5: five seconds of timeout
+      ret_IPv4 = SCR.Execute(path(".target.bash"), "/usr/sbin/sntp -4 -K /dev/null -t 5 -c #{server}")
       ret_IPv6 = 0
       if ret_IPv4 != 0
-        ret_IPv6 = Convert.to_integer(
-          SCR.Execute(
-            path(".target.bash"),
-            Builtins.sformat("/usr/sbin/sntp -6 -t 5 %1", server)
-          )
-        )
+        ret_IPv6 = SCR.Execute(path(".target.bash"), "/usr/sbin/sntp -6 -K /dev/null -t 5 -c #{server}")
       end
 
       UI.CloseDialog if verbosity != :no_ui
