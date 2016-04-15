@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr 11 09:16:37 CEST 2016 - kanderssen@suse.com
+
+- Calls to sntp adjusted to the syntax of ntp 4.2.8
+  (bnc#916617, FATE#320394)
+- 2.17.14.1
+
+-------------------------------------------------------------------
 Wed Apr 21 16:39:38 CEST 2010 - varkoly@suse.de
 
 - Remove missleading depracated input field
