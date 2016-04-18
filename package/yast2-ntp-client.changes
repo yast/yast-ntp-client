@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr 14 09:16:37 CEST 2016 - kanderssen@suse.com
+
+- Calls to sntp adjusted to the syntax of ntp 4.2.8
+  (bnc#937837, bnc#916617, FATE#320392)
+- 3.1.22
+
+-------------------------------------------------------------------
 Fri Nov 13 10:59:21 UTC 2015 - igonzalezsosa@suse.com
 
 - Fix validation of AutoYaST profiles (bsc#954412)
