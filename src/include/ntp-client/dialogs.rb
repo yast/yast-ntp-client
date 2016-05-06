@@ -172,11 +172,7 @@ module Yast
               VSpacing(),
               Left("secure"),
               VSpacing(),
-              Frame(
-                # TRANSLATORS: UI frame label
-                _("Firewall Settings"),
-                "firewall"
-              )
+              "firewall"
             )
           ),
           VStretch()

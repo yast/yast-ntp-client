@@ -8,6 +8,7 @@
 # $Id$
 module Yast
   module NtpClientHelpsInclude
+    Yast.import "NtpClient"
     def initialize_ntp_client_helps(include_target)
       textdomain "ntp-client"
 
@@ -31,16 +32,14 @@ module Yast
               "Abort the save procedure by pressing  <b>Abort</b>.\n" +
               "An additional dialog will inform you whether it is safe to do so.</p>"
           ),
-        # help text 1/5
+        # help text 1/5, %d is a number of minutes
         "start"              => _(
           "<p><b><big>Start NTP Daemon</big></b><br>\n" +
             "Select whether to start the NTP daemon now and on every system boot. \n" +
-            "The NTP daemon resolves host names when initializing. Your\n" +
-            "network connection must be started before the NTP daemon starts.</p>\n" +
-	    "Selecting <b>Synchronize without Daemon</b> the ntp daemon will not be activated. \n" +
-	    "The system time will be set periodically. The interval is configurable. It is 15 minutes by default.\n " +
-	    "You can change this when the system was set up."
-	),
+	    "Selecting <b>Synchronize without Daemon</b> the ntp daemon will not be activated\n" +
+	    "and the system time will be set periodically by a <i>cron</i> script. \n" +
+      "The interval is configurable, by default it is %d minutes."
+	    ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
         # help text 2/5
         "chroot_environment" => _(
           "<p><b><big>Chroot Jail</big></b><br>\n" +

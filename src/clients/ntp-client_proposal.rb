@@ -57,9 +57,7 @@ module Yast
 
 
 
-      if false
-        return
-      elsif @func == "GetNTPEnabled"
+      if @func == "GetNTPEnabled"
         @ret = GetNTPEnabled()
       elsif @func == "SetUseNTP"
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
@@ -326,7 +324,7 @@ module Yast
       NtpClient.run_service = run_service
       if !run_service
         NtpClient.synchronize_time = true
-        NtpClient.sync_interval = 15
+        NtpClient.sync_interval = NtpClientClass::DEFAULT_SYNC_INTERVAL
       end
 
       #OK, so we stored the server address
