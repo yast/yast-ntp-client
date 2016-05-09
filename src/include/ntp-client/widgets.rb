@@ -111,6 +111,9 @@ module Yast
     def intervalInit(id)
       UI.ChangeWidget(Id("interval"), :Value, NtpClient.sync_interval)
 
+      enabled = UI.QueryWidget(Id("start"), :CurrentButton) == "sync"
+      UI.ChangeWidget(Id("interval"), :Enabled, enabled)
+
       nil
     end
 

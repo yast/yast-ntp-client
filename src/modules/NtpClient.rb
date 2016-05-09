@@ -14,6 +14,12 @@ require "yaml"
 
 module Yast
   class NtpClientClass < Module
+
+    # the default synchronization interval in minutes when running in the manual
+    # sync mode ("Synchronize without Daemon" option, ntp started from cron)
+    # Note: the UI field currently uses maximum of 60 minutes
+    DEFAULT_SYNC_INTERVAL = 5
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -61,7 +67,7 @@ module Yast
       @synchronize_time = false
 
       # The interval of synchronization in minutes.
-      @sync_interval = 5
+      @sync_interval = DEFAULT_SYNC_INTERVAL
 
       # The cron file name for the synchronization.
       @cron_file = "/etc/cron.d/novell.ntp-synchronize"
@@ -462,7 +468,7 @@ module Yast
       Builtins.y2milestone("CRONTAB %1", crontab)
       tmp = Ops.get_string(crontab, [0, "events", 0, "active"], "0")
       @synchronize_time = tmp == "1"
-      tmp = Ops.get_string(crontab, [0, "events", 0, "minute"], "*/5")
+      tmp = Ops.get_string(crontab, [0, "events", 0, "minute"], "*/#{DEFAULT_SYNC_INTERVAL}")
       Builtins.y2milestone("MINUTE %1", tmp)
       pos = Builtins.regexppos(tmp, "[0-9]+")
       tmp2 = Builtins.substring(
@@ -930,7 +936,7 @@ module Yast
     def Import(settings)
       settings = deep_copy(settings)
       @synchronize_time = Ops.get_boolean(settings, "synchronize_time", false)
-      @sync_interval = Ops.get_integer(settings, "sync_interval", 5)
+      @sync_interval = Ops.get_integer(settings, "sync_interval", DEFAULT_SYNC_INTERVAL)
       @run_service = Ops.get_boolean(settings, "start_at_boot", false)
       @run_chroot = Ops.get_boolean(settings, "start_in_chroot", true)
       # compatibility: configure_dhcp:true translates to ntp_policy:auto

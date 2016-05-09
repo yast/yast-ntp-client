@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Fri May  6 16:09:50 UTC 2016 - lslezak@suse.cz
+
+- Fixed the default synchronization interval in the help text
+  (bsc#978453)
+- Unify the default value in the code (the proposal client used
+  a different default)
+- Set the initial state of the interval widget according to
+  the current synchronization mode (bsc#978892)
+- Fixed firewall widget layout (double frame widget)
+- 3.1.23
+
+-------------------------------------------------------------------
 Thu Apr 14 09:16:37 CEST 2016 - kanderssen@suse.com
 
 - Calls to sntp adjusted to the syntax of ntp 4.2.8
