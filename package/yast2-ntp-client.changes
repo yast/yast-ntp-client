@@ -6,7 +6,7 @@ Fri May  6 16:09:50 UTC 2016 - lslezak@suse.cz
 - Unify the default value in the code (the proposal client used
   a different default)
 - Set the initial state of the interval widget according to
-  the current synchronization mode
+  the current synchronization mode (bsc#978892)
 - Fixed firewall widget layout (double frame widget)
 - 3.1.23
 
