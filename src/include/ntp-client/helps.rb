@@ -36,7 +36,7 @@ module Yast
         "start"              => _(
           "<p><b><big>Start NTP Daemon</big></b><br>\n" +
             "Select whether to start the NTP daemon now and on every system boot. \n" +
-	    "Selecting <b>Synchronize without Daemon</b> the ntp daemon will not be activated\n" +
+	    "Selecting <b>Synchronize without Daemon</b> the NTP daemon will not be activated\n" +
 	    "and the system time will be set periodically by a <i>cron</i> script. \n" +
       "The interval is configurable, by default it is %d minutes."
 	    ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
