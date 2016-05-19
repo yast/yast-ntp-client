@@ -76,9 +76,15 @@ module Yast
         #               cloning the just installed system
         if Mode.config && Stage.initial
           ntp_conf = "/etc/ntp.conf"
+          installed_ntp_conf = File.join(Installation.destdir, ntp_conf)
+          # if ntp is not installed at all we cannot copy it, so return empty values
+          if !::File.exist?(installed_ntp_conf)
+            Builtins.y2milestone("Ntp is not installed, so return empty hash")
+            return {}
+          end
           # copy ntp.conf from the installed system to
           # running system
-          ::FileUtils.cp File.join(Installation.destdir, ntp_conf), ntp_conf
+          ::FileUtils.cp installed_ntp_conf, ntp_conf
           # read ntp.conf
           NtpClient.ProcessNtpConf
         end
