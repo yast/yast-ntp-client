@@ -2,7 +2,7 @@
 Thu May 19 09:18:34 CEST 2016 - schubi@suse.de
 
 - do not crash if ntp is not installed to target system during
-  cloning (bnc#936178, bnc#978188). Backport from SP1
+  cloning (bnc#936178, bnc#978188). Backport from SP1.
 - 3.1.12.5
 
 -------------------------------------------------------------------
