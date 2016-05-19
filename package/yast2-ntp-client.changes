@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 19 09:18:34 CEST 2016 - schubi@suse.de
+
+- do not crash if ntp is not installed to target system during
+  cloning (bnc#936178, bnc#978188)
+- 3.1.12.4
+
+-------------------------------------------------------------------
 Fri Nov 13 10:59:21 UTC 2015 - igonzalezsosa@suse.com
 
 - Fix validation of AutoYaST profiles (bsc#954412)
