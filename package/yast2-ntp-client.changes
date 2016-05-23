@@ -2,7 +2,7 @@
 Mon May 23 06:19:31 UTC 2016 - kanderssen@suse.com
 
 - Calls to sntp adjusted to the syntax of ntp 4.2.8
-  (bsc#bsc#979421)
+  (bsc#979421)
 - 3.1.12.1
 
 -------------------------------------------------------------------

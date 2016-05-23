@@ -1066,13 +1066,13 @@ module Yast
     def sntp_test(server, ip_version = 4)
       output = SCR.Execute(
         path(".target.bash_output"),
-        "/usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}"
+        "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}"
       )
 
       Builtins.y2milestone("sntp test response: #{output}")
       # sntp returns always 0 if not called with option -S or -s (set system time)
       # so this is a workaround at least to return 1 in case server is not
-      # reachable
+      # reachable.
       return 1 if output["stderr"].include?("lookup error")
 
       output["exit"]
@@ -1086,16 +1086,11 @@ module Yast
     def TestNtpServer(server, verbosity)
       return reachable_ntp_server?(server) if verbosity == :no_ui
 
-      UI.OpenDialog(
-        # An informative popup label diring the NTP server testings
-        Left(Label(_("Testing the NTP server...")))
-      )
-
-      Builtins.y2milestone("Testing reachability of server %1", server)
-
-      ok = reachable_ntp_server?(server)
-
-      UI.CloseDialog
+      ok = false
+      Yast::Popup.Feedback(_("Testing the NTP server..."), Message.takes_a_while) do
+        Builtins.y2milestone("Testing reachability of server %1", server)
+        ok = reachable_ntp_server?(server)
+      end
 
       if verbosity == :result_popup
         if ok
