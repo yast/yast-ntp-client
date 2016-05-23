@@ -1070,9 +1070,13 @@ module Yast
       )
 
       Builtins.y2milestone("sntp test response: #{output}")
+
       # sntp returns always 0 if not called with option -S or -s (set system time)
       # so this is a workaround at least to return false in case server is not
-      # reachable.
+      # reachable. We could also take care of stdout checking if it includes
+      # "no (U|B)CST reponse", but it also implies be to dependent in the
+      # future and the ntp package should take care of it and aswer other exit
+      # code instead of 0
       output["stderr"].include?("lookup error") ? false : output["exit"] == 0
     end
 
