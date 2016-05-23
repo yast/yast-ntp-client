@@ -1046,36 +1046,34 @@ module Yast
     end
 
 
-    # Test if specified NTP server answers
+    # Test if a specified NTP server is reachable by IPv4 or IPv6 (bsc#74076),
+    # Firewall could have been blocked IPv6
     # @param [String] server string host name or IP address of the NTP server
     # @return [Boolean] true if NTP server answers properly
     def reachable_ntp_server?(server)
-      # testing the server using IPv4 and then using IPv6 protocol
-      # bug #74076, Firewall could have been blocked IPv6
-      return true if sntp_test(server) == 0
+      return true if sntp_test(server)
 
-      sntp_test(server, 6) == 0
+      sntp_test(server, 6)
     end
 
-    # -K /dev/null: use /dev/null as KoD history file (if not specified,
-    #               /var/db/ntp-kod will be used and it doesn't exist)
-    # -c: concurrently query all IPs; -t 5: five seconds of timeout
+    # Test NTP server answer for a given IP version.
     # @param [String] server string host name or IP address of the NTP server
     # @param [Fixnum] integer ip version to use (4 or 6)
     # @return [Fixnum] sntp exit code or 1 in case of lookup error
     def sntp_test(server, ip_version = 4)
       output = SCR.Execute(
         path(".target.bash_output"),
+        # -K /dev/null: use /dev/null as KoD history file (if not specified,
+        #               /var/db/ntp-kod will be used and it doesn't exist)
+        # -c: concurrently query all IPs; -t 5: five seconds of timeout
         "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}"
       )
 
       Builtins.y2milestone("sntp test response: #{output}")
       # sntp returns always 0 if not called with option -S or -s (set system time)
-      # so this is a workaround at least to return 1 in case server is not
+      # so this is a workaround at least to return false in case server is not
       # reachable.
-      return 1 if output["stderr"].include?("lookup error")
-
-      output["exit"]
+      output["stderr"].include?("lookup error") ? false : output["exit"] == 0
     end
 
     # Handle UI of NTP server test answers
