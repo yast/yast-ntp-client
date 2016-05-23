@@ -1051,15 +1051,14 @@ module Yast
     # @param [String] server string host name or IP address of the NTP server
     # @return [Boolean] true if NTP server answers properly
     def reachable_ntp_server?(server)
-      return true if sntp_test(server)
-
-      sntp_test(server, 6)
+      sntp_test(server) || sntp_test(server, 6)
     end
 
     # Test NTP server answer for a given IP version.
     # @param [String] server string host name or IP address of the NTP server
     # @param [Fixnum] integer ip version to use (4 or 6)
-    # @return [Fixnum] sntp exit code or 1 in case of lookup error
+    # @return [Boolean] true if stderr does not include lookup error and exit
+    # code is 0
     def sntp_test(server, ip_version = 4)
       output = SCR.Execute(
         path(".target.bash_output"),
@@ -1074,7 +1073,7 @@ module Yast
       # sntp returns always 0 if not called with option -S or -s (set system time)
       # so this is a workaround at least to return false in case server is not
       # reachable. We could also take care of stdout checking if it includes
-      # "no (U|B)CST reponse", but it also implies be to dependent in the
+      # "no (U|B)CST reponse", but it also implies be too dependent in the
       # future and the ntp package should take care of it and aswer other exit
       # code instead of 0
       output["stderr"].include?("lookup error") ? false : output["exit"] == 0
