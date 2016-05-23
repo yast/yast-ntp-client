@@ -101,7 +101,7 @@ global string ad_controller = "";
 /**
   * Required packages
   */
-global list required_packages = ["xntp"];
+global list required_packages = ["ntp"];
 
 /**
  * ports in firewall to open
@@ -263,7 +263,7 @@ global define boolean Read() ``{
     boolean failed = false;
 
     if (! Mode::testsuite ()
-	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["xntp"])
+	&& ! PackageSystem::CheckAndInstallPackagesInteractive (["ntp"])
     )
     {
 	return false;
