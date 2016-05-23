@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.1.12
+Version:        3.1.12.1
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -36,6 +36,7 @@ BuildRequires:  yast2-testsuite
 Requires:       yast2 >= 3.1.11
 Requires:       yast2-country-data
 Requires:       yast2-ruby-bindings >= 1.0.0
+Conflicts:      ntp < 4.2.8p7
 BuildArch:      noarch
 
 
