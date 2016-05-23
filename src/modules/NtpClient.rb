@@ -1045,42 +1045,54 @@ module Yast
       summary
     end
 
-    # Test if specified NTP server answers
+
+    # Test if a specified NTP server is reachable by IPv4 or IPv6 (bsc#74076),
+    # Firewall could have been blocked IPv6
+    # @param [String] server string host name or IP address of the NTP server
+    # @return [Boolean] true if NTP server answers properly
+    def reachable_ntp_server?(server)
+      sntp_test(server) || sntp_test(server, 6)
+    end
+
+    # Test NTP server answer for a given IP version.
+    # @param [String] server string host name or IP address of the NTP server
+    # @param [Fixnum] integer ip version to use (4 or 6)
+    # @return [Boolean] true if stderr does not include lookup error and exit
+    # code is 0
+    def sntp_test(server, ip_version = 4)
+      output = SCR.Execute(
+        path(".target.bash_output"),
+        # -K /dev/null: use /dev/null as KoD history file (if not specified,
+        #               /var/db/ntp-kod will be used and it doesn't exist)
+        # -c: concurrently query all IPs; -t 5: five seconds of timeout
+        "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}"
+      )
+
+      Builtins.y2milestone("sntp test response: #{output}")
+
+      # sntp returns always 0 if not called with option -S or -s (set system time)
+      # so this is a workaround at least to return false in case server is not
+      # reachable. We could also take care of stdout checking if it includes
+      # "no (U|B)CST reponse", but it also implies be too dependent in the
+      # future and the ntp package should take care of it and aswer other exit
+      # code instead of 0
+      output["stderr"].include?("lookup error") ? false : output["exit"] == 0
+    end
+
+    # Handle UI of NTP server test answers
     # @param [String] server string host name or IP address of the NTP server
     # @param [Symbol] verbosity `no_ui: ..., `transient_popup: pop up while scanning,
     #                  `result_popup: also final pop up about the result
     # @return [Boolean] true if NTP server answers properly
     def TestNtpServer(server, verbosity)
-      if verbosity != :no_ui
-        UI.OpenDialog(
-          # An informative popup label diring the NTP server testings
-          Left(Label(_("Testing the NTP server...")))
-        )
+      return reachable_ntp_server?(server) if verbosity == :no_ui
+
+      ok = false
+      Yast::Popup.Feedback(_("Testing the NTP server..."), Message.takes_a_while) do
+        Builtins.y2milestone("Testing reachability of server %1", server)
+        ok = reachable_ntp_server?(server)
       end
 
-      Builtins.y2milestone("Testing reachability of server %1", server)
-
-      # testing the server using IPv4 and then using IPv6 protocol
-      # bug #74076, Firewall could have been blocked IPv6
-      ret_IPv4 = Convert.to_integer(
-        SCR.Execute(
-          path(".target.bash"),
-          Builtins.sformat("/usr/sbin/sntp -4 -t 5 %1", server)
-        )
-      )
-      ret_IPv6 = 0
-      if ret_IPv4 != 0
-        ret_IPv6 = Convert.to_integer(
-          SCR.Execute(
-            path(".target.bash"),
-            Builtins.sformat("/usr/sbin/sntp -6 -t 5 %1", server)
-          )
-        )
-      end
-
-      UI.CloseDialog if verbosity != :no_ui
-
-      ok = ret_IPv4 == 0 || ret_IPv6 == 0
       if verbosity == :result_popup
         if ok
           # message report - result of test of connection to NTP server
