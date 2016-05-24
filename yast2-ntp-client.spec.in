@@ -1,12 +1,21 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	yast2-slp perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-Requires:	yast2 yast2-slp yast2-country
+BuildRequires:  yast2-slp
+BuildRequires:  perl-XML-Writer
+BuildRequires:  update-desktop-files
+BuildRequires:  yast2
+BuildRequires:  yast2-devtools
+BuildRequires:  yast2-testsuite
+Requires:       yast2
+Requires:       yast2-slp
+Requires:       yast2-country
+# New sntp command line syntax
+Conflicts:      ntp < 4.2.8p7
 
 BuildArchitectures:	noarch
 
-Summary:	Configuration of ntp-client
+Summary:        YaST2 - NTP Client Configuration
 
 %description
 -

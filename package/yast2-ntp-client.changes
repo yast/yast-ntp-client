@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon May 23 11:36:42 UTC 2016 - kanderssen@suse.com
+
+- Calls to sntp adjusted to the syntax of ntp 4.2.8 (bsc#979416)
+- 2.13.18
+
+-------------------------------------------------------------------
 Tue Feb  6 10:32:24 CET 2007 - kmachalkova@suse.cz
 
 - Merged 'Great Britain' and 'UK' public ntp server lists (#241054)
