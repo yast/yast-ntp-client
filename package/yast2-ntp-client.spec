@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.1.23
+Version:        3.1.24
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -44,15 +44,6 @@ Conflicts:      ntp < 4.2.8
 %description
 This package contains the YaST2 component for NTP client configuration.
 
-%package devel-doc
-Requires:       yast2-ntp-client = %version
-Summary:        YaST2 - NTP Client - Development Documentation
-Group:          System/YaST
-
-%description devel-doc
-This package contains development documentation for using the API
-provided by yast2-ntp-client package.
-
 %prep
 %setup -n %{name}-%{version}
 
@@ -77,11 +68,5 @@ provided by yast2-ntp-client package.
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
-%doc %{yast_docdir}/TODO
-%doc %{yast_docdir}/spec.txt
-
-%files devel-doc
-%doc %{yast_docdir}/autodocs
-%doc %{yast_docdir}/ntp.conf_agent.txt
 
 %changelog

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jun  1 15:33:15 UTC 2016 - igonzalezsosa@suse.com
+
+- Drop yast2-ntp-client-devel-doc package (fate#320256)
+- 3.1.24
+
+-------------------------------------------------------------------
 Fri May  6 16:09:50 UTC 2016 - lslezak@suse.cz
 
 - Fixed the default synchronization interval in the help text
