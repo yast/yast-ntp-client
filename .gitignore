@@ -34,3 +34,6 @@ tmp.*
 /testsuite/site.exp
 /testsuite/yast2-ntp-client.sum
 /testsuite/yast2-ntp-client.test/
+/doc/autodocs
+/.yardoc
+/coverage
