@@ -83,7 +83,6 @@ module Yast
       # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
       @ntp_policy = "auto"
 
-
       # Index of the currently sellected item
       @selected_index = -1
 
@@ -101,7 +100,6 @@ module Yast
 
       # ports in firewall to open
       @firewall_services = ["service:ntp"]
-
 
       # List of known NTP servers
       # server address -> information
@@ -164,7 +162,7 @@ module Yast
     #        ...
     #      ]
     def GetAllKnownCountries
-      #first point of dependence on yast2-country-data
+      # first point of dependence on yast2-country-data
       if !@countries_already_read
         @known_countries = Convert.convert(
           Builtins.eval(
@@ -180,7 +178,7 @@ module Yast
         @known_countries = {} if @known_countries.nil?
       end
 
-      #workaround bug #241054: servers in United Kingdom are in domain .uk
+      # workaround bug #241054: servers in United Kingdom are in domain .uk
       # domain .gb does not exist - add UK to the list of known countries
       if Builtins.haskey(@known_countries, "GB")
         Ops.set(@known_countries, "UK", Ops.get(@known_countries, "GB", ""))
@@ -195,17 +193,20 @@ module Yast
     def GetCurrentLanguageCode
       lang = Convert.to_string(SCR.Read(path(".sysconfig.language.RC_LANG")))
 
-      #second point of dependence on yast2-country-data
+      # second point of dependence on yast2-country-data
       Language.GetGivenLanguageCountry(lang)
     end
 
-    def MakePoolRecord(_CC, location)
-      mycc = Builtins.tolower(_CC)
-      #There is no gb.pool.ntp.org only uk.pool.ntp.org
+    # Given a country code and a location returns a hash with pool
+    # ntp address for given country, country code and location
+    # @return [Hash{String => String}] ntp pool address for given country
+    def MakePoolRecord(country_code, location)
+      mycc = Builtins.tolower(country_code)
+      # There is no gb.pool.ntp.org only uk.pool.ntp.org
       mycc = "uk" if mycc == "gb"
       {
-        "address"  => Ops.add(mycc, ".pool.ntp.org"),
-        "country"  => _CC,
+        "address"  => "#{mycc}.pool.ntp.org",
+        "country"  => country_code,
         "location" => location
       }
     end
@@ -316,19 +317,8 @@ module Yast
         type = Ops.get_string(m, "name", "")
         address = Ops.get_string(m, "value", "")
         options = ""
-        if Builtins.contains(
-            [
-              "server",
-              "peer",
-              "broadcast",
-              "broadcastclient",
-              "manycast",
-              "manycastclient",
-              "fudge",
-              "restrict"
-            ],
-            type
-          )
+        if ["server", "peer", "broadcast", "broadcastclient", "manycast",
+            "manycastclient", "fudge", "restrict"].include? type
           l = Builtins.splitstring(address, " \t")
           l = Builtins.filter(l) { |s| s != "" }
           address = Ops.get(l, 0, "")
@@ -458,7 +448,6 @@ module Yast
 
       @synchronize_time
     end
-
 
     # Read all ntp-client settings
     # @return true on success
@@ -623,7 +612,7 @@ module Yast
       end
 
       ret = true
-      Builtins.foreach(needed_servers) do |nserver_name, ns_value|
+      Builtins.foreach(needed_servers) do |_nserver_name, ns_value|
         ret = false if ns_value != true
       end
       ret
@@ -747,22 +736,17 @@ module Yast
       return false if Abort()
       Progress.NextStage if have_progress
 
-      Builtins.foreach(@restrict_map) do |key, m|
+      @restrict_map.each do |key, m|
+        options = " "
+        options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
+        options << m["options"].to_s
         ret = {
           "address" => key,
-          "comment" => Ops.get_string(m, "comment", ""),
+          "comment" => m["comment"].to_s,
           "type"    => "restrict",
-          "options" => Ops.add(
-            Ops.add(
-              Ops.get_string(m, "mask", "") != "" ?
-                Ops.add(" mask ", Ops.get_string(m, "mask", "")) :
-                "",
-              " "
-            ),
-            Ops.get_string(m, "options", "")
-          )
+          "options" => options
         }
-        @ntp_records = Builtins.add(@ntp_records, ret)
+        @ntp_records << ret
       end
 
       Builtins.y2milestone("Writing settings %1", @ntp_records)
@@ -794,7 +778,7 @@ module Yast
         end
         [s1, s2]
       end)
-      save2 = Builtins.filter(save2) { |m| m != nil }
+      save2 = Builtins.filter(save2) { |m| !m.nil? }
 
       failed = false
       conf = Convert.to_map(SCR.Read(path(".etc.ntp_conf.all")))
@@ -1002,8 +986,8 @@ module Yast
         # summary string, FIXME
         summary = Summary.AddLine(summary, _("Static configuration only."))
       else
-        # summary string, FIXME
-        summary = Summary.AddLine(summary, _("Custom configuration policy.")) # FIXME too generic!
+        # summary string, FIXME: too generic!
+        summary = Summary.AddLine(summary, _("Custom configuration policy."))
       end
 
       Builtins.foreach(
@@ -1238,7 +1222,7 @@ module Yast
 
       # FIXME: This is wrong approach, because datadir should be array of all Y2DIR/DATA
       # so we need to skip it in tests, even if we set Y2DIR properly
-      servers = YAML.load_file(servers_file) rescue nil
+      servers = YAML.load_file(servers_file)
       if servers.nil?
         log.error("Failed to read the list of NTP servers")
         return {}

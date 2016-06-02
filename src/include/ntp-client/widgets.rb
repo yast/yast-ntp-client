@@ -56,22 +56,20 @@ module Yast
     # Show popup with NTP daemon's log
     def showLogPopup
       LogView.Display(
-        {
-          "file"    => "/var/log/ntp",
-          "save"    => true,
-          "actions" => [
-            # menubutton entry, try to keep short
-            [
-              _("Restart NTP Daemon"),
-              fun_ref(method(:restartNtpDaemon), "void ()")
-            ],
-            # menubutton entry, try to keep short
-            [
-              _("Save Settings and Restart NTP Daemon"),
-              fun_ref(method(:SilentWrite), "boolean ()")
-            ]
+        "file"    => "/var/log/ntp",
+        "save"    => true,
+        "actions" => [
+          # menubutton entry, try to keep short
+          [
+            _("Restart NTP Daemon"),
+            fun_ref(method(:restartNtpDaemon), "void ()")
+          ],
+          # menubutton entry, try to keep short
+          [
+            _("Save Settings and Restart NTP Daemon"),
+            fun_ref(method(:SilentWrite), "boolean ()")
           ]
-        }
+        ]
       )
       nil
     end
@@ -108,7 +106,7 @@ module Yast
 
     # Initialize the widget
     # @param [String] id any widget id
-    def intervalInit(id)
+    def intervalInit(_id)
       UI.ChangeWidget(Id("interval"), :Value, NtpClient.sync_interval)
 
       enabled = UI.QueryWidget(Id("start"), :CurrentButton) == "sync"
@@ -120,8 +118,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id any widget id
     # @param [Hash] event map event that caused storing process
-    def intervalStore(id, event)
-      event = deep_copy(event)
+    def intervalStore(_id, _event)
       NtpClient.sync_interval = Convert.to_integer(
         UI.QueryWidget(Id("interval"), :Value)
       )
@@ -131,7 +128,7 @@ module Yast
 
     # Initialize the widget
     # @param [String] id any widget id
-    def startInit(id)
+    def startInit(_id)
       if NtpClient.synchronize_time
         UI.ChangeWidget(Id("start"), :CurrentButton, "sync")
       elsif NtpClient.run_service
@@ -146,8 +143,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id any widget id
     # @param [Hash] event map event that caused storing process
-    def startStore(id, event)
-      event = deep_copy(event)
+    def startStore(_id, _event)
       NtpClient.run_service = UI.QueryWidget(Id("start"), :CurrentButton) == "boot"
       NtpClient.synchronize_time = UI.QueryWidget(Id("start"), :CurrentButton) == "sync"
 
@@ -158,11 +154,11 @@ module Yast
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
     # @return [Object] always nil
-    def startHandle(id, event)
+    def startHandle(_id, event)
       event = deep_copy(event)
       start = UI.QueryWidget(Id("start"), :CurrentButton) == "boot"
-      #All these network devices are possibly started on boot || managed by NM
-      #hence do not display the message
+      # All these network devices are possibly started on boot || managed by NM
+      # hence do not display the message
       d1 = NetworkInterfaces.Locate("STARTMODE", "onboot")
       d2 = NetworkInterfaces.Locate("STARTMODE", "auto")
       d3 = NetworkInterfaces.Locate("STARTMODE", "nfsroot")
@@ -174,16 +170,14 @@ module Yast
         :to   => "list <string>"
       )
       devices = Builtins.filter(devices) { |d| d != "lo" }
-      #Do not display this warning if we use NetworkManager (#299666)
+      # Do not display this warning if we use NetworkManager (#299666)
       if start && !NetworkService.is_network_manager && Builtins.size(devices) == 0 &&
-          Ops.get_string(event, "EventReason", "") != "" &&
-          !# continue-cancel popup
-          Popup.ContinueCancel(
+          Ops.get_string(event, "EventReason", "") != "" && !Popup.ContinueCancel(
             _(
-              "Warning!\n" +
-                "\n" +
-                "If you do not have a permanent Internet connection,\n" +
-                "starting the NTP daemon can take a very long time and \n" +
+              "Warning!\n" \
+                "\n" \
+                "If you do not have a permanent Internet connection,\n" \
+                "starting the NTP daemon can take a very long time and \n" \
                 "the daemon might not run properly."
             )
           )
@@ -241,7 +235,8 @@ module Yast
         Report.Error(
           Builtins.sformat(
             _(
-              "NTP server '%1' is not a valid hostname,\nfully qualified hostname, IPv4 address, or IPv6 address."
+              "NTP server '%1' is not a valid hostname,\nfully qualified hostname," \
+              " IPv4 address, or IPv6 address."
             ),
             server_1
           )
@@ -263,11 +258,11 @@ module Yast
           # RandomServersService is disabled
           if !rss
             ret = true
-            raise Break 
+            raise Break
             # RandomServersService is enabled, don't take servers from RSS
           elsif !Builtins.contains(
-              NtpClient.random_pool_servers,
-              Ops.get_string(one_record, "address", "")
+            NtpClient.random_pool_servers,
+            Ops.get_string(one_record, "address", "")
             )
             ret = true
             raise Break
@@ -305,7 +300,7 @@ module Yast
         # disabled in case of PoolNTPorg feature
         # and in case of missing server value
         if Convert.to_boolean(UI.QueryWidget(Id("server_address"), :Enabled)) &&
-            Ops.get(NtpClient.selected_record, "address") != nil &&
+            !NtpClient.selected_record["address"].nil? &&
             Ops.get_string(NtpClient.selected_record, "address", "") != ""
           # Save the server_address only when changed
           # do not re-add it (with defaut values) - bug 177575
@@ -321,7 +316,7 @@ module Yast
               NtpClient.selected_record
             )
             NtpClient.storeSyncRecord
-          end 
+          end
           # deleting the current record if current server address is empty
         elsif Ops.get_string(NtpClient.selected_record, "address", "") == ""
           # delete only the server record if there is some current server record
@@ -342,8 +337,7 @@ module Yast
     # @param [String] key string widget id
     # @param [Hash] event map event that caused storing process
     # @return [Symbol] always `complex
-    def fudgeButtonHandle(key, event)
-      event = deep_copy(event)
+    def fudgeButtonHandle(_key, _event)
       :fudge
     end
 
@@ -358,8 +352,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id any widget id
     # @param [Hash] event map event that caused storing process
-    def chrootStore(id, event)
-      event = deep_copy(event)
+    def chrootStore(id, _event)
       tmp = NtpClient.run_chroot
       NtpClient.run_chroot = Convert.to_boolean(UI.QueryWidget(Id(id), :Value))
       if tmp != NtpClient.run_chroot
@@ -373,7 +366,7 @@ module Yast
       nil
     end
 
-    def secureInit(id)
+    def secureInit(_id)
       Builtins.y2milestone("Restrict %1", NtpClient.restrict_map)
       if NtpClient.PolicyIsNonstatic
         UI.ChangeWidget(Id("secure"), :Enabled, false)
@@ -384,8 +377,7 @@ module Yast
       nil
     end
 
-    def secureStore(id, event)
-      event = deep_copy(event)
+    def secureStore(id, _event)
       restrict = Convert.to_boolean(UI.QueryWidget(Id(id), :Value))
 
       if restrict
@@ -395,24 +387,22 @@ module Yast
           Ops.set(
             NtpClient.restrict_map,
             "default",
-            { "mask" => "", "comment" => "", "options" => "ignore" }
+            "mask" => "", "comment" => "", "options" => "ignore"
           )
 
           Ops.set(
             NtpClient.restrict_map,
             "127.0.0.1",
-            { "mask" => "", "comment" => "", "options" => "" }
+            "mask" => "", "comment" => "", "options" => ""
           )
 
           Builtins.foreach(servers) do |s|
             Ops.set(
               NtpClient.restrict_map,
               s,
-              {
-                "mask"    => "",
-                "comment" => "",
-                "options" => "nomodify notrap noquery"
-              }
+              "mask"    => "",
+              "comment" => "",
+              "options" => "nomodify notrap noquery"
             )
           end
         end
@@ -425,7 +415,7 @@ module Yast
 
     # Initialize the widget
     # @param [String] id any widget id
-    def PolicyInit(id)
+    def PolicyInit(_id)
       if NtpClient.PolicyIsNomodify
         UI.ChangeWidget(Id("policy_combo"), :Value, Id(:nomodify))
         UI.ChangeWidget(Id("custom_policy"), :Value, "")
@@ -446,8 +436,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id any widget id
     # @param [Hash] event map event that caused storing process
-    def PolicyStore(id, event)
-      event = deep_copy(event)
+    def PolicyStore(_id, _event)
       tmp = NtpClient.ntp_policy
       if UI.QueryWidget(Id("policy_combo"), :Value) == :nomodify
         NtpClient.ntp_policy = ""
@@ -465,7 +454,6 @@ module Yast
 
       nil
     end
-
 
     def RandomServersInit(id)
       ntpEnabledOrDisabled(id, {})
@@ -494,8 +482,7 @@ module Yast
       nil
     end
 
-    def RandomServersStore(id, event)
-      event = deep_copy(event)
+    def RandomServersStore(id, _event)
       return nil if id != "use_random_servers"
 
       if Convert.to_boolean(UI.QueryWidget(Id("use_random_servers"), :Value))
@@ -531,12 +518,12 @@ module Yast
         # if there is already some server defined
         if @ntp_server_before_random_servers != ""
           if !Popup.ContinueCancel(
-              _(
-                "Enabling Random Servers from pool.ntp.org would\n" +
-                  "replace the current NTP server.\n" +
-                  "\n" +
-                  "Really replace the current NTP server?"
-              )
+            _(
+              "Enabling Random Servers from pool.ntp.org would\n" \
+              "replace the current NTP server.\n"                 \
+              "\n"                                                \
+              "Really replace the current NTP server?"
+            )
             )
             # user has cancelled the operation, return it back
             UI.ChangeWidget(Id("use_random_servers"), :Value, false)
@@ -623,7 +610,7 @@ module Yast
 
         enabled = UI.QueryWidget(Id("start"), :CurrentButton) != "never"
         #	UI::ChangeWidget (`id (`advanced), `Enabled, enabled);
-        enabled = enabled && pol != :nomodify
+        enabled &&= pol != :nomodify
         UI.ChangeWidget(Id(:add), :Enabled, enabled)
         UI.ChangeWidget(Id(:edit), :Enabled, enabled)
         UI.ChangeWidget(Id(:delete), :Enabled, enabled)
@@ -701,7 +688,7 @@ module Yast
     def overviewInit(id)
       tmp = NtpClient.modified
       overviewRedraw
-      overviewHandle(id, { "ID" => "boot" })
+      overviewHandle(id, "ID" => "boot")
       NtpClient.modified = tmp
 
       nil
@@ -710,8 +697,8 @@ module Yast
     # Initialize the widget
     # @param [String] id any widget id
     def addressInit(id)
-      #remember selected_record_during_init only when the module is started
-      ##230240
+      # remember selected_record_during_init only when the module is started
+      # #230240
       if @selected_record_during_init == {}
         @selected_record_during_init = deep_copy(NtpClient.selected_record)
       end
@@ -767,7 +754,7 @@ module Yast
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
     # @return [Boolean] is successful
-    def serverAddressValidate(id, event)
+    def serverAddressValidate(_id, event)
       event = deep_copy(event)
       # NTP Client is disabled, do not check the server name
       if Ops.get(event, "ID") == :next && UI.WidgetExists(Id("start")) &&
@@ -834,7 +821,7 @@ module Yast
 
     # Initialize the widget
     # @param [String] id any widget id
-    def optionsInit(id)
+    def optionsInit(_id)
       # bnc#438704, add a recommended option
       UI.ChangeWidget(
         Id("options"),
@@ -848,8 +835,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id any widget id
     # @param [Hash] event map event that caused storing process
-    def optionsStore(id, event)
-      event = deep_copy(event)
+    def optionsStore(_id, _event)
       Ops.set(
         NtpClient.selected_record,
         "options",
@@ -859,7 +845,7 @@ module Yast
       nil
     end
 
-    def restrictOptionsInit(id)
+    def restrictOptionsInit(_id)
       address = Ops.get_string(NtpClient.selected_record, "address", "")
       if NtpClient.restrict_map == {} || NtpClient.PolicyIsNonstatic
         UI.ChangeWidget(Id("ac_options"), :Enabled, false)
@@ -878,8 +864,7 @@ module Yast
       nil
     end
 
-    def restrictOptionsStore(id, event)
-      event = deep_copy(event)
+    def restrictOptionsStore(_id, _event)
       address = Ops.get_string(NtpClient.selected_record, "address", "")
       opts = Convert.to_string(UI.QueryWidget(Id("ac_options"), :Value))
 
@@ -894,7 +879,7 @@ module Yast
         Ops.set(
           NtpClient.restrict_map,
           address,
-          { "comment" => "", "mask" => "", "options" => opts }
+          "comment" => "", "mask" => "", "options" => opts
         )
       end
 
@@ -902,8 +887,8 @@ module Yast
     end
     # Initialize the widget
     # @param [String] id any widget id
-    def peerTypesInit(id)
-      if @peer_type_selected != nil
+    def peerTypesInit(_id)
+      if !@peer_type_selected.nil?
         UI.ChangeWidget(Id("peer_types"), :CurrentButton, @peer_type_selected)
       else
         UI.ChangeWidget(Id("peer_types"), :CurrentButton, "server")
@@ -916,7 +901,7 @@ module Yast
     # @param [String] id any widget id
     # @param [Hash] event map event that caused storing process
     # @return [Symbol] event to pass to WS or nil
-    def peerTypesHandle(id, event)
+    def peerTypesHandle(_id, event)
       event = deep_copy(event)
       @peer_type_selected = Convert.to_string(
         UI.QueryWidget(Id("peer_types"), :CurrentButton)
@@ -951,15 +936,13 @@ module Yast
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
     # @return [Symbol] always nil
-    def createSymlinkHandle(id, event)
-      event = deep_copy(event)
+    def createSymlinkHandle(id, _event)
       active = Convert.to_boolean(UI.QueryWidget(Id("create_symlink"), :Value))
-      current = 0
       if id == "clock_type"
         current = Builtins.tointeger(
           Convert.to_string(UI.QueryWidget(Id(id), :Value))
         )
-        active = active && Ops.get(@clock_types, [current, "device"], "") == ""
+        active &&= Ops.get(@clock_types, [current, "device"], "") == ""
       end
       UI.ChangeWidget(Id("device"), :Enabled, active)
       UI.ChangeWidget(Id("browse"), :Enabled, active)
@@ -969,8 +952,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
-    def createSymlinkStore(id, event)
-      event = deep_copy(event)
+    def createSymlinkStore(id, _event)
       Ops.set(
         NtpClient.selected_record,
         "create_symlink",
@@ -1013,8 +995,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
-    def clockTypeStore(id, event)
-      event = deep_copy(event)
+    def clockTypeStore(id, _event)
       Ops.set(
         NtpClient.selected_record,
         "address",
@@ -1044,8 +1025,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
-    def unitNumberStore(id, event)
-      event = deep_copy(event)
+    def unitNumberStore(id, _event)
       Ops.set(
         NtpClient.selected_record,
         "address",
@@ -1062,13 +1042,12 @@ module Yast
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
     # @return [Symbol] always nil
-    def browseButtonHandle(id, event)
-      event = deep_copy(event)
+    def browseButtonHandle(_id, _event)
       current = Convert.to_string(UI.QueryWidget(Id("device"), :Value))
       current = "/dev" if current == ""
       # popup header
       current = UI.AskForExistingFile(current, "", _("Select the Device"))
-      UI.ChangeWidget(Id("device"), :Value, current) if current != nil
+      UI.ChangeWidget(Id("device"), :Value, current) if !current.nil?
       nil
     end
 
@@ -1087,8 +1066,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
-    def deviceStore(id, event)
-      event = deep_copy(event)
+    def deviceStore(id, _event)
       Ops.set(
         NtpClient.selected_record,
         "device",
@@ -1102,7 +1080,7 @@ module Yast
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
     # @return [Symbol] always nil
-    def ServerListHandle(id, event)
+    def ServerListHandle(_id, event)
       event = deep_copy(event)
       #    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
       #    {
@@ -1112,7 +1090,7 @@ module Yast
       #	return nil;
       #    }
       country = Convert.to_string(UI.QueryWidget(Id(:country), :Value))
-      country = "" if country == nil
+      country = "" if country.nil?
       Builtins.y2milestone(
         "Handling server list change, last country: %1, current country: %2",
         @last_country,
@@ -1141,7 +1119,7 @@ module Yast
       end
       if Ops.get(event, "ID") == :test || Ops.get(event, "ID") == :info
         server = Convert.to_string(UI.QueryWidget(Id(:servers), :Value))
-        if server == nil || server == ""
+        if server.nil? || server == ""
           # message report (no server selected)
           Report.Message(_("Select an NTP server."))
           return nil
@@ -1159,9 +1137,7 @@ module Yast
     def ServerListInit(id)
       country_names = NtpClient.GetCountryNames
       country_codes = Builtins.mapmap(country_names) { |k, v| { v => k } }
-      country_name_list = Builtins.maplist(country_codes) { |k, v| k }
-      country_name_list = Builtins.lsort(country_name_list)
-      countries_lst = Builtins.toset(Builtins.maplist(NtpClient.GetNtpServers) do |s, m|
+      countries_lst = Builtins.toset(Builtins.maplist(NtpClient.GetNtpServers) do |_s, m|
         country = Ops.get(m, "country", "")
         label = Ops.get(country_names, country, country)
         label
@@ -1186,12 +1162,12 @@ module Yast
       @last_country = nil
 
       lang = NtpClient.GetCurrentLanguageCode
-      if lang != nil
+      if !lang.nil?
         Builtins.y2milestone("Current language: %1", lang)
         UI.ChangeWidget(Id(:country), :Value, lang)
       end
       ServerListHandle(id, {})
-      ServerListHandle(id, { "ID" => "list_rb" })
+      ServerListHandle(id, "ID" => "list_rb")
 
       nil
     end
@@ -1199,15 +1175,14 @@ module Yast
     # Store settings of the widget
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
-    def ServerListStore(id, event)
-      event = deep_copy(event)
+    def ServerListStore(_id, _event)
       if UI.WidgetExists(Id("list_rb")) &&
           !Convert.to_boolean(UI.QueryWidget(Id("list_rb"), :Value))
         return
       end
       address = Convert.to_string(UI.QueryWidget(Id(:servers), :Value))
       Ops.set(NtpClient.selected_record, "address", address)
-      #Do not forget to add type of the record - here we have 'server' (#216456)
+      # Do not forget to add type of the record - here we have 'server' (#216456)
       Ops.set(NtpClient.selected_record, "type", "server")
 
       nil
@@ -1217,14 +1192,13 @@ module Yast
     # @param [String] id string widget id
     # @param [Hash] event map event that caused validation
     # @return [Boolean] true if validation succeeded
-    def ServerListValidate(id, event)
-      event = deep_copy(event)
+    def ServerListValidate(_id, _event)
       if UI.WidgetExists(Id("list_rb")) &&
           !Convert.to_boolean(UI.QueryWidget(Id("list_rb"), :Value))
         return true
       end
       address = Convert.to_string(UI.QueryWidget(Id(:servers), :Value))
-      if address == "" || address == nil
+      if address == "" || address.nil?
         # report message
         Report.Message(_("Select an NTP server."))
         return false
@@ -1240,8 +1214,7 @@ module Yast
       nil
     end
 
-
-    def FoundServersHandle(id, event)
+    def FoundServersHandle(_id, event)
       event = deep_copy(event)
       #    if (event["ID"]:nil == "list_rb" || event["ID"]:nil == "lookup_rb")
       #    {
@@ -1261,18 +1234,18 @@ module Yast
         UI.CloseDialog
 
         # no server has been found
-        if server_names == [] || server_names == nil
+        if server_names == [] || server_names.nil?
           # firewall probably blocks broadcast reply
           if SuSEFirewall.GetStartService
             # TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
             #              There is a very high possibility that is is because of running firewall.
             Report.Error(
               _(
-                "No NTP server has been found on your network.\n" +
-                  "This could be caused by a running SuSEfirewall2,\n" +
+                "No NTP server has been found on your network.\n"   \
+                  "This could be caused by a running SuSEfirewall2,\n" \
                   "which probably blocks the network scanning."
               )
-            ) 
+            )
             # no server is available on the network
           else
             # TRANSLATORS: Popup error - no NTP server has been found during scanning the network.
@@ -1302,7 +1275,7 @@ module Yast
       items = []
 
       # fate#302863: suggest ntp.$domain
-      if @found_servers_cache == nil
+      if @found_servers_cache.nil?
         guessed = Ops.add("ntp.", Hostname.CurrentDomain)
         if NtpClient.TestNtpServer(guessed, :transient_popup)
           @found_servers_cache = [guessed]
@@ -1315,7 +1288,7 @@ module Yast
         items = Builtins.add(items, Item(Id(server), server))
       end
       UI.ChangeWidget(Id("server_address"), :Items, items)
-      FoundServersHandle(id, { "ID" => "list_rb" })
+      FoundServersHandle(id, "ID" => "list_rb")
 
       nil
     end
@@ -1323,8 +1296,7 @@ module Yast
     # Store settings of the widget
     # @param [String] id string widget id
     # @param [Hash] event map event that caused storing process
-    def FoundServersStore(id, event)
-      event = deep_copy(event)
+    def FoundServersStore(_id, _event)
       #    if (UI::WidgetExists (`id ("lookup_rb"))
       #    	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
       #    {
@@ -1336,15 +1308,14 @@ module Yast
       nil
     end
 
-    def FoundServersValidate(id, event)
-      event = deep_copy(event)
+    def FoundServersValidate(_id, _event)
       #    if (UI::WidgetExists (`id ("lookup_rb"))
       #	&& ! (boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
       #    {
       #	return true;
       #    }
       server = Convert.to_string(UI.QueryWidget(Id("server_address"), :Value))
-      if server == nil || server == ""
+      if server.nil? || server == ""
         UI.SetFocus(Id("server_address"))
         # popup message
         Popup.Message(_("No server is selected."))
@@ -1353,9 +1324,7 @@ module Yast
       true
     end
 
-    def LocalSelectTestHandle(id, event)
-      event = deep_copy(event)
-      server = ""
+    def LocalSelectTestHandle(_id, _event)
       #    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
       #    {
       server = Convert.to_string(UI.QueryWidget(Id("server_address"), :Value))
@@ -1368,9 +1337,7 @@ module Yast
       nil
     end
 
-    def PublicSelectTestHandle(id, event)
-      event = deep_copy(event)
-      server = ""
+    def PublicSelectTestHandle(_id, _event)
       #    if ((boolean)UI::QueryWidget (`id ("lookup_rb"), `Value))
       #    {
       #	server = (string)UI::QueryWidget (`id ("server_address"), `Value);
@@ -1463,7 +1430,7 @@ module Yast
         },
         "secure"             => {
           "widget" => :checkbox,
-          #TRANSLATORS:
+          # TRANSLATORS:
           "label"  => _(
             "&Restrict NTP Service to Configured Servers Only "
           ),
@@ -1471,39 +1438,39 @@ module Yast
           "store"  => fun_ref(method(:secureStore), "void (string, map)"),
           "help"   => Ops.get_string(@HELPS, "secure", "")
         },
-        "policy_combo" =>
-          # FIXME
-          {
-            "widget" => :combobox,
-            "opt"    => [:notify],
-            "items"  => [
-              # combo box item FIXME usability
-              [:nomodify, _("Manual")],
-              # combo box item
-              [:auto, _("Auto")],
-              # combo box item
-              [:custom, _("Custom")]
-            ],
-            "label"  => _("&Runtime Configuration Policy"),
-            "init"   => fun_ref(method(:PolicyInit), "void (string)"),
-            "store"  => fun_ref(method(:PolicyStore), "void (string, map)"),
-            "handle" => fun_ref(
-              method(:ntpEnabledOrDisabled),
-              "symbol (string, map)"
+        "policy_combo"       =>
+                                # FIXME
+                                {
+                                  "widget" => :combobox,
+                                  "opt"    => [:notify],
+                                  "items"  => [
+                                    # combo box item FIXME usability
+                                    [:nomodify, _("Manual")],
+                                    # combo box item
+                                    [:auto, _("Auto")],
+                                    # combo box item
+                                    [:custom, _("Custom")]
+                                  ],
+                                  "label"  => _("&Runtime Configuration Policy"),
+                                  "init"   => fun_ref(method(:PolicyInit), "void (string)"),
+                                  "store"  => fun_ref(method(:PolicyStore), "void (string, map)"),
+                                  "handle" => fun_ref(
+                                    method(:ntpEnabledOrDisabled),
+                                    "symbol (string, map)"
             ),
-            "help"   => Ops.get_string(@HELPS, "policy_combo", "")
-          },
-        "custom_policy" =>
-          # FIXME
-          {
-            "widget" => :textentry,
-            "label"  => _("&Custom Policy"),
-            "handle" => fun_ref(
-              method(:ntpEnabledOrDisabled),
-              "symbol (string, map)"
+                                  "help"   => Ops.get_string(@HELPS, "policy_combo", "")
+                                },
+        "custom_policy"      =>
+                                # FIXME
+                                {
+                                  "widget" => :textentry,
+                                  "label"  => _("&Custom Policy"),
+                                  "handle" => fun_ref(
+                                    method(:ntpEnabledOrDisabled),
+                                    "symbol (string, map)"
             ),
-            "help"   => Ops.get_string(@HELPS, "custom_policy", "")
-          },
+                                  "help"   => Ops.get_string(@HELPS, "custom_policy", "")
+                                },
         "use_random_servers" => {
           "widget" => :checkbox,
           "opt"    => [:notify],
@@ -1519,49 +1486,47 @@ module Yast
         },
         "server_address"     => Builtins.union(
           address,
-          {
-            # text entry label
-            "label"             => _("&Address"),
-            "help"              => Ops.get_string(@HELPS, "server_address", ""),
-            "handle"            => fun_ref(
-              method(:serverAddressHandle),
-              "symbol (string, map)"
-            ),
-            "validate_type"     => :function,
-            "validate_function" => fun_ref(
-              method(:serverAddressValidate),
-              "boolean (string, map)"
-            ),
-            "widget"            => :custom,
-            "custom_widget"     => VBox(
-              HBox(
-                TextEntry(
-                  Id("server_address"),
-                  Opt(:hstretch),
-                  # text entry
-                  _("&Address")
-                ),
-                VBox(
-                  Label(" "),
-                  # push button
-                  MenuButton(
-                    Id(:select_server),
-                    _("&Select..."),
-                    [
-                      Item(Id(:select_local), _("Local NTP Server")),
-                      Item(Id(:select_public), _("Public NTP Server"))
-                    ]
-                  )
-                )
+          # text entry label
+          "label"             => _("&Address"),
+          "help"              => Ops.get_string(@HELPS, "server_address", ""),
+          "handle"            => fun_ref(
+            method(:serverAddressHandle),
+            "symbol (string, map)"
+          ),
+          "validate_type"     => :function,
+          "validate_function" => fun_ref(
+            method(:serverAddressValidate),
+            "boolean (string, map)"
+          ),
+          "widget"            => :custom,
+          "custom_widget"     => VBox(
+            HBox(
+              TextEntry(
+                Id("server_address"),
+                Opt(:hstretch),
+                # text entry
+                _("&Address")
               ),
-              HBox(
-                HStretch(),
+              VBox(
+                Label(" "),
                 # push button
-                PushButton(Id(:test_server), _("&Test")),
-                HStretch()
+                MenuButton(
+                  Id(:select_server),
+                  _("&Select..."),
+                  [
+                    Item(Id(:select_local), _("Local NTP Server")),
+                    Item(Id(:select_public), _("Public NTP Server"))
+                  ]
+                )
               )
+            ),
+            HBox(
+              HStretch(),
+              # push button
+              PushButton(Id(:test_server), _("&Test")),
+              HStretch()
             )
-          }
+          )
         ),
         "overview"           => {
           "widget"        => :custom,
@@ -1598,15 +1563,15 @@ module Yast
         },
         "paddress"           => Builtins.union(
           address,
-          { "help" => Ops.get_string(@HELPS, "paddress", "") }
+          "help" => Ops.get_string(@HELPS, "paddress", "")
         ),
         "bcaddress"          => Builtins.union(
           address,
-          { "help" => Ops.get_string(@HELPS, "bcaddress", "") }
+          "help" => Ops.get_string(@HELPS, "bcaddress", "")
         ),
         "bccaddress"         => Builtins.union(
           address,
-          { "help" => Ops.get_string(@HELPS, "bccaddress", "") }
+          "help" => Ops.get_string(@HELPS, "bccaddress", "")
         ),
         "clock_type"         => {
           "widget" => :combobox,
@@ -1838,10 +1803,8 @@ module Yast
           "help"          => Ops.get_string(@HELPS, "selected_test", "")
         },
         "firewall"           => CWMFirewallInterfaces.CreateOpenFirewallWidget(
-          {
-            "services"        => NtpClient.firewall_services,
-            "display_details" => true
-          }
+          "services"        => NtpClient.firewall_services,
+          "display_details" => true
         )
       }
     end

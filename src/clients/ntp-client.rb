@@ -13,7 +13,7 @@ module Yast
     def main
       Yast.import "UI"
 
-      #**
+      # **
       # <h3>Configuration of the ntp-client</h3>
 
       textdomain "ntp-client"
@@ -27,9 +27,7 @@ module Yast
 
       Yast.include self, "ntp-client/wizards.rb"
 
-
       Yast.include self, "ntp-client/commandline.rb"
-
 
       # main ui function
       @ret = CommandLine.Run(@cmdline)
@@ -39,7 +37,7 @@ module Yast
       Builtins.y2milestone("NtpClient module finished")
       Builtins.y2milestone("----------------------------------------")
 
-      deep_copy(@ret) 
+      deep_copy(@ret)
 
       # EOF
     end
@@ -48,7 +46,7 @@ module Yast
     # @return [Boolean] true if settings were saved
     def GuiHandler
       ret = NtpClientSequence()
-      return false if ret == :abort || ret == :back || ret == nil
+      return false if ret == :abort || ret == :back || ret.nil?
       true
     end
   end

@@ -8,7 +8,7 @@
 # $Id$
 module Yast
   module NtpClientClocktypesInclude
-    def initialize_ntp_client_clocktypes(include_target)
+    def initialize_ntp_client_clocktypes(_include_target)
       textdomain "ntp-client"
 
       @clock_types = {
@@ -282,7 +282,7 @@ module Yast
           "refid"  => "JJY",
           "device" => "/dev/jjy%1"
         }
-      } 
+      }
 
       # EOF
     end

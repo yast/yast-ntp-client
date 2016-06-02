@@ -118,7 +118,7 @@ module Yast
       Builtins.y2milestone("NtpClient auto finished")
       Builtins.y2milestone("----------------------------------------")
 
-      deep_copy(@ret) 
+      deep_copy(@ret)
 
       # EOF
     end
