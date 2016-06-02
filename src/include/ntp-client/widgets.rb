@@ -166,8 +166,8 @@ module Yast
 
       devices = Convert.convert(
         Builtins.union(Builtins.union(d1, d2), Builtins.union(d3, d4)),
-        :from => "list",
-        :to   => "list <string>"
+        from: "list",
+        to:   "list <string>"
       )
       devices = Builtins.filter(devices) { |d| d != "lo" }
       # Do not display this warning if we use NetworkManager (#299666)

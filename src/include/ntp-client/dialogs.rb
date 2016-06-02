@@ -128,7 +128,7 @@ module Yast
       ret = CWM.Run(
         w,
         # yes-no popup
-        :abort => fun_ref(method(:reallyExitSimple), "boolean ()")
+        abort: fun_ref(method(:reallyExitSimple), "boolean ()")
       )
 
       Builtins.y2milestone("Simple dialog: Returning %1", ret)
@@ -213,8 +213,8 @@ module Yast
         ["tab"],
         Convert.convert(
           wd,
-          :from => "map <string, any>",
-          :to   => "map <string, map <string, any>>"
+          from: "map <string, any>",
+          to:   "map <string, map <string, any>>"
         )
       )
 
@@ -236,7 +236,7 @@ module Yast
 
       CWM.Run(
         w,
-        :abort => fun_ref(method(:reallyExitComplex), "boolean ()")
+        abort: fun_ref(method(:reallyExitComplex), "boolean ()")
       )
     end
 
@@ -260,7 +260,7 @@ module Yast
         "back_button"        => Label.BackButton,
         "next_button"        => Label.NextButton,
         "fallback_functions" => {
-          :abort => fun_ref(method(:abortPopup), "boolean ()")
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -299,7 +299,7 @@ module Yast
         "back_button"        => Label.BackButton,
         "next_button"        => Label.OKButton,
         "fallback_functions" => {
-          :abort => fun_ref(method(:abortPopup), "boolean ()")
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -338,9 +338,9 @@ module Yast
 
       ret = CWM.Run(
         widgets,
-        :abort => fun_ref(method(:abortPopup), "boolean ()"),
-        :ok    => true,
-        :back  => false
+        abort: fun_ref(method(:abortPopup), "boolean ()"),
+        ok:    true,
+        back:  false
       )
 
       UI.CloseDialog
@@ -382,9 +382,9 @@ module Yast
 
       ret = CWM.Run(
         widgets,
-        :abort => fun_ref(method(:abortPopup), "boolean ()"),
-        :ok    => true,
-        :back  => false
+        abort: fun_ref(method(:abortPopup), "boolean ()"),
+        ok:    true,
+        back:  false
       )
 
       UI.CloseDialog
@@ -412,7 +412,7 @@ module Yast
         "back_button"        => Label.BackButton,
         "next_button"        => Label.OKButton,
         "fallback_functions" => {
-          :abort => fun_ref(method(:abortPopup), "boolean ()")
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -457,7 +457,7 @@ module Yast
         "back_button"        => Label.BackButton,
         "next_button"        => Label.OKButton,
         "fallback_functions" => {
-          :abort => fun_ref(method(:abortPopup), "boolean ()")
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -482,7 +482,7 @@ module Yast
         "back_button"        => Label.BackButton,
         "next_button"        => Label.OKButton,
         "fallback_functions" => {
-          :abort => fun_ref(method(:abortPopup), "boolean ()")
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -507,7 +507,7 @@ module Yast
         "back_button"        => Label.BackButton,
         "next_button"        => Label.OKButton,
         "fallback_functions" => {
-          :abort => fun_ref(method(:abortPopup), "boolean ()")
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -731,7 +731,8 @@ module Yast
       end
 
       random_pool_servers_enabled_only =
-        # number of listed servers is the same as the needed servers for random_pool_servers function
+        # number of listed servers is the same as the needed servers for
+        # random_pool_servers function
         Builtins.size(servers) == Builtins.size(NtpClient.random_pool_servers) &&
           # enabled means that all of needed servers are listed
           NtpClient.IsRandomServersServiceEnabled

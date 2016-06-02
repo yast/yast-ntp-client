@@ -12,17 +12,6 @@ Metrics/AbcSize:
   Include:
     - 'src/lib/**/*.rb' # be more strict for new code in lib
 
-Metrics/BlockNesting:
-  Max: 5
-  Exclude:
-    - 'src/lib/**/*.rb' # be more strict for new code in lib
-
-Metrics/BlockNesting:
-  Max: 2
-  Include:
-    - 'src/lib/**/*.rb' # be more strict for new code in lib
-
-
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
   Max: 385
@@ -35,16 +24,6 @@ Metrics/ClassLength:
   Include:
     - 'src/lib/**/*.rb' # be more strict for new code in lib
 
-Metrics/ModuleLength:
-  Max: 385
-  Exclude:
-    - 'src/lib/**/*.rb' # be more strict for new code in lib
-
-Metrics/ModuleLength:
-  Max: 100
-  Include:
-    - 'src/lib/**/*.rb' # be more strict for new code in lib
-
 Metrics/CyclomaticComplexity:
   Max: 29
   Exclude:
@@ -52,18 +31,6 @@ Metrics/CyclomaticComplexity:
 
 Metrics/CyclomaticComplexity:
   Max: 13 # TODO this should be lower for new code
-  Include:
-    - 'src/lib/**/*.rb' # be more strict for new code in lib
-
-# Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
-  Max: 299
-  Exclude:
-    - 'src/lib/**/*.rb' # be more strict for new code in lib
-
-# Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
-  Max: 100 # TODO this should be lower for new code
   Include:
     - 'src/lib/**/*.rb' # be more strict for new code in lib
 
@@ -104,10 +71,6 @@ Style/Documentation:
 Style/FileName:
   Include:
     - 'src/lib/**/*.rb' # force correct names on new code
-
-Style/HashSyntax:
-  Include:
-    - 'src/lib/**/*.rb' # force new hash style only for new code
 
 # JR: I found lambda easier to read and understand then ->()
 Style/Lambda:

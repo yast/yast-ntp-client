@@ -54,29 +54,32 @@ module Yast
       # FIXME: must go to module to preserve value
       @ntp_was_used = false
 
-      if @func == "GetNTPEnabled"
+      case @func
+      when "GetNTPEnabled"
         @ret = GetNTPEnabled()
-      elsif @func == "SetUseNTP"
+      when "SetUseNTP"
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
-      elsif @func == "MakeProposal"
+      when "MakeProposal"
         @ret = MakeProposal()
-      elsif @func == "Write"
+      when "Write"
         @ret = Write(@param)
-      elsif @func == "ui_help_text"
+      when "ui_help_text"
         @ret = ui_help_text
-      elsif @func == "ui_init"
+      when "ui_init"
         @rp = Ops.get_term(@param, "replace_point") { Id(:rp) }
         @ft = Ops.get_boolean(@param, "first_time", false)
         @ret = ui_init(@rp, @ft)
-      elsif @func == "ui_try_save"
+      when "ui_try_save"
         @ret = ui_try_save
-      elsif @func == "ui_enable_disable_widgets"
+      when "ui_enable_disable_widgets"
         @ret = ui_enable_disable_widgets(
           Ops.get_boolean(@param, "enabled", false)
         )
-      elsif @func == "ui_handle"
+      when "ui_handle"
         @ret = ui_handle(Ops.get(@param, "ui"))
+      else
+        log.error("Not known called func #{@func}")
       end
 
       deep_copy(@ret)
@@ -114,7 +117,8 @@ module Yast
       tmp = Ops.add(
         tmp,
         _(
-          "<p>Synchronization with the NTP server can be done only when the network is configured.</p>"
+          "<p>Synchronization with the NTP server can be done only when " \
+          "the network is configured.</p>"
         )
       )
       tmp
@@ -208,7 +212,8 @@ module Yast
         Builtins.y2milestone(
           "Nothing found in /etc/ntp.conf, proposing current timezone-based NTP server list"
         )
-        ntp_items = NtpClient.GetNtpServersByCountry(Timezone.GetCountryForTimezone(Timezone.timezone), true)
+        time_zone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
+        ntp_items = NtpClient.GetNtpServersByCountry(time_zone_country, true)
         NtpClient.config_has_been_read = true
       end
       ntp_items = Builtins.add(ntp_items, "")

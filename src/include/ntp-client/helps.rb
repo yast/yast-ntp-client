@@ -20,7 +20,8 @@ module Yast
         ) +
           # Read dialog help 2/2
           _(
-            "<p><b><big>Aborting Initialization:</big></b><br>\nSafely abort the configuration utility by pressing <b>Abort</b> now.</p>"
+            "<p><b><big>Aborting Initialization:</big></b><br>\n" \
+            "Safely abort the configuration utility by pressing <b>Abort</b> now.</p>"
           ),
         # Write dialog help 1/2
         "write"              => _(
@@ -34,11 +35,11 @@ module Yast
           ),
         # help text 1/5, %d is a number of minutes
         "start"              => _(
-          "<p><b><big>Start NTP Daemon</big></b><br>\n" \
-            "Select whether to start the NTP daemon now and on every system boot. \n" \
-      "Selecting <b>Synchronize without Daemon</b> the NTP daemon will not be activated\n" \
-      "and the system time will be set periodically by a <i>cron</i> script. \n" \
-      "The interval is configurable, by default it is %d minutes."
+          "<p><b><big>Start NTP Daemon</big></b><br>\n"                                        \
+          "Select whether to start the NTP daemon now and on every system boot. \n"            \
+          "Selecting <b>Synchronize without Daemon</b> the NTP daemon will not be activated\n" \
+          "and the system time will be set periodically by a <i>cron</i> script. \n"           \
+          "The interval is configurable, by default it is %d minutes."
       ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
         # help text 2/5
         "chroot_environment" => _(
@@ -49,29 +50,32 @@ module Yast
         ),
         "secure"             => _(
           "<p><b><big>Secure NTP Configuration</big></b><br>\n" \
-            "By selecting <b>Restrict NTP Service to Configured Servers Only</b>, remote hosts will not be able to view and modify NTP settings on your \n" \
-            "computer. The NTP service is restricted to servers in the <tt>/etc/ntp.conf</tt> file and to localhost.<br> \n" \
-            "Access control flags can be fine-tuded in the servers overview table. This option is not available if NTP is configured via DHCP.</p>\n"
+            "By selecting <b>Restrict NTP Service to Configured Servers Only</b>, remote hosts " \
+            "will not be able to view and modify NTP settings on your \ncomputer. The NTP "      \
+            "service is restricted to servers in the <tt>/etc/ntp.conf</tt> file and to "        \
+            "localhost.<br> \nAccess control flags can be fine-tuded in the servers overview "   \
+            "table. This option is not available if NTP is configured via DHCP.</p>\n"
         ),
         # help text 3/5
         "config_dhcp"        => _(
-          "<p><b><big>Configuring via DHCP</big></b><br>\n" \
+          "<p><b><big>Configuring via DHCP</big></b><br>\n"                              \
             "To retrieve the information about NTP servers via the DHCP protocol from\n" \
-            "your network server instead of setting them manually, set\n" \
-            "<b>Configure NTP Daemon via DHCP</b>. Ask your network administrator if\n" \
+            "your network server instead of setting them manually, set\n"                \
+            "<b>Configure NTP Daemon via DHCP</b>. Ask your network administrator if\n"  \
             "the information about NTP servers is provided by the DHCP server.</p>"
         ),
         # help text 4/5
         "overview"           => _(
-          "<p><b><big>Configured Servers</big></b><br>\n" \
-            "To adjust NTP servers, peers, local clocks, and NTP broadcasting,\n" \
+          "<p><b><big>Configured Servers</big></b><br>\n"                                       \
+            "To adjust NTP servers, peers, local clocks, and NTP broadcasting,\n"               \
             "select the appropriate line and click <b>Edit</b>. To add a new synchronization\n" \
-            "peer, click <b>Add</b>. To delete an existing synchronization peer,\n" \
+            "peer, click <b>Add</b>. To delete an existing synchronization peer,\n"             \
             "select it and click <b>Delete</b>.</p>"
         ) +
           # help text 5/5
           _(
-            "<p><b><big>Display Log</big></b></p>\n<p>To view the logs of the NTP daemon, click <b>Display Log</b>.</p>\n"
+            "<p><b><big>Display Log</big></b></p>\n<p>To view the logs of the NTP daemon, click " \
+            "<b>Display Log</b>.</p>\n"
           ),
         # help text to a button
         "complex_button"     => _(
@@ -101,7 +105,8 @@ module Yast
         ),
         # help text 4/4
         "fudge_button"       => _(
-          "<p><b><big>Driver Calibration</big></b><br>\nTo calibrate the clock driver, click <b>Driver Calibration</b>.</p>"
+          "<p><b><big>Driver Calibration</big></b><br>\nTo calibrate the clock driver, " \
+          "click <b>Driver Calibration</b>.</p>"
         ),
         # help text 1/1, alt. 1 part 1/3
         "server_address"     => _(
@@ -153,15 +158,16 @@ module Yast
         "restrict"           => _(
           "<p><b><big>Access Control Options</big></b><br>\n" \
             "Define the access control flags (<b><tt>restrict</tt></b> directive in\n" \
-            "<i>/etc/ntp.conf</i>) for this server, indicating which types of actions the remote\n" \
-            "host can perform on your NTP daemon. By default, it is set to <i>notrap\n" \
+            "<i>/etc/ntp.conf</i>) for this server, indicating which types of actions the remote" \
+            "\nhost can perform on your NTP daemon. By default, it is set to <i>notrap\n" \
             "nomodify noquery</i>. This option is only available if you have checked the\n" \
             "<b>Restrict NTP Service to Configured Servers Only</b> option in\n" \
             "<b>Security Settings</b>.</p>\n"
         ),
         # help text 1/6
         "peer_types"         => _(
-          "<p><b><big>Synchronization Peer Type</big></b><br>\nSelect the kind of synchronization peer to add here.</p>"
+          "<p><b><big>Synchronization Peer Type</big></b><br>\n" \
+          "Select the kind of synchronization peer to add here.</p>"
         ) +
           # help text 2/6
           _(
@@ -173,15 +179,18 @@ module Yast
           ) +
           # help text 4/6
           _(
-            "<p>To configure a local clock connected directly to your computer,\nselect <b>Radio Clock</b>.</p>"
+            "<p>To configure a local clock connected directly to your computer,\n" \
+            "select <b>Radio Clock</b>.</p>"
           ) +
           # help text 5/6
           _(
-            "<p>To broadcast time information through your network, select\n<b>Outgoing Broadcast</b>.</p>"
+            "<p>To broadcast time information through your network, select\n" \
+            "<b>Outgoing Broadcast</b>.</p>"
           ) +
           # help text 6/6
           _(
-            "<p>To accept NTP packets broadcasted by other hosts on the network\nand use them for setting local time, select <b>Incoming Broadcast<b>.</p>"
+            "<p>To accept NTP packets broadcasted by other hosts on the network\n" \
+            "and use them for setting local time, select <b>Incoming Broadcast<b>.</p>"
           ),
         # help text 1/5
         "servers_source"     => _(
@@ -216,7 +225,8 @@ module Yast
           ),
         # help text 5/5
         "selected_test"      => _(
-          "<p><big><b>Testing Server Accessibility</b></big><br>\nTo test if the selected server responds properly, click <b>Test</b>.</p>"
+          "<p><big><b>Testing Server Accessibility</b></big><br>\n" \
+          "To test if the selected server responds properly, click <b>Test</b>.</p>"
         ),
         # help text connected with checkbox: "Use Random Server from pool.ntp.org"
         # rwalter, please, correct it ;)
@@ -242,7 +252,8 @@ module Yast
       ) +
         # help text 2/2
         _(
-          "To learn more about available options, install the package\n<i>ntp-doc</i> and see <i>/usr/share/doc/packages/ntp-doc/html/refclock.htm</i>.</p>\n"
+          "To learn more about available options, install the package\n<i>ntp-doc</i> and see " \
+          "<i>/usr/share/doc/packages/ntp-doc/html/refclock.htm</i>.</p>\n"
         )
     end
   end

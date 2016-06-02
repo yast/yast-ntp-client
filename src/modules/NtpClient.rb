@@ -171,8 +171,8 @@ module Yast
               Ops.add(Directory.datadir, "/country.ycp")
             )
           ),
-          :from => "any",
-          :to   => "map <string, string>"
+          from: "any",
+          to:   "map <string, string>"
         )
         @countries_already_read = true
         @known_countries = {} if @known_countries.nil?
@@ -226,8 +226,8 @@ module Yast
       if @country_names.nil?
         @country_names = Convert.convert(
           Builtins.eval(SCR.Read(path(".target.yast2"), "country.ycp")),
-          :from => "any",
-          :to   => "map <string, string>"
+          from: "any",
+          to:   "map <string, string>"
         )
       end
       if @country_names.nil?
@@ -341,8 +341,8 @@ module Yast
           key = Ops.get_string(m, "address", "")
           { key => m }
         end,
-        :from => "map <string, map>",
-        :to   => "map <string, map <string, any>>"
+        from: "map <string, map>",
+        to:   "map <string, map <string, any>>"
       )
 
       restrict_records = Builtins.filter(@ntp_records) do |m|
@@ -372,8 +372,8 @@ module Yast
           Ops.set(value2, "comment", Ops.get_string(m, "comment", ""))
           { key => value2 }
         end,
-        :from => "map <string, map>",
-        :to   => "map <string, map <string, any>>"
+        from: "map <string, map>",
+        to:   "map <string, map <string, any>>"
       )
 
       @ntp_records = Builtins.filter(@ntp_records) do |m|
@@ -408,8 +408,8 @@ module Yast
           end
           deep_copy(m)
         end,
-        :from => "list <map>",
-        :to   => "list <map <string, any>>"
+        from: "list <map>",
+        to:   "list <map <string, any>>"
       )
 
       # mark local clock to be local clock and not real servers
@@ -522,8 +522,8 @@ module Yast
         Builtins.y2milestone("Reading %1", ad_ntp_file)
         ad_ntp_data = Convert.convert(
           SCR.Read(path(".target.ycp"), ad_ntp_file),
-          :from => "any",
-          :to   => "map <string, string>"
+          from: "any",
+          to:   "map <string, string>"
         )
         @ad_controller = Ops.get(ad_ntp_data, "ads", "")
         if @ad_controller != ""
@@ -684,7 +684,8 @@ module Yast
         @ntp_records <<
           {
             "address" => one_server,
-            "comment" => "\n# Random pool server, see http://www.pool.ntp.org/ for more information\n",
+            "comment" => "\n# Random pool server, see http://www.pool.ntp.org/ " \
+                         "for more information\n",
             "options" => one_options,
             "type"    => "server"
           }
@@ -1251,56 +1252,56 @@ module Yast
       pool_servers_for(GetAllKnownCountries()).each { |p| cache_server(p) }
     end
 
-    publish :variable => :AbortFunction, :type => "boolean ()"
-    publish :variable => :modified, :type => "boolean"
-    publish :variable => :write_only, :type => "boolean"
-    publish :variable => :ntp_records, :type => "list <map <string, any>>"
-    publish :variable => :restrict_map, :type => "map <string, map <string, any>>"
-    publish :variable => :run_service, :type => "boolean"
-    publish :variable => :synchronize_time, :type => "boolean"
-    publish :variable => :sync_interval, :type => "integer"
-    publish :variable => :cron_file, :type => "string"
-    publish :variable => :service_name, :type => "string"
-    publish :variable => :run_chroot, :type => "boolean"
-    publish :variable => :ntp_policy, :type => "string"
-    publish :variable => :selected_index, :type => "integer"
-    publish :variable => :selected_record, :type => "map <string, any>"
-    publish :variable => :ad_controller, :type => "string"
-    publish :variable => :change_firewall, :type => "boolean"
-    publish :variable => :required_packages, :type => "list"
-    publish :variable => :firewall_services, :type => "list <string>"
-    publish :variable => :simple_dialog, :type => "boolean"
-    publish :variable => :config_has_been_read, :type => "boolean"
-    publish :variable => :ntp_selected, :type => "boolean"
-    publish :function => :PolicyIsAuto, :type => "boolean ()"
-    publish :function => :PolicyIsNomodify, :type => "boolean ()"
-    publish :function => :PolicyIsNonstatic, :type => "boolean ()"
-    publish :function => :GetAllKnownCountries, :type => "map <string, string> ()"
-    publish :function => :GetCurrentLanguageCode, :type => "string ()"
-    publish :function => :GetNtpServers, :type => "map <string, map <string, string>> ()"
-    publish :function => :GetCountryNames, :type => "map <string, string> ()"
-    publish :function => :GetNtpServersByCountry, :type => "list (string, boolean)"
-    publish :function => :ProcessNtpConf, :type => "boolean ()"
-    publish :function => :ReadSynchronization, :type => "boolean ()"
-    publish :function => :Read, :type => "boolean ()"
-    publish :function => :GetUsedNtpServers, :type => "list <string> ()"
-    publish :variable => :random_pool_servers, :type => "list <string>"
-    publish :function => :IsRandomServersServiceEnabled, :type => "boolean ()"
-    publish :function => :DeActivateRandomPoolServersFunction, :type => "void ()"
-    publish :function => :ActivateRandomPoolServersFunction, :type => "void ()"
-    publish :function => :Write, :type => "boolean ()"
-    publish :function => :Import, :type => "boolean (map)"
-    publish :function => :Export, :type => "map ()"
-    publish :function => :Summary, :type => "string ()"
-    publish :function => :TestNtpServer, :type => "boolean (string, symbol)"
-    publish :function => :DetectNtpServers, :type => "list <string> (symbol)"
-    publish :function => :getSyncRecords, :type => "list <map <string, any>> ()"
-    publish :function => :selectSyncRecord, :type => "boolean (integer)"
-    publish :function => :findSyncRecord, :type => "integer (string, string)"
-    publish :function => :storeSyncRecord, :type => "boolean ()"
-    publish :function => :deleteSyncRecord, :type => "boolean (integer)"
-    publish :function => :enableOptionInSyncRecord, :type => "void (string)"
-    publish :function => :AutoPackages, :type => "map ()"
+    publish variable: :AbortFunction, type: "boolean ()"
+    publish variable: :modified, type: "boolean"
+    publish variable: :write_only, type: "boolean"
+    publish variable: :ntp_records, type: "list <map <string, any>>"
+    publish variable: :restrict_map, type: "map <string, map <string, any>>"
+    publish variable: :run_service, type: "boolean"
+    publish variable: :synchronize_time, type: "boolean"
+    publish variable: :sync_interval, type: "integer"
+    publish variable: :cron_file, type: "string"
+    publish variable: :service_name, type: "string"
+    publish variable: :run_chroot, type: "boolean"
+    publish variable: :ntp_policy, type: "string"
+    publish variable: :selected_index, type: "integer"
+    publish variable: :selected_record, type: "map <string, any>"
+    publish variable: :ad_controller, type: "string"
+    publish variable: :change_firewall, type: "boolean"
+    publish variable: :required_packages, type: "list"
+    publish variable: :firewall_services, type: "list <string>"
+    publish variable: :simple_dialog, type: "boolean"
+    publish variable: :config_has_been_read, type: "boolean"
+    publish variable: :ntp_selected, type: "boolean"
+    publish function: :PolicyIsAuto, type: "boolean ()"
+    publish function: :PolicyIsNomodify, type: "boolean ()"
+    publish function: :PolicyIsNonstatic, type: "boolean ()"
+    publish function: :GetAllKnownCountries, type: "map <string, string> ()"
+    publish function: :GetCurrentLanguageCode, type: "string ()"
+    publish function: :GetNtpServers, type: "map <string, map <string, string>> ()"
+    publish function: :GetCountryNames, type: "map <string, string> ()"
+    publish function: :GetNtpServersByCountry, type: "list (string, boolean)"
+    publish function: :ProcessNtpConf, type: "boolean ()"
+    publish function: :ReadSynchronization, type: "boolean ()"
+    publish function: :Read, type: "boolean ()"
+    publish function: :GetUsedNtpServers, type: "list <string> ()"
+    publish variable: :random_pool_servers, type: "list <string>"
+    publish function: :IsRandomServersServiceEnabled, type: "boolean ()"
+    publish function: :DeActivateRandomPoolServersFunction, type: "void ()"
+    publish function: :ActivateRandomPoolServersFunction, type: "void ()"
+    publish function: :Write, type: "boolean ()"
+    publish function: :Import, type: "boolean (map)"
+    publish function: :Export, type: "map ()"
+    publish function: :Summary, type: "string ()"
+    publish function: :TestNtpServer, type: "boolean (string, symbol)"
+    publish function: :DetectNtpServers, type: "list <string> (symbol)"
+    publish function: :getSyncRecords, type: "list <map <string, any>> ()"
+    publish function: :selectSyncRecord, type: "boolean (integer)"
+    publish function: :findSyncRecord, type: "integer (string, string)"
+    publish function: :storeSyncRecord, type: "boolean ()"
+    publish function: :deleteSyncRecord, type: "boolean (integer)"
+    publish function: :enableOptionInSyncRecord, type: "void (string)"
+    publish function: :AutoPackages, type: "map ()"
   end
 
   NtpClient = NtpClientClass.new
