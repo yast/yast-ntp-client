@@ -293,28 +293,25 @@ module Yast
     # @return true on success
     def ProcessNtpConf
       if @config_has_been_read
-        Builtins.y2milestone("Configuration has been read already, skipping.")
+        log.info "Configuration has been read already, skipping."
         return false
       end
 
       conf = nil
-      if FileUtils.Exists("/etc/ntp.conf")
-        conf = Convert.to_map(SCR.Read(path(".etc.ntp_conf.all")))
-      end
+      conf = SCR.Read(path(".etc.ntp_conf.all")) if FileUtils.Exists("/etc/ntp.conf")
 
       if conf.nil?
-        Builtins.y2error(
-          "Failed to read /etc/ntp.conf, either it doesn't exist or contains no data"
-        )
+        log.error("Failed to read /etc/ntp.conf, either it doesn't exist or contains no data")
         return false
       end
-      Builtins.y2milestone("Raw ntp conf %1", conf)
+
+      log.info("Raw ntp conf #{conf}")
       @config_has_been_read = true
-      value = Ops.get_list(conf, "value", [])
+      value = conf["value"] || []
       index = -1
       @ntp_records = Builtins.maplist(value) do |m|
-        index = Ops.add(index, 1)
-        type = Ops.get_string(m, "name", "")
+        index += 1
+        type = m["name"].to_s
         address = Ops.get_string(m, "value", "")
         options = ""
         if ["server", "peer", "broadcast", "broadcastclient", "manycast",
@@ -1112,21 +1109,17 @@ module Yast
     # @return a list of maps with keys type (eg. "server"), address and index.
     def getSyncRecords
       index = -1
-      ret = Builtins.maplist(@ntp_records) do |m|
-        index = Ops.add(index, 1)
-        type = Ops.get_string(m, "type", "")
-        if !["server", "peer", "broadcast", "broadcastclient", "__clock"].include? type
-          next nil
-        end
-        {
+      @ntp_records.each_with_object([]) do |record, ret|
+        index += 1
+        type = record["type"]
+        next if !sync_record?(type)
+        ret << {
           "type"    => type,
           "index"   => index,
-          "address" => Ops.get_string(m, "address", ""),
-          "device"  => Ops.get_string(m, "device", "")
+          "address" => record["address"].to_s,
+          "device"  => record["device"].to_s
         }
       end
-      ret = Builtins.filter(ret) { |m| !m.nil? }
-      deep_copy(ret)
     end
 
     # Select synchronization record
@@ -1216,20 +1209,22 @@ module Yast
 
   private
 
+    def sync_record?(entry)
+      ["server", "peer", "broadcast", "broadcastclient", "__clock"].include? entry
+    end
+
     def read_known_servers
       servers_file = Directory.find_data_file("ntp_servers.yml")
 
       return {} if !servers_file
 
-      # FIXME: This is wrong approach, because datadir should be array of all Y2DIR/DATA
-      # so we need to skip it in tests, even if we set Y2DIR properly
       servers = YAML.load_file(servers_file)
       if servers.nil?
         log.error("Failed to read the list of NTP servers")
         return {}
       end
 
-      log.info "#{servers.size} known NTP servers read"
+      log.info "Known NTP servers read: #{servers}"
 
       servers
     end

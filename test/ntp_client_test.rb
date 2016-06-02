@@ -433,7 +433,7 @@ describe Yast::NtpClient do
     end
   end
 
-  describe "TestNtpServer" do
+  describe "#TestNtpServer" do
     it "returns true if ntp server is reachable" do
       allow(subject).to receive(:reachable_ntp_server?).with("server") { true }
       expect(subject.TestNtpServer("server", "")).to eql(true)
@@ -447,6 +447,41 @@ describe Yast::NtpClient do
       it "doesn't show any dialog" do
         expect(Yast::Popup).to receive(:Feedback).never
       end
+    end
+  end
+
+  describe "#getSyncRecords" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
+        File.join(data_dir, "scr_root/etc/ntp.conf"))
+      change_scr_root(File.join(data_dir, "scr_root"), &example)
+    end
+
+    before do
+      subject.instance_variable_set(:@config_has_been_read, false)
+      load_records
+    end
+
+    it "returns a map's list with current synchronization related entries with index" do
+      expect(subject.getSyncRecords.size).to eql(6)
+      expect(subject.getSyncRecords[3]["address"]).to eql("3.pool.ntp.org")
+      expect(subject.getSyncRecords[5]["address"]).to eql("192.168.1.30")
+    end
+  end
+
+  describe "#ProcessNtpConf" do
+    it "returns false if config has been read previously" do
+      subject.instance_variable_set(:@config_has_been_read, true)
+
+      expect(subject.ProcessNtpConf).to eql(false)
+    end
+
+    it "returns false if config doesn't exist" do
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(false)
+
+      expect(subject.ProcessNtpConf).to eql(false)
     end
   end
 end

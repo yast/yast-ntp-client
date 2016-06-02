@@ -36,3 +36,9 @@ if ENV["COVERAGE"]
     ]
   end
 end
+
+def load_records
+  subject.GetNtpServers()
+  subject.GetCountryNames()
+  subject.ProcessNtpConf()
+end
