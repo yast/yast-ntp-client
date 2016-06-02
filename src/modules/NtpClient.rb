@@ -14,6 +14,7 @@ require "yaml"
 
 module Yast
   class NtpClientClass < Module
+    include Logger
 
     # the default synchronization interval in minutes when running in the manual
     # sync mode ("Synchronize without Daemon" option, ntp started from cron)
@@ -41,7 +42,6 @@ module Yast
       Yast.import "Summary"
       Yast.import "SuSEFirewall"
       Yast.import "FileChanges"
-
 
       # Abort function
       # return boolean return true if abort
@@ -78,9 +78,8 @@ module Yast
       # Should the daemon be started in chroot environment?
       @run_chroot = false
 
-
       # Netconfig policy: for merging and prioritizing static and DHCP config.
-      # FIXME get a public URL
+      # FIXME: get a public URL
       # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
       @ntp_policy = "auto"
 
@@ -150,7 +149,7 @@ module Yast
     # Abort function
     # @return blah blah lahjk
     def Abort
-      return @AbortFunction.call == true if @AbortFunction != nil
+      return @AbortFunction.call == true if !@AbortFunction.nil?
       false
     end
     # Reads and returns all known countries with their country codes
@@ -178,7 +177,7 @@ module Yast
           :to   => "map <string, string>"
         )
         @countries_already_read = true
-        @known_countries = {} if @known_countries == nil
+        @known_countries = {} if @known_countries.nil?
       end
 
       #workaround bug #241054: servers in United Kingdom are in domain .uk
@@ -214,30 +213,8 @@ module Yast
     # Get the list of known NTP servers
     # @return a list of known NTP servers
     def GetNtpServers
-      if @ntp_servers == nil
-        @ntp_servers = {}
-        #FIXME This is wrong approach, because datadir should be array of all Y2DIR/DATA
-        # so we need to skip it in tests, even if we set Y2DIR properly
-        return {} if Mode.test
-        servers = YAML.load_file(Directory.datadir + "/ntp_servers.yml") rescue nil
-        if servers == nil 
-          Builtins.y2error("Failed to read the list of NTP servers")
-        else
-          Builtins.y2milestone(
-            "%1 known NTP servers read",
-            Builtins.size(servers)
-          )
-          @ntp_servers = Builtins.listmap(servers) do |s|
-            server = Ops.get(s, "address", "")
-            { server => s }
-          end
-        end
-        Builtins.foreach(GetAllKnownCountries()) do |short_country, country_name|
-          # just refactored existing code
-          p = MakePoolRecord(short_country, country_name)
-          Ops.set(@ntp_servers, Ops.get(p, "address", ""), p)
-        end
-      end
+      return {} if Mode.test
+      update_ntp_servers! if @ntp_servers.nil?
 
       deep_copy(@ntp_servers)
     end
@@ -245,14 +222,14 @@ module Yast
     # Get the mapping between country codea and names ("CZ" -> "Czech Republic")
     # @return a map the country codes and names mapping
     def GetCountryNames
-      if @country_names == nil
+      if @country_names.nil?
         @country_names = Convert.convert(
           Builtins.eval(SCR.Read(path(".target.yast2"), "country.ycp")),
           :from => "any",
           :to   => "map <string, string>"
         )
       end
-      if @country_names == nil
+      if @country_names.nil?
         Builtins.y2error("Failed to read country names")
         @country_names = {}
       end
@@ -267,7 +244,7 @@ module Yast
       country_names = {}
       servers = GetNtpServers()
       if country != ""
-        servers = Builtins.filter(servers) do |s, o|
+        servers = Builtins.filter(servers) do |_s, o|
           Ops.get(o, "country", "") == country
         end
         # bnc#458917 add country, in case data/country.ycp does not have it
@@ -324,7 +301,7 @@ module Yast
         conf = Convert.to_map(SCR.Read(path(".etc.ntp_conf.all")))
       end
 
-      if conf == nil
+      if conf.nil?
         Builtins.y2error(
           "Failed to read /etc/ntp.conf, either it doesn't exist or contains no data"
         )
@@ -528,12 +505,9 @@ module Yast
       NetworkInterfaces.Read
       Progress.set(progress_orig)
 
-      #SCR::Read may return nil (no such value in sysconfig, file not there etc. )
-      policy = Convert.to_string(
-        SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
-      )
-      #set if not nil, otherwise use 'auto' as safe fallback (#449362)
-      @ntp_policy = policy if policy != nil
+      # SCR::Read may return nil (no such value in sysconfig, file not there etc. )
+      # set if not nil, otherwise use 'auto' as safe fallback (#449362)
+      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || "auto"
 
       GetNtpServers()
       GetCountryNames()
@@ -553,7 +527,7 @@ module Yast
 
       @run_service = Service.Enabled(@service_name)
 
-      #Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
+      # Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
       ad_ntp_file = Ops.add(Directory.vardir, "/ad_ntp_data.ycp")
       if FileUtils.Exists(ad_ntp_file)
         Builtins.y2milestone("Reading %1", ad_ntp_file)
@@ -587,7 +561,7 @@ module Yast
       )
       @run_chroot = run_chroot_s == "yes"
 
-      if run_chroot_s == nil
+      if run_chroot_s.nil?
         failed = true
         Builtins.y2error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED")
       end
@@ -623,13 +597,8 @@ module Yast
     # @return [Array<String>] of servers
     def GetUsedNtpServers
       used_servers = []
-      Builtins.foreach(@ntp_records) do |record|
-        if Ops.get_string(record, "type", "") == "server"
-          used_servers = Builtins.add(
-            used_servers,
-            Ops.get_string(record, "address", "")
-          )
-        end
+      @ntp_records.each do |record|
+        used_servers << record["address"] if record["type"] == "server"
       end
 
       deep_copy(used_servers)
@@ -648,7 +617,7 @@ module Yast
 
       Builtins.foreach(GetUsedNtpServers()) do |used_server|
         # if server is needed by pool.ntp.org and matches
-        if Ops.get(needed_servers, used_server) != nil
+        if !Ops.get(needed_servers, used_server).nil?
           Ops.set(needed_servers, used_server, true)
         end
       end
@@ -723,15 +692,13 @@ module Yast
             one_options
           )
         end
-        @ntp_records = Builtins.add(
-          @ntp_records,
+        @ntp_records <<
           {
             "address" => one_server,
             "comment" => "\n# Random pool server, see http://www.pool.ntp.org/ for more information\n",
             "options" => one_options,
             "type"    => "server"
           }
-        )
       end
 
       nil
@@ -740,7 +707,7 @@ module Yast
     # Write all ntp-client settings
     # @return true on success
     def Write
-      #boolean update_dhcp = original_config_dhcp != config_dhcp;
+      # boolean update_dhcp = original_config_dhcp != config_dhcp;
 
       # NtpClient read dialog caption
       caption = _("Saving NTP Client Configuration")
@@ -780,70 +747,68 @@ module Yast
       return false if Abort()
       Progress.NextStage if have_progress
 
-      if true
-        Builtins.foreach(@restrict_map) do |key, m|
-          ret = {
-            "address" => key,
-            "comment" => Ops.get_string(m, "comment", ""),
-            "type"    => "restrict",
-            "options" => Ops.add(
-              Ops.add(
-                Ops.get_string(m, "mask", "") != "" ?
-                  Ops.add(" mask ", Ops.get_string(m, "mask", "")) :
-                  "",
-                " "
-              ),
-              Ops.get_string(m, "options", "")
-            )
-          }
-          @ntp_records = Builtins.add(@ntp_records, ret)
-        end
+      Builtins.foreach(@restrict_map) do |key, m|
+        ret = {
+          "address" => key,
+          "comment" => Ops.get_string(m, "comment", ""),
+          "type"    => "restrict",
+          "options" => Ops.add(
+            Ops.add(
+              Ops.get_string(m, "mask", "") != "" ?
+                Ops.add(" mask ", Ops.get_string(m, "mask", "")) :
+                "",
+              " "
+            ),
+            Ops.get_string(m, "options", "")
+          )
+        }
+        @ntp_records = Builtins.add(@ntp_records, ret)
+      end
 
-        Builtins.y2milestone("Writing settings %1", @ntp_records)
+      Builtins.y2milestone("Writing settings %1", @ntp_records)
 
-        save2 = Builtins.flatten(Builtins.maplist(@ntp_records) do |r|
-          s1 = {
-            "comment" => Ops.get_string(r, "comment", ""),
+      save2 = Builtins.flatten(Builtins.maplist(@ntp_records) do |r|
+        s1 = {
+          "comment" => Ops.get_string(r, "comment", ""),
+          "kind"    => "value",
+          "name"    => Ops.get_string(r, "type", ""),
+          "type"    => 0,
+          "value"   => Ops.add(
+            Ops.add(Ops.get_string(r, "address", ""), " "),
+            Ops.get_string(r, "options", "")
+          )
+        }
+        s2 = nil
+        if Ops.get_string(r, "type", "") == "__clock"
+          s2 = {
+            "comment" => Ops.get_string(r, "fudge_comment", ""),
             "kind"    => "value",
-            "name"    => Ops.get_string(r, "type", ""),
+            "name"    => "fudge",
             "type"    => 0,
             "value"   => Ops.add(
               Ops.add(Ops.get_string(r, "address", ""), " "),
-              Ops.get_string(r, "options", "")
+              Ops.get_string(r, "fudge_options", "")
             )
           }
-          s2 = nil
-          if Ops.get_string(r, "type", "") == "__clock"
-            s2 = {
-              "comment" => Ops.get_string(r, "fudge_comment", ""),
-              "kind"    => "value",
-              "name"    => "fudge",
-              "type"    => 0,
-              "value"   => Ops.add(
-                Ops.add(Ops.get_string(r, "address", ""), " "),
-                Ops.get_string(r, "fudge_options", "")
-              )
-            }
-            Ops.set(s1, "name", "server")
-          end
-          [s1, s2]
-        end)
-        save2 = Builtins.filter(save2) { |m| m != nil }
-
-        failed = false
-        conf = Convert.to_map(SCR.Read(path(".etc.ntp_conf.all")))
-        if conf == nil
-          failed = true
-        else
-          Ops.set(conf, "value", save2)
-          failed = true if !SCR.Write(path(".etc.ntp_conf.all"), conf)
-          failed = true if !SCR.Write(path(".etc.ntp_conf"), nil)
+          Ops.set(s1, "name", "server")
         end
+        [s1, s2]
+      end)
+      save2 = Builtins.filter(save2) { |m| m != nil }
 
-        FileChanges.StoreFileCheckSum("/etc/ntp.conf")
-
-        Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if failed
+      failed = false
+      conf = Convert.to_map(SCR.Read(path(".etc.ntp_conf.all")))
+      if conf.nil?
+        failed = true
+      else
+        Ops.set(conf, "value", save2)
+        failed = true if !SCR.Write(path(".etc.ntp_conf.all"), conf)
+        failed = true if !SCR.Write(path(".etc.ntp_conf"), nil)
       end
+
+      FileChanges.StoreFileCheckSum("/etc/ntp.conf")
+
+      Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if failed
       # write policy and run netconfig command
       SCR.Write(
         path(".sysconfig.network.config.NETCONFIG_NTP_POLICY"),
@@ -870,23 +835,15 @@ module Yast
 
       # SuSEFirewall::Write checks on its own whether there are pending
       # changes, so call it always. bnc#476951
-      if true
-        progress_orig = Progress.set(false)
-        SuSEFirewall.Write
-        Progress.set(progress_orig)
-      end
 
-      adjusted = false
-      if @run_service && Service.Enable(@service_name)
-        adjusted = true
-      end
-      if !@run_service && Service.Disable(@service_name)
-        adjusted = true
-      end
-      unless adjusted
-        # error report
-        Report.Error(Message.CannotAdjustService("NTP"))
-      end
+      progress_orig = Progress.set(false)
+      SuSEFirewall.Write
+      Progress.set(progress_orig)
+
+      adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
+
+      # error report
+      Report.Error(Message.CannotAdjustService("NTP")) unless adjusted
 
       if @run_service
         unless @write_only
@@ -906,13 +863,7 @@ module Yast
       else
         SCR.Execute(
           path(".target.bash"),
-          Ops.add(
-            Ops.add(
-              Ops.add(Ops.add("test -e ", @cron_file), "  && rm "),
-              @cron_file
-            ),
-            ";"
-          )
+          "test -e #{@cron_file} && rm #{@cron_file};"
         )
       end
 
@@ -1179,10 +1130,7 @@ module Yast
       ret = Builtins.maplist(@ntp_records) do |m|
         index = Ops.add(index, 1)
         type = Ops.get_string(m, "type", "")
-        if !Builtins.contains(
-            ["server", "peer", "broadcast", "broadcastclient", "__clock"],
-            type
-          )
+        if !["server", "peer", "broadcast", "broadcastclient", "__clock"].include? type
           next nil
         end
         {
@@ -1192,7 +1140,7 @@ module Yast
           "device"  => Ops.get_string(m, "device", "")
         }
       end
-      ret = Builtins.filter(ret) { |m| m != nil }
+      ret = Builtins.filter(ret) { |m| !m.nil? }
       deep_copy(ret)
     end
 
@@ -1258,7 +1206,7 @@ module Yast
         return false
       end
       Ops.set(@ntp_records, index, nil)
-      @ntp_records = Builtins.filter(@ntp_records) { |r| r != nil }
+      @ntp_records = Builtins.filter(@ntp_records) { |r| !r.nil? }
       @modified = true
       true
     end
@@ -1279,6 +1227,44 @@ module Yast
     # @return [Hash] of packages to be installed and to be removed
     def AutoPackages
       { "install" => @required_packages, "remove" => [] }
+    end
+
+  private
+
+    def read_known_servers
+      servers_file = Directory.find_data_file("ntp_servers.yml")
+
+      return {} if !servers_file
+
+      # FIXME: This is wrong approach, because datadir should be array of all Y2DIR/DATA
+      # so we need to skip it in tests, even if we set Y2DIR properly
+      servers = YAML.load_file(servers_file) rescue nil
+      if servers.nil?
+        log.error("Failed to read the list of NTP servers")
+        return {}
+      end
+
+      log.info "#{servers.size} known NTP servers read"
+
+      servers
+    end
+
+    def pool_servers_for(known_countries)
+      known_countries.map do |short_country, country_name|
+        MakePoolRecord(short_country, country_name)
+      end
+    end
+
+    def cache_server(server)
+      @ntp_servers[server["address"].to_s] = server
+    end
+
+    def update_ntp_servers!
+      @ntp_servers = {}
+
+      read_known_servers.each { |s| cache_server(s) }
+
+      pool_servers_for(GetAllKnownCountries()).each { |p| cache_server(p) }
     end
 
     publish :variable => :AbortFunction, :type => "boolean ()"
