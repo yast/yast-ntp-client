@@ -56,7 +56,7 @@ Metrics/PerceivedComplexity:
   Include:
     - 'src/lib/**/*.rb' # be more strict for new code in lib
 
-# be more strict then rubocop, 5 is too much
+# be more strict than rubocop, 5 is too much
 Metrics/ParameterLists:
   Max: 4
 
@@ -72,7 +72,7 @@ Style/FileName:
   Include:
     - 'src/lib/**/*.rb' # force correct names on new code
 
-# JR: I found lambda easier to read and understand then ->()
+# JR: I found lambda easier to read and understand than ->()
 Style/Lambda:
   Enabled: false
 
