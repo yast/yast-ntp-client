@@ -472,6 +472,18 @@ describe Yast::NtpClient do
   end
 
   describe "#ProcessNtpConf" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
+        File.join(data_dir, "scr_root/etc/ntp.conf"))
+      change_scr_root(File.join(data_dir, "scr_root"), &example)
+    end
+
+    before do
+      subject.instance_variable_set(:@config_has_been_read, false)
+    end
+
     it "returns false if config has been read previously" do
       subject.instance_variable_set(:@config_has_been_read, true)
 
@@ -482,6 +494,24 @@ describe Yast::NtpClient do
       allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(false)
 
       expect(subject.ProcessNtpConf).to eql(false)
+    end
+
+    it "sets configuration as read and returns true" do
+      expect(subject.ProcessNtpConf).to eql(true)
+      expect(subject.config_has_been_read).to eql(true)
+    end
+
+    # FIXME: Add fudge entries to test
+    it "initializes ntp records excluding restrict and fudge entries" do
+      expect(subject.ntp_records.map { |r| r["type"] }).not_to include("restrict")
+
+      subject.ProcessNtpConf
+    end
+
+    it "initializes restrict records" do
+      expect(subject.restrict_map.size).to eql(4)
+
+      subject.ProcessNtpConf
     end
   end
 end
