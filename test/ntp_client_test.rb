@@ -10,114 +10,137 @@ describe Yast::NtpClient do
   subject { Yast::NtpClient }
 
   describe "#Read" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
     before do
-      subject.config_has_been_read = false
-      allow(Yast::NetworkInterfaces).to receive(:Read)
       allow(subject).to receive(:Abort).and_return(false)
+      allow(Yast::NetworkInterfaces).to receive(:Read)
       allow(Yast::Mode).to receive(:normal).and_return(false)
       allow(Yast::Progress).to receive(:set)
-      allow(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
-        .and_return(nil)
       allow(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
         .with(["ntp"]).and_return(true)
-      allow(subject).to receive(:GetNtpServers)
-      allow(subject).to receive(:GetCountryNames)
-      allow(Yast::FileUtils).to receive(:Exists)
-        .with("#{Yast::Directory.vardir}/ad_ntp_data.ycp").and_return(false)
-      allow(Yast::FileChanges).to receive(:CheckFiles)
-        .with(["/etc/ntp.conf"]).and_return(true)
+      allow(subject).to receive(:read_ad_address!)
       allow(subject).to receive(:ProcessNtpConf)
       allow(subject).to receive(:ReadSynchronization)
+      allow(subject).to receive(:read_chroot_config!)
       allow(Yast::SuSEFirewall).to receive(:Read)
-      allow(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
-        .and_return(nil)
       allow(Yast::Service).to receive(:Enabled).with("ntpd").and_return(true)
     end
 
-    it "returns true if config was read previously" do
-      subject.config_has_been_read = true
-      expect(Yast::Mode).not_to receive(:normal)
+    context "when config has been read previously" do
+      it "returns true" do
+        subject.config_has_been_read = true
+        expect(Yast::Mode).not_to receive(:normal)
 
-      expect(subject.Read).to eql(true)
+        expect(subject.Read).to eql(true)
+      end
     end
 
-    it "returns false if abort is pressed" do
-      allow(subject).to receive(:Abort).and_return(true)
+    context "when config has not been read" do
+      before do
+        subject.config_has_been_read = false
+      end
 
-      expect(subject.Read).to eql(false)
-    end
+      it "returns false if abort is pressed" do
+        allow(subject).to receive(:Abort).and_return(true)
 
-    it "doesn't show progress if it is not in normal Mode" do
-      expect(Yast::Progress).not_to receive(:New)
+        expect(subject.Read).to eql(false)
+      end
 
-      subject.Read
-    end
+      it "doesn't show progress if it is not in normal Mode" do
+        expect(Yast::Progress).not_to receive(:New)
 
-    it "reads network interfaces config" do
-      expect(Yast::NetworkInterfaces).to receive(:Read)
+        subject.Read
+      end
 
-      subject.Read
-    end
+      it "reads network interfaces config" do
+        expect(Yast::NetworkInterfaces).to receive(:Read)
 
-    it "reads ntp policy setting, using auto as default if not exists" do
-      expect(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
-        .and_return(nil)
-      expect(subject.ntp_policy).to eql("auto")
+        subject.Read
+      end
 
-      subject.Read
-    end
+      context "when sysconfig network policity setting's config exists" do
+        it "sets ntp policy setting as read value" do
+          allow(Yast::FileChanges).to receive(:CheckFiles).with(["/etc/ntp.conf"])
+          allow(Yast::SCR).to receive(:Read)
+            .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
+            .and_return("manual")
 
-    it "loads known ntp servers and known country names" do
-      expect(subject).to receive(:GetNtpServers)
-      expect(subject).to receive(:GetCountryNames)
+          subject.Read
 
-      subject.Read
-    end
+          expect(subject.ntp_policy).to eql("manual")
+        end
+      end
 
-    it "returns false if the ntp package is not and could not be installed" do
-      expect(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
-        .with(["ntp"]).and_return(false)
-      expect(Yast::Service).not_to receive(:Enabled)
+      context "when sysconfig network policity setting's config doesn't exist" do
+        it "sets ntp policy setting as auto" do
+          allow(Yast::FileChanges).to receive(:CheckFiles).with(["/etc/ntp.conf"])
+          allow(Yast::SCR).to receive(:Read)
+            .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
+            .and_return(nil)
 
-      expect(subject.Read).to eql(false)
-    end
+          subject.Read
 
-    it "checks if ntpd service is enable" do
-      expect(Yast::Service).to receive(:Enabled).with("ntpd")
+          expect(subject.ntp_policy).to eql("auto")
+        end
+      end
 
-      subject.Read
-    end
+      it "loads known ntp servers and known country names" do
+        expect(subject).to receive(:GetNtpServers)
+        expect(subject).to receive(:GetCountryNames)
 
-    it "checks active directory's ntp dumped data file" do
-      expect(Yast::FileUtils).to receive(:Exists).with("#{Yast::Directory.vardir}/ad_ntp_data.ycp")
+        subject.Read
+      end
 
-      subject.Read
-    end
+      context "when Mode is not installation" do
+        it "returns false if the ntp package is not and could not be installed" do
+          expect(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
+            .with(["ntp"]).and_return(false)
+          expect(Yast::Service).not_to receive(:Enabled)
 
-    it "reads ntp config from /etc/ntp.conf" do
-      expect(subject).to receive(:ProcessNtpConf)
+          expect(subject.Read).to eql(false)
+        end
+      end
 
-      subject.Read
-    end
+      it "checks if ntpd service is enable" do
+        expect(Yast::Service).to receive(:Enabled).with("ntpd")
 
-    it "reads synchronization config" do
-      expect(subject).to receive(:ReadSynchronization)
+        subject.Read
+      end
 
-      subject.Read
-    end
+      context "when active directory's ntp dumped data file exists" do
+        it "reads active directory address from file" do
+          expect(subject).to receive(:read_ad_address!)
 
-    it "reads ntpd chroot configuration" do
-      expect(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
+          subject.Read
+        end
+      end
 
-      subject.Read
-    end
+      it "reads ntp config from /etc/ntp.conf" do
+        expect(subject).to receive(:ProcessNtpConf)
 
-    it "returns true if all reads were performed" do
-      expect(subject.Read).to eql(true)
+        subject.Read
+      end
+
+      it "reads synchronization config" do
+        expect(subject).to receive(:ReadSynchronization)
+
+        subject.Read
+      end
+
+      it "reads ntpd chroot config" do
+        expect(subject).to receive(:read_chroot_config!)
+
+        subject.Read
+      end
+
+      it "returns true if all reads were performed" do
+        expect(subject.Read).to eql(true)
+      end
     end
   end
 
@@ -293,8 +316,7 @@ describe Yast::NtpClient do
         subject.synchronize_time = false
         expect(Yast::SCR).to receive(:Execute)
           .with(Yast::Path.new(".target.bash"),
-            "test -e #{subject.cron_file} && rm #{subject.cron_file};"
-               )
+            "test -e #{subject.cron_file} && rm #{subject.cron_file};")
 
         subject.Write
       end
@@ -333,12 +355,6 @@ describe Yast::NtpClient do
     end
 
     context "when ntp servers haven't been read before" do
-      it "returns empty hash in test Mode" do
-        allow(Yast::Mode).to receive(:test).and_return(true)
-
-        expect(subject.GetNtpServers).to eql({})
-      end
-
       it "caches known ntp servers" do
         allow(Yast::Mode).to receive(:test).and_return(false)
         subject.instance_variable_set(:@ntp_servers, nil)
@@ -354,7 +370,7 @@ describe Yast::NtpClient do
       end
     end
 
-    context "when ntp servers haven been read before" do
+    context "when ntp servers have been read before" do
 
       before do
         subject.instance_variable_set(:@ntp_servers, country_servers)
@@ -365,6 +381,51 @@ describe Yast::NtpClient do
       end
     end
 
+  end
+
+  describe "#ReadSynchronization" do
+    let(:cron_job_file) { "/etc/cron.d/novell.ntp-synchronize" }
+    let(:cron_entry) { [] }
+
+    before do
+      allow(Yast::SCR).to receive(:Read)
+        .with(Yast::Path.new(".cron"), cron_job_file, "").and_return(cron_entry)
+    end
+
+    it "reads cron file" do
+      expect(Yast::SCR).to receive(:Read)
+        .with(Yast::Path.new(".cron"), cron_job_file, "")
+
+      subject.ReadSynchronization
+    end
+
+    context "when there is no cron entry" do
+      it "sets synchronize_time as false" do
+        subject.ReadSynchronization
+
+        expect(subject.synchronize_time).to eql(false)
+      end
+
+      it "sets sync interval with default value" do
+        subject.ReadSynchronization
+
+        expect(subject.sync_interval).to eql(Yast::NtpClientClass::DEFAULT_SYNC_INTERVAL)
+      end
+    end
+
+    context "when there is cron entry" do
+      let(:cron_entry) { [{ "events"   => [{ "active"   => "1", "minute" => "*/10" }] }] }
+
+      it "sets synchronize time as true if first cron entry is valid" do
+        expect(subject.ReadSynchronization).to eql(true)
+      end
+
+      it "sets sync_interval with cron minute interval" do
+        subject.ReadSynchronization
+
+        expect(subject.sync_interval).to eql(10)
+      end
+    end
   end
 
   describe "#reachable_ntp_server?" do
@@ -512,6 +573,129 @@ describe Yast::NtpClient do
       expect(subject.restrict_map.size).to eql(4)
 
       subject.ProcessNtpConf
+    end
+  end
+
+  describe "#read_ad_address!" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    context "when there is an active directory data file" do
+      before do
+        allow(Yast::Directory).to receive(:find_data_file).with("ad_ntp_data.ycp")
+          .and_return("/usr/share/YaST2/data/ad_ntp_data.ycp")
+        allow(Yast::SCR).to receive(:Execute)
+          .with(path(".target.remove"), "/usr/share/YaST2/data/ad_ntp_data.ycp")
+      end
+
+      it "reads and sets active directory controller" do
+        subject.read_ad_address!
+
+        expect(subject.ad_controller).to eql("ads.suse.de")
+      end
+
+      it "removes data file if controller is read" do
+        expect(Yast::SCR).to receive(:Execute)
+          .with(path(".target.remove"), "/usr/share/YaST2/data/ad_ntp_data.ycp")
+
+        subject.read_ad_address!
+      end
+    end
+  end
+
+  describe "#read_chroot_config!" do
+    it "reads sysconfig NTPD_RUN_CHROOTED variable" do
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
+
+      subject.read_chroot_config!
+    end
+
+    context "when NTPD_RUN_CHROOTED variable doesn't exist" do
+      it "returns false" do
+        expect(Yast::SCR).to receive(:Read)
+          .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return(nil)
+
+        expect(subject.read_chroot_config!).to eql(false)
+      end
+    end
+
+    context "when NTPD_RUN_CHROOTED variable exists" do
+      it "returns true" do
+        expect(Yast::SCR).to receive(:Read)
+          .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return("no")
+
+        expect(subject.read_chroot_config!).to eql(true)
+      end
+
+      it "sets ntpd as chrooted if variable is 'yes'" do
+        expect(Yast::SCR).to receive(:Read)
+          .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return("yes")
+        subject.read_chroot_config!
+
+        expect(subject.run_chroot).to eql(true)
+      end
+
+      it "sets ntpd as no chrooted in any other case" do
+        expect(Yast::SCR).to receive(:Read)
+          .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return("other")
+
+        subject.read_chroot_config!
+
+        expect(subject.run_chroot).to eql(false)
+      end
+    end
+  end
+
+  describe "#update_ntp_servers!" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+    let(:known_server) do
+      { "access_policy"   => "open access, please send a message to notify",
+        "address"         => "tick.nap.com.ar",
+        "country"         => "AR",
+        "exact_location"  => "Network Access Point, Buenos Aires, Argentina",
+        "location"        => "Argentina",
+        "stratum"         => "2",
+        "synchronization" => "NTP V3 secondary (stratum 2), Cisco IOS"
+      }
+    end
+    let(:country_server) do
+      { "address" => "ca.pool.ntp.org", "country" => "CA", "location" => "Canada" }
+    end
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    it "initializes ntp_servers as an empty hash" do
+      allow(subject).to receive(:read_known_servers).and_return([])
+      allow(subject).to receive(:pool_servers_for).with(anything).and_return([])
+
+      subject.update_ntp_servers!
+
+      expect(subject.instance_variable_get(:@ntp_servers)).to eql({})
+    end
+
+    it "adds known servers to ntp_servers" do
+      allow(subject).to receive(:pool_servers_for).with(anything).and_return([])
+      allow(subject).to receive(:cache_server).with(anything)
+      expect(subject).to receive(:read_known_servers).and_call_original
+      expect(subject).to receive(:cache_server).with(known_server)
+
+      subject.update_ntp_servers!
+
+    end
+
+    it "adds ntp pool servers for known countries to ntp_servers" do
+      allow(subject).to receive(:read_known_servers).and_return([])
+      allow(subject).to receive(:cache_server).with(anything)
+      expect(subject).to receive(:pool_servers_for).with(anything).and_call_original
+      expect(subject).to receive(:cache_server).with(country_server)
+
+      subject.update_ntp_servers!
     end
   end
 end

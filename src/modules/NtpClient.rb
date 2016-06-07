@@ -147,8 +147,7 @@ module Yast
     # Abort function
     # @return blah blah lahjk
     def Abort
-      return @AbortFunction.call == true if !@AbortFunction.nil?
-      false
+      !@AbortFunction.nil? ? false : @AbortFunction.call == true
     end
     # Reads and returns all known countries with their country codes
     #
@@ -168,7 +167,7 @@ module Yast
           Builtins.eval(
             SCR.Read(
               path(".target.ycp"),
-              Ops.add(Directory.datadir, "/country.ycp")
+              Directory.find_data_file("country.ycp")
             )
           ),
           from: "any",
@@ -214,7 +213,6 @@ module Yast
     # Get the list of known NTP servers
     # @return a list of known NTP servers
     def GetNtpServers
-      return {} if Mode.test
       update_ntp_servers! if @ntp_servers.nil?
 
       deep_copy(@ntp_servers)
@@ -428,20 +426,16 @@ module Yast
     # synchronize_time and sync_interval variables
     # Return updated value of synchronize_time
     def ReadSynchronization
-      crontab = Convert.to_list(SCR.Read(path(".cron"), @cron_file, ""))
-      Builtins.y2milestone("CRONTAB %1", crontab)
-      tmp = Ops.get_string(crontab, [0, "events", 0, "active"], "0")
-      @synchronize_time = tmp == "1"
-      tmp = Ops.get_string(crontab, [0, "events", 0, "minute"], "*/#{DEFAULT_SYNC_INTERVAL}")
-      Builtins.y2milestone("MINUTE %1", tmp)
-      pos = Builtins.regexppos(tmp, "[0-9]+")
-      tmp2 = Builtins.substring(
-        tmp,
-        Ops.get_integer(pos, 0, 0),
-        Ops.get_integer(pos, 1, 0)
-      )
-      @sync_interval = Builtins.tointeger(tmp2)
-      Builtins.y2milestone("SYNC_INTERVAL %1", @sync_interval)
+      crontab = SCR.Read(path(".cron"), @cron_file, "")
+      log.info("NTP Synchronization crontab entry: #{crontab}")
+      cron_entry = crontab.fetch(0, {}).fetch("events", []).fetch(0, {})
+      @synchronize_time = cron_entry["active"] == "1"
+
+      sync_interval_entry = cron_entry.fetch("minute", "*/#{DEFAULT_SYNC_INTERVAL}")
+      log.info("MINUTE #{sync_interval_entry}")
+
+      @sync_interval = sync_interval_entry.tr("^[0-9]", "").to_i
+      log.info("SYNC_INTERVAL #{@sync_interval}")
 
       @synchronize_time
     end
@@ -497,60 +491,29 @@ module Yast
 
       GetNtpServers()
       GetCountryNames()
+
       # read current settings
       return false if Abort()
       Progress.NextStage if have_progress
 
-      failed = false
-
-      if !Mode.testsuite && !Mode.installation &&
-          !PackageSystem.CheckAndInstallPackagesInteractive(["ntp"])
-        Builtins.y2milestone(
-          "PackageSystem::CheckAndInstallPackagesInteractive failed"
-        )
+      if !Mode.installation && !PackageSystem.CheckAndInstallPackagesInteractive(["ntp"])
+        log.info("PackageSystem::CheckAndInstallPackagesInteractive failed")
         return false
       end
 
       @run_service = Service.Enabled(@service_name)
 
       # Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
-      ad_ntp_file = Ops.add(Directory.vardir, "/ad_ntp_data.ycp")
-      if FileUtils.Exists(ad_ntp_file)
-        Builtins.y2milestone("Reading %1", ad_ntp_file)
-        ad_ntp_data = Convert.convert(
-          SCR.Read(path(".target.ycp"), ad_ntp_file),
-          from: "any",
-          to:   "map <string, string>"
-        )
-        @ad_controller = Ops.get(ad_ntp_data, "ads", "")
-        if @ad_controller != ""
-          Builtins.y2milestone(
-            "Got %1 for ntp sync, deleting %2, since it is no longer needed",
-            @ad_controller,
-            ad_ntp_file
-          )
-          SCR.Execute(path(".target.remove"), ad_ntp_file)
-        end
-      end
+      read_ad_address!
 
       # Stay away if the user may have made changes which we cannot parse.
       # But bnc#456553, no pop-ups for CLI.
-      if !Mode.commandline && !FileChanges.CheckFiles(["/etc/ntp.conf"])
-        failed = true
-      end
-      ProcessNtpConf()
+      failed = !Mode.commandline && !FileChanges.CheckFiles(["/etc/ntp.conf"])
 
+      ProcessNtpConf()
       ReadSynchronization()
 
-      run_chroot_s = Convert.to_string(
-        SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
-      )
-      @run_chroot = run_chroot_s == "yes"
-
-      if run_chroot_s.nil?
-        failed = true
-        Builtins.y2error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED")
-      end
+      failed = true unless read_chroot_config!
 
       if failed
         # While calling "yast clone_system" it is possible that
@@ -560,11 +523,9 @@ module Yast
         Report.Error(Message.CannotReadCurrentSettings) unless Mode.config
       end
 
-      if !Mode.testsuite
-        progress_orig2 = Progress.set(false)
-        SuSEFirewall.Read
-        Progress.set(progress_orig2)
-      end
+      progress_orig2 = Progress.set(false)
+      SuSEFirewall.Read
+      Progress.set(progress_orig2)
 
       return false if Abort()
       if have_progress
@@ -1207,11 +1168,45 @@ module Yast
       { "install" => @required_packages, "remove" => [] }
     end
 
-  private
+    def read_ad_address!
+      ad_ntp_file = Directory.find_data_file("ad_ntp_data.ycp")
+      if ad_ntp_file
+        log.info("Reading #{ad_ntp_file}")
+        ad_ntp_data = SCR.Read(path(".target.ycp"), ad_ntp_file)
 
-    def sync_record?(entry)
-      ["server", "peer", "broadcast", "broadcastclient", "__clock"].include? entry
+        @ad_controller = ad_ntp_data["ads"].to_s if ad_ntp_data
+        if @ad_controller != ""
+          Builtins.y2milestone(
+            "Got %1 for ntp sync, deleting %2, since it is no longer needed",
+            @ad_controller,
+            ad_ntp_file
+          )
+          SCR.Execute(path(".target.remove"), ad_ntp_file)
+        end
+      else
+        log.info "There is no active directory data's file available."
+      end
     end
+
+    def read_chroot_config!
+      run_chroot_s = SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
+
+      @run_chroot = run_chroot_s == "yes"
+
+      log.error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED") if run_chroot_s.nil?
+
+      run_chroot_s.nil? ? false : true
+    end
+
+    def update_ntp_servers!
+      @ntp_servers = {}
+
+      read_known_servers.each { |s| cache_server(s) }
+
+      pool_servers_for(GetAllKnownCountries()).each { |p| cache_server(p) }
+    end
+
+  private
 
     def read_known_servers
       servers_file = Directory.find_data_file("ntp_servers.yml")
@@ -1229,6 +1224,10 @@ module Yast
       servers
     end
 
+    def sync_record?(entry)
+      ["server", "peer", "broadcast", "broadcastclient", "__clock"].include? entry
+    end
+
     def pool_servers_for(known_countries)
       known_countries.map do |short_country, country_name|
         MakePoolRecord(short_country, country_name)
@@ -1237,14 +1236,6 @@ module Yast
 
     def cache_server(server)
       @ntp_servers[server["address"].to_s] = server
-    end
-
-    def update_ntp_servers!
-      @ntp_servers = {}
-
-      read_known_servers.each { |s| cache_server(s) }
-
-      pool_servers_for(GetAllKnownCountries()).each { |p| cache_server(p) }
     end
 
     publish variable: :AbortFunction, type: "boolean ()"

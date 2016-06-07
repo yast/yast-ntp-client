@@ -53,7 +53,6 @@ This package contains the YaST2 component for NTP client configuration.
 rake test:unit
 
 %build
-yardoc
 
 %install
 rake install DESTDIR="%{buildroot}"

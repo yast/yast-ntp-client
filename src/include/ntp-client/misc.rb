@@ -87,33 +87,26 @@ module Yast
     # @param [Array<String>] without_param a list of options that don't have any parameter
     # @return [Hash] options as a map
     def string2opts(options_string, with_param, without_param)
-      with_param = deep_copy(with_param)
-      without_param = deep_copy(without_param)
-      l = Builtins.splitstring(options_string, " ")
-      l = Builtins.filter(l) { |e| e != "" }
-      ignore_next = false
-      index = -1
+      options_list = options_string.split(" ")
+      option_parse = nil
+      parsed = {}
       unknown = []
-      ret = Builtins.listmap(l) do |e|
-        index = Ops.add(index, 1)
-        if ignore_next
-          ignore_next = false
-          next { e => nil }
+      options_list.each do |option|
+        if option_parse
+          parsed[option_parse] = option unless option.nil?
+          option_parse = nil
+          next
         end
-        ignore_next = false
-        if Builtins.contains(with_param, e)
-          ignore_next = true
-          next { e => Ops.get(l, Ops.add(index, 1), "") }
-        elsif Builtins.contains(without_param, e)
-          next { e => true }
+        if with_param.include? option
+          option_parse = option
+        elsif without_param.include? option
+          parsed[option] = true
         else
-          unknown = Builtins.add(unknown, e)
-          next { e => nil }
+          unknown << option
         end
       end
-      ret = Builtins.filter(ret) { |_k, v| !v.nil? }
-      ret = { "parsed" => ret, "unknown" => Builtins.mergestring(unknown, " ") }
-      deep_copy(ret)
+
+      { "parsed" => parsed, "unknown" => unknown.join(" ") }
     end
 
     # Create options string from a map
