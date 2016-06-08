@@ -146,7 +146,6 @@ describe Yast::NtpClient do
 
   describe "#Write" do
     let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
     around do |example|
       ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
         File.join(data_dir, "scr_root/etc/ntp.conf"))
@@ -154,113 +153,59 @@ describe Yast::NtpClient do
     end
 
     before do
-      allow(Yast::Mode).to receive(:normal).and_return(false)
       allow(subject).to receive(:Abort).and_return(false)
-      allow(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".etc.ntp_conf.all")).and_return(nil)
-      allow(Yast::FileChanges).to receive(:StoreFileCheckSum).with("/etc/ntp.conf")
-      allow(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"), anything)
-      allow(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.network.config"), nil)
-      allow(Yast::SCR).to receive(:Execute)
-        .with(Yast::Path.new(".target.bash"), "/sbin/netconfig update -m ntp")
-        .and_return(0)
-      allow(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.ntp.NTPD_RUN_CHROOTED"), anything)
-      allow(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.ntp"), nil)
-      allow(Yast::SCR).to receive(:Execute)
-        .with(Yast::Path.new(".target.bash"),
-          "test -e #{subject.cron_file} && rm #{subject.cron_file};")
-      allow(Yast::SuSEFirewall).to receive(:Write)
-      allow(Yast::Service).to receive(:Enable)
-      allow(Yast::Service).to receive(:Disable)
-      allow(Yast::Service).to receive(:Restart)
-      allow(Yast::Service).to receive(:Stop)
-      allow(Yast::Report).to receive(:Error)
-      allow(Yast::SCR).to receive(:Execute)
-        .with(Yast::Path.new(".target.string"),
-          subject.cron_file,
-          "test -e #{subject.cron_file} && rm #{subject.cron_file};"
-               )
-    end
+      allow(subject).to receive(:go_next).and_return(true)
+      allow(subject).to receive(:progress?).and_return(false)
+      allow(subject).to receive(:write_ntp_conf).and_return(true)
+      allow(subject).to receive(:write_ntp_policy).and_return(true)
+      allow(subject).to receive(:update_netconfig)
+      allow(subject).to receive(:write_chroot_config)
 
-    it "doesn't show progress if it is not in normal Mode" do
-      expect(Yast::Progress).not_to receive(:New)
-
-      subject.Write
+      allow(Yast::SuSEFirewall)
+      allow(Yast::Report)
     end
 
     it "returns false if abort is pressed" do
       allow(subject).to receive(:Abort).and_return(true)
+      expect(subject).to receive(:go_next).and_call_original
 
       expect(subject.Write).to eql(false)
     end
 
-    it "reads current /etc/ntp.conf config" do
-      expect(Yast::SCR).to receive(:Read).with(Yast::Path.new(".etc.ntp_conf.all"))
+    it "appends restrict records to current ntp_records before write" do
+      expect(subject).to receive(:append_restrict_records!).with(subject.ntp_records)
 
       subject.Write
     end
 
-    context "when /etc/ntp.conf exists" do
-      let(:conf) do
-        { "comment" => "",
-          "file"    => -1,
-          "kind"    => "section",
-          "name"    => "",
-          "type"    => -1,
-          "value"   => []
-        }
-      end
-
-      before do
-        allow(Yast::SCR).to receive(:Read)
-          .with(Yast::Path.new(".etc.ntp_conf.all")).and_call_original
-      end
-
-      it "tries to write to it current ntp entries" do
-        expect(Yast::SCR).to receive(:Write).with(Yast::Path.new(".etc.ntp_conf.all"), conf)
-        expect(Yast::SCR).to receive(:Write).with(Yast::Path.new(".etc.ntp_conf"), nil)
-
-        subject.Write
-      end
-
-      it "reports and error if not able to write /etc/ntp.conf file" do
-        allow(Yast::SCR).to receive(:Write)
-          .with(Yast::Path.new(".etc.ntp_conf.all"), conf).and_return(false)
-        allow(Yast::SCR).to receive(:Write)
-          .with(Yast::Path.new(".etc.ntp_conf"), nil).and_return(false)
-        expect(Yast::Report).to receive(:Error)
-          .with(Yast::Message.CannotWriteSettingsTo("/etc/ntp.conf"))
-
-        subject.Write
-      end
-    end
-
-    it "stores /etc/ntp.conf checksum" do
-      expect(Yast::FileChanges).to receive(:StoreFileCheckSum).with("/etc/ntp.conf")
+    it "writes current ntp records to ntp config" do
+      expect(subject).to receive(:write_ntp_conf)
 
       subject.Write
     end
 
-    it "updates netconfig ntp config" do
-      subject.ntp_policy = "manual"
-      expect(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"), "manual")
-      expect(Yast::SCR).to receive(:Execute)
-        .with(Yast::Path.new(".target.bash"), "/sbin/netconfig update -m ntp")
+    it "writes ntp policy" do
+      expect(subject).to receive(:write_ntp_policy)
 
       subject.Write
     end
 
-    it "writes sysconfig ntp chrooted option with current value" do
-      subject.run_chroot = true
-      expect(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.ntp.NTPD_RUN_CHROOTED"), "yes")
-      expect(Yast::SCR).to receive(:Write)
-        .with(Yast::Path.new(".sysconfig.ntp"), nil)
+    it "updates netconfig if ntp policy write success" do
+      expect(subject).to receive(:write_ntp_policy).and_return(true)
+      expect(subject).to receive(:update_netconfig)
+
+      subject.Write
+    end
+
+    it "doesn't update netconfig if ntp policy write failed" do
+      expect(subject).to receive(:write_ntp_policy).and_return(false)
+      expect(subject).not_to receive(:update_netconfig)
+
+      subject.Write
+    end
+
+    it "writes chroot ntp config" do
+      expect(subject).to receive(:write_chroot_config)
 
       subject.Write
     end
@@ -270,69 +215,16 @@ describe Yast::NtpClient do
       subject.Write
     end
 
-    context "when ntp has been configured to run as a service" do
-      before do
-        subject.run_service = true
-        subject.write_only = false
-      end
+    it "checks ntp service" do
+      expect(subject).to receive(:check_service)
 
-      it "enables ntp service" do
-        expect(Yast::Service).to receive(:Enable).with(subject.service_name)
-        subject.Write
-      end
-
-      context "when it is in write only mode" do
-        it "doesn't try to restart ntp service" do
-          subject.write_only = true
-          expect(Yast::Service).not_to receive(:Restart).with(subject.service_name)
-
-          subject.Write
-        end
-      end
-
-      context "when it is not in write only mode" do
-        it "tries to restart ntp service" do
-          expect(Yast::Service).to receive(:Restart).with(subject.service_name)
-
-          subject.Write
-        end
-      end
+      subject.Write
     end
 
-    context "when has not been configured to run as a service" do
-      before do
-        subject.run_service = false
-      end
+    it "updates cron settings" do
+      expect(subject).to receive(:update_cron_settings!)
 
-      it "disables ntp service" do
-        expect(Yast::Service).to receive(:Disable).with(subject.service_name)
-        expect(Yast::Service).to receive(:Stop).with(subject.service_name)
-        subject.Write
-      end
-    end
-
-    context "when synchronize time is false" do
-      it "writes cronfile to sync ntp via cron" do
-        subject.synchronize_time = false
-        expect(Yast::SCR).to receive(:Execute)
-          .with(Yast::Path.new(".target.bash"),
-            "test -e #{subject.cron_file} && rm #{subject.cron_file};")
-
-        subject.Write
-      end
-    end
-
-    context "when synchronize time is true" do
-      let(:cron_entry) do
-        "-*/#{subject.sync_interval} * * * * root /usr/sbin/start-ntpd ntptimeset &>/dev/null\n"
-      end
-      it "writes cronfile to sync ntp via cron" do
-        subject.synchronize_time = true
-        expect(Yast::SCR).to receive(:Write)
-          .with(Yast::Path.new(".target.string"), subject.cron_file, cron_entry)
-
-        subject.Write
-      end
+      subject.Write
     end
 
     it "returns true if not aborted" do
@@ -381,6 +273,31 @@ describe Yast::NtpClient do
       end
     end
 
+  end
+
+  describe "#GetNtpServersByCountry" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    it "gets all ntp servers" do
+      expect(subject).to receive(:GetNtpServers).and_call_original
+
+      subject.GetNtpServersByCountry("", false)
+    end
+
+    it "gets all country names if given country name is an empty string" do
+      expect(subject).to receive(:GetNtpServers).and_call_original
+      expect(subject).to receive(:GetCountryNames).and_call_original
+
+      subject.GetNtpServersByCountry("", false)
+    end
+
+    it "returns a list of items with read servers" do
+
+    end
   end
 
   describe "#ReadSynchronization" do
@@ -446,7 +363,6 @@ describe Yast::NtpClient do
         expect(subject.reachable_ntp_server?("server")).to eql(false)
       end
     end
-
   end
 
   describe "#sntp_test" do
@@ -463,6 +379,7 @@ describe Yast::NtpClient do
             "exit"   => 0
           }
         end
+
         it "calls sntp command with ip version 4 by default" do
           expect(Yast::SCR).to receive(:Execute)
             .with(Yast::Path.new(".target.bash_output"),

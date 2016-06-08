@@ -147,8 +147,19 @@ module Yast
     # Abort function
     # @return blah blah lahjk
     def Abort
-      !@AbortFunction.nil? ? false : @AbortFunction.call == true
+      @AbortFunction.nil? ? false : @AbortFunction.call == true
     end
+
+    def go_next
+      return false if Abort()
+      Progress.NextStage if progress?
+      true
+    end
+
+    def progress?
+      Mode.normal
+    end
+
     # Reads and returns all known countries with their country codes
     #
     # @return [Hash{String => String}] of known contries
@@ -242,49 +253,30 @@ module Yast
     def GetNtpServersByCountry(country, terse_output)
       country_names = {}
       servers = GetNtpServers()
-      if country != ""
-        servers = Builtins.filter(servers) do |_s, o|
-          Ops.get(o, "country", "") == country
-        end
+      if country.to_s != ""
+        servers.select! { |_server, attrs| attrs["country"] == country }
         # bnc#458917 add country, in case data/country.ycp does not have it
-        p = MakePoolRecord(country, "")
-        Ops.set(servers, Ops.get(p, "address", ""), p)
+        pool_country_record = MakePoolRecord(country, "")
+        servers[pool_country_record["address"]] = pool_country_record
       else
         country_names = GetCountryNames()
       end
 
-      default_already_chosen = false
-      items = Builtins.maplist(servers) do |s, o|
-        label = Ops.get(o, "location", "")
-        l_country = Ops.get(o, "country", "")
-        if country != ""
-          l_country = ""
-        else
-          l_country = Ops.get(country_names, l_country, l_country)
-        end
-        if label != "" && l_country != ""
-          label = Builtins.sformat("%1 (%2, %3)", s, label, l_country)
-        elsif label == "" && l_country == ""
-          label = s
-        else
-          label = Builtins.sformat("%1 (%2%3)", s, label, l_country)
-        end
-
+      default = false
+      items = servers.map do |server, attrs|
         # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
-        if default_already_chosen
-          selected = false
-        else
-          selected = default_already_chosen = s.end_with?("pool.ntp.org")
-        end
+        selected = default ? false : default = server.end_with?("pool.ntp.org")
 
-        if terse_output
-          next Item(Id(s), s, selected)
-        else
-          next Item(Id(s), label, selected)
-        end
+        next Item(Id(server), server, selected) if terse_output
+
+        country_label = country.empty? ? country_names[attrs["country"]] || attrs["country"] : ""
+
+        label = server + country_server_label(attrs["location"].to_s, country_label.to_s)
+
+        Item(Id(server), label, selected)
       end
 
-      deep_copy(items)
+      items
     end
 
     # Read and parse /etc.ntp.conf
@@ -445,41 +437,13 @@ module Yast
     def Read
       return true if @config_has_been_read
 
-      # NtpClient read dialog caption
-      caption = _("Initializing NTP Client Configuration")
-
-      steps = 2
       sl = 500
 
-      have_progress = Mode.normal
-
       # We do not set help text here, because it was set outside
-      if have_progress
-        Progress.New(
-          caption,
-          " ",
-          steps,
-          [
-            # progress stage
-            _("Read network configuration"),
-            # progress stage
-            _("Read NTP settings")
-          ],
-          [
-            # progress step
-            _("Reading network configuration..."),
-            # progress step
-            _("Reading NTP settings..."),
-            # progress step
-            _("Finished")
-          ],
-          ""
-        )
-      end
+      new_read_progress(_("Initializing NTP Client Configuration"), 2) if progress?
 
       # read network configuration
-      return false if Abort()
-      Progress.NextStage if have_progress
+      return false if !go_next
 
       progress_orig = Progress.set(false)
       NetworkInterfaces.Read
@@ -493,8 +457,7 @@ module Yast
       GetCountryNames()
 
       # read current settings
-      return false if Abort()
-      Progress.NextStage if have_progress
+      return false if !go_next
 
       if !Mode.installation && !PackageSystem.CheckAndInstallPackagesInteractive(["ntp"])
         log.info("PackageSystem::CheckAndInstallPackagesInteractive failed")
@@ -527,11 +490,9 @@ module Yast
       SuSEFirewall.Read
       Progress.set(progress_orig2)
 
-      return false if Abort()
-      if have_progress
-        Progress.NextStage
-        Progress.Title(_("Finished"))
-      end
+      return false if !go_next
+      Progress.Title(_("Finished")) if progress?
+
       Builtins.sleep(sl)
 
       return false if Abort()
@@ -655,126 +616,24 @@ module Yast
     # Write all ntp-client settings
     # @return true on success
     def Write
-      # boolean update_dhcp = original_config_dhcp != config_dhcp;
-
-      # NtpClient read dialog caption
-      caption = _("Saving NTP Client Configuration")
-
-      steps = 2
-
-      sl = 0
-      Builtins.sleep(sl)
-
-      have_progress = Mode.normal
-
       # We do not set help text here, because it was set outside
-      if have_progress
-        Progress.New(
-          caption,
-          " ",
-          steps,
-          [
-            # progress stage
-            _("Write NTP settings"),
-            # progress stage
-            _("Restart NTP daemon")
-          ],
-          [
-            # progress step
-            _("Writing the settings..."),
-            # progress step
-            _("Restarting NTP daemon..."),
-            # progress step
-            _("Finished")
-          ],
-          ""
-        )
-      end
+      new_write_progress(_("Saving NTP Client Configuration"), 2) if progress?
 
       # write settings
-      return false if Abort()
-      Progress.NextStage if have_progress
+      return false if !go_next
 
-      @restrict_map.each do |key, m|
-        options = " "
-        options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
-        options << m["options"].to_s
-        ret = {
-          "address" => key,
-          "comment" => m["comment"].to_s,
-          "type"    => "restrict",
-          "options" => options
-        }
-        @ntp_records << ret
-      end
+      append_restrict_records!(@ntp_records)
 
-      Builtins.y2milestone("Writing settings %1", @ntp_records)
+      log.info "Writing settings #{@ntp_records}"
 
-      save2 = Builtins.flatten(Builtins.maplist(@ntp_records) do |r|
-        s1 = {
-          "comment" => Ops.get_string(r, "comment", ""),
-          "kind"    => "value",
-          "name"    => Ops.get_string(r, "type", ""),
-          "type"    => 0,
-          "value"   => Ops.add(
-            Ops.add(Ops.get_string(r, "address", ""), " "),
-            Ops.get_string(r, "options", "")
-          )
-        }
-        s2 = nil
-        if Ops.get_string(r, "type", "") == "__clock"
-          s2 = {
-            "comment" => Ops.get_string(r, "fudge_comment", ""),
-            "kind"    => "value",
-            "name"    => "fudge",
-            "type"    => 0,
-            "value"   => Ops.add(
-              Ops.add(Ops.get_string(r, "address", ""), " "),
-              Ops.get_string(r, "fudge_options", "")
-            )
-          }
-          Ops.set(s1, "name", "server")
-        end
-        [s1, s2]
-      end)
-      save2 = Builtins.filter(save2) { |m| !m.nil? }
+      Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if !write_ntp_conf
 
-      failed = false
-      conf = Convert.to_map(SCR.Read(path(".etc.ntp_conf.all")))
-      if conf.nil?
-        failed = true
-      else
-        Ops.set(conf, "value", save2)
-        failed = true if !SCR.Write(path(".etc.ntp_conf.all"), conf)
-        failed = true if !SCR.Write(path(".etc.ntp_conf"), nil)
-      end
+      write_ntp_policy && update_netconfig
 
-      FileChanges.StoreFileCheckSum("/etc/ntp.conf")
-
-      Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if failed
-      # write policy and run netconfig command
-      SCR.Write(
-        path(".sysconfig.network.config.NETCONFIG_NTP_POLICY"),
-        @ntp_policy
-      )
-      SCR.Write(path(".sysconfig.network.config"), nil)
-
-      if SCR.Execute(path(".target.bash"), "/sbin/netconfig update -m ntp") != 0
-        # error message
-        Report.Error(_("Cannot update the dynamic configuration policy."))
-      end
-
-      SCR.Write(
-        path(".sysconfig.ntp.NTPD_RUN_CHROOTED"),
-        @run_chroot ? "yes" : "no"
-      )
-      SCR.Write(path(".sysconfig.ntp"), nil)
-
-      Builtins.sleep(sl)
+      write_chroot_config
 
       # restart daemon
-      return false if Abort()
-      Progress.NextStage if have_progress
+      return false if !go_next
 
       # SuSEFirewall::Write checks on its own whether there are pending
       # changes, so call it always. bnc#476951
@@ -783,44 +642,15 @@ module Yast
       SuSEFirewall.Write
       Progress.set(progress_orig)
 
-      adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
+      check_service
 
-      # error report
-      Report.Error(Message.CannotAdjustService("NTP")) unless adjusted
+      update_cron_settings!
 
-      if @run_service
-        unless @write_only
-          # error report
-          Report.Error(_("Cannot restart the NTP daemon.")) unless Service.Restart(@service_name)
-        end
-      else
-        Service.Stop(@service_name)
-      end
+      return false if !go_next
 
-      if @synchronize_time
-        SCR.Write(
-          path(".target.string"),
-          @cron_file,
-          "-*/#{@sync_interval} * * * * root /usr/sbin/start-ntpd ntptimeset &>/dev/null\n"
-        )
-      else
-        SCR.Execute(
-          path(".target.bash"),
-          "test -e #{@cron_file} && rm #{@cron_file};"
-        )
-      end
+      Progress.Title(_("Finished")) if progress?
 
-      Builtins.sleep(sl)
-
-      return false if Abort()
-      if have_progress
-        Progress.NextStage
-        Progress.Title(_("Finished"))
-      end
-      Builtins.sleep(sl)
-
-      return false if Abort()
-      true
+      !Abort()
     end
 
     # Get all ntp-client settings from the first parameter
@@ -1208,6 +1038,167 @@ module Yast
 
   private
 
+    def new_read_progress(caption, steps)
+      Progress.New(
+        caption,
+        " ",
+        steps,
+        [
+          # progress stage
+          _("Read network configuration"),
+          # progress stage
+          _("Read NTP settings")
+        ],
+        [
+          # progress step
+          _("Reading network configuration..."),
+          # progress step
+          _("Reading NTP settings..."),
+          # progress step
+          _("Finished")
+        ],
+        ""
+      )
+    end
+
+    def new_write_progress(caption, steps)
+      Progress.New(
+        caption,
+        " ",
+        steps,
+        [
+          # progress stage
+          _("Write NTP settings"),
+          # progress stage
+          _("Restart NTP daemon")
+        ],
+        [
+          # progress step
+          _("Writing the settings..."),
+          # progress step
+          _("Restarting NTP daemon..."),
+          # progress step
+          _("Finished")
+        ],
+        ""
+      )
+    end
+
+    def write_ntp_conf
+      conf = SCR.Read(path(".etc.ntp_conf.all"))
+
+      return false if conf.nil?
+
+      conf["value"] = records_for_write(@ntp_records)
+
+      return false if !SCR.Write(path(".etc.ntp_conf.all"), conf)
+
+      ret = SCR.Write(path(".etc.ntp_conf"), nil)
+
+      FileChanges.StoreFileCheckSum("/etc/ntp.conf")
+
+      ret
+    end
+
+    def write_ntp_policy
+      # write policy and run netconfig command
+      SCR.Write(
+        path(".sysconfig.network.config.NETCONFIG_NTP_POLICY"),
+        @ntp_policy
+      )
+      SCR.Write(path(".sysconfig.network.config"), nil)
+    end
+
+    def write_chroot_config
+      SCR.Write(
+        path(".sysconfig.ntp.NTPD_RUN_CHROOTED"),
+        @run_chroot ? "yes" : "no"
+      )
+
+      SCR.Write(path(".sysconfig.ntp"), nil)
+    end
+
+    def update_netconfig
+      error = SCR.Execute(path(".target.bash"), "/sbin/netconfig update -m ntp") != 0
+
+      Report.Error(_("Cannot update the dynamic configuration policy.")) if error
+
+      !error
+    end
+
+    def check_service
+      adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
+
+      # error report
+      Report.Error(Message.CannotAdjustService("NTP")) unless adjusted
+
+      if @run_service
+        unless @write_only
+          # error report
+          Report.Error(_("Cannot restart the NTP daemon.")) unless Service.Restart(@service_name)
+        end
+      else
+        Service.Stop(@service_name)
+      end
+    end
+
+    def update_cron_settings!
+      if @synchronize_time
+        SCR.Write(
+          path(".target.string"),
+          @cron_file,
+          "-*/#{@sync_interval} * * * * root /usr/sbin/start-ntpd ntptimeset &>/dev/null\n"
+        )
+      else
+        SCR.Execute(
+          path(".target.bash"),
+          "test -e #{@cron_file} && rm #{@cron_file};"
+        )
+      end
+    end
+
+    def record_to_h(record)
+      {
+        "comment" => record["comment"],
+        "kind"    => "value",
+        "name"    => record["type"] == "__clock" ? "server" : record["type"],
+        "type"    => 0,
+        "value"   => "#{record["address"]} #{record["options"]}"
+      }
+    end
+
+    def fugde_options_to_h(record)
+      {
+        "comment" => record["fudge_comment"],
+        "kind"    => "value",
+        "name"    => "fudge",
+        "type"    => 0,
+        "value"   => "#{record["address"]} #{record["fudge_options"]}"
+      }
+    end
+
+    def append_restrict_records!(records)
+      @restrict_map.each do |key, m|
+        options = " "
+        options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
+        options << m["options"].to_s
+        ret = {
+          "address" => key,
+          "comment" => m["comment"].to_s,
+          "type"    => "restrict",
+          "options" => options
+        }
+        records << ret
+      end
+    end
+
+    def records_for_write(records)
+      records.each_with_object([]) do |record, ret|
+        ret << record_to_h(record)
+        ret << fudge_options_to_h(record) if record["type"] == "__clock"
+      end
+    end
+
     def read_known_servers
       servers_file = Directory.find_data_file("ntp_servers.yml")
 
@@ -1222,6 +1213,13 @@ module Yast
       log.info "Known NTP servers read: #{servers}"
 
       servers
+    end
+
+    def country_server_label(location, country)
+      return "" if location.empty? && country.empty?
+      return " (#{location}, #{country})" if !location.empty? && !country.empty?
+
+      " (#{location}#{country})"
     end
 
     def sync_record?(entry)
