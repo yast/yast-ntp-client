@@ -40,6 +40,7 @@ BuildArch:      noarch
 # New sntp command line syntax
 Conflicts:      ntp < 4.2.8
 
+Obsoletes:      yast2-ntp-client-devel-doc
 
 %description
 This package contains the YaST2 component for NTP client configuration.
