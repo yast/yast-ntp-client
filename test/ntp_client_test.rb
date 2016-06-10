@@ -447,10 +447,48 @@ describe Yast::NtpClient do
       expect(subject.TestNtpServer("server", "")).to eql(false)
     end
 
-    it "doesn't show any dialog if given verbosity is :no_ui" do
-      expect(Yast::Popup).to receive(:Feedback).never
+    context "when given verbosity is :no_ui" do
+      it "doesn't show any dialog" do
+        expect(Yast::Popup).to receive(:Feedback).never
+        expect(Yast::Popup).to receive(:Notify).never
+        expect(Yast::Report).to receive(:Error).never
 
-      subject.TestNtpServer("server", :no_ui)
+        subject.TestNtpServer("server", :no_ui)
+      end
+    end
+
+    context "when given verbosity is :result_popup" do
+      it "shows Feedback Popup" do
+        expect(Yast::Popup).to receive(:Feedback).once
+
+        subject.TestNtpServer("server", :whatever)
+      end
+
+      it "notifies with a Popup if success" do
+        allow(subject).to receive(:reachable_ntp_server?).with("server") { true }
+        expect(Yast::Popup).to receive(:Notify).once
+        expect(Yast::Report).to receive(:Error).never
+
+        subject.TestNtpServer("server", :result_popup)
+      end
+
+      it "reports with an error if not reachable server" do
+        allow(subject).to receive(:reachable_ntp_server?).with("server") { false }
+        expect(Yast::Popup).to receive(:Notify).never
+        expect(Yast::Report).to receive(:Error).once
+
+        subject.TestNtpServer("server", :result_popup)
+      end
+    end
+
+    context "when given vervosity is any other argument" do
+      it "only shows Feedback Popup" do
+        expect(Yast::Popup).to receive(:Feedback).once
+        expect(Yast::Popup).to receive(:Notify).never
+        expect(Yast::Report).to receive(:Error).never
+
+        subject.TestNtpServer("server", :whatever)
+      end
     end
   end
 
@@ -496,28 +534,24 @@ describe Yast::NtpClient do
       change_scr_root(File.join(data_dir, "scr_root_read"), &example)
     end
 
+    before do
+      subject.instance_variable_set(:@config_has_been_read, false)
+      load_records
+    end
+
     context "when given index is not between -1 an ntp_records size" do
       it "returns false" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         expect(subject.selectSyncRecord(-2)).to eql(false)
         expect(subject.selectSyncRecord(21)).to eql(false)
       end
 
       it "sets selected_index as -1" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         subject.selectSyncRecord(-2)
 
         expect(subject.selected_index).to eql(-1)
       end
 
       it "sets selected_record as an empty hash" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         subject.selectSyncRecord(-2)
 
         expect(subject.selected_record).to eql({})
@@ -526,27 +560,18 @@ describe Yast::NtpClient do
 
     context "when given index is -1" do
       it "sets selected_index as -1" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         subject.selectSyncRecord(-1)
 
         expect(subject.selected_index).to eql(-1)
       end
 
       it "sets selected_record as an empty hash" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         subject.selectSyncRecord(-1)
 
         expect(subject.selected_record).to eql({})
       end
 
       it "returns true" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         expect(subject.selectSyncRecord(-1)).to eql(true)
       end
     end
@@ -557,30 +582,68 @@ describe Yast::NtpClient do
       end
 
       it "sets selected_index as given value" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         subject.selectSyncRecord(10)
 
         expect(subject.selected_index).to eql(10)
       end
 
       it "sets selected_record as the ntp_records entry for given index" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         subject.selectSyncRecord(9)
 
         expect(subject.selected_record).to eql(selected_record)
       end
 
       it "returns true" do
-        subject.instance_variable_set(:@config_has_been_read, false)
-        load_records
-
         expect(subject.selectSyncRecord(0)).to eql(true)
       end
     end
+  end
+
+  describe "#deleteSyncRecord" do
+    let(:record) do
+      { "type" => "server", "address" => "3.pool.ntp.org", "options" => "", "comment" => "" }
+    end
+
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    before do
+      subject.instance_variable_set(:@config_has_been_read, false)
+      load_records
+    end
+
+    it "returns false if given index is not in @ntp_records size range" do
+      expect(subject.deleteSyncRecord(-2)).to eql(false)
+      expect(subject.deleteSyncRecord(20)).to eql(false)
+    end
+
+    it "returns true otherwise" do
+      expect(subject.deleteSyncRecord(3)).to eql(true)
+    end
+
+    it "sets modified as true if deleted record" do
+      subject.modified = false
+
+      subject.deleteSyncRecord(3)
+
+      expect(subject.modified).to eql(true)
+    end
+
+    it "removes record entry from ntp records at given index position" do
+      subject.selectSyncRecord(9)
+      expect(subject.selected_record).to eql(record)
+      expect(subject.ntp_records.size).to eql(12)
+
+      expect(subject.deleteSyncRecord(9)).to eql(true)
+
+      subject.selectSyncRecord(9)
+      expect(subject.selected_record).not_to eql(record)
+      expect(subject.ntp_records.size).to eql(11)
+    end
+
   end
 
   describe "#ProcessNtpConf" do

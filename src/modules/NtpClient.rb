@@ -26,7 +26,7 @@ module Yast
     # @see #http://www.pool.ntp.org/
     RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]
 
-    # Different kinds of records wich the server can syncronize with and
+    # Different kinds of records which the server can syncronize with and
     # reference clock record
     #
     # @see http://doc.ntp.org/4.1.0/confopt.htm
@@ -519,7 +519,7 @@ module Yast
     def IsRandomServersServiceEnabled
       used_servers = GetUsedNtpServers()
 
-      RANDOM_POOL_NTP_SERVERS.all? { |server| used_servers.include? server }
+      RANDOM_POOL_NTP_SERVERS.all? { |s| used_servers.include? s }
     end
 
     # Removes all servers contained in the random_pool_servers list
@@ -756,8 +756,8 @@ module Yast
       end
 
       SYNC_RECORDS.each do |t|
-        type_records = @ntp_records.select { |record| record["type"] == t }
-        names = type_records.map { |record| record["address"].to_s }.select { |r| r != "" }
+        type_records = @ntp_records.select { |r| r["type"] == t }
+        names = type_records.map { |r| r["address"].to_s }.select { |n| n != "" }
         summary = Summary.AddLine(summary, "#{types[t]}#{names.join(", ")}") if names.size > 0
       end
 
@@ -882,7 +882,7 @@ module Yast
     # @return [Boolean] true on success
     def selectSyncRecord(index)
       ret = true
-      if index >= @ntp_records.size || index < -1
+      unless (-1..@ntp_records.size - 1).cover?(index)
         log.error("Record with index #{index} doesn't exist, creating new")
         index = -1
         ret = false
@@ -925,15 +925,12 @@ module Yast
     # @param [Fixnum] index integer index of record to delete
     # @return [Boolean] true on success
     def deleteSyncRecord(index)
-      if Ops.greater_or_equal(index, Builtins.size(@ntp_records)) ||
-          Ops.less_or_equal(index, -1)
-        Builtins.y2error("Record with index %1 doesn't exist", index)
+      if index >= @ntp_records.size || index <= -1
+        log.error("Record with index #{index} doesn't exist")
         return false
       end
-      Ops.set(@ntp_records, index, nil)
-      @ntp_records = Builtins.filter(@ntp_records) { |r| !r.nil? }
+      @ntp_records.delete_at(index)
       @modified = true
-      true
     end
 
     # Ensure that selected_record["options"] contains the option.
@@ -956,7 +953,9 @@ module Yast
 
   private
 
-    # It reads ntp policy from sysconfig, sets as auto is not able to read it.
+    # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
+    # /etc/sysconfig/network/config or with "auto" if not found
+    #
     # @return [String] read value or "auto" as default
     def read_policy!
       # SCR::Read may return nil (no such value in sysconfig, file not there etc. )
@@ -964,6 +963,10 @@ module Yast
       @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || "auto"
     end
 
+    # Set @ad_controller according to ad_ntp_data["ads"] value found in
+    # data_file ad_ntp_data.ycp if exists.
+    #
+    # Removes the file if some value is read.
     def read_ad_address!
       ad_ntp_file = Directory.find_data_file("ad_ntp_data.ycp")
       if ad_ntp_file
@@ -984,9 +987,10 @@ module Yast
       end
     end
 
-    # Reads /etc/sysconfig/ntp NTPD_RUN_CHROOTED and sets @run_chroot as true
-    # if read value is "yes" or as false in any other case
-    # @return [Boolean] true if read value is not nil
+    # Set @run_chroot according to NTPD_RUN_CHROOTED value found in
+    # /etc/sysconfig/ntp
+    #
+    # @return [Boolean] true when value is "yes"; false in any other case.
     def read_chroot_config!
       run_chroot_s = SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
 
@@ -997,6 +1001,7 @@ module Yast
       run_chroot_s.nil? ? false : true
     end
 
+    # Set @ntp_servers with known servers and known countries pool ntp servers
     def update_ntp_servers!
       @ntp_servers = {}
 
@@ -1060,7 +1065,7 @@ module Yast
 
       return false if conf.nil?
 
-      conf["value"] = records_for_write(@ntp_records)
+      conf["value"] = records_for_write
 
       return false if !SCR.Write(path(".etc.ntp_conf.all"), conf)
 
@@ -1102,6 +1107,7 @@ module Yast
 
     # Writes /etc/sysconfig/ntp NTPD_RUN_CHROOTED with "yes" if current
     # @run_chroot is true or with "no" in other case
+    #
     # @return [Boolean] true on success
     def write_chroot_config
       SCR.Write(
@@ -1112,9 +1118,11 @@ module Yast
       SCR.Write(path(".sysconfig.ntp"), nil)
     end
 
-    # Enable or disable ntp service depending on @run_service value. In case of
-    # disable it also stop the service if running and in case of enable it,
-    # tries to restart the service if not in write only mode.
+    # Enable or disable ntp service depending on @run_service value
+    #
+    # * When disabling, it also stops the service.
+    # * When enabling, it tries to restart the service unless it's in write
+    #   only mode.
     def check_service
       adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
 
@@ -1187,8 +1195,8 @@ module Yast
 
     # Prepare current ntp_records in hashes for write, splitting fudge options
     # of __clock records in their own hashes.
-    def records_for_write(records)
-      records.each_with_object([]) do |record, ret|
+    def records_for_write
+      @ntp_records.each_with_object([]) do |record, ret|
         ret << record_to_h(record)
         ret << fudge_options_to_h(record) if record["type"] == "__clock"
       end
@@ -1217,8 +1225,7 @@ module Yast
     # Returns a concatenation of given location and country depending on if
     # them are empty or not.
     #
-    # ==== Examples
-    #
+    # @example
     #   country_server_label("Canary Islands", "Spain") # => " (Canary Islands, Spain)"
     #   country_server_label("Nürnberg", "")            # => " (Nürnberg)"
     #   country_server_label("", "Deutschland")         # => " (Deutschland)"
