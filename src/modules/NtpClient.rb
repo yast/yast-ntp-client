@@ -21,6 +21,18 @@ module Yast
     # Note: the UI field currently uses maximum of 60 minutes
     DEFAULT_SYNC_INTERVAL = 5
 
+    # List of servers defined by the pool.ntp.org to get random ntp servers
+    #
+    # @see #http://www.pool.ntp.org/
+    RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]
+
+    # Different kinds of records wich the server can syncronize with and
+    # reference clock record
+    #
+    # @see http://doc.ntp.org/4.1.0/confopt.htm
+    # @see http://doc.ntp.org/4.1.0/clockopt.htm
+    SYNC_RECORDS = ["server", "__clock", "peer", "broadcast", "broadcastclient"]
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -122,14 +134,7 @@ module Yast
       @countries_already_read = false
       @known_countries = {}
 
-      # List of servers defined by the pool.ntp.org to get random ntp servers
-      #
-      # @see #http://www.pool.ntp.org/
-      @random_pool_servers = [
-        "0.pool.ntp.org",
-        "1.pool.ntp.org",
-        "2.pool.ntp.org"
-      ]
+      @random_pool_servers = RANDOM_POOL_NTP_SERVERS
     end
 
     def PolicyIsAuto
@@ -211,7 +216,7 @@ module Yast
     # ntp address for given country, country code and location
     # @return [Hash{String => String}] ntp pool address for given country
     def MakePoolRecord(country_code, location)
-      mycc = Builtins.tolower(country_code)
+      mycc = country_code.downcase
       # There is no gb.pool.ntp.org only uk.pool.ntp.org
       mycc = "uk" if mycc == "gb"
       {
@@ -263,7 +268,7 @@ module Yast
       end
 
       default = false
-      items = servers.map do |server, attrs|
+      servers.map do |server, attrs|
         # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
         selected = default ? false : default = server.end_with?("pool.ntp.org")
 
@@ -275,8 +280,6 @@ module Yast
 
         Item(Id(server), label, selected)
       end
-
-      items
     end
 
     # Read and parse /etc.ntp.conf
@@ -440,7 +443,7 @@ module Yast
       sl = 500
 
       # We do not set help text here, because it was set outside
-      new_read_progress(_("Initializing NTP Client Configuration"), 2) if progress?
+      new_read_progress if progress?
 
       # read network configuration
       return false if !go_next
@@ -449,10 +452,7 @@ module Yast
       NetworkInterfaces.Read
       Progress.set(progress_orig)
 
-      # SCR::Read may return nil (no such value in sysconfig, file not there etc. )
-      # set if not nil, otherwise use 'auto' as safe fallback (#449362)
-      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || "auto"
-
+      read_policy!
       GetNtpServers()
       GetCountryNames()
 
@@ -509,7 +509,7 @@ module Yast
         used_servers << record["address"] if record["type"] == "server"
       end
 
-      deep_copy(used_servers)
+      used_servers
     end
 
     # Checks whether all servers listed in the random_pool_servers list
@@ -517,40 +517,16 @@ module Yast
     #
     # @return [Boolean] true if enabled
     def IsRandomServersServiceEnabled
-      # all servers needed by pool.ntp.org service, before checking false == not used
-      needed_servers = {}
-      Builtins.foreach(@random_pool_servers) do |server_name|
-        Ops.set(needed_servers, server_name, false)
-      end
+      used_servers = GetUsedNtpServers()
 
-      Builtins.foreach(GetUsedNtpServers()) do |used_server|
-        # if server is needed by pool.ntp.org and matches
-        if !Ops.get(needed_servers, used_server).nil?
-          Ops.set(needed_servers, used_server, true)
-        end
-      end
-
-      ret = true
-      Builtins.foreach(needed_servers) do |_nserver_name, ns_value|
-        ret = false if ns_value != true
-      end
-      ret
+      RANDOM_POOL_NTP_SERVERS.all? { |server| used_servers.include? server }
     end
 
     # Removes all servers contained in the random_pool_servers list
     # from the current configuration.
     def DeActivateRandomPoolServersFunction
-      Builtins.foreach(@random_pool_servers) do |random_pool_server|
-        @ntp_records = Builtins.filter(@ntp_records) do |one_record|
-          Ops.get_string(
-            # do not filter out not-servers
-            one_record,
-            "type",
-            ""
-          ) != "server" ||
-            # do not filter out serces that are not random_pool_servers
-            Ops.get_string(one_record, "address", "") != random_pool_server
-        end
+      @ntp_records.reject! do |record|
+        record["type"] == "server" && RANDOM_POOL_NTP_SERVERS.include?(record["address"])
       end
 
       nil
@@ -617,18 +593,18 @@ module Yast
     # @return true on success
     def Write
       # We do not set help text here, because it was set outside
-      new_write_progress(_("Saving NTP Client Configuration"), 2) if progress?
+      new_write_progress if progress?
 
       # write settings
       return false if !go_next
 
-      append_restrict_records!(@ntp_records)
+      @ntp_records += restrict_map_records
 
       log.info "Writing settings #{@ntp_records}"
 
       Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if !write_ntp_conf
 
-      write_ntp_policy && update_netconfig
+      write_and_update_policy
 
       write_chroot_config
 
@@ -644,7 +620,7 @@ module Yast
 
       check_service
 
-      update_cron_settings!
+      update_cron_settings
 
       return false if !go_next
 
@@ -779,24 +755,12 @@ module Yast
         summary = Summary.AddLine(summary, _("Custom configuration policy."))
       end
 
-      Builtins.foreach(
-        ["server", "__clock", "peer", "broadcast", "broadcastclient"]
-      ) do |t|
-        l = Builtins.filter(@ntp_records) do |p|
-          Ops.get_string(p, "type", "") == t
-        end
-        names = Builtins.maplist(l) { |i| Ops.get_string(i, "address", "") }
-        names = Builtins.filter(names) { |n| n != "" }
-        if Ops.greater_than(Builtins.size(names), 0)
-          summary = Summary.AddLine(
-            summary,
-            Builtins.sformat(
-              Ops.get_string(types, t, ""),
-              Builtins.mergestring(names, ", ")
-            )
-          )
-        end
+      SYNC_RECORDS.each do |t|
+        type_records = @ntp_records.select { |record| record["type"] == t }
+        names = type_records.map { |record| record["address"].to_s }.select { |r| r != "" }
+        summary = Summary.AddLine(summary, "#{types[t]}#{names.join(", ")}") if names.size > 0
       end
+
       summary
     end
 
@@ -843,7 +807,7 @@ module Yast
 
       ok = false
       Yast::Popup.Feedback(_("Testing the NTP server..."), Message.takes_a_while) do
-        Builtins.y2milestone("Testing reachability of server %1", server)
+        log.info("Testing reachability of server #{server}")
         ok = reachable_ntp_server?(server)
       end
 
@@ -918,20 +882,12 @@ module Yast
     # @return [Boolean] true on success
     def selectSyncRecord(index)
       ret = true
-      if Ops.greater_or_equal(index, Builtins.size(@ntp_records)) ||
-          Ops.less_than(index, -1)
-        Builtins.y2error(
-          "Record with index %1 doesn't exist, creating new",
-          index
-        )
+      if index >= @ntp_records.size || index < -1
+        log.error("Record with index #{index} doesn't exist, creating new")
         index = -1
         ret = false
       end
-      if index == -1
-        @selected_record = {}
-      else
-        @selected_record = Ops.get(@ntp_records, index, {})
-      end
+      @selected_record = index == -1 ? {} : @ntp_records[index]
       @selected_index = index
       ret
     end
@@ -998,6 +954,16 @@ module Yast
       { "install" => @required_packages, "remove" => [] }
     end
 
+  private
+
+    # It reads ntp policy from sysconfig, sets as auto is not able to read it.
+    # @return [String] read value or "auto" as default
+    def read_policy!
+      # SCR::Read may return nil (no such value in sysconfig, file not there etc. )
+      # set if not nil, otherwise use 'auto' as safe fallback (#449362)
+      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || "auto"
+    end
+
     def read_ad_address!
       ad_ntp_file = Directory.find_data_file("ad_ntp_data.ycp")
       if ad_ntp_file
@@ -1018,6 +984,9 @@ module Yast
       end
     end
 
+    # Reads /etc/sysconfig/ntp NTPD_RUN_CHROOTED and sets @run_chroot as true
+    # if read value is "yes" or as false in any other case
+    # @return [Boolean] true if read value is not nil
     def read_chroot_config!
       run_chroot_s = SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
 
@@ -1036,13 +1005,12 @@ module Yast
       pool_servers_for(GetAllKnownCountries()).each { |p| cache_server(p) }
     end
 
-  private
-
-    def new_read_progress(caption, steps)
+    # Start a new progress for Read NTP Configuration
+    def new_read_progress
       Progress.New(
-        caption,
+        _("Initializing NTP Client Configuration"),
         " ",
-        steps,
+        2,
         [
           # progress stage
           _("Read network configuration"),
@@ -1061,11 +1029,12 @@ module Yast
       )
     end
 
-    def new_write_progress(caption, steps)
+    # Start a new progress for Write NTP Configuration
+    def new_write_progress
       Progress.New(
-        caption,
+        _("Saving NTP Client Configuration"),
         " ",
-        steps,
+        2,
         [
           # progress stage
           _("Write NTP settings"),
@@ -1084,6 +1053,8 @@ module Yast
       )
     end
 
+    # Write current /etc/ntp.conf with @ntp_records
+    # @return [Boolean] true on success
     def write_ntp_conf
       conf = SCR.Read(path(".etc.ntp_conf.all"))
 
@@ -1100,8 +1071,10 @@ module Yast
       ret
     end
 
-    def write_ntp_policy
-      # write policy and run netconfig command
+    # Writes /etc/sysconfig/network/config NETCONFIG_NTP_POLICY
+    # with current @ntp_policy value
+    # @return [Boolean] true on success
+    def write_policy
       SCR.Write(
         path(".sysconfig.network.config.NETCONFIG_NTP_POLICY"),
         @ntp_policy
@@ -1109,6 +1082,27 @@ module Yast
       SCR.Write(path(".sysconfig.network.config"), nil)
     end
 
+    # Calls netconfig to update ntp
+    # @return [Boolean] true on success
+    def update_netconfig
+      SCR.Execute(path(".target.bash"), "/sbin/netconfig update -m ntp") == 0
+    end
+
+    # Writes sysconfig ntp policy and calls netconfig to update ntp. Report an
+    # error if some of the call fails.
+    #
+    # @return [Boolean] true if write and update success
+    def write_and_update_policy
+      success = write_policy && update_netconfig
+
+      Report.Error(_("Cannot update the dynamic configuration policy.")) unless success
+
+      success
+    end
+
+    # Writes /etc/sysconfig/ntp NTPD_RUN_CHROOTED with "yes" if current
+    # @run_chroot is true or with "no" in other case
+    # @return [Boolean] true on success
     def write_chroot_config
       SCR.Write(
         path(".sysconfig.ntp.NTPD_RUN_CHROOTED"),
@@ -1118,14 +1112,9 @@ module Yast
       SCR.Write(path(".sysconfig.ntp"), nil)
     end
 
-    def update_netconfig
-      error = SCR.Execute(path(".target.bash"), "/sbin/netconfig update -m ntp") != 0
-
-      Report.Error(_("Cannot update the dynamic configuration policy.")) if error
-
-      !error
-    end
-
+    # Enable or disable ntp service depending on @run_service value. In case of
+    # disable it also stop the service if running and in case of enable it,
+    # tries to restart the service if not in write only mode.
     def check_service
       adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
 
@@ -1142,7 +1131,9 @@ module Yast
       end
     end
 
-    def update_cron_settings!
+    # If synchronize time has been enable it writes ntp cron entry for manual
+    # sync. If not it removes current cron entry if exists.
+    def update_cron_settings
       if @synchronize_time
         SCR.Write(
           path(".target.string"),
@@ -1167,6 +1158,8 @@ module Yast
       }
     end
 
+    # Parse fudge options of given record and returns a new fudge record for
+    # write
     def fugde_options_to_h(record)
       {
         "comment" => record["fudge_comment"],
@@ -1177,21 +1170,23 @@ module Yast
       }
     end
 
-    def append_restrict_records!(records)
-      @restrict_map.each do |key, m|
+    # Returns current restrict map as a list of ntp records
+    def restrict_map_records
+      @restrict_map.map do |key, m|
         options = " "
         options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
         options << m["options"].to_s
-        ret = {
+        {
           "address" => key,
           "comment" => m["comment"].to_s,
           "type"    => "restrict",
           "options" => options
         }
-        records << ret
       end
     end
 
+    # Prepare current ntp_records in hashes for write, splitting fudge options
+    # of __clock records in their own hashes.
     def records_for_write(records)
       records.each_with_object([]) do |record, ret|
         ret << record_to_h(record)
@@ -1199,6 +1194,10 @@ module Yast
       end
     end
 
+    # Reads from file ntp servers list and return them. Return an empty hash if
+    # not able to read the servers.
+    #
+    # @return [Hash] of ntp servers.
     def read_known_servers
       servers_file = Directory.find_data_file("ntp_servers.yml")
 
@@ -1215,23 +1214,47 @@ module Yast
       servers
     end
 
-    def country_server_label(location, country)
+    # Returns a concatenation of given location and country depending on if
+    # them are empty or not.
+    #
+    # ==== Examples
+    #
+    #   country_server_label("Canary Islands", "Spain") # => " (Canary Islands, Spain)"
+    #   country_server_label("Nürnberg", "")            # => " (Nürnberg)"
+    #   country_server_label("", "Deutschland")         # => " (Deutschland)"
+    #
+    # @param [String] server location
+    # @param [String] server country
+    # @return [String] concatenate location and country if not empty
+    def country_server_label(location = "", country = "")
       return "" if location.empty? && country.empty?
       return " (#{location}, #{country})" if !location.empty? && !country.empty?
 
       " (#{location}#{country})"
     end
 
-    def sync_record?(entry)
-      ["server", "peer", "broadcast", "broadcastclient", "__clock"].include? entry
+    # @see SYNC_RECORDS
+    def sync_record?(record_type)
+      SYNC_RECORDS.include? record_type
     end
 
+    # Given a Hash of known countries, it returns a list of pool records for
+    # each country.
+    # @see #MakePoolRecord
+    #
+    # @param [Hash <String, String>] known countries
+    # @return [Array <Hash>] pool records for given countries
     def pool_servers_for(known_countries)
       known_countries.map do |short_country, country_name|
         MakePoolRecord(short_country, country_name)
       end
     end
 
+    # Add given server to @ntp_server Hash using the server address as the key
+    # and the server as the value
+    #
+    # @param [Hash <String, String>] server string host name or IP address of the NTP server
+    # @return [Boolean] result of the assignation
     def cache_server(server)
       @ntp_servers[server["address"].to_s] = server
     end

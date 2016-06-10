@@ -17,18 +17,22 @@ describe Yast::NtpClient do
     end
 
     before do
+      subject.config_has_been_read = false
       allow(subject).to receive(:Abort).and_return(false)
-      allow(Yast::NetworkInterfaces).to receive(:Read)
-      allow(Yast::Mode).to receive(:normal).and_return(false)
-      allow(Yast::Progress).to receive(:set)
-      allow(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
-        .with(["ntp"]).and_return(true)
+      allow(subject).to receive(:Abort).and_return(false)
+      allow(subject).to receive(:go_next).and_return(true)
+      allow(subject).to receive(:progress?).and_return(false)
       allow(subject).to receive(:read_ad_address!)
       allow(subject).to receive(:ProcessNtpConf)
       allow(subject).to receive(:ReadSynchronization)
       allow(subject).to receive(:read_chroot_config!)
+      allow(subject).to receive(:read_policy!)
       allow(Yast::SuSEFirewall).to receive(:Read)
       allow(Yast::Service).to receive(:Enabled).with("ntpd").and_return(true)
+      allow(Yast::NetworkInterfaces).to receive(:Read)
+      allow(Yast::Progress)
+      allow(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
+        .with(["ntp"]).and_return(true)
     end
 
     context "when config has been read previously" do
@@ -63,30 +67,10 @@ describe Yast::NtpClient do
         subject.Read
       end
 
-      context "when sysconfig network policity setting's config exists" do
-        it "sets ntp policy setting as read value" do
-          allow(Yast::FileChanges).to receive(:CheckFiles).with(["/etc/ntp.conf"])
-          allow(Yast::SCR).to receive(:Read)
-            .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
-            .and_return("manual")
+      it "reads ntp policy" do
+        expect(subject).to receive(:read_policy!)
 
-          subject.Read
-
-          expect(subject.ntp_policy).to eql("manual")
-        end
-      end
-
-      context "when sysconfig network policity setting's config doesn't exist" do
-        it "sets ntp policy setting as auto" do
-          allow(Yast::FileChanges).to receive(:CheckFiles).with(["/etc/ntp.conf"])
-          allow(Yast::SCR).to receive(:Read)
-            .with(Yast::Path.new(".sysconfig.network.config.NETCONFIG_NTP_POLICY"))
-            .and_return(nil)
-
-          subject.Read
-
-          expect(subject.ntp_policy).to eql("auto")
-        end
+        subject.Read
       end
 
       it "loads known ntp servers and known country names" do
@@ -97,7 +81,7 @@ describe Yast::NtpClient do
       end
 
       context "when Mode is not installation" do
-        it "returns false if the ntp package is not and could not be installed" do
+        it "returns false if the ntp package neither is installed nor available" do
           expect(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
             .with(["ntp"]).and_return(false)
           expect(Yast::Service).not_to receive(:Enabled)
@@ -150,6 +134,7 @@ describe Yast::NtpClient do
       ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
         File.join(data_dir, "scr_root/etc/ntp.conf"))
       change_scr_root(File.join(data_dir, "scr_root"), &example)
+      ::FileUtils.rm(File.join(data_dir, "scr_root/etc/ntp.conf"))
     end
 
     before do
@@ -157,8 +142,7 @@ describe Yast::NtpClient do
       allow(subject).to receive(:go_next).and_return(true)
       allow(subject).to receive(:progress?).and_return(false)
       allow(subject).to receive(:write_ntp_conf).and_return(true)
-      allow(subject).to receive(:write_ntp_policy).and_return(true)
-      allow(subject).to receive(:update_netconfig)
+      allow(subject).to receive(:write_and_update_policy).and_return(true)
       allow(subject).to receive(:write_chroot_config)
 
       allow(Yast::SuSEFirewall)
@@ -172,34 +156,14 @@ describe Yast::NtpClient do
       expect(subject.Write).to eql(false)
     end
 
-    it "appends restrict records to current ntp_records before write" do
-      expect(subject).to receive(:append_restrict_records!).with(subject.ntp_records)
-
-      subject.Write
-    end
-
     it "writes current ntp records to ntp config" do
       expect(subject).to receive(:write_ntp_conf)
 
       subject.Write
     end
 
-    it "writes ntp policy" do
-      expect(subject).to receive(:write_ntp_policy)
-
-      subject.Write
-    end
-
-    it "updates netconfig if ntp policy write success" do
-      expect(subject).to receive(:write_ntp_policy).and_return(true)
-      expect(subject).to receive(:update_netconfig)
-
-      subject.Write
-    end
-
-    it "doesn't update netconfig if ntp policy write failed" do
-      expect(subject).to receive(:write_ntp_policy).and_return(false)
-      expect(subject).not_to receive(:update_netconfig)
+    it "writes ntp policy and updates ntp with netconfig" do
+      expect(subject).to receive(:write_and_update_policy)
 
       subject.Write
     end
@@ -222,13 +186,38 @@ describe Yast::NtpClient do
     end
 
     it "updates cron settings" do
-      expect(subject).to receive(:update_cron_settings!)
+      expect(subject).to receive(:update_cron_settings)
 
       subject.Write
     end
 
     it "returns true if not aborted" do
       expect(subject.Write).to eql(true)
+    end
+  end
+
+  describe "#MakePoolRecord" do
+    let(:record) do
+      {
+        "address"  => "de.pool.ntp.org",
+        "country"  => "DE",
+        "location" => "some location"
+      }
+    end
+    let(:uk_record) do
+      {
+        "address"  => "uk.pool.ntp.org",
+        "country"  => "GB",
+        "location" => "some UK location"
+      }
+    end
+
+    it "returns a pool ntp record for the given country code and location" do
+      expect(subject.MakePoolRecord("DE", "some location")).to eql(record)
+    end
+
+    it "returns a pool ntp record with 'uk.pool.ntp.org' address if country code is GB" do
+      expect(subject.MakePoolRecord("GB", "some UK location")).to eql(uk_record)
     end
   end
 
@@ -255,7 +244,7 @@ describe Yast::NtpClient do
         subject.GetNtpServers
       end
 
-      it "return known ntp servers" do
+      it "returns known ntp servers" do
         subject.instance_variable_set(:@ntp_servers, country_servers)
 
         expect(subject.GetNtpServers).to eql(country_servers)
@@ -273,6 +262,40 @@ describe Yast::NtpClient do
       end
     end
 
+  end
+
+  describe "#IsRandomServersServiceEnabled" do
+    it "returns true if all random pool ntp servers are in use" do
+      expect(subject).to receive(:GetUsedNtpServers)
+        .and_return(Yast::NtpClientClass::RANDOM_POOL_NTP_SERVERS)
+
+      expect(subject.IsRandomServersServiceEnabled).to eql(true)
+    end
+    it "returns false in other case" do
+      expect(subject).to receive(:GetUsedNtpServers)
+        .and_return(["0.pool.ntp.org", "ntp.suse.de", "de.pool.ntp.org"])
+
+      expect(subject.IsRandomServersServiceEnabled).to eql(false)
+    end
+  end
+
+  describe "#DeActivateRandomPoolServersFunction" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    it "removes random pool ntp servers from @ntp_records" do
+      subject.instance_variable_set(:@config_has_been_read, false)
+      load_records
+
+      expect(subject.GetUsedNtpServers.size).to eql(4)
+      expect(subject.GetUsedNtpServers).to include "0.pool.ntp.org"
+      subject.DeActivateRandomPoolServersFunction
+      expect(subject.GetUsedNtpServers.size).to eql(1)
+      expect(subject.GetUsedNtpServers).not_to include "0.pool.ntp.org"
+    end
   end
 
   describe "#GetNtpServersByCountry" do
@@ -295,9 +318,7 @@ describe Yast::NtpClient do
       subject.GetNtpServersByCountry("", false)
     end
 
-    it "returns a list of items with read servers" do
-
-    end
+    pending("returns a list of items with read servers")
   end
 
   describe "#ReadSynchronization" do
@@ -347,18 +368,23 @@ describe Yast::NtpClient do
 
   describe "#reachable_ntp_server?" do
     context "given a server" do
-      it "returns true if sntp test passed with IPv4 or/and with IPv6" do
-        allow(subject).to receive(:sntp_test).with("server").and_return(true, false, true)
-        allow(subject).to receive(:sntp_test).with("server", 6).and_return(true, true)
+      it "returns true if sntp test passed with IPv4" do
+        expect(subject).to receive(:sntp_test).with("server").and_return(true)
+        expect(subject).not_to receive(:sntp_test).with("server", 6)
 
-        expect(subject.reachable_ntp_server?("server")).to eql(true)
-        expect(subject.reachable_ntp_server?("server")).to eql(true)
         expect(subject.reachable_ntp_server?("server")).to eql(true)
       end
 
-      it "returns false if sntp test fails with IPv4 or/and with IPv6" do
-        allow(subject).to receive(:sntp_test).with("server").and_return(false)
-        allow(subject).to receive(:sntp_test).with("server", 6).and_return(false)
+      it "returns true if sntp test passed with IPv6" do
+        expect(subject).to receive(:sntp_test).with("server").and_return(false)
+        expect(subject).to receive(:sntp_test).with("server", 6).and_return(true)
+
+        expect(subject.reachable_ntp_server?("server")).to eql(true)
+      end
+
+      it "returns false if sntp test fails with IPv4 and with IPv6" do
+        expect(subject).to receive(:sntp_test).with("server").and_return(false)
+        expect(subject).to receive(:sntp_test).with("server", 6).and_return(false)
 
         expect(subject.reachable_ntp_server?("server")).to eql(false)
       end
@@ -421,10 +447,28 @@ describe Yast::NtpClient do
       expect(subject.TestNtpServer("server", "")).to eql(false)
     end
 
-    context "when given verbosity is no ui" do
-      it "doesn't show any dialog" do
-        expect(Yast::Popup).to receive(:Feedback).never
-      end
+    it "doesn't show any dialog if given verbosity is :no_ui" do
+      expect(Yast::Popup).to receive(:Feedback).never
+
+      subject.TestNtpServer("server", :no_ui)
+    end
+  end
+
+  describe "#GetUsedNtpServers" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+    let(:used_ntp_servers) do
+      ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"]
+    end
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    it "returns a list of NTP servers used in the current configuration" do
+      subject.instance_variable_set(:@config_has_been_read, false)
+      load_records
+
+      expect(subject.GetUsedNtpServers).to eql(used_ntp_servers)
     end
   end
 
@@ -432,20 +476,110 @@ describe Yast::NtpClient do
     let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
 
     around do |example|
-      ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
-        File.join(data_dir, "scr_root/etc/ntp.conf"))
-      change_scr_root(File.join(data_dir, "scr_root"), &example)
-    end
-
-    before do
-      subject.instance_variable_set(:@config_has_been_read, false)
-      load_records
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
     end
 
     it "returns a map's list with current synchronization related entries with index" do
+      subject.instance_variable_set(:@config_has_been_read, false)
+      load_records
+
       expect(subject.getSyncRecords.size).to eql(6)
       expect(subject.getSyncRecords[3]["address"]).to eql("3.pool.ntp.org")
       expect(subject.getSyncRecords[5]["address"]).to eql("192.168.1.30")
+    end
+  end
+
+  describe "#selectSyncRecord" do
+    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+    around do |example|
+      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    end
+
+    context "when given index is not between -1 an ntp_records size" do
+      it "returns false" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        expect(subject.selectSyncRecord(-2)).to eql(false)
+        expect(subject.selectSyncRecord(21)).to eql(false)
+      end
+
+      it "sets selected_index as -1" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        subject.selectSyncRecord(-2)
+
+        expect(subject.selected_index).to eql(-1)
+      end
+
+      it "sets selected_record as an empty hash" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        subject.selectSyncRecord(-2)
+
+        expect(subject.selected_record).to eql({})
+      end
+    end
+
+    context "when given index is -1" do
+      it "sets selected_index as -1" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        subject.selectSyncRecord(-1)
+
+        expect(subject.selected_index).to eql(-1)
+      end
+
+      it "sets selected_record as an empty hash" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        subject.selectSyncRecord(-1)
+
+        expect(subject.selected_record).to eql({})
+      end
+
+      it "returns true" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        expect(subject.selectSyncRecord(-1)).to eql(true)
+      end
+    end
+
+    context "when given index is between 0 and ntp_records size" do
+      let(:selected_record) do
+        { "type" => "server", "address" => "3.pool.ntp.org", "options" => "", "comment" => "" }
+      end
+
+      it "sets selected_index as given value" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        subject.selectSyncRecord(10)
+
+        expect(subject.selected_index).to eql(10)
+      end
+
+      it "sets selected_record as the ntp_records entry for given index" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        subject.selectSyncRecord(9)
+
+        expect(subject.selected_record).to eql(selected_record)
+      end
+
+      it "returns true" do
+        subject.instance_variable_set(:@config_has_been_read, false)
+        load_records
+
+        expect(subject.selectSyncRecord(0)).to eql(true)
+      end
     end
   end
 
@@ -456,6 +590,7 @@ describe Yast::NtpClient do
       ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
         File.join(data_dir, "scr_root/etc/ntp.conf"))
       change_scr_root(File.join(data_dir, "scr_root"), &example)
+      ::FileUtils.rm(File.join(data_dir, "scr_root/etc/ntp.conf"))
     end
 
     before do
@@ -509,7 +644,7 @@ describe Yast::NtpClient do
       end
 
       it "reads and sets active directory controller" do
-        subject.read_ad_address!
+        subject.send(:read_ad_address!)
 
         expect(subject.ad_controller).to eql("ads.suse.de")
       end
@@ -518,7 +653,7 @@ describe Yast::NtpClient do
         expect(Yast::SCR).to receive(:Execute)
           .with(path(".target.remove"), "/usr/share/YaST2/data/ad_ntp_data.ycp")
 
-        subject.read_ad_address!
+        subject.send(:read_ad_address!)
       end
     end
   end
@@ -528,7 +663,7 @@ describe Yast::NtpClient do
       expect(Yast::SCR).to receive(:Read)
         .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
 
-      subject.read_chroot_config!
+      subject.send(:read_chroot_config!)
     end
 
     context "when NTPD_RUN_CHROOTED variable doesn't exist" do
@@ -536,7 +671,7 @@ describe Yast::NtpClient do
         expect(Yast::SCR).to receive(:Read)
           .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return(nil)
 
-        expect(subject.read_chroot_config!).to eql(false)
+        expect(subject.send(:read_chroot_config!)).to eql(false)
       end
     end
 
@@ -545,13 +680,13 @@ describe Yast::NtpClient do
         expect(Yast::SCR).to receive(:Read)
           .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return("no")
 
-        expect(subject.read_chroot_config!).to eql(true)
+        expect(subject.send(:read_chroot_config!)).to eql(true)
       end
 
       it "sets ntpd as chrooted if variable is 'yes'" do
         expect(Yast::SCR).to receive(:Read)
           .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return("yes")
-        subject.read_chroot_config!
+        subject.send(:read_chroot_config!)
 
         expect(subject.run_chroot).to eql(true)
       end
@@ -560,7 +695,7 @@ describe Yast::NtpClient do
         expect(Yast::SCR).to receive(:Read)
           .with(path(".sysconfig.ntp.NTPD_RUN_CHROOTED")).and_return("other")
 
-        subject.read_chroot_config!
+        subject.send(:read_chroot_config!)
 
         expect(subject.run_chroot).to eql(false)
       end
@@ -591,7 +726,7 @@ describe Yast::NtpClient do
       allow(subject).to receive(:read_known_servers).and_return([])
       allow(subject).to receive(:pool_servers_for).with(anything).and_return([])
 
-      subject.update_ntp_servers!
+      subject.send(:update_ntp_servers!)
 
       expect(subject.instance_variable_get(:@ntp_servers)).to eql({})
     end
@@ -602,7 +737,7 @@ describe Yast::NtpClient do
       expect(subject).to receive(:read_known_servers).and_call_original
       expect(subject).to receive(:cache_server).with(known_server)
 
-      subject.update_ntp_servers!
+      subject.send(:update_ntp_servers!)
 
     end
 
@@ -612,7 +747,7 @@ describe Yast::NtpClient do
       expect(subject).to receive(:pool_servers_for).with(anything).and_call_original
       expect(subject).to receive(:cache_server).with(country_server)
 
-      subject.update_ntp_servers!
+      subject.send(:update_ntp_servers!)
     end
   end
 end

@@ -36,10 +36,8 @@ module Yast
     end
 
     def reallyExitSimple
-      if NtpClient.run_service ==
-          (UI.QueryWidget(Id("start"), :CurrentButton) == "boot") &&
-          Ops.get_string(NtpClient.selected_record, "address", "") ==
-              UI.QueryWidget(Id("server_address"), :Value)
+      if NtpClient.run_service == (UI.QueryWidget(Id("start"), :CurrentButton) == "boot") &&
+          NtpClient.selected_record["address"] == UI.QueryWidget(Id("server_address"), :Value)
         return true
       end
       reallyExit
@@ -93,7 +91,7 @@ module Yast
       unknown = []
       options_list.each do |option|
         if option_parse
-          parsed[option_parse] = option unless option.nil?
+          parsed[option_parse] = option
           option_parse = nil
           next
         end

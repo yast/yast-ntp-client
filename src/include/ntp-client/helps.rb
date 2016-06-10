@@ -79,7 +79,7 @@ module Yast
           ),
         # help text to a button
         "complex_button"     => _(
-          "<p><b><big>Advanced configuration</big></b><br>\n" \
+          "<p><b><big>Advanced configuration</big></b><br>\n"                                \
           "To configure this host to synchronize against multiple remote hosts or against\n" \
           "a locally connected clock, use <b>Advanced Configuration</b>."
         ),
@@ -89,7 +89,7 @@ module Yast
         ),
         # help text 2/4
         "unit_number"        => _(
-          "<p><b><big>Unit Number</big></b><br>\n" \
+          "<p><b><big>Unit Number</big></b><br>\n"                       \
           "If you have multiple clocks of the same type, you must set\n" \
           "<b>Unit Number</b>.</p>"
         ),
@@ -110,39 +110,39 @@ module Yast
         ),
         # help text 1/1, alt. 1 part 1/3
         "server_address"     => _(
-          "<p><b><big>Address of the NTP Server</big></b><br>\n" \
-          "To set the address of the NTP server, use the <b>Address</b> entry.\n" \
+          "<p><b><big>Address of the NTP Server</big></b><br>\n"                        \
+          "To set the address of the NTP server, use the <b>Address</b> entry.\n"       \
           "To find an NTP server, ask your network administrator or Internet service\n" \
           "provider.</p>"
         ) +
           # help text 1/1, alt. 1 part 2/3
           _(
-            "<p><b><big>Selecting a Server</big></b><br>\n" \
-            "To select an NTP server from those found in the local network\n" \
+            "<p><b><big>Selecting a Server</big></b><br>\n"                    \
+            "To select an NTP server from those found in the local network\n"  \
             "or from the list of known NTP servers, click <b>Select</b> and\n" \
             "choose between <b>Local NTP Server</b> and <b>Public NTP Server</b>.</p>"
           ) +
           # help text 1/1, alt. 1 part 3/3
           _(
-            "<p><b><big>Testing Server Accessibility</big></b><br>\n" \
+            "<p><b><big>Testing Server Accessibility</big></b><br>\n"       \
             "To test if the selected server is up and responds properly,\n" \
             "click <b>Test</b>.</p>"
           ),
         # help text 1/1, alt. 2
         "paddress"           => _(
-          "<p><b><big>Address</big></b><br>\n" \
+          "<p><b><big>Address</big></b><br>\n"                                   \
           "To set the address of the host with which to synchronize mutually,\n" \
           "use <b>Address</b>.</p>"
         ),
         # help text 1/1, alt. 3
         "bcaddress"          => _(
-          "<p><b><big>Address</big></b><br>\n" \
+          "<p><b><big>Address</big></b><br>\n"                                 \
           "To set the address to which to broadcast, use the <b>Address</b>\n" \
           "text field.</p>"
         ),
         # help text 1/1, alt. 4
         "bccaddress"         => _(
-          "<p><b><big>Address</big></b><br>\n" \
+          "<p><b><big>Address</big></b><br>\n"                                \
           "To set the address from which to accept broadcast packets, use \n" \
           "<b>Address</b>.</p>"
         ),
@@ -150,23 +150,23 @@ module Yast
 
         # help text 3/4, optional
         "options"            => _(
-          "<p><b><big>Options</big></b><br>\n" \
+          "<p><b><big>Options</big></b><br>\n"                                             \
           "To fine-tune the synchronization source, enter the respective options in the\n" \
-          "<b>Options</b> text field. For details, see\n" \
+          "<b>Options</b> text field. For details, see\n"                                  \
           "<i>/usr/share/doc/packages/ntp-doc/confopt.htm</i>.</p>\n"
         ),
         "restrict"           => _(
-          "<p><b><big>Access Control Options</big></b><br>\n" \
-          "Define the access control flags (<b><tt>restrict</tt></b> directive in\n" \
+          "<p><b><big>Access Control Options</big></b><br>\n"                                   \
+          "Define the access control flags (<b><tt>restrict</tt></b> directive in\n"            \
           "<i>/etc/ntp.conf</i>) for this server, indicating which types of actions the remote" \
-          "\nhost can perform on your NTP daemon. By default, it is set to <i>notrap\n" \
-          "nomodify noquery</i>. This option is only available if you have checked the\n" \
-          "<b>Restrict NTP Service to Configured Servers Only</b> option in\n" \
+          "\nhost can perform on your NTP daemon. By default, it is set to <i>notrap\n"         \
+          "nomodify noquery</i>. This option is only available if you have checked the\n"       \
+          "<b>Restrict NTP Service to Configured Servers Only</b> option in\n"                  \
           "<b>Security Settings</b>.</p>\n"
         ),
         # help text 1/6
         "peer_types"         => _(
-          "<p><b><big>Synchronization Peer Type</big></b><br>\n" \
+          "<p><b><big>Synchronization Peer Type</big></b><br>\n"      \
           "Select the kind of synchronization peer to add here.</p>"
         ) +
           # help text 2/6
@@ -194,7 +194,7 @@ module Yast
           ),
         # help text 1/5
         "servers_source"     => _(
-          "<p><big><b>Server Location</b></big>\n" \
+          "<p><big><b>Server Location</b></big>\n"                                     \
           "Select if you want to find the NTP server in the local network or select\n" \
           "the NTP server from the list of known NTP servers.</p>"
         ),
@@ -208,7 +208,7 @@ module Yast
         ),
         # help text 3/5
         "servers_list"       => _(
-          "<p><big><b>Selecting a Public NTP Server</b></big><br>\n" \
+          "<p><big><b>Selecting a Public NTP Server</b></big><br>\n"                           \
           "Select the NTP server to use from the <b>Public NTP Servers</b> list. To display\n" \
           "NTP servers only for a particular country, select it in <b>Country</b>.</p>"
         ) +
@@ -245,10 +245,10 @@ module Yast
     def fudgeHelp
       # help text 1/2
       _(
-        "<p><big><b>Clock Driver Calibration</b></big><br>\n" \
-          "The clock driver may need to be calibrated. In this dialog, various calibration\n" \
-          "options can be set. The meaning of particular options depends on the particular\n" \
-          "driver. Some drivers do not use all the options.</p>"
+        "<p><big><b>Clock Driver Calibration</b></big><br>\n"                               \
+        "The clock driver may need to be calibrated. In this dialog, various calibration\n" \
+        "options can be set. The meaning of particular options depends on the particular\n" \
+        "driver. Some drivers do not use all the options.</p>"
       ) +
         # help text 2/2
         _(
