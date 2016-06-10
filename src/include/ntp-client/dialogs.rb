@@ -24,7 +24,6 @@ module Yast
       Yast.import "Report"
       Yast.import "Confirm"
 
-
       Yast.include include_target, "ntp-client/misc.rb"
       Yast.include include_target, "ntp-client/widgets.rb"
 
@@ -34,7 +33,7 @@ module Yast
     # Get the map of all widgets
     # @return a map with all widgets for CWM
     def GetWidgets
-      @widgets = InitWidgets() if @widgets == nil
+      @widgets = InitWidgets() if @widgets.nil?
       deep_copy(@widgets)
     end
 
@@ -124,12 +123,12 @@ module Yast
       Wizard.SetAbortButton(:abort, Label.CancelButton)
 
       startInit(nil)
-      CWM.handleWidgets(w, { "ID" => "never" })
+      CWM.handleWidgets(w, "ID" => "never")
 
       ret = CWM.Run(
         w,
         # yes-no popup
-        { :abort => fun_ref(method(:reallyExitSimple), "boolean ()") }
+        abort: fun_ref(method(:reallyExitSimple), "boolean ()")
       )
 
       Builtins.y2milestone("Simple dialog: Returning %1", ret)
@@ -201,13 +200,11 @@ module Yast
 
       wd = {
         "tab" => CWMTab.CreateWidget(
-          {
-            "tab_order"    => ["general", "security"],
-            "tabs"         => tabs,
-            "widget_descr" => GetWidgets(),
-            "initial_tab"  => "general",
-            "tab_help"     => ""
-          }
+          "tab_order"    => ["general", "security"],
+          "tabs"         => tabs,
+          "widget_descr" => GetWidgets(),
+          "initial_tab"  => "general",
+          "tab_help"     => ""
         )
       }
 
@@ -216,8 +213,8 @@ module Yast
         ["tab"],
         Convert.convert(
           wd,
-          :from => "map <string, any>",
-          :to   => "map <string, map <string, any>>"
+          from: "map <string, any>",
+          to:   "map <string, map <string, any>>"
         )
       )
 
@@ -235,11 +232,11 @@ module Yast
       Wizard.HideBackButton
       Wizard.SetAbortButton(:abort, Label.CancelButton)
 
-      #CWM::handleWidgets (w, $["ID" : "never"]);
+      # CWM::handleWidgets (w, $["ID" : "never"]);
 
       CWM.Run(
         w,
-        { :abort => fun_ref(method(:reallyExitComplex), "boolean ()") }
+        abort: fun_ref(method(:reallyExitComplex), "boolean ()")
       )
     end
 
@@ -256,16 +253,14 @@ module Yast
       caption = _("New Synchronization")
 
       CWM.ShowAndRun(
-        {
-          "widget_names"       => ["peer_types"],
-          "widget_descr"       => GetWidgets(),
-          "contents"           => contents,
-          "caption"            => caption,
-          "back_button"        => Label.BackButton,
-          "next_button"        => Label.NextButton,
-          "fallback_functions" => {
-            :abort => fun_ref(method(:abortPopup), "boolean ()")
-          }
+        "widget_names"       => ["peer_types"],
+        "widget_descr"       => GetWidgets(),
+        "contents"           => contents,
+        "caption"            => caption,
+        "back_button"        => Label.BackButton,
+        "next_button"        => Label.NextButton,
+        "fallback_functions" => {
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -297,16 +292,14 @@ module Yast
       caption = _("NTP Server")
 
       CWM.ShowAndRun(
-        {
-          "widget_names"       => ["server_address", "options", "ac_options"],
-          "widget_descr"       => GetWidgets(),
-          "contents"           => contents,
-          "caption"            => caption,
-          "back_button"        => Label.BackButton,
-          "next_button"        => Label.OKButton,
-          "fallback_functions" => {
-            :abort => fun_ref(method(:abortPopup), "boolean ()")
-          }
+        "widget_names"       => ["server_address", "options", "ac_options"],
+        "widget_descr"       => GetWidgets(),
+        "contents"           => contents,
+        "caption"            => caption,
+        "back_button"        => Label.BackButton,
+        "next_button"        => Label.OKButton,
+        "fallback_functions" => {
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -345,11 +338,9 @@ module Yast
 
       ret = CWM.Run(
         widgets,
-        {
-          :abort => fun_ref(method(:abortPopup), "boolean ()"),
-          :ok    => true,
-          :back  => false
-        }
+        abort: fun_ref(method(:abortPopup), "boolean ()"),
+        ok:    true,
+        back:  false
       )
 
       UI.CloseDialog
@@ -391,11 +382,9 @@ module Yast
 
       ret = CWM.Run(
         widgets,
-        {
-          :abort => fun_ref(method(:abortPopup), "boolean ()"),
-          :ok    => true,
-          :back  => false
-        }
+        abort: fun_ref(method(:abortPopup), "boolean ()"),
+        ok:    true,
+        back:  false
       )
 
       UI.CloseDialog
@@ -416,16 +405,14 @@ module Yast
       caption = _("NTP Peer")
 
       CWM.ShowAndRun(
-        {
-          "widget_names"       => ["paddress", "options"],
-          "widget_descr"       => GetWidgets(),
-          "contents"           => contents,
-          "caption"            => caption,
-          "back_button"        => Label.BackButton,
-          "next_button"        => Label.OKButton,
-          "fallback_functions" => {
-            :abort => fun_ref(method(:abortPopup), "boolean ()")
-          }
+        "widget_names"       => ["paddress", "options"],
+        "widget_descr"       => GetWidgets(),
+        "contents"           => contents,
+        "caption"            => caption,
+        "back_button"        => Label.BackButton,
+        "next_button"        => Label.OKButton,
+        "fallback_functions" => {
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -455,24 +442,22 @@ module Yast
       caption = _("Local Reference Clock")
 
       CWM.ShowAndRun(
-        {
-          "widget_names"       => [
-            "clock_type",
-            "unit_number",
-            "create_symlink",
-            "device",
-            "browse",
-            "options",
-            "fudge_button"
-          ],
-          "widget_descr"       => GetWidgets(),
-          "contents"           => contents,
-          "caption"            => caption,
-          "back_button"        => Label.BackButton,
-          "next_button"        => Label.OKButton,
-          "fallback_functions" => {
-            :abort => fun_ref(method(:abortPopup), "boolean ()")
-          }
+        "widget_names"       => [
+          "clock_type",
+          "unit_number",
+          "create_symlink",
+          "device",
+          "browse",
+          "options",
+          "fudge_button"
+        ],
+        "widget_descr"       => GetWidgets(),
+        "contents"           => contents,
+        "caption"            => caption,
+        "back_button"        => Label.BackButton,
+        "next_button"        => Label.OKButton,
+        "fallback_functions" => {
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -490,16 +475,14 @@ module Yast
       caption = _("Outgoing Broadcast")
 
       CWM.ShowAndRun(
-        {
-          "widget_names"       => ["bcaddress", "options"],
-          "widget_descr"       => GetWidgets(),
-          "contents"           => contents,
-          "caption"            => caption,
-          "back_button"        => Label.BackButton,
-          "next_button"        => Label.OKButton,
-          "fallback_functions" => {
-            :abort => fun_ref(method(:abortPopup), "boolean ()")
-          }
+        "widget_names"       => ["bcaddress", "options"],
+        "widget_descr"       => GetWidgets(),
+        "contents"           => contents,
+        "caption"            => caption,
+        "back_button"        => Label.BackButton,
+        "next_button"        => Label.OKButton,
+        "fallback_functions" => {
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -517,16 +500,14 @@ module Yast
       caption = _("Incoming Broadcast")
 
       CWM.ShowAndRun(
-        {
-          "widget_names"       => ["bccaddress"],
-          "widget_descr"       => GetWidgets(),
-          "contents"           => contents,
-          "caption"            => caption,
-          "back_button"        => Label.BackButton,
-          "next_button"        => Label.OKButton,
-          "fallback_functions" => {
-            :abort => fun_ref(method(:abortPopup), "boolean ()")
-          }
+        "widget_names"       => ["bccaddress"],
+        "widget_descr"       => GetWidgets(),
+        "contents"           => contents,
+        "caption"            => caption,
+        "back_button"        => Label.BackButton,
+        "next_button"        => Label.OKButton,
+        "fallback_functions" => {
+          abort: fun_ref(method(:abortPopup), "boolean ()")
         }
       )
     end
@@ -646,9 +627,7 @@ module Yast
       UI.ChangeWidget(Id(:time2), :ValidChars, "1234567890.")
 
       ret = nil
-      while ret == nil
-        ret = UI.UserInput
-      end
+      ret = UI.UserInput while ret.nil?
       ret = :abort if ret == :cancel
       return Convert.to_symbol(ret) if ret == :back || ret == :abort
       if ret == :next
@@ -718,7 +697,6 @@ module Yast
       :next
     end
 
-
     # Pseudo-dialog to store information after the simple dialog
     # @return [Symbol] for wizard sequencer (always `next)
     def SimpleDialogFinish
@@ -727,7 +705,6 @@ module Yast
       end
       :next
     end
-
 
     # Pseudo-dialog to store settings to main structure
     # @return [Symbol] for wizard sequencer
@@ -754,7 +731,8 @@ module Yast
       end
 
       random_pool_servers_enabled_only =
-        # number of listed servers is the same as the needed servers for random_pool_servers function
+        # number of listed servers is the same as the needed servers for
+        # random_pool_servers function
         Builtins.size(servers) == Builtins.size(NtpClient.random_pool_servers) &&
           # enabled means that all of needed servers are listed
           NtpClient.IsRandomServersServiceEnabled

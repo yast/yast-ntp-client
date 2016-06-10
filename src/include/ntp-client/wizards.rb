@@ -40,49 +40,49 @@ module Yast
       sequence = {
         "ws_start"             => "main",
         "main"                 => {
-          :abort       => :abort,
-          :next        => :next,
-          :peer        => "peer",
-          :server      => "server",
-          :clock       => "clock",
-          :bcast       => "bcast",
-          :bcastclient => "bcastclient",
-          :add         => "type_select"
+          abort:       :abort,
+          next:        :next,
+          peer:        "peer",
+          server:      "server",
+          clock:       "clock",
+          bcast:       "bcast",
+          bcastclient: "bcastclient",
+          add:         "type_select"
         },
         "type_select"          => {
-          :abort       => :abort,
-          :peer        => "peer",
-          :server      => "server",
-          :clock       => "clock",
-          :bcast       => "bcast",
-          :bcastclient => "bcastclient"
+          abort:       :abort,
+          peer:        "peer",
+          server:      "server",
+          clock:       "clock",
+          bcast:       "bcast",
+          bcastclient: "bcastclient"
         },
-        "peer"                 => { :abort => :abort, :next => "store_record" },
+        "peer"                 => { abort: :abort, next: "store_record" },
         "server"               => {
-          :abort         => :abort,
-          :next          => "store_record",
-          :select_local  => "server_select_local",
-          :select_public => "server_select_public"
+          abort:         :abort,
+          next:          "store_record",
+          select_local:  "server_select_local",
+          select_public: "server_select_public"
         },
         "server_select_local"  => {
-          :abort => :abort,
-          :next  => "server",
-          :back  => "server"
+          abort: :abort,
+          next:  "server",
+          back:  "server"
         },
         "server_select_public" => {
-          :abort => :abort,
-          :next  => "server",
-          :back  => "server"
+          abort: :abort,
+          next:  "server",
+          back:  "server"
         },
         "clock"                => {
-          :abort => :abort,
-          :next  => "store_record",
-          :fudge => "fudge"
+          abort: :abort,
+          next:  "store_record",
+          fudge: "fudge"
         },
-        "fudge"                => { :abort => :abort, :next => "clock" },
-        "bcast"                => { :abort => :abort, :next => "store_record" },
-        "bcastclient"          => { :abort => :abort, :next => "store_record" },
-        "store_record"         => { :abort => :abort, :next => "main" }
+        "fudge"                => { abort: :abort, next: "clock" },
+        "bcast"                => { abort: :abort, next: "store_record" },
+        "bcastclient"          => { abort: :abort, next: "store_record" },
+        "store_record"         => { abort: :abort, next: "main" }
       }
 
       ret = Sequencer.Run(aliases, sequence)
@@ -111,29 +111,29 @@ module Yast
       sequence = {
         "ws_start"             => "switcher",
         "switcher"             => {
-          :simple  => "simple_pre",
-          :complex => "complex"
+          simple:  "simple_pre",
+          complex: "complex"
         },
-        "simple_pre"           => { :abort => :abort, :next => "simple" },
+        "simple_pre"           => { abort: :abort, next: "simple" },
         "simple"               => {
-          :abort         => :abort,
-          :next          => "simple_post",
-          :complex       => "complex",
-          :select_local  => "server_select_local",
-          :select_public => "server_select_public"
+          abort:         :abort,
+          next:          "simple_post",
+          complex:       "complex",
+          select_local:  "server_select_local",
+          select_public: "server_select_public"
         },
-        "simple_post"          => { :abort => :abort, :next => :next },
+        "simple_post"          => { abort: :abort, next: :next },
         "server_select_local"  => {
-          :abort => :abort,
-          :next  => "simple",
-          :back  => "simple"
+          abort: :abort,
+          next:  "simple",
+          back:  "simple"
         },
         "server_select_public" => {
-          :abort => :abort,
-          :next  => "simple",
-          :back  => "simple"
+          abort: :abort,
+          next:  "simple",
+          back:  "simple"
         },
-        "complex"              => { :abort => :abort, :next => :next }
+        "complex"              => { abort: :abort, next: :next }
       }
 
       ret = Sequencer.Run(aliases, sequence)
@@ -152,9 +152,9 @@ module Yast
 
       sequence = {
         "ws_start" => "read",
-        "read"     => { :abort => :abort, :next => "main" },
-        "main"     => { :abort => :abort, :next => "write" },
-        "write"    => { :abort => :abort, :next => :next }
+        "read"     => { abort: :abort, next: "main" },
+        "main"     => { abort: :abort, next: "write" },
+        "write"    => { abort: :abort, next: :next }
       }
 
       Wizard.CreateDialog
@@ -172,7 +172,7 @@ module Yast
 
       sequence = {
         "ws_start" => "main",
-        "main"     => { :abort => :abort, :next => :next }
+        "main"     => { abort: :abort, next: :next }
       }
 
       # dialog caption

@@ -12,7 +12,6 @@ module Yast
       Yast.import "UI"
       textdomain "ntp-client"
 
-
       Yast.import "Address"
       Yast.import "NetworkService"
       Yast.import "NtpClient"
@@ -52,34 +51,35 @@ module Yast
         @param
       )
 
-      # FIXME must go to module to preserve value
+      # FIXME: must go to module to preserve value
       @ntp_was_used = false
 
-
-
-      if @func == "GetNTPEnabled"
+      case @func
+      when "GetNTPEnabled"
         @ret = GetNTPEnabled()
-      elsif @func == "SetUseNTP"
+      when "SetUseNTP"
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
-      elsif @func == "MakeProposal"
+      when "MakeProposal"
         @ret = MakeProposal()
-      elsif @func == "Write"
+      when "Write"
         @ret = Write(@param)
-      elsif @func == "ui_help_text"
+      when "ui_help_text"
         @ret = ui_help_text
-      elsif @func == "ui_init"
+      when "ui_init"
         @rp = Ops.get_term(@param, "replace_point") { Id(:rp) }
         @ft = Ops.get_boolean(@param, "first_time", false)
-        @ret = ui_init(@rp,@ft)
-      elsif @func == "ui_try_save"
+        @ret = ui_init(@rp, @ft)
+      when "ui_try_save"
         @ret = ui_try_save
-      elsif @func == "ui_enable_disable_widgets"
+      when "ui_enable_disable_widgets"
         @ret = ui_enable_disable_widgets(
           Ops.get_boolean(@param, "enabled", false)
         )
-      elsif @func == "ui_handle"
+      when "ui_handle"
         @ret = ui_handle(Ops.get(@param, "ui"))
+      else
+        log.error("Not known called func #{@func}")
       end
 
       deep_copy(@ret)
@@ -88,13 +88,18 @@ module Yast
     def ui_help_text
       # help text
       tmp = _(
-        "<p>Press <b>Synchronize Now</b>, to get your system time set correctly using the selected NTP server. If you want to make use of NTP permanently, enable the <b>Save NTP Configuration</b> option</p>"
+        "<p>Press <b>Synchronize Now</b>, to get your system time set correctly " \
+        "using the selected NTP server. If you want to make use of NTP permanently, " \
+        "enable the <b>Save NTP Configuration</b> option</p>"
       )
 
       tmp = Ops.add(
         tmp,
         _(
-          "<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be started as daemon. Otherwise the system time will be synchronized periodically. The default interval is 15 min. You can change it after installation with the <b>yast2 ntp-client module</b>.</p>"
+          "<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be " \
+          "started as daemon. Otherwise the system time will be synchronized periodically. " \
+          "The default interval is 15 min. You can change it after installation " \
+          "with the <b>yast2 ntp-client module</b>.</p>"
         )
       )
 
@@ -112,7 +117,8 @@ module Yast
       tmp = Ops.add(
         tmp,
         _(
-          "<p>Synchronization with the NTP server can be done only when the network is configured.</p>"
+          "<p>Synchronization with the NTP server can be done only when " \
+          "the network is configured.</p>"
         )
       )
       tmp
@@ -122,7 +128,7 @@ module Yast
       UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
       UI.ChangeWidget(Id(:run_service), :Enabled, enabled)
       if !NetworkService.isNetworkRunning
-	UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
+        UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
       else
         UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
       end
@@ -179,13 +185,11 @@ module Yast
       nil
     end
 
-
-    def MakeProposal()
+    def MakeProposal
       ntp_items = []
 
-      #on the running system, read all the data, otherwise firewall
-      #and other stuff outside ntp.conf may not be initialized correctly
-      #(#375877)
+      # On the running system, read all the data, otherwise firewall and other
+      # stuff outside ntp.conf may not be initialized correctly (#375877)
       if !Stage.initial
         progress_orig = Progress.set(false)
         NtpClient.Read
@@ -208,7 +212,8 @@ module Yast
         Builtins.y2milestone(
           "Nothing found in /etc/ntp.conf, proposing current timezone-based NTP server list"
         )
-        ntp_items = NtpClient.GetNtpServersByCountry(Timezone.GetCountryForTimezone(Timezone.timezone), true)
+        time_zone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
+        ntp_items = NtpClient.GetNtpServersByCountry(time_zone_country, true)
         NtpClient.config_has_been_read = true
       end
       ntp_items = Builtins.add(ntp_items, "")
@@ -268,9 +273,7 @@ module Yast
               VSpacing(0.3),
               # push button label
               # bnc#449615: only simple config for inst-sys
-              Stage.initial ?
-                Label("") :
-                Left(PushButton(Id(:ntp_configure), _("&Configure..."))),
+              Stage.initial ? Label("") : Left(PushButton(Id(:ntp_configure), _("&Configure..."))),
               Label("")
             )
           )
@@ -279,16 +282,12 @@ module Yast
 
       UI.ReplaceWidget(rp, cont)
 
-      if !NetworkService.isNetworkRunning
-	UI.ChangeWidget(Id(:ntp_now),:Enabled,false);
-      end
+      UI.ChangeWidget(Id(:ntp_now), :Enabled, false) if !NetworkService.isNetworkRunning
 
       # ^ createui0
 
-      # FIXME is it correct? move out?
-      ntp_used = first_time && !Stage.initial ?
-        GetNTPEnabled() :
-        NtpClient.ntp_selected
+      # FIXME: is it correct? move out?
+      ntp_used = first_time && !Stage.initial ? GetNTPEnabled() : NtpClient.ntp_selected
 
       UI.ChangeWidget(Id(:ntp_save), :Value, ntp_used)
 
@@ -327,12 +326,13 @@ module Yast
         NtpClient.sync_interval = NtpClientClass::DEFAULT_SYNC_INTERVAL
       end
 
-      #OK, so we stored the server address
-      #In inst-sys we don't need to care further
-      #ntp-client_finish will do the job
-      #In installed system we must write the settings
+      # OK, so we stored the server address
+      # In inst-sys we don't need to care further
+      # ntp-client_finish will do the job
+      # In installed system we must write the settings
       if !Stage.initial
-        Wizard.OpenAcceptDialog # FIXME so that the progress does not disturb the dialog to be returned to
+        # FIXME: so that the progress does not disturb the dialog to be returned to
+        Wizard.OpenAcceptDialog
         NtpClient.Write
         Wizard.CloseDialog
       end
@@ -367,11 +367,11 @@ module Yast
 
       required_package = "ntp"
 
-      #In 1st stage, schedule packages for installation
+      # In 1st stage, schedule packages for installation
       if Stage.initial
         Yast.import "Packages"
         Packages.addAdditionalPackage(required_package)
-      #Otherwise, prompt user for confirming pkg installation
+      # Otherwise, prompt user for confirming pkg installation
       else
         if !PackageSystem.CheckAndInstallPackages([required_package])
           Report.Error(
@@ -387,7 +387,7 @@ module Yast
 
       ret = 0
       if NetworkService.isNetworkRunning
-        #Only if network is running try to synchronize the ntp server
+        # Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
 
         Builtins.y2milestone("Running sntp to sync with %1", ntp_server)
@@ -399,13 +399,13 @@ module Yast
         # -l <file>: log to a file to not mess text mode installation
         # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
         ret = SCR.Execute(
-                path(".target.bash"),
-                "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log -t 5 -c '#{String.Quote(ntp_server)}'"
+          path(".target.bash"),
+          "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log " \
+          "-t 5 -c '#{String.Quote(ntp_server)}'"
               )
         Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
         Popup.ClearFeedback
       end
-
 
       return :ntpdate_failed if ret != 0
 
@@ -430,7 +430,7 @@ module Yast
         end
       end
       if ui == :ntp_now
-        rv = Write({ "ntpdate_only" => true })
+        rv = Write("ntpdate_only" => true)
         if rv == :invalid_hostname
           handle_invalid_hostname(UI.QueryWidget(Id(:ntp_address), :Value))
         elsif rv == :success
@@ -466,14 +466,14 @@ module Yast
         # Translators: yes-no popup,
         # ntpdate is a command, %1 is the server address
         if Popup.YesNo(
-            Builtins.sformat(
-              _(
-                "Test query to server '%1' failed.\n" +
-                "If server is not yet accessible or network is not configured\n"+
-                "click 'No' to ignore. Revisit NTP server configuration?"
-              ),
-              server
-            )
+          Builtins.sformat(
+            _(
+              "Test query to server '%1' failed.\n" \
+              "If server is not yet accessible or network is not configured\n" \
+              "click 'No' to ignore. Revisit NTP server configuration?"
+            ),
+            server
+          )
           )
           return false # loop on
         elsif !Ops.get_boolean(argmap, "ntpdate_only", false)
@@ -481,7 +481,7 @@ module Yast
             [],
             server,
             Ops.get_boolean(argmap, "run_service", false)
-          ) #may be the server is realy not accessable
+          ) # may be the server is realy not accessable
         end
       end
       # success, exit

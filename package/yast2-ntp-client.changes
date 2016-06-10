@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Thu Jun  2 07:40:56 UTC 2016 - kanderssen@suse.com
+
+- Fixed Ntp Test adding a workaround to return false in case given
+  server is not reachable (bsc#977610)
+- Replaced old testsuite with Rspec tests
+- Added rubocop and coveralls
+- Removed autotools
+- 3.1.25
+
+-------------------------------------------------------------------
 Wed Jun  1 15:33:15 UTC 2016 - igonzalezsosa@suse.com
 
 - Drop yast2-ntp-client-devel-doc package (fate#320256)

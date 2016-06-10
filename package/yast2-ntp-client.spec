@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.1.24
+Version:        3.1.25
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -29,7 +29,9 @@ BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 3.1.11
 BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
-BuildRequires:  yast2-testsuite
+BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
+BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
+
 #SLPAPI.pm 
 # Hostname::CurrentDomain
 # Wizard::SetDesktopTitleAndIcon
@@ -48,11 +50,13 @@ This package contains the YaST2 component for NTP client configuration.
 %prep
 %setup -n %{name}-%{version}
 
+%check
+rake test:unit
+
 %build
-%yast_build
 
 %install
-%yast_install
+rake install DESTDIR="%{buildroot}"
 
 %files
 %defattr(-,root,root)
@@ -69,5 +73,7 @@ This package contains the YaST2 component for NTP client configuration.
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
+%doc %{yast_docdir}/README.md
+%doc %{yast_docdir}/CONTRIBUTING.md
 
 %changelog
