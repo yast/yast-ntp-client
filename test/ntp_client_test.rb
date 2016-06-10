@@ -616,7 +616,7 @@ describe Yast::NtpClient do
     end
 
     it "returns false if given index is not in @ntp_records size range" do
-      expect(subject.deleteSyncRecord(-2)).to eql(false)
+      expect(subject.deleteSyncRecord(-1)).to eql(false)
       expect(subject.deleteSyncRecord(20)).to eql(false)
     end
 
