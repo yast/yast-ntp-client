@@ -925,7 +925,7 @@ module Yast
     # @param [Fixnum] index integer index of record to delete
     # @return [Boolean] true on success
     def deleteSyncRecord(index)
-      if index >= @ntp_records.size || index <= -1
+      unless (-1..@ntp_records.size - 1).cover?(index)
         log.error("Record with index #{index} doesn't exist")
         return false
       end
