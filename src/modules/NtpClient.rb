@@ -1158,11 +1158,11 @@ module Yast
 
     def record_to_h(record)
       {
-        "comment" => record["comment"],
+        "comment" => record["comment"].to_s,
         "kind"    => "value",
         "name"    => record["type"] == "__clock" ? "server" : record["type"],
         "type"    => 0,
-        "value"   => "#{record["address"]} #{record["options"]}"
+        "value"   => "#{record["address"]} #{record["options"]}".strip
       }
     end
 
@@ -1170,11 +1170,11 @@ module Yast
     # write
     def fugde_options_to_h(record)
       {
-        "comment" => record["fudge_comment"],
+        "comment" => record["fudge_comment"].to_s,
         "kind"    => "value",
         "name"    => "fudge",
         "type"    => 0,
-        "value"   => "#{record["address"]} #{record["fudge_options"]}"
+        "value"   => "#{record["address"]} #{record["fudge_options"]}".strip
       }
     end
 
