@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jun 30 06:51:52 UTC 2016 - jreidinger@suse.com
+
+- Fix regression: crash when reading cron entry failed
+  ( discovered by sap-ha module ) (bsc#977610)
+- 3.1.27
+
+-------------------------------------------------------------------
 Tue Jun 14 06:54:54 UTC 2016 - kanderssen@suse.com
 
 - Fix handling of NTP records without comments (bsc#977610)
