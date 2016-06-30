@@ -423,7 +423,7 @@ module Yast
     def ReadSynchronization
       crontab = SCR.Read(path(".cron"), @cron_file, "")
       log.info("NTP Synchronization crontab entry: #{crontab}")
-      cron_entry = crontab.fetch(0, {}).fetch("events", []).fetch(0, {})
+      cron_entry = (crontab || []).fetch(0, {}).fetch("events", []).fetch(0, {})
       @synchronize_time = cron_entry["active"] == "1"
 
       sync_interval_entry = cron_entry.fetch("minute", "*/#{DEFAULT_SYNC_INTERVAL}")
