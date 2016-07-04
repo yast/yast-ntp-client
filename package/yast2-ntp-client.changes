@@ -2,7 +2,7 @@
 Thu Jun 30 06:51:52 UTC 2016 - jreidinger@suse.com
 
 - Fix regression: crash when reading cron entry failed
-  ( discovered by sap-ha module ) (bsc#977610)
+  ( discovered by sap-ha module ) (bsc#977610, bsc#987064)
 - 3.1.27
 
 -------------------------------------------------------------------

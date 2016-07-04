@@ -337,7 +337,9 @@ describe Yast::NtpClient do
       subject.ReadSynchronization
     end
 
-    context "when there is no cron entry" do
+    context "when cron file does not exist" do
+      let(:cron_entry) { nil }
+
       it "sets synchronize_time as false" do
         subject.ReadSynchronization
 
@@ -351,17 +353,33 @@ describe Yast::NtpClient do
       end
     end
 
-    context "when there is cron entry" do
-      let(:cron_entry) { [{ "events"   => [{ "active"   => "1", "minute" => "*/10" }] }] }
+    context "when cron file exists" do
+      context "when there is no cron entry" do
+        it "sets synchronize_time as false" do
+          subject.ReadSynchronization
 
-      it "sets synchronize time as true if first cron entry is valid" do
-        expect(subject.ReadSynchronization).to eql(true)
+          expect(subject.synchronize_time).to eql(false)
+        end
+
+        it "sets sync interval with default value" do
+          subject.ReadSynchronization
+
+          expect(subject.sync_interval).to eql(Yast::NtpClientClass::DEFAULT_SYNC_INTERVAL)
+        end
       end
 
-      it "sets sync_interval with cron minute interval" do
-        subject.ReadSynchronization
+      context "when there is cron entry" do
+        let(:cron_entry) { [{ "events"   => [{ "active"   => "1", "minute" => "*/10" }] }] }
 
-        expect(subject.sync_interval).to eql(10)
+        it "sets synchronize time as true if first cron entry is valid" do
+          expect(subject.ReadSynchronization).to eql(true)
+        end
+
+        it "sets sync_interval with cron minute interval" do
+          subject.ReadSynchronization
+
+          expect(subject.sync_interval).to eql(10)
+        end
       end
     end
   end
