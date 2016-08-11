@@ -1168,7 +1168,7 @@ module Yast
 
     # Parse fudge options of given record and returns a new fudge record for
     # write
-    def fugde_options_to_h(record)
+    def fudge_options_to_h(record)
       {
         "comment" => record["fudge_comment"].to_s,
         "kind"    => "value",
