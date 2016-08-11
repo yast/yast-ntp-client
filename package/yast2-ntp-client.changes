@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Aug 11 14:24:42 CEST 2016 - schubi@suse.de
+
+- Error while using <type>__clock</type> in AutoYaST.
+  Fixed typo.
+  (bnc#992854)
+- 3.1.28
+
+-------------------------------------------------------------------
 Thu Jun 30 06:51:52 UTC 2016 - jreidinger@suse.com
 
 - Fix regression: crash when reading cron entry failed
