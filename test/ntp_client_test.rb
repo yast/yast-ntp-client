@@ -442,6 +442,17 @@ describe Yast::NtpClient do
           expect(subject.sntp_test(server)).to eql(false)
         end
 
+        it "returns false if sntp respong no UCST" do
+          output["stdout"] = "sntp 4.2.8p8@1.3265-o Fri Sep 30 15:52:10 UTC 2016 (1)\n" \
+            "195.113.144.2 no UCST response after 5 seconds\n"
+          expect(Yast::SCR).to receive(:Execute)
+            .with(path(".target.bash_output"),
+              "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
+            .and_return(output)
+
+          expect(subject.sntp_test(server)).to eql(false)
+        end
+
         it "returns true if sntp command's exit code is 0" do
           output["stderr"] = ""
           expect(Yast::SCR).to receive(:Execute)
