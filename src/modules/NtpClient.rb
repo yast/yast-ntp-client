@@ -793,8 +793,8 @@ module Yast
       # so this is a workaround at least to return false in case server is not
       # reachable.
       return false if output["stderr"].include?("lookup error")
-      # this check is for valid address, but without ntp. If it break in future
-      # start complaining to sntp maintainer to not return 0 in this case.
+      # this happens for valid address, but without ntp server. If it breaks in the
+      # future start complaining to sntp maintainer to not return 0 in this case.
       # customer case: bsc#972842
       return false if output["stdout"] =~ /no (U|B)CST/
 
