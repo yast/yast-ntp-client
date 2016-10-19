@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct 18 13:53:24 UTC 2016 - jreidinger@suse.com
+
+- properly report that test failed if server without running ntp is
+  checked as ntp server (bsc#972842)
+- 3.2.0
+
+-------------------------------------------------------------------
 Thu Aug 11 14:24:42 CEST 2016 - schubi@suse.de
 
 - Error while using <type>__clock</type> in AutoYaST.

@@ -1,5 +1,7 @@
 require_relative "test_helper"
 
+require "fileutils"
+
 Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
 Yast.import "PackageSystem"
@@ -414,44 +416,44 @@ describe Yast::NtpClient do
     let(:server) { "sntp.server.de" }
     let(:output) { { "stdout" => "", "stderr" => "", "exit" => 0 } }
 
-    context "given a server" do
-      context "when no ip_version is passed as argument" do
-        let(:output) do
-          {
-            "stderr" => "server_name lookup error Name or service not known",
-            "stdout" => "sntp 4.2.8p7@1.3265-o Thu May 12 16:14:59 UTC 2016",
-            "exit"   => 0
-          }
-        end
+    it "calls sntp command with ip version 4 by default" do
+      expect(Yast::SCR).to receive(:Execute)
+        .with(Yast::Path.new(".target.bash_output"),
+          "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
+        .and_return(output)
 
-        it "calls sntp command with ip version 4 by default" do
-          expect(Yast::SCR).to receive(:Execute)
-            .with(Yast::Path.new(".target.bash_output"),
-              "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
-            .and_return(output)
+      subject.sntp_test(server)
+    end
 
-          subject.sntp_test(server)
-        end
+    it "returns false if server is not reachable" do
+      output["stderr"] = "server_name lookup error Name or service not known"
+      expect(Yast::SCR).to receive(:Execute)
+        .with(path(".target.bash_output"),
+          "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
+        .and_return(output)
 
-        it "returns false if server is not reachable" do
-          expect(Yast::SCR).to receive(:Execute)
-            .with(path(".target.bash_output"),
-              "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
-            .and_return(output)
+      expect(subject.sntp_test(server)).to eql(false)
+    end
 
-          expect(subject.sntp_test(server)).to eql(false)
-        end
+    it "returns false if sntp response includes 'no UCST'" do
+      output["stdout"] = "sntp 4.2.8p8@1.3265-o Fri Sep 30 15:52:10 UTC 2016 (1)\n" \
+        "195.113.144.2 no UCST response after 5 seconds\n"
+      expect(Yast::SCR).to receive(:Execute)
+        .with(path(".target.bash_output"),
+          "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
+        .and_return(output)
 
-        it "returns true if sntp command's exit code is 0" do
-          output["stderr"] = ""
-          expect(Yast::SCR).to receive(:Execute)
-            .with(path(".target.bash_output"),
-              "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
-            .and_return(output)
+      expect(subject.sntp_test(server)).to eql(false)
+    end
 
-          expect(subject.sntp_test(server)).to eql(true)
-        end
-      end
+    it "returns true if sntp command's exit code is 0" do
+      output["stdout"] = "sntp 4.2.8p8@1.3265-o Fri Sep 30 15:52:10 UTC 2016 (1)\n"
+      expect(Yast::SCR).to receive(:Execute)
+        .with(path(".target.bash_output"),
+          "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}")
+        .and_return(output)
+
+      expect(subject.sntp_test(server)).to eql(true)
     end
   end
 
