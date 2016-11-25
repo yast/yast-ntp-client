@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Nov 25 16:44:58 UTC 2016 - igonzalezsosa@suse.com
+
+- Remove warning message from a wrong widget definition 
+  (bsc#1012185)
+- 3.2.1
+
+-------------------------------------------------------------------
 Tue Oct 18 13:53:24 UTC 2016 - jreidinger@suse.com
 
 - properly report that test failed if server without running ntp is

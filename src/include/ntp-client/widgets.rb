@@ -1574,10 +1574,6 @@ module Yast
           # check box
           "label"         => _("Create &Symlink"),
           "opt"           => [:notify],
-          "init"          => fun_ref(
-            method(:createSymlinkHandle),
-            "symbol (string, map)"
-          ),
           "handle_events" => ["create_symlink"],
           "init"          => fun_ref(
             method(:createSymlinkInit),
