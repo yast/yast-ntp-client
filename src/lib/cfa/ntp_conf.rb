@@ -133,7 +133,7 @@ module CFA
         other.tree_data == self.tree_data
       end
 
-      alias :eq? :==
+      alias_method :eq?, :==
 
       protected
 
