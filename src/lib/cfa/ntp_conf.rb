@@ -12,18 +12,25 @@ module CFA
     DEFAULT_PATH = "/etc/ntp.conf".freeze
     SIMPLE_SETTINGS = ["logfile", "driftfile"].freeze
     AUTH_COMMANDS = ["trustedkey", "requestkey", "controlkey", "keys"].freeze
-    COMMAND_RECORDS = ["server", "peer", "broadcast", "manycastclient", "multicastclient", "manycastserver"].freeze
+    COMMAND_RECORDS = [
+      "server",
+      "peer",
+      "broadcast",
+      "manycastclient",
+      "multicastclient",
+      "manycastserver"
+    ].freeze
 
     def self.ntp_attributes(*attrs)
       attrs.each do |attr|
-        define_method(attr) {get_attribute(attr.to_s)}
-        define_method("#{attr}=") {|record| set_attribute(attr.to_s, record)}
-        define_method("delete_#{attr}") {delete_attribute(attr.to_s)}
+        define_method(attr) { get_attribute(attr.to_s) }
+        define_method("#{attr}=") { |record| set_attribute(attr.to_s, record) }
+        define_method("delete_#{attr}") { delete_attribute(attr.to_s) }
       end
     end
 
     ntp_attributes :driftfile, :logfile, :keys, :requestkey, :controlkey
-      
+
     def initialize(path: DEFAULT_PATH, file_handler: nil)
       super(PARSER, path, file_handler: file_handler)
     end
@@ -43,7 +50,7 @@ module CFA
     private
 
     def get_attribute(name)
-      return nil if data[name].nil? 
+      return nil if data[name].nil?
       AttributeRecord.new_from_augeas(data[name])
     end
 
@@ -65,13 +72,13 @@ module CFA
     class RecordCollection
       include Enumerable
 
-      def initialize(record_class, augeas_collection) 
+      def initialize(record_class, augeas_collection)
         @record_class = record_class
         @augeas_collection = augeas_collection
       end
 
       def each
-        @augeas_collection.each do |augeas_value| 
+        @augeas_collection.each do |augeas_value|
           yield @record_class.new_from_augeas(augeas_value)
         end
       end
@@ -85,8 +92,8 @@ module CFA
       end
 
       def replace(old_record, new_record)
-        return if !self.include? old_record
-        matcher = CFA::Matcher.new {|k, v| v == old_record.to_augeas}
+        return if !include? old_record
+        matcher = CFA::Matcher.new { |_k, v| v == old_record.to_augeas }
         placer = CFA::ReplacePlacer.new(matcher)
         @augeas_collection.add(new_record.to_augeas, placer)
       end
@@ -96,9 +103,8 @@ module CFA
       end
 
       def ==(other)
-        other.to_a == self.to_a
+        other.to_a == to_a
       end
-
     end
 
     # class to represent a general entry of the file.
@@ -109,8 +115,8 @@ module CFA
       end
 
       def self.new_from_augeas(augeas_value)
-        value, tree_data = self.parse_augeas(augeas_value)
-        record = self.new
+        value, tree_data = parse_augeas(augeas_value)
+        record = new
         record.send(:add_value, value)
         record.send(:add_tree_data, tree_data)
         record
@@ -123,14 +129,14 @@ module CFA
       end
 
       def comment
-        comment = @tree_data.select {|d| d[:key] == "#comment"}.first
+        comment = @tree_data.select { |d| d[:key] == "#comment" }.first
         comment[:value] if !comment.nil?
       end
 
       def ==(other)
         other.class == self.class &&
-        other.value == self.value &&
-        other.tree_data == self.tree_data
+          other.value == value &&
+          other.tree_data == tree_data
       end
 
       alias_method :eq?, :==
@@ -170,7 +176,7 @@ module CFA
       def create_augeas
         return value if @tree_data.empty?
         tree = CFA::AugeasTree.new
-        @tree_data.each {|d| tree.add(d[:key], d[:value])}
+        @tree_data.each { |d| tree.add(d[:key], d[:value]) }
         CFA::AugeasTreeValue.new(tree, value)
       end
     end
@@ -199,14 +205,14 @@ module CFA
       end
 
       def options
-        options = @tree_data.select {|d| d[:key] != "#comment"}
-        options.map {|option| option[:key]}
+        options = @tree_data.select { |d| d[:key] != "#comment" }
+        options.map { |option| option[:key] }
       end
 
       private
 
       def add_options(options)
-        @tree_data += options.map {|option| {key: option, value: nil}}
+        @tree_data += options.map { |option| { key: option, value: nil } }
       end
     end
 
@@ -228,14 +234,14 @@ module CFA
       end
 
       def actions
-        actions = @tree_data.select {|d| d[:key] == "action[]"}
-        actions.map {|action| action[:value]}
+        actions = @tree_data.select { |d| d[:key] == "action[]" }
+        actions.map { |action| action[:value] }
       end
 
       private
 
       def add_actions(actions)
-        @tree_data += actions.map {|action| {key: "action[]", value: action}}
+        @tree_data += actions.map { |action| { key: "action[]", value: action } }
       end
     end
   end

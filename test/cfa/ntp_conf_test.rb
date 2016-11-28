@@ -8,34 +8,34 @@ def ntp_disk_file
 end
 
 describe CFA::NtpConf do
-  subject(:ntp) {described_class.new(file_handler: ntp_file)}
-  
-  let(:ntp_file) {CFA::MemoryFile.new(content)}
+  subject(:ntp) { described_class.new(file_handler: ntp_file) }
+
+  let(:ntp_file) { CFA::MemoryFile.new(content) }
 
   before do
     ntp.load
   end
-  
+
   context "when ask for the collection" do
     context "#servers" do
       context "if ntp conf has several 'server' entries" do
-        let(:content) {ntp_disk_file}
+        let(:content) { ntp_disk_file }
 
         it "obtains a collection of records" do
           expect(ntp.servers).to be_a(CFA::NtpConf::RecordCollection)
         end
-        
+
         it "obtains the correct amount of records" do
           expect(ntp.servers.count).to eq(4)
         end
 
         it "obtains records of type ServerRecord" do
-          expect(ntp.servers.all? {|s| s.is_a? CFA::NtpConf::ServerRecord}).to eq(true)
+          expect(ntp.servers.all? { |s| s.is_a? CFA::NtpConf::ServerRecord }).to eq(true)
         end
       end
 
       context "if ntp conf has not 'server' entries" do
-        let(:content) {"peer 128.100.0.45\npeer 192.168.1.30\n"}
+        let(:content) { "peer 128.100.0.45\npeer 192.168.1.30\n" }
 
         it "obtains an empty collection" do
           expect(ntp.servers.empty?).to eq(true)
@@ -45,23 +45,23 @@ describe CFA::NtpConf do
 
     context "#peers" do
       context "if ntp conf has several 'peer' entries" do
-        let(:content) {ntp_disk_file}
+        let(:content) { ntp_disk_file }
 
         it "obtains a collection of records" do
           expect(ntp.peers).to be_a(CFA::NtpConf::RecordCollection)
         end
-        
+
         it "obtains the correct amount of records" do
           expect(ntp.peers.count).to eq(2)
         end
 
         it "obtains records of type PeerRecord" do
-          expect(ntp.peers.all? {|s| s.is_a? CFA::NtpConf::PeerRecord}).to eq(true)
+          expect(ntp.peers.all? { |s| s.is_a? CFA::NtpConf::PeerRecord }).to eq(true)
         end
       end
 
       context "if ntp conf has not 'peer' entries" do
-        let(:content) {"server 0.pool.ntp.org\nserver 1.pool.ntp.org\n"}
+        let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
 
         it "obtains an empty collection" do
           expect(ntp.peers.empty?).to eq(true)
@@ -71,23 +71,23 @@ describe CFA::NtpConf do
 
     context "#restricts" do
       context "if ntp conf has several 'restrict' entries" do
-        let(:content) {ntp_disk_file}
+        let(:content) { ntp_disk_file }
 
         it "obtains a collection of records" do
           expect(ntp.restricts).to be_a(CFA::NtpConf::RecordCollection)
         end
-        
+
         it "obtains the correct amount of records" do
           expect(ntp.restricts.count).to eq(4)
         end
 
         it "obtains records of type RestrictRecord" do
-          expect(ntp.restricts.all? {|s| s.is_a? CFA::NtpConf::RestrictRecord}).to eq(true)
+          expect(ntp.restricts.all? { |s| s.is_a? CFA::NtpConf::RestrictRecord }).to eq(true)
         end
       end
 
       context "if ntp conf has not 'retrict' entries" do
-        let(:content) {"server 0.pool.ntp.org\nserver 1.pool.ntp.org\n"}
+        let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
 
         it "obtains an empty collection" do
           expect(ntp.restricts.empty?).to eq(true)
@@ -98,7 +98,7 @@ describe CFA::NtpConf do
 
   context "when get an attribute" do
     context "if ntp conf has an entry for the attribute" do
-      let(:content) {ntp_disk_file}
+      let(:content) { ntp_disk_file }
 
       it "obtains a record of type AttributeRecord" do
         expect(ntp.driftfile).to be_a(CFA::NtpConf::AttributeRecord)
@@ -106,17 +106,17 @@ describe CFA::NtpConf do
     end
 
     context "if ntp conf has not an entry for the attribute" do
-      let(:content) {"server 0.pool.ntp.org\nserver 1.pool.ntp.org\n"}
+      let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
 
       it "obtains nil" do
         expect(ntp.driftfile).to eq(nil)
       end
-    end    
+    end
   end
 
   context "when set an attribute" do
     context "if ntp conf has an entry for the attribute" do
-      let(:content) {ntp_disk_file}
+      let(:content) { ntp_disk_file }
 
       it "updates the record" do
         path = "/etc/ntp.drift"
@@ -127,7 +127,7 @@ describe CFA::NtpConf do
     end
 
     context "if ntp conf has not an entry for the attribute" do
-      let(:content) {"server 0.pool.ntp.org\nserver 1.pool.ntp.org\n"}
+      let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
 
       it "creates a record" do
         record = CFA::NtpConf::AttributeRecord.new(value: "/etc/ntp.drift")
@@ -139,7 +139,7 @@ describe CFA::NtpConf do
 
   context "when delete an attribute" do
     context "if ntp conf has an entry for the attribute" do
-      let(:content) {ntp_disk_file}
+      let(:content) { ntp_disk_file }
 
       it "deletes the attribute" do
         ntp.delete_driftfile
@@ -148,7 +148,7 @@ describe CFA::NtpConf do
     end
 
     context "if ntp conf has not an entry for the attribute" do
-      let(:content) {"server 0.pool.ntp.org\nserver 1.pool.ntp.org\n"}
+      let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
 
       it "does nothing" do
         ntp.delete_driftfile
@@ -159,30 +159,30 @@ describe CFA::NtpConf do
 end
 
 describe CFA::NtpConf::RecordCollection do
-  subject(:ntp) {CFA::NtpConf.new(file_handler: ntp_file)}
-  
-  let(:ntp_file) {CFA::MemoryFile.new(ntp_disk_file)}
+  subject(:ntp) { CFA::NtpConf.new(file_handler: ntp_file) }
 
-  let(:new_server) {CFA::NtpConf::ServerRecord.new(value: "4.pool.ntp.org")}
-  
-  let(:existing_server) {ntp.servers.first.dup}
+  let(:ntp_file) { CFA::MemoryFile.new(ntp_disk_file) }
+
+  let(:new_server) { CFA::NtpConf::ServerRecord.new(value: "4.pool.ntp.org") }
+
+  let(:existing_server) { ntp.servers.first.dup }
 
   before do
     ntp.load
   end
-  
-  context "#add" do  
+
+  context "#add" do
     context "when does not exist the record to add" do
       it "adds the record" do
         ntp.servers.add(new_server)
-        expect(ntp.servers.include? new_server).to be(true)
+        expect(ntp.servers.include?(new_server)).to be(true)
       end
     end
 
     context "when exists the record to add" do
       it "adds the record too" do
         ntp.servers.add(existing_server)
-        expect(ntp.servers.count existing_server).to eq(2)
+        expect(ntp.servers.count(existing_server)).to eq(2)
       end
     end
   end
@@ -199,7 +199,7 @@ describe CFA::NtpConf::RecordCollection do
     context "when exists the record to delete" do
       it "deletes the record" do
         ntp.servers.delete(existing_server)
-        expect(ntp.servers.include? existing_server).to be(false)
+        expect(ntp.servers.include?(existing_server)).to be(false)
       end
     end
   end
@@ -216,7 +216,7 @@ describe CFA::NtpConf::RecordCollection do
     context "when exists the record to replace" do
       it "deletes the old record" do
         ntp.servers.replace(existing_server, new_server)
-        expect(ntp.servers.include? existing_server).to be(false)
+        expect(ntp.servers.include?(existing_server)).to be(false)
       end
 
       it "adds the new record at the same position" do
@@ -227,16 +227,19 @@ describe CFA::NtpConf::RecordCollection do
   end
 end
 
-describe CFA::NtpConf::Record do 
+describe CFA::NtpConf::Record do
   let(:augeas) do
     tree = CFA::AugeasTree.new
     tree.add("iburst", nil)
     CFA::AugeasTreeValue.new(tree, "4.pool.ntp.org")
   end
 
-  let(:record) {CFA::NtpConf::Record.new(value: "4.pool.ntp.org", tree_data: [{key: "iburst", value: nil}])}
+  let(:record) do
+    CFA::NtpConf::Record.new(value:     "4.pool.ntp.org",
+                             tree_data: [{ key: "iburst", value: nil }])
+  end
 
-  let(:record_from_augeas) {CFA::NtpConf::Record.new_from_augeas(augeas)}
+  let(:record_from_augeas) { CFA::NtpConf::Record.new_from_augeas(augeas) }
 
   context ".new_from_augeas" do
     it "creates a record" do
@@ -264,15 +267,15 @@ describe CFA::NtpConf::Record do
 end
 
 describe CFA::NtpConf::AttributeRecord do
-  subject(:record) {described_class.new(value: value, comment: comment)}
+  subject(:record) { described_class.new(value: value, comment: comment) }
 
-  let(:value) {"1"}
+  let(:value) { "1" }
 
-  let(:comment) {"# is a requestkey"}
+  let(:comment) { "# is a requestkey" }
 
   context "#initialize" do
     it "allows to create an attribute with :value and :comment" do
-      expect{described_class.new(value: value, comment: comment)}.to_not raise_error
+      expect { described_class.new(value: value, comment: comment) }.to_not raise_error
     end
   end
 
@@ -290,17 +293,19 @@ describe CFA::NtpConf::AttributeRecord do
 end
 
 describe CFA::NtpConf::CommandRecord do
-  subject(:record) {described_class.new(value: value, options: options, comment: comment)}
+  subject(:record) { described_class.new(value: value, options: options, comment: comment) }
 
-  let(:value) {"0.opensuse.pool.ntp.org"}
+  let(:value) { "0.opensuse.pool.ntp.org" }
 
-  let(:options) {["iburst"]}
+  let(:options) { ["iburst"] }
 
-  let(:comment) {"# is a server entry"}
+  let(:comment) { "# is a server entry" }
 
   context "#initialize" do
     it "allows to create a command with :value, :options and :comment" do
-      expect{described_class.new(value: value, options: options, comment: comment)}.to_not raise_error
+      expect do
+        described_class.new(value: value, options: options, comment: comment)
+      end.to_not raise_error
     end
   end
 
@@ -324,17 +329,19 @@ describe CFA::NtpConf::CommandRecord do
 end
 
 describe CFA::NtpConf::RestrictRecord do
-  subject(:record) {described_class.new(value: value, actions: actions, comment: comment)}
+  subject(:record) { described_class.new(value: value, actions: actions, comment: comment) }
 
-  let(:value) {"192.168.123.0"}
+  let(:value) { "192.168.123.0" }
 
-  let(:actions) {["mask", "255.255.255.0", "notrust"]}
+  let(:actions) { ["mask", "255.255.255.0", "notrust"] }
 
-  let(:comment) {"# is a restrict entry"}
+  let(:comment) { "# is a restrict entry" }
 
   context "#initialize" do
     it "allows to create a restrict with :value, :actions and :comment" do
-      expect{described_class.new(value: value, actions: actions, comment: comment)}.to_not raise_error
+      expect do
+        described_class.new(value: value, actions: actions, comment: comment)
+      end.to_not raise_error
     end
   end
 
