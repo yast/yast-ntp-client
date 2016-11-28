@@ -139,6 +139,20 @@ module CFA
 
       attr_reader :tree_data
 
+      def self.parse_augeas(augeas_value)
+        case augeas_value
+        when CFA::AugeasTreeValue
+          value = augeas_value.value
+          tree_data = augeas_value.tree.data
+        else
+          value = augeas_value
+          tree_data = []
+        end
+        [value, tree_data]
+      end
+
+      private_class_method :parse_augeas
+
       private
 
       def add_value(value)
@@ -150,19 +164,7 @@ module CFA
       end
 
       def add_comment(comment)
-        @tree_data << {key: "#comment", value: comment} if !comment.nil?
-      end
-
-      def self.parse_augeas(augeas_value)
-        case augeas_value
-        when CFA::AugeasTreeValue
-          value = augeas_value.value
-          tree_data = augeas_value.tree.data
-        else
-          value = augeas_value
-          tree_data = []
-        end
-        [value, tree_data]
+        @tree_data << { key: "#comment", value: comment } if !comment.nil?
       end
 
       def create_augeas
