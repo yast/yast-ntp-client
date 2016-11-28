@@ -3,6 +3,10 @@ require "cfa/augeas_parser"
 require "cfa/matcher"
 
 module CFA
+  # class representings /etc/ntp.conf file model. It provides helper to manipulate
+  # with file. It uses CFA framework and Augeas parser.
+  # @see http://www.rubydoc.info/github/config-files-api/config_files_api/CFA/BaseModel
+  # @see http://www.rubydoc.info/github/config-files-api/config_files_api/CFA/AugeasParser
   class NtpConf < ::CFA::BaseModel
     PARSER = CFA::AugeasParser.new("ntp.lns")
     DEFAULT_PATH = "/etc/ntp.conf".freeze
@@ -51,6 +55,13 @@ module CFA
       data.delete(name)
     end
 
+    # class to manage a collection of some ntp entries, as
+    # server, restrict, peer, etc.
+    #   For example:
+    #     server 0.opensuse.pool.ntp.org iburst
+    #     server 1.opensuse.pool.ntp.org iburst
+    #     server 2.opensuse.pool.ntp.org iburst
+    #     server 3.opensuse.pool.ntp.org iburst
     class RecordCollection
       include Enumerable
 
@@ -90,6 +101,7 @@ module CFA
 
     end
 
+    # class to represent a general entry of the file.
     class Record
       def initialize(value: nil, tree_data: [])
         @value = value
@@ -161,6 +173,9 @@ module CFA
       end
     end
 
+    # class to represent a key-value ntp entry.
+    #   For example:
+    #     logfile /var/log/ntp
     class AttributeRecord < Record
       def initialize(value: nil, comment: nil)
         super()
@@ -169,6 +184,10 @@ module CFA
       end
     end
 
+    # class to represent ntp command entries, as
+    # server, peer.
+    #   For example:
+    #     server 0.opensuse.pool.ntp.org iburst
     class CommandRecord < Record
       def initialize(value: nil, options: [], comment: nil)
         super()
@@ -195,6 +214,9 @@ module CFA
     class PeerRecord < CommandRecord
     end
 
+    # class to represent ntp restrict entries.
+    #   For example:
+    #     restrict -4 default notrap nomodify nopeer noquery
     class RestrictRecord < Record
       def initialize(value: nil, actions: [], comment: nil)
         super()
