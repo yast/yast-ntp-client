@@ -9,186 +9,185 @@ module CFA
   # @see http://www.rubydoc.info/github/config-files-api/config_files_api/CFA/AugeasParser
   class NtpConf < ::CFA::BaseModel
     PARSER = CFA::AugeasParser.new("ntp.lns")
-    DEFAULT_PATH = "/etc/ntp.conf".freeze
-    SIMPLE_SETTINGS = ["logfile", "driftfile"].freeze
-    AUTH_COMMANDS = ["trustedkey", "requestkey", "controlkey", "keys"].freeze
-    COMMAND_RECORDS = [
-      "server",
-      "peer",
-      "broadcast",
-      "manycastclient",
-      "multicastclient",
-      "manycastserver"
-    ].freeze
+    PATH = "/etc/ntp.conf".freeze
+    COLLECTION_KEYS = %W(
+      server
+      peer
+      broadcast
+      manycastclient
+      multicastclient
+      manycastserver
+      fudge
+      restrict
+      #comment
+      action
+    ).freeze
 
-    def self.ntp_attributes(*attrs)
-      attrs.each do |attr|
-        define_method(attr) { get_attribute(attr.to_s) }
-        define_method("#{attr}=") { |record| set_attribute(attr.to_s, record) }
-        define_method("delete_#{attr}") { delete_attribute(attr.to_s) }
-      end
+    def initialize(file_handler: nil)
+      super(PARSER, PATH, file_handler: file_handler)
     end
 
-    ntp_attributes :driftfile, :logfile, :keys, :requestkey, :controlkey
-
-    def initialize(path: DEFAULT_PATH, file_handler: nil)
-      super(PARSER, path, file_handler: file_handler)
+    def load
+      super
+      fix_keys
     end
 
-    def servers
-      RecordCollection.new(ServerRecord, data.collection("server"))
-    end
-
-    def peers
-      RecordCollection.new(PeerRecord, data.collection("peer"))
-    end
-
-    def restricts
-      RecordCollection.new(RestrictRecord, data.collection("restrict"))
+    def records
+      RecordCollection.new(data)
     end
 
     private
 
-    def get_attribute(name)
-      return nil if data[name].nil?
-      AttributeRecord.new_from_augeas(data[name])
+    def fix_keys
+      fix_collection_keys(data.data)
+      data.data.each do |entry|
+        if entry[:value].is_a?(AugeasTreeValue)
+          fix_collection_keys(entry[:value].tree.data)  
+        end
+      end
     end
 
-    def set_attribute(name, record)
-      data[name] = record.to_augeas
+    def fix_collection_keys(entries)
+      entries.each do |entry|
+        if COLLECTION_KEYS.include?(entry[:key])
+          entry[:key] += "[]" unless entry[:key] =~ /.*\[\]$/
+        end
+      end
     end
 
-    def delete_attribute(name)
-      data.delete(name)
-    end
-
-    # class to manage a collection of some ntp entries, as
-    # server, restrict, peer, etc.
-    #   For example:
-    #     server 0.opensuse.pool.ntp.org iburst
-    #     server 1.opensuse.pool.ntp.org iburst
-    #     server 2.opensuse.pool.ntp.org iburst
-    #     server 3.opensuse.pool.ntp.org iburst
+    # class to manage ntp entries
     class RecordCollection
       include Enumerable
 
-      def initialize(record_class, augeas_collection)
-        @record_class = record_class
-        @augeas_collection = augeas_collection
+      RECORD_ENTRIES = %W(
+        server
+        peer
+        broadcast
+        manycastclient
+        multicastclient
+        manycastserver
+        fudge
+        restrict
+        #comment
+      ).freeze
+
+      def initialize(augeas_tree)
+        @augeas_tree = augeas_tree
       end
 
       def each
-        @augeas_collection.each do |augeas_value|
-          yield @record_class.new_from_augeas(augeas_value)
+        record_entries.each do |augeas_element|
+          yield Record.new_from_augeas(augeas_element)
         end
       end
 
       def add(record)
-        @augeas_collection.add(record.to_augeas)
+        @augeas_tree.data << record.augeas
       end
+
+      alias_method :<<, :add
 
       def delete(record)
-        @augeas_collection.delete(record.to_augeas)
+        @augeas_tree.delete_if { |entry| entry == record.augeas }
       end
 
-      def replace(old_record, new_record)
-        return if !include? old_record
-        matcher = CFA::Matcher.new { |_k, v| v == old_record.to_augeas }
-        placer = CFA::ReplacePlacer.new(matcher)
-        @augeas_collection.add(new_record.to_augeas, placer)
+      def delete_if(&block)
+        records = select(&block)
+        records.each { |record| delete(record) }
       end
 
       def empty?
-        @augeas_collection.empty?
+        count == 0
       end
 
       def ==(other)
         other.to_a == to_a
       end
+
+      private
+
+      def record_entries
+        @augeas_tree.data.select do |d| 
+          RECORD_ENTRIES.include?(d[:key].gsub("[]", ""))
+        end
+      end
     end
 
     # class to represent a general entry of the file.
     class Record
-      def initialize(value: nil, tree_data: [])
-        @value = value
-        @tree_data = tree_data
+      def self.record_class(key)
+        case key
+        when /server/ then ServerRecord
+        when /peer/ then PeerRecord
+        when /broadcast/ then BroadcastRecord
+        when /broadcastclient/ then BroadcastclientRecord
+        when /manycast/ then ManycastRecord
+        when /manycastclient/ then ManycastclientRecord
+        when /fudge/ then FudgeRecord
+        when /restrict/ then RestrictRecord
+        when /comment/ then CommentRecord
+        end
       end
 
-      def self.new_from_augeas(augeas_value)
-        value, tree_data = parse_augeas(augeas_value)
-        record = new
-        record.send(:add_value, value)
-        record.send(:add_tree_data, tree_data)
+      def initialize(key = nil)
+        @augeas = { key: key, value: nil }
+      end
+
+      attr_accessor :augeas
+
+      def self.new_from_augeas(augeas_entry)
+        record = record_class(augeas_entry[:key]).new
+        record.augeas = augeas_entry
         record
       end
 
-      attr_reader :value
+      def value
+        has_tree_value? ? tree_value.value : @augeas[:value]
+      end
 
-      def to_augeas
-        create_augeas
+      def value=(value)
+        if has_tree_value?
+          tree_value.value = value
+        else
+          @augeas[:value] = value
+        end
       end
 
       def comment
-        comment = @tree_data.select { |d| d[:key] == "#comment" }.first
-        comment[:value] if !comment.nil?
+        return nil unless has_tree_value?
+        tree_value.tree["#comment"]
+      end
+
+      def comment=(comment)
+        create_tree_value unless has_tree_value?
+        tree_value.tree["#comment"] = comment
       end
 
       def ==(other)
-        other.class == self.class &&
-          other.value == value &&
-          other.tree_data == tree_data
+        other.class == self.class && 
+          other.augeas == augeas
       end
 
-      alias_method :eq?, :==
-
-      protected
-
-      attr_reader :tree_data
-
-      def self.parse_augeas(augeas_value)
-        case augeas_value
-        when CFA::AugeasTreeValue
-          value = augeas_value.value
-          tree_data = augeas_value.tree.data
-        else
-          value = augeas_value
-          tree_data = []
-        end
-        [value, tree_data]
-      end
-
-      private_class_method :parse_augeas
+      alias_method :eql?, :==
 
       private
 
-      def add_value(value)
-        @value = value
+      def has_tree_value?
+        @augeas[:value].is_a?(AugeasTreeValue)
       end
 
-      def add_tree_data(tree_data)
-        @tree_data = tree_data
+      def tree_value
+        has_tree_value? ? @augeas[:value] : nil
       end
 
-      def add_comment(comment)
-        @tree_data << { key: "#comment", value: comment } if !comment.nil?
-      end
-
-      def create_augeas
-        return value if @tree_data.empty?
-        tree = CFA::AugeasTree.new
-        @tree_data.each { |d| tree.add(d[:key], d[:value]) }
-        CFA::AugeasTreeValue.new(tree, value)
+      def create_tree_value
+        @augeas[:value] = AugeasTreeValue.new(AugeasTree.new, @augeas[:value])
       end
     end
 
-    # class to represent a key-value ntp entry.
-    #   For example:
-    #     logfile /var/log/ntp
-    class AttributeRecord < Record
-      def initialize(value: nil, comment: nil)
-        super()
-        add_value(value)
-        add_comment(comment)
+    class CommentRecord < Record
+      def initialize
+        super("#comment[]")
       end
     end
 
@@ -197,51 +196,69 @@ module CFA
     #   For example:
     #     server 0.opensuse.pool.ntp.org iburst
     class CommandRecord < Record
-      def initialize(value: nil, options: [], comment: nil)
-        super()
-        add_value(value)
-        add_options(options)
-        add_comment(comment)
-      end
-
       def options
-        options = @tree_data.select { |d| d[:key] != "#comment" }
-        options.map { |option| option[:key] }
+        return [] unless has_tree_value?
+        current_options = tree_value.tree.data.reject { |d| d[:key].include?("#comment") }
+        current_options.map { |option| option[:key] }
       end
 
-      private
-
-      def add_options(options)
-        @tree_data += options.map { |option| { key: option, value: nil } }
+      def options=(options)
+        create_tree_value unless has_tree_value?
+        tree_value.tree.data.reject! { |d| d[:key] != "#comment" }
+        options.each { |option| tree_value.tree.add(option, nil) }
       end
     end
 
     class ServerRecord < CommandRecord
+      def initialize
+        super("server[]")
+      end
     end
 
     class PeerRecord < CommandRecord
+      def initialize
+        super("peer[]")
+      end
+    end
+
+    class FudgeRecord < CommandRecord
+      def initialize
+        super("fudge[]")
+      end
+
+      def options
+        return {} unless has_tree_value?
+        current_options = tree_value.tree.data.reject { |d| d[:key].to_s.include?("#comment") }
+        current_options.each_with_object({}) do |option, opts|
+          opts[option[:key]] = option[:value]
+        end
+      end
+
+      def options=(options)
+        create_tree_value unless has_tree_value?
+        tree_value.tree.data.reject! { |d| d[:key] != "#comment" }
+        options.each { |k, v| tree_value.tree.add(k, v) }
+      end
     end
 
     # class to represent ntp restrict entries.
     #   For example:
     #     restrict -4 default notrap nomodify nopeer noquery
     class RestrictRecord < Record
-      def initialize(value: nil, actions: [], comment: nil)
-        super()
-        add_value(value)
-        add_actions(actions)
-        add_comment(comment)
+      def initialize
+        super("restrict[]")
       end
 
       def actions
-        actions = @tree_data.select { |d| d[:key] == "action[]" }
-        actions.map { |action| action[:value] }
+        return [] unless has_tree_value?
+        current_actions = tree_value.tree.data.select { |d| d[:key] == "action[]" }
+        current_actions.map { |action| action[:value] }
       end
 
-      private
-
-      def add_actions(actions)
-        @tree_data += actions.map { |action| { key: "action[]", value: action } }
+      def actions=(actions)
+        create_tree_value unless has_tree_value?
+        tree_value.tree.data.reject! { |d| d[:key].include?("action") }
+        actions.each { |action| tree_value.tree.add("action[]", action) }
       end
     end
   end
