@@ -16,144 +16,27 @@ describe CFA::NtpConf do
     ntp.load
   end
 
-  context "when ask for the collection" do
-    context "#servers" do
-      context "if ntp conf has several 'server' entries" do
-        let(:content) { ntp_disk_file }
-
-        it "obtains a collection of records" do
-          expect(ntp.servers).to be_a(CFA::NtpConf::RecordCollection)
-        end
-
-        it "obtains the correct amount of records" do
-          expect(ntp.servers.count).to eq(4)
-        end
-
-        it "obtains records of type ServerRecord" do
-          expect(ntp.servers.all? { |s| s.is_a? CFA::NtpConf::ServerRecord }).to eq(true)
-        end
+  describe "#load" do
+    context "when there is only one entry of a collection" do
+      let(:content) do
+        "server 127.127.1.0\n"
       end
 
-      context "if ntp conf has not 'server' entries" do
-        let(:content) { "peer 128.100.0.45\npeer 192.168.1.30\n" }
-
-        it "obtains an empty collection" do
-          expect(ntp.servers.empty?).to eq(true)
-        end
-      end
-    end
-
-    context "#peers" do
-      context "if ntp conf has several 'peer' entries" do
-        let(:content) { ntp_disk_file }
-
-        it "obtains a collection of records" do
-          expect(ntp.peers).to be_a(CFA::NtpConf::RecordCollection)
-        end
-
-        it "obtains the correct amount of records" do
-          expect(ntp.peers.count).to eq(2)
-        end
-
-        it "obtains records of type PeerRecord" do
-          expect(ntp.peers.all? { |s| s.is_a? CFA::NtpConf::PeerRecord }).to eq(true)
-        end
-      end
-
-      context "if ntp conf has not 'peer' entries" do
-        let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
-
-        it "obtains an empty collection" do
-          expect(ntp.peers.empty?).to eq(true)
-        end
-      end
-    end
-
-    context "#restricts" do
-      context "if ntp conf has several 'restrict' entries" do
-        let(:content) { ntp_disk_file }
-
-        it "obtains a collection of records" do
-          expect(ntp.restricts).to be_a(CFA::NtpConf::RecordCollection)
-        end
-
-        it "obtains the correct amount of records" do
-          expect(ntp.restricts.count).to eq(4)
-        end
-
-        it "obtains records of type RestrictRecord" do
-          expect(ntp.restricts.all? { |s| s.is_a? CFA::NtpConf::RestrictRecord }).to eq(true)
-        end
-      end
-
-      context "if ntp conf has not 'retrict' entries" do
-        let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
-
-        it "obtains an empty collection" do
-          expect(ntp.restricts.empty?).to eq(true)
-        end
+      it "fixes the key of the collection" do
+        expect(ntp.records.first.augeas[:key]).to eq("server[]")
       end
     end
   end
 
-  context "when get an attribute" do
-    context "if ntp conf has an entry for the attribute" do
-      let(:content) { ntp_disk_file }
+  describe "#records" do
+    let(:content) { ntp_disk_file }
 
-      it "obtains a record of type AttributeRecord" do
-        expect(ntp.driftfile).to be_a(CFA::NtpConf::AttributeRecord)
-      end
+    it "obtains the corrent amount of records" do
+      expect(ntp.records.count).to eq(12)
     end
 
-    context "if ntp conf has not an entry for the attribute" do
-      let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
-
-      it "obtains nil" do
-        expect(ntp.driftfile).to eq(nil)
-      end
-    end
-  end
-
-  context "when set an attribute" do
-    context "if ntp conf has an entry for the attribute" do
-      let(:content) { ntp_disk_file }
-
-      it "updates the record" do
-        path = "/etc/ntp.drift"
-        record = CFA::NtpConf::AttributeRecord.new(value: path)
-        ntp.driftfile = record
-        expect(ntp.driftfile.value).to eq(path)
-      end
-    end
-
-    context "if ntp conf has not an entry for the attribute" do
-      let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
-
-      it "creates a record" do
-        record = CFA::NtpConf::AttributeRecord.new(value: "/etc/ntp.drift")
-        ntp.driftfile = record
-        expect(ntp.driftfile).not_to be(nil)
-      end
-    end
-  end
-
-  context "when delete an attribute" do
-    context "if ntp conf has an entry for the attribute" do
-      let(:content) { ntp_disk_file }
-
-      it "deletes the attribute" do
-        ntp.delete_driftfile
-        expect(ntp.driftfile).to be(nil)
-      end
-    end
-
-    context "if ntp conf has not an entry for the attribute" do
-      let(:content) { "server 0.pool.ntp.org\nserver 1.pool.ntp.org\n" }
-
-      it "does nothing" do
-        ntp.delete_driftfile
-        expect(ntp.driftfile).to be(nil)
-      end
+    it "obtains a collection of records" do
+      expect(ntp.records).to be_a(CFA::NtpConf::RecordCollection)
     end
   end
 end
@@ -163,9 +46,13 @@ describe CFA::NtpConf::RecordCollection do
 
   let(:ntp_file) { CFA::MemoryFile.new(ntp_disk_file) }
 
-  let(:new_server) { CFA::NtpConf::ServerRecord.new(value: "4.pool.ntp.org") }
+  let(:new_record) do
+    record = CFA::NtpConf::ServerRecord.new
+    record.value = "4.pool.ntp.org"
+    record
+  end
 
-  let(:existing_server) { ntp.servers.first.dup }
+  let(:existing_record) { ntp.records.first.dup }
 
   before do
     ntp.load
@@ -174,15 +61,15 @@ describe CFA::NtpConf::RecordCollection do
   context "#add" do
     context "when does not exist the record to add" do
       it "adds the record" do
-        ntp.servers.add(new_server)
-        expect(ntp.servers.include?(new_server)).to be(true)
+        ntp.records.add(new_record)
+        expect(ntp.records.include?(new_record)).to be(true)
       end
     end
 
     context "when exists the record to add" do
       it "adds the record too" do
-        ntp.servers.add(existing_server)
-        expect(ntp.servers.count(existing_server)).to eq(2)
+        ntp.records.add(existing_record)
+        expect(ntp.records.count(existing_record)).to eq(2)
       end
     end
   end
@@ -190,176 +77,229 @@ describe CFA::NtpConf::RecordCollection do
   context "#delete" do
     context "when does not exist the record to delete" do
       it "does anything" do
-        servers = ntp.servers
-        ntp.servers.delete(new_server)
-        expect(ntp.servers).to eq(servers)
+        records = ntp.records
+        ntp.records.delete(new_record)
+        expect(ntp.records).to eq(records)
       end
     end
 
     context "when exists the record to delete" do
       it "deletes the record" do
-        ntp.servers.delete(existing_server)
-        expect(ntp.servers.include?(existing_server)).to be(false)
+        ntp.records.delete(existing_record)
+        expect(ntp.records.include?(existing_record)).to be(false)
       end
     end
   end
 
-  context "#replace" do
-    context "when does not exist the record to replace" do
-      it "does anything" do
-        servers = ntp.servers
-        ntp.servers.replace(new_server, new_server)
-        expect(ntp.servers).to eq(servers)
-      end
-    end
-
-    context "when exists the record to replace" do
-      it "deletes the old record" do
-        ntp.servers.replace(existing_server, new_server)
-        expect(ntp.servers.include?(existing_server)).to be(false)
-      end
-
-      it "adds the new record at the same position" do
-        ntp.servers.replace(existing_server, new_server)
-        expect(ntp.servers.first).to eq(new_server)
-      end
+  context "#delete_if" do
+    it "deletes all records that satisfy the condition" do
+      ntp.records.delete_if { |record| record.type == "server" }
+      expect(ntp.records.any? { |record| record.type == "server" }).to eq(false)
     end
   end
 end
 
 describe CFA::NtpConf::Record do
-  let(:augeas) do
+  let(:augeas_options) do
     tree = CFA::AugeasTree.new
     tree.add("iburst", nil)
-    CFA::AugeasTreeValue.new(tree, "4.pool.ntp.org")
+    tree
   end
 
-  let(:record) do
-    CFA::NtpConf::Record.new(value:     "4.pool.ntp.org",
-                             tree_data: [{ key: "iburst", value: nil }])
+  let(:augeas_tree_value) do
+    CFA::AugeasTreeValue.new(augeas_options, "4.pool.ntp.org")
   end
 
-  let(:record_from_augeas) { CFA::NtpConf::Record.new_from_augeas(augeas) }
+  let(:augeas_element) do
+    {
+      key:   "server[]",
+      value: augeas_tree_value
+    }
+  end
 
-  context ".new_from_augeas" do
-    it "creates a record" do
-      expect(record_from_augeas).to be_a(CFA::NtpConf::Record)
+  subject(:record) { described_class.new_from_augeas(augeas_element) }
+
+  describe ".new_from_augeas" do
+    it "creates a record of the correct class" do
+      expect(record).to be_a(CFA::NtpConf::ServerRecord)
     end
 
     it "creates the record with correct data" do
-      expect(record_from_augeas).to eq(record)
+      expect(record.augeas).to eq(augeas_element)
     end
   end
 
-  context "#to_augeas" do
-    it "creates an AugeasTreeValue" do
-      expect(record.to_augeas).to be_a(CFA::AugeasTreeValue)
-    end
-
-    it "creates an augeas with correct value" do
-      expect(record.to_augeas.value).to eq(augeas.value)
-    end
-
-    it "creates an augeas with correct tree" do
-      expect(record.to_augeas.tree).to eq(augeas.tree)
-    end
-  end
-end
-
-describe CFA::NtpConf::AttributeRecord do
-  subject(:record) { described_class.new(value: value, comment: comment) }
-
-  let(:value) { "1" }
-
-  let(:comment) { "# is a requestkey" }
-
-  context "#initialize" do
-    it "allows to create an attribute with :value and :comment" do
-      expect { described_class.new(value: value, comment: comment) }.to_not raise_error
+  describe "#value" do
+    it "obtains the value of the record" do
+      expect(record.value).to eq(augeas_element[:value].value)
     end
   end
 
-  context "#value" do
-    it "obtains the value of the attribute" do
+  describe "#value=" do
+    it "sets the value of the record" do
+      value = "1.pool.ntp.org"
+      record.value = value
       expect(record.value).to eq(value)
     end
   end
 
-  context "#comment" do
-    it "obtains the comment of the attribute" do
+  describe "#comment" do
+    context "when the record has not comment" do
+      it "obtains nil" do
+        expect(record.comment).to eq(nil)
+      end
+    end
+
+    context "when the record has comment" do
+      let(:augeas_options) do
+        tree = CFA::AugeasTree.new
+        tree.add("#comment", "sample comment")
+        tree
+      end
+
+      it "obtains the comment" do
+        expect(record.comment).to eq("sample comment")
+      end
+    end
+  end
+
+  describe "#comment=" do
+    it "sets a comment to the record" do
+      comment = "sample comment"
+      record.comment = comment
       expect(record.comment).to eq(comment)
+    end
+  end
+
+  describe "#==" do
+    it "returns true for equal records" do
+      equal_record = described_class.new_from_augeas(augeas_element)
+      expect(record == equal_record).to be(true)
+    end
+
+    it "returns false for different records" do
+      different_record = CFA::NtpConf::Record.new(key: "server[]")
+      different_record.value = "10.10.10.10"
+      expect(record == different_record).to be(false)
+    end
+  end
+
+  describe "#type" do
+    it "obtains the type of the record" do
+      expect(record.type).to eq("server")
+    end
+  end
+
+  describe "#raw_options" do
+    it "obtains options as string" do
+      expect(record.raw_options).to eq("iburst")
+    end
+  end
+
+  describe "#raw_options=" do
+    it "sets options from a string" do
+      record.raw_options = "iburst prefer"
+      expect(record.options).to eq(["iburst", "prefer"])
     end
   end
 end
 
 describe CFA::NtpConf::CommandRecord do
-  subject(:record) { described_class.new(value: value, options: options, comment: comment) }
+  let(:augeas_element) do
+    tree = CFA::AugeasTree.new
+    tree.add("iburst", nil)
+    value = CFA::AugeasTreeValue.new(tree, "4.pool.ntp.org")
+    { key: "server[]", value: value }
+  end
 
-  let(:value) { "0.opensuse.pool.ntp.org" }
+  subject(:record) { described_class.new_from_augeas(augeas_element) }
 
-  let(:options) { ["iburst"] }
-
-  let(:comment) { "# is a server entry" }
-
-  context "#initialize" do
-    it "allows to create a command with :value, :options and :comment" do
-      expect do
-        described_class.new(value: value, options: options, comment: comment)
-      end.to_not raise_error
+  describe "#options" do
+    it "obtains the options of the record" do
+      expect(record.options).to eq(["iburst"])
     end
   end
 
-  context "#value" do
-    it "obtains the value of the command" do
-      expect(record.value).to eq(value)
+  describe "#options=" do
+    it "sets options to the record" do
+      record.options = ["iburst", "prefer"]
+      expect(record.options).to eq(["iburst", "prefer"])
+    end
+  end
+end
+
+describe CFA::NtpConf::FudgeRecord do
+  let(:augeas_element) do
+    tree = CFA::AugeasTree.new
+    tree.add("stratum", "10")
+    value = CFA::AugeasTreeValue.new(tree, "127.127.1.0")
+    { key: "fudge[]", value: value }
+  end
+
+  subject(:record) { described_class.new_from_augeas(augeas_element) }
+
+  describe "#options" do
+    it "obtains the options of the record" do
+      expect(record.options).to eq("stratum" => "10")
     end
   end
 
-  context "#options" do
-    it "obtains the options of the command" do
+  context "#options=" do
+    it "sets options to the record" do
+      options = { "stratum" => "11" }
+      record.options = options
       expect(record.options).to eq(options)
     end
   end
 
-  context "#comment" do
-    it "obtains the comment of the command" do
-      expect(record.comment).to eq(comment)
+  describe "#raw_options" do
+    it "obtains options as string" do
+      expect(record.raw_options).to eq("stratum 10")
+    end
+  end
+
+  describe "#raw_options=" do
+    it "sets options from a string" do
+      record.raw_options = "stratum 11"
+      expect(record.options).to eq("stratum" => "11")
     end
   end
 end
 
 describe CFA::NtpConf::RestrictRecord do
-  subject(:record) { described_class.new(value: value, actions: actions, comment: comment) }
+  let(:augeas_element) do
+    tree = CFA::AugeasTree.new
+    tree.add("action[]", "default")
+    value = CFA::AugeasTreeValue.new(tree, "127.127.1.0")
+    { key: "restrict[]", value: value }
+  end
 
-  let(:value) { "192.168.123.0" }
+  subject(:record) { described_class.new_from_augeas(augeas_element) }
 
-  let(:actions) { ["mask", "255.255.255.0", "notrust"] }
-
-  let(:comment) { "# is a restrict entry" }
-
-  context "#initialize" do
-    it "allows to create a restrict with :value, :actions and :comment" do
-      expect do
-        described_class.new(value: value, actions: actions, comment: comment)
-      end.to_not raise_error
+  describe "#options" do
+    it "obtains the options of the record" do
+      expect(record.options).to eq(["default"])
     end
   end
 
-  context "#value" do
-    it "obtains the value of the restrict" do
-      expect(record.value).to eq(value)
+  context "#options=" do
+    it "sets options to the record" do
+      options = ["default", "notrap"]
+      record.options = options
+      expect(record.options).to eq(options)
     end
   end
 
-  context "#actions" do
-    it "obtains the actions of the restrict" do
-      expect(record.actions).to eq(actions)
+  describe "#raw_options" do
+    it "obtains options as string" do
+      expect(record.raw_options).to eq("default")
     end
   end
 
-  context "#comment" do
-    it "obtains the comment of the restrict" do
-      expect(record.comment).to eq(comment)
+  describe "#raw_options=" do
+    it "sets options from a string" do
+      record.raw_options = "default notrap"
+      expect(record.options).to eq(["default", "notrap"])
     end
   end
 end
