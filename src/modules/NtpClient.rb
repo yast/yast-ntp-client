@@ -11,6 +11,7 @@
 # Input and output routines.
 require "yast"
 require "yaml"
+require "cfa/ntp_conf"
 
 module Yast
   class NtpClientClass < Module
@@ -32,6 +33,8 @@ module Yast
     # @see http://doc.ntp.org/4.1.0/confopt.htm
     # @see http://doc.ntp.org/4.1.0/clockopt.htm
     SYNC_RECORDS = ["server", "__clock", "peer", "broadcast", "broadcastclient"]
+
+    NTP_FILE = "/etc/ntp.conf".freeze
 
     def main
       Yast.import "UI"
@@ -135,6 +138,17 @@ module Yast
       @known_countries = {}
 
       @random_pool_servers = RANDOM_POOL_NTP_SERVERS
+
+      @deleted_records = []
+    end
+
+    def add_to_deleted_records(records)
+      records.each do |record|
+        cfa = record["cfa_record"]
+        cfa_fudge = record["cfa_fudge_record"]
+        @deleted_records << cfa if cfa
+        @deleted_records << cfa_fudge if cfa_fudge
+      end
     end
 
     def PolicyIsAuto
@@ -282,6 +296,38 @@ module Yast
       end
     end
 
+    def read_ntp_conf
+      if !File.exist?(NTP_FILE)
+        log.error("File #{NTP_FILE} does not exist")
+        return false
+      end
+
+      begin
+        @ntp_conf = CFA::NtpConf.new
+        @ntp_conf.load
+      rescue
+        log.error("Failed to read #{NTP_FILE}")
+        return false
+      end
+
+      load_ntp_records
+
+      log.info("Raw ntp conf #{@ntp_conf.raw}")
+      true
+    end
+
+    def load_ntp_records
+      @ntp_records = @ntp_conf.records.map do |record|
+        {
+          "type"       => record.type,
+          "address"    => record.value,
+          "options"    => record.raw_options,
+          "comment"    => record.comment.to_s,
+          "cfa_record" => record
+        }
+      end
+    end
+
     # Read and parse /etc.ntp.conf
     # @return true on success
     def ProcessNtpConf
@@ -290,42 +336,14 @@ module Yast
         return false
       end
 
-      conf = nil
-      conf = SCR.Read(path(".etc.ntp_conf.all")) if FileUtils.Exists("/etc/ntp.conf")
+      return false unless read_ntp_conf
 
-      if conf.nil?
-        log.error("Failed to read /etc/ntp.conf, either it doesn't exist or contains no data")
-        return false
-      end
-
-      log.info("Raw ntp conf #{conf}")
       @config_has_been_read = true
-      value = conf["value"] || []
-      index = -1
-      @ntp_records = Builtins.maplist(value) do |m|
-        index += 1
-        type = m["name"].to_s
-        address = Ops.get_string(m, "value", "")
-        options = ""
-        if ["server", "peer", "broadcast", "broadcastclient", "manycast",
-            "manycastclient", "fudge", "restrict"].include? type
-          l = Builtins.splitstring(address, " \t")
-          l = Builtins.filter(l) { |s| s != "" }
-          address = Ops.get(l, 0, "")
-          Ops.set(l, 0, "")
-          options = Builtins.mergestring(l, " ")
-        end
-        entry = {
-          "type"    => type,
-          "address" => address,
-          "options" => options,
-          "comment" => Ops.get_string(m, "comment", "")
-        }
-        deep_copy(entry)
-      end
+
       fudge_records = Builtins.filter(@ntp_records) do |m|
         Ops.get_string(m, "type", "") == "fudge"
       end
+
       fudge_map = Convert.convert(
         Builtins.listmap(fudge_records) do |m|
           key = Ops.get_string(m, "address", "")
@@ -360,6 +378,7 @@ module Yast
             String.CutBlanks(Builtins.mergestring(opts, " "))
           )
           Ops.set(value2, "comment", Ops.get_string(m, "comment", ""))
+          value2["cfa_record"] = m["cfa_record"]
           { key => value2 }
         end,
         from: "map <string, map>",
@@ -395,8 +414,11 @@ module Yast
                 ""
               )
             )
+            m["cfa_fudge_record"] = @ntp_conf.records.find do |record|
+              record.type == "fudge" && record.value == m["address"]
+            end
           end
-          deep_copy(m)
+          m
         end,
         from: "list <map>",
         to:   "list <map <string, any>>"
@@ -411,7 +433,7 @@ module Yast
             )
           Ops.set(p, "type", "__clock")
         end
-        deep_copy(p)
+        p
       end
 
       true
@@ -525,9 +547,10 @@ module Yast
     # Removes all servers contained in the random_pool_servers list
     # from the current configuration.
     def DeActivateRandomPoolServersFunction
-      @ntp_records.reject! do |record|
+      deleted_records, @ntp_records = @ntp_records.partition do |record|
         record["type"] == "server" && RANDOM_POOL_NTP_SERVERS.include?(record["address"])
       end
+      add_to_deleted_records(deleted_records)
 
       nil
     end
@@ -553,14 +576,10 @@ module Yast
       # remove all old ones
       DeActivateRandomPoolServersFunction()
 
-      @ntp_records = Builtins.filter(@ntp_records) do |one_record|
-        Ops.get_string(
-          # filter out all servers
-          one_record,
-          "type",
-          ""
-        ) != "server"
+      deleted_records, @ntp_records = @ntp_records.partition do |record|
+        record["type"] == "server"
       end
+      add_to_deleted_records(deleted_records)
 
       Builtins.foreach(@random_pool_servers) do |one_server|
         one_options = ""
@@ -579,8 +598,8 @@ module Yast
         @ntp_records <<
           {
             "address" => one_server,
-            "comment" => "\n# Random pool server, see http://www.pool.ntp.org/ " \
-                         "for more information\n",
+            "comment" => "# Random pool server, see http://www.pool.ntp.org/ " \
+                         "for more information",
             "options" => one_options,
             "type"    => "server"
           }
@@ -933,6 +952,7 @@ module Yast
         log.error("Record with index #{index} doesn't exist")
         return false
       end
+      add_to_deleted_records([@ntp_records[index]])
       @ntp_records.delete_at(index)
       @modified = true
     end
@@ -955,7 +975,7 @@ module Yast
       { "install" => @required_packages, "remove" => [] }
     end
 
-  private
+    private
 
     # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
     # /etc/sysconfig/network/config or with "auto" if not found
@@ -1062,22 +1082,37 @@ module Yast
       )
     end
 
+    def update_cfa_record(record)
+      cfa_record = record["cfa_record"]
+      cfa_record.value = record["address"]
+      cfa_record.raw_options = record["options"]
+      cfa_record.comment = record["comment"]
+    end
+
     # Write current /etc/ntp.conf with @ntp_records
     # @return [Boolean] true on success
     def write_ntp_conf
-      conf = SCR.Read(path(".etc.ntp_conf.all"))
+      records_for_write.each do |record|
+        unless record["cfa_record"]
+          record["cfa_record"] = CFA::NtpConf::Record.record_class(record["type"]).new
+          @ntp_conf.records.add(record["cfa_record"])
+        end
+        update_cfa_record(record)
+      end
 
-      return false if conf.nil?
+      @deleted_records.each do |cfa_record|
+        @ntp_conf.records.delete(cfa_record)
+      end
 
-      conf["value"] = records_for_write
+      begin
+        @ntp_conf.save
+      rescue
+        return false
+      end
 
-      return false if !SCR.Write(path(".etc.ntp_conf.all"), conf)
+      FileChanges.StoreFileCheckSum(NTP_FILE)
 
-      ret = SCR.Write(path(".etc.ntp_conf"), nil)
-
-      FileChanges.StoreFileCheckSum("/etc/ntp.conf")
-
-      ret
+      true
     end
 
     # Writes /etc/sysconfig/network/config NETCONFIG_NTP_POLICY
@@ -1160,25 +1195,25 @@ module Yast
       end
     end
 
-    def record_to_h(record)
+    def record_for_write(record)
       {
-        "comment" => record["comment"].to_s,
-        "kind"    => "value",
-        "name"    => record["type"] == "__clock" ? "server" : record["type"],
-        "type"    => 0,
-        "value"   => "#{record["address"]} #{record["options"]}".strip
+        "type"       => record["type"] == "__clock" ? "server" : record["type"],
+        "address"    => record["address"],
+        "options"    => record["options"].to_s.strip,
+        "comment"    => record["comment"].to_s,
+        "cfa_record" => record["cfa_record"]
       }
     end
 
     # Parse fudge options of given record and returns a new fudge record for
     # write
-    def fudge_options_to_h(record)
+    def fudge_options_for_write(record)
       {
-        "comment" => record["fudge_comment"].to_s,
-        "kind"    => "value",
-        "name"    => "fudge",
-        "type"    => 0,
-        "value"   => "#{record["address"]} #{record["fudge_options"]}".strip
+        "type"       => "fudge",
+        "address"    => record["address"],
+        "options"    => record["fudge_options"].to_s.strip,
+        "comment"    => record["fudge_comment"].to_s,
+        "cfa_record" => record["cfa_fudge_record"]
       }
     end
 
@@ -1189,10 +1224,11 @@ module Yast
         options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
         options << m["options"].to_s
         {
-          "address" => key,
-          "comment" => m["comment"].to_s,
-          "type"    => "restrict",
-          "options" => options
+          "type"       => "restrict",
+          "address"    => key,
+          "comment"    => m["comment"].to_s,
+          "options"    => options,
+          "cfa_record" => m["cfa_record"]
         }
       end
     end
@@ -1201,8 +1237,8 @@ module Yast
     # of __clock records in their own hashes.
     def records_for_write
       @ntp_records.each_with_object([]) do |record, ret|
-        ret << record_to_h(record)
-        ret << fudge_options_to_h(record) if record["type"] == "__clock"
+        ret << record_for_write(record)
+        ret << fudge_options_for_write(record) if record["type"] == "__clock"
       end
     end
 

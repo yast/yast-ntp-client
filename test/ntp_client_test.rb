@@ -1,6 +1,7 @@
 require_relative "test_helper"
 
 require "fileutils"
+require "cfa/memory_file"
 
 Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
@@ -10,6 +11,15 @@ Yast.import "Service"
 describe Yast::NtpClient do
 
   subject { Yast::NtpClient }
+
+  let(:ntp_file_path) do
+    File.expand_path("../data/scr_root_read/etc/ntp.conf", __FILE__)
+  end
+
+  let(:ntp_conf) do
+    file_handler = CFA::MemoryFile.new(File.read(ntp_file_path))
+    CFA::NtpConf.new(file_handler: file_handler)
+  end
 
   describe "#Read" do
     let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
@@ -282,13 +292,8 @@ describe Yast::NtpClient do
   end
 
   describe "#DeActivateRandomPoolServersFunction" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
-
     it "removes random pool ntp servers from @ntp_records" do
+      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
@@ -513,16 +518,12 @@ describe Yast::NtpClient do
   end
 
   describe "#GetUsedNtpServers" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
     let(:used_ntp_servers) do
       ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"]
     end
 
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
-
     it "returns a list of NTP servers used in the current configuration" do
+      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
@@ -548,13 +549,8 @@ describe Yast::NtpClient do
   end
 
   describe "#selectSyncRecord" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
-
     before do
+      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
     end
@@ -602,15 +598,14 @@ describe Yast::NtpClient do
       end
 
       it "sets selected_index as given value" do
-        subject.selectSyncRecord(10)
-
-        expect(subject.selected_index).to eql(10)
+        subject.selectSyncRecord(3)
+        expect(subject.selected_index).to eql(3)
       end
 
       it "sets selected_record as the ntp_records entry for given index" do
-        subject.selectSyncRecord(9)
-
-        expect(subject.selected_record).to eql(selected_record)
+        subject.selectSyncRecord(3)
+        record = subject.selected_record.reject { |k| k == "cfa_record" }
+        expect(record).to eql(selected_record)
       end
 
       it "returns true" do
@@ -620,17 +615,12 @@ describe Yast::NtpClient do
   end
 
   describe "#deleteSyncRecord" do
-    let(:record) do
-      { "type" => "server", "address" => "3.pool.ntp.org", "options" => "", "comment" => "" }
-    end
-
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
+    let(:deleted_record) do
+      { "type" => "server", "address" => "0.pool.ntp.org", "options" => "", "comment" => "" }
     end
 
     before do
+      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
     end
@@ -646,49 +636,33 @@ describe Yast::NtpClient do
 
     it "sets modified as true if deleted record" do
       subject.modified = false
-
       subject.deleteSyncRecord(3)
-
       expect(subject.modified).to eql(true)
     end
 
     it "removes record entry from ntp records at given index position" do
-      subject.selectSyncRecord(9)
-      expect(subject.selected_record).to eql(record)
-      expect(subject.ntp_records.size).to eql(12)
+      expect(subject.deleteSyncRecord(0)).to eql(true)
 
-      expect(subject.deleteSyncRecord(9)).to eql(true)
-
-      subject.selectSyncRecord(9)
-      expect(subject.selected_record).not_to eql(record)
-      expect(subject.ntp_records.size).to eql(11)
+      subject.selectSyncRecord(0)
+      record = subject.selected_record.reject { |k| k == "cfa_record" }
+      expect(record).not_to eql(deleted_record)
+      expect(subject.ntp_records.size).to eql(5)
     end
-
   end
 
   describe "#ProcessNtpConf" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
-        File.join(data_dir, "scr_root/etc/ntp.conf"))
-      change_scr_root(File.join(data_dir, "scr_root"), &example)
-      ::FileUtils.rm(File.join(data_dir, "scr_root/etc/ntp.conf"))
-    end
-
     before do
+      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
     end
 
     it "returns false if config has been read previously" do
       subject.instance_variable_set(:@config_has_been_read, true)
-
       expect(subject.ProcessNtpConf).to eql(false)
     end
 
     it "returns false if config doesn't exist" do
-      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(false)
-
+      allow(File).to receive(:exist?).and_return(false)
       expect(subject.ProcessNtpConf).to eql(false)
     end
 
@@ -700,13 +674,11 @@ describe Yast::NtpClient do
     # FIXME: Add fudge entries to test
     it "initializes ntp records excluding restrict and fudge entries" do
       expect(subject.ntp_records.map { |r| r["type"] }).not_to include("restrict")
-
       subject.ProcessNtpConf
     end
 
     it "initializes restrict records" do
       expect(subject.restrict_map.size).to eql(4)
-
       subject.ProcessNtpConf
     end
   end
