@@ -1095,7 +1095,7 @@ module Yast
       records_for_write.each do |record|
         unless record["cfa_record"]
           record["cfa_record"] = CFA::NtpConf::Record.record_class(record["type"]).new
-          @ntp_conf.records.add(record["cfa_record"])
+          @ntp_conf.records << record["cfa_record"]
         end
         update_cfa_record(record)
       end
