@@ -67,7 +67,7 @@ module CFA
     # are added.
     def load
       super
-      fix_keys
+      fix_keys(data)
     end
 
     # Obtains a collection that represents the
@@ -90,20 +90,12 @@ module CFA
 
   private
 
-    def fix_keys
-      fix_collection_keys(data.data)
-      data.data.each do |entry|
-        if entry[:value].is_a?(AugeasTreeValue)
-          fix_collection_keys(entry[:value].tree.data)
-        end
-      end
-    end
-
-    def fix_collection_keys(entries)
-      entries.each do |entry|
+    def fix_keys(tree)
+      tree.data.each do |entry|
         if COLLECTION_KEYS.include?(entry[:key])
-          entry[:key] += "[]" unless entry[:key] =~ /.*\[\]$/
+          entry[:key] << "[]" unless entry[:key].end_with?("[]")
         end
+        fix_keys(entry[:value].tree) if entry[:value].is_a?(AugeasTreeValue)
       end
     end
 
@@ -119,27 +111,27 @@ module CFA
       end
 
       def each
-        record_entries.each do |augeas_element|
-          yield Record.new_from_augeas(augeas_element)
+        record_entries.each do |record|
+          yield record
         end
       end
 
       # Adds a new Record object to the collection.
       # @param [Record] record
-      def add(record)
+      def <<(record)
         @augeas_tree.data << record.augeas
+        reset_cache
       end
-
-      alias_method :<<, :add
 
       # Removes a Record object from the collection.
       # @param [Record] record
       def delete(record)
-        matcher = Matcher.new do |k, v|
-          k == record.augeas[:key] &&
-            v == record.augeas[:value]
-        end
+        matcher = Matcher.new(
+          key:           record.augeas[:key],
+          value_matcher: record.augeas[:value]
+        )
         @augeas_tree.delete(matcher)
+        reset_cache
       end
 
       def delete_if(&block)
@@ -157,11 +149,18 @@ module CFA
 
     private
 
+      def reset_cache
+        @record_entries = nil
+      end
+
       def record_entries
+        return @record_entries if @record_entries
         matcher = Matcher.new do |k, _v|
           RECORD_ENTRIES.include?(k.gsub("[]", ""))
         end
-        @augeas_tree.select(matcher)
+        @record_entries = @augeas_tree.select(matcher).map do |e|
+          Record.new_from_augeas(e)
+        end
       end
     end
 
@@ -169,7 +168,8 @@ module CFA
     #
     # This class is an AugeasElement wrapper. A Record
     # has a value, and could also contains a comment and
-    # options. Its contain is stored in an AugeasElement.
+    # options. All its modifications are directly saved
+    # into augeas tree.
     #
     # Each ntp entry type has different interpretation
     # for its options in the AugeasElement. For each one,
@@ -179,24 +179,23 @@ module CFA
       # to its AugeasElement key.
       # @param [String] key
       def self.new_from_augeas(augeas_entry)
-        record = record_class(augeas_entry[:key]).new
-        record.augeas = augeas_entry
-        record
+        record_class(augeas_entry[:key]).new(augeas_entry)
       end
 
       # Returns the corresponding subclass
       # @param [string] key
       def self.record_class(key)
         entry_type = key.gsub("[]", "")
-        record_class = ["::CFA::NtpConf::", entry_type.capitalize, "Record"].join
+        record_class = "::CFA::NtpConf::#{entry_type.capitalize}Record"
         Kernel.const_get(record_class)
       end
 
-      def initialize(key = nil)
-        @augeas = { key: key, value: nil }
+      def initialize(augeas = nil)
+        augeas ||= create_augeas
+        @augeas = augeas
       end
 
-      attr_accessor :augeas
+      attr_reader :augeas
 
       def value
         tree_value? ? tree_value.value : @augeas[:value]
@@ -212,27 +211,38 @@ module CFA
 
       def comment
         return nil unless tree_value?
-        tree_value.tree["#comment"]
+        tree_value.tree["#comment[]"]
       end
 
       def comment=(comment)
-        create_tree_value unless tree_value?
+        ensure_tree_value
         if comment.to_s == ""
-          tree_value.tree.delete("#comment")
+          tree_value.tree.delete("#comment[]")
         else
-          tree_value.tree["#comment"] = comment
+          tree_value.tree["#comment[]"] = comment
         end
       end
 
+      def options
+        raise NotImplementedError,
+          "Subclasses of #{Module.nesting.first} must override #{__method__}"
+      end
+
+      def options=(_options)
+        raise NotImplementedError,
+          "Subclasses of #{Module.nesting.first} must override #{__method__}"
+      end
+
       def ==(other)
-        other.class == self.class &&
-          other.augeas == augeas
+        [:class, :augeas].all? do |a|
+          public_send(a) == other.public_send(a)
+        end
       end
 
       alias_method :eql?, :==
 
       def type
-        augeas[:key].gsub("[]", "")
+        @augeas[:key].gsub("[]", "")
       end
 
       # Returns an String representing the options
@@ -247,16 +257,24 @@ module CFA
 
     private
 
+      def create_augeas
+        raise NotImplementedError,
+          "Subclasses of #{Module.nesting.first} must override #{__method__}"
+      end
+
       def tree_value?
         @augeas[:value].is_a?(AugeasTreeValue)
       end
 
       def tree_value
-        tree_value? ? @augeas[:value] : nil
+        @augeas[:value]
       end
 
-      def create_tree_value
-        @augeas[:value] = AugeasTreeValue.new(AugeasTree.new, @augeas[:value])
+      def ensure_tree_value
+        @augeas[:value] = AugeasTreeValue.new(
+          AugeasTree.new,
+          @augeas[:value]
+        ) unless tree_value?
       end
 
       def split_raw_options(raw_options)
@@ -281,7 +299,7 @@ module CFA
       end
 
       def options=(options)
-        create_tree_value unless tree_value?
+        ensure_tree_value
         tree_value.tree.delete(options_matcher)
         options.each { |option| tree_value.tree.add(option, nil) }
       end
@@ -291,8 +309,8 @@ module CFA
     # For example:
     #   server 0.opensuse.pool.ntp.org iburst
     class ServerRecord < CommandRecord
-      def initialize
-        super("server[]")
+      def create_augeas
+        { key: "server[]", value: nil }
       end
     end
 
@@ -300,8 +318,8 @@ module CFA
     # For example:
     #   peer 128.100.0.45
     class PeerRecord < CommandRecord
-      def initialize
-        super("peer[]")
+      def create_augeas
+        { key: "peer[]", value: nil }
       end
     end
 
@@ -309,15 +327,15 @@ module CFA
     # For example:
     #   broadcast 128.100.0.45
     class BroadcastRecord < CommandRecord
-      def initialize
-        super("broadcast[]")
+      def create_augeas
+        { key: "broadcast[]", value: nil }
       end
     end
 
     # class to represent a ntp broadcastclient entry.
     class BroadcastclientRecord < CommandRecord
-      def initialize
-        super("broadcastclient[]")
+      def create_augeas
+        { key: "broadcastclient[]", value: nil }
       end
     end
 
@@ -328,8 +346,8 @@ module CFA
     #
     # Fudge entry has its own options interpretation.
     class FudgeRecord < CommandRecord
-      def initialize
-        super("fudge[]")
+      def create_augeas
+        { key: "fudge[]", value: nil }
       end
 
       def options
@@ -340,7 +358,7 @@ module CFA
       end
 
       def options=(options)
-        create_tree_value unless tree_value?
+        ensure_tree_value
         tree_value.tree.delete(options_matcher)
         options.each { |k, v| tree_value.tree.add(k, v) }
       end
@@ -362,8 +380,8 @@ module CFA
     #
     # Restrict entry has its own options interpretation.
     class RestrictRecord < Record
-      def initialize
-        super("restrict[]")
+      def create_augeas
+        { key: "restrict[]", value: nil }
       end
 
       def options
@@ -372,7 +390,7 @@ module CFA
       end
 
       def options=(options)
-        create_tree_value unless tree_value?
+        ensure_tree_value
         tree_value.tree.delete(options_matcher)
         options.each { |option| tree_value.tree.add("action[]", option) }
       end
