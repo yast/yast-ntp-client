@@ -7,6 +7,24 @@ module CFA
   # with file. It uses CFA framework and Augeas parser.
   # @see http://www.rubydoc.info/github/config-files-api/config_files_api/CFA/BaseModel
   # @see http://www.rubydoc.info/github/config-files-api/config_files_api/CFA/AugeasParser
+  #
+  # In NTP files some keys can be present multiple times.
+  #
+  # For example:
+  #
+  # server 1.pool.ntp.org iburst
+  # server 2.pool.ntp.org
+  # server 127.127.1.0
+  # fudge 127.127.1.0 stratum 10
+  # peer 128.100.0.45
+  # peer 192.168.1.30
+  #
+  # Order of lines is not important, except for the
+  # fudge option that should immediately follow
+  # appropriate "server" option.
+  #
+  # Important keys (that are to be read and written) are
+  # server, peer, fudge, broadcast and broadcastclient.
   class NtpConf < ::CFA::BaseModel
     PARSER = CFA::AugeasParser.new("ntp.lns")
 
@@ -29,15 +47,43 @@ module CFA
       super(PARSER, PATH, file_handler: file_handler)
     end
 
+    # Loads and fixes AugeasElement keys.
+    #
+    # AugeasParser returns collection entries with
+    # key ending in '[]', for example 'server[]'.
+    #
+    # If only exists one entry of the collection, parser
+    # return key without '[]'.
+    #
+    # For example:
+    #
+    # server 1.pool.ntp.org iburst
+    # server 2.pool.ntp.org
+    # peer 128.100.0.45
+    #
+    # In this case, key for peer entry is 'peer'.
+    # It is necessary to add '[]' to avoid possible
+    # write issues when more entries of that type
+    # are added.
     def load
       super
       fix_keys
     end
 
+    # Obtains a collection that represents the
+    # entries of the file.
+    # @return [CollectionRecord] collection to
+    #   manipulate ntp entries.
+    #
+    # The collection preserves the order of the
+    # ntp entries in the file and only contains the
+    # entries of interest (see RECORD_ENTRIES).
     def records
       RecordCollection.new(data)
     end
 
+    # Obtains raw content of the file.
+    # @return [String]
     def raw
       PARSER.serialize(data)
     end
@@ -61,7 +107,10 @@ module CFA
       end
     end
 
-    # class to manage ntp entries
+    # class to manage ntp entries as a collection.
+    #
+    # Each element of the collection is a subclass of Record.
+    # A Record object is a wrapper of an AugeasElement.
     class RecordCollection
       include Enumerable
 
@@ -75,12 +124,16 @@ module CFA
         end
       end
 
+      # Adds a new Record object to the collection.
+      # @param [Record] record
       def add(record)
         @augeas_tree.data << record.augeas
       end
 
       alias_method :<<, :add
 
+      # Removes a Record object from the collection.
+      # @param [Record] record
       def delete(record)
         matcher = Matcher.new do |k, v|
           k == record.augeas[:key] &&
@@ -113,17 +166,30 @@ module CFA
     end
 
     # Base class to represent a general ntp entry.
+    #
+    # This class is an AugeasElement wrapper. A Record
+    # has a value, and could also contains a comment and
+    # options. Its contain is stored in an AugeasElement.
+    #
+    # Each ntp entry type has different interpretation
+    # for its options in the AugeasElement. For each one,
+    # a Record subclass is created.
     class Record
-      def self.record_class(key)
-        entry_type = key.gsub("[]", "")
-        record_class = ["::CFA::NtpConf::", entry_type.capitalize, "Record"].join
-        Kernel.const_get(record_class)
-      end
-
+      # Creates the corresponding subclass object according
+      # to its AugeasElement key.
+      # @param [String] key
       def self.new_from_augeas(augeas_entry)
         record = record_class(augeas_entry[:key]).new
         record.augeas = augeas_entry
         record
+      end
+
+      # Returns the corresponding subclass
+      # @param [string] key
+      def self.record_class(key)
+        entry_type = key.gsub("[]", "")
+        record_class = ["::CFA::NtpConf::", entry_type.capitalize, "Record"].join
+        Kernel.const_get(record_class)
       end
 
       def initialize(key = nil)
@@ -169,10 +235,12 @@ module CFA
         augeas[:key].gsub("[]", "")
       end
 
+      # Returns an String representing the options
       def raw_options
         options.join(" ")
       end
 
+      # Sets options from a String
       def raw_options=(raw_options)
         self.options = split_raw_options(raw_options)
       end
@@ -204,8 +272,8 @@ module CFA
       end
     end
 
-    # Base class to represent a ntp command entry, as
-    # server, peer, broadcast, etc.
+    # class to represent a ntp command record entry. There is a
+    # subclass for server, peer, broadcast and broacastclient.
     class CommandRecord < Record
       def options
         return [] unless tree_value?
@@ -220,8 +288,8 @@ module CFA
     end
 
     # class to represent a ntp server entry.
-    #   For example:
-    #     server 0.opensuse.pool.ntp.org iburst
+    # For example:
+    #   server 0.opensuse.pool.ntp.org iburst
     class ServerRecord < CommandRecord
       def initialize
         super("server[]")
@@ -229,8 +297,8 @@ module CFA
     end
 
     # class to represent a ntp peer entry.
-    #   For example:
-    #     peer 128.100.0.45
+    # For example:
+    #   peer 128.100.0.45
     class PeerRecord < CommandRecord
       def initialize
         super("peer[]")
@@ -238,8 +306,8 @@ module CFA
     end
 
     # class to represent a ntp broadcast entry.
-    #   For example:
-    #     broadcast 128.100.0.45
+    # For example:
+    #   broadcast 128.100.0.45
     class BroadcastRecord < CommandRecord
       def initialize
         super("broadcast[]")
@@ -254,8 +322,11 @@ module CFA
     end
 
     # class to represent a ntp fudge entry.
-    #   For example:
-    #     fudge  127.127.1.0 stratum 10
+    #
+    # For example:
+    #   fudge  127.127.1.0 stratum 10
+    #
+    # Fudge entry has its own options interpretation.
     class FudgeRecord < CommandRecord
       def initialize
         super("fudge[]")
@@ -285,8 +356,11 @@ module CFA
     end
 
     # class to represent a ntp restrict entry.
-    #   For example:
-    #     restrict -4 default notrap nomodify nopeer noquery
+    #
+    # For example:
+    #   restrict -4 default notrap nomodify nopeer noquery
+    #
+    # Restrict entry has its own options interpretation.
     class RestrictRecord < Record
       def initialize
         super("restrict[]")
