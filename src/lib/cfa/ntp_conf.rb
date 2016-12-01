@@ -88,7 +88,7 @@ module CFA
       PARSER.serialize(data)
     end
 
-    private
+  private
 
     def fix_keys
       fix_collection_keys(data.data)
@@ -155,7 +155,7 @@ module CFA
         other.to_a == to_a
       end
 
-      private
+    private
 
       def record_entries
         matcher = Matcher.new do |k, _v|
@@ -245,7 +245,7 @@ module CFA
         self.options = split_raw_options(raw_options)
       end
 
-      private
+    private
 
       def tree_value?
         @augeas[:value].is_a?(AugeasTreeValue)
@@ -377,7 +377,7 @@ module CFA
         options.each { |option| tree_value.tree.add("action[]", option) }
       end
 
-      private
+    private
 
       def options_matcher
         Matcher.new { |k, _v| k.include?("action") }

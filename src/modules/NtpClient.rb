@@ -975,7 +975,7 @@ module Yast
       { "install" => @required_packages, "remove" => [] }
     end
 
-    private
+  private
 
     # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
     # /etc/sysconfig/network/config or with "auto" if not found
