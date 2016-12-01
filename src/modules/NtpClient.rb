@@ -305,8 +305,8 @@ module Yast
       begin
         @ntp_conf = CFA::NtpConf.new
         @ntp_conf.load
-      rescue
-        log.error("Failed to read #{NTP_FILE}")
+      rescue StandardError => e
+        log.error("Failed to read #{NTP_FILE}: #{e.message}")
         return false
       end
 
