@@ -539,6 +539,7 @@ describe Yast::NtpClient do
     end
 
     it "returns a map's list with current synchronization related entries with index" do
+      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
