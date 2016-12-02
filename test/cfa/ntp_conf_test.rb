@@ -113,7 +113,6 @@ describe CFA::NtpConf::RecordCollection do
     context "when does not exist the record to add" do
       it "adds the record" do
         ntp.records << new_record
-        expect(ntp.records.include?(new_record)).to be(true)
         expect(ntp.records.count(new_record)).to eq(1)
       end
     end

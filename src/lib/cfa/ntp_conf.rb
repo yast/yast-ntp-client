@@ -41,7 +41,7 @@ module CFA
       restrict
     ).freeze
 
-    COLLECTION_KEYS = (RECORD_ENTRIES + %w(#comment action)).freeze
+    COLLECTION_KEYS = (RECORD_ENTRIES + ["action"]).freeze
 
     def initialize(file_handler: nil)
       super(PARSER, PATH, file_handler: file_handler)
@@ -92,9 +92,7 @@ module CFA
 
     def fix_keys(tree)
       tree.data.each do |entry|
-        if COLLECTION_KEYS.include?(entry[:key])
-          entry[:key] << "[]" unless entry[:key].end_with?("[]")
-        end
+        entry[:key] << "[]" if COLLECTION_KEYS.include?(entry[:key])
         fix_keys(entry[:value].tree) if entry[:value].is_a?(AugeasTreeValue)
       end
     end
@@ -110,10 +108,8 @@ module CFA
         @augeas_tree = augeas_tree
       end
 
-      def each
-        record_entries.each do |record|
-          yield record
-        end
+      def each(&block)
+        record_entries.each(&block)
       end
 
       # Adds a new Record object to the collection.
@@ -211,15 +207,17 @@ module CFA
 
       def comment
         return nil unless tree_value?
-        tree_value.tree["#comment[]"]
+        tree_value.tree["#comment"]
       end
 
+      # Comment is saved literally, so be sure that
+      # it is prepended by '#'
       def comment=(comment)
         ensure_tree_value
         if comment.to_s == ""
-          tree_value.tree.delete("#comment[]")
+          tree_value.tree.delete("#comment")
         else
-          tree_value.tree["#comment[]"] = comment
+          tree_value.tree["#comment"] = comment
         end
       end
 
@@ -255,11 +253,10 @@ module CFA
         self.options = split_raw_options(raw_options)
       end
 
-    private
+    protected
 
       def create_augeas
-        raise NotImplementedError,
-          "Subclasses of #{Module.nesting.first} must override #{__method__}"
+        { key: self.class.const_get("AUGEAS_KEY"), value: nil }
       end
 
       def tree_value?
@@ -309,34 +306,26 @@ module CFA
     # For example:
     #   server 0.opensuse.pool.ntp.org iburst
     class ServerRecord < CommandRecord
-      def create_augeas
-        { key: "server[]", value: nil }
-      end
+      AUGEAS_KEY = "server[]"
     end
 
     # class to represent a ntp peer entry.
     # For example:
     #   peer 128.100.0.45
     class PeerRecord < CommandRecord
-      def create_augeas
-        { key: "peer[]", value: nil }
-      end
+      AUGEAS_KEY = "peer[]"
     end
 
     # class to represent a ntp broadcast entry.
     # For example:
     #   broadcast 128.100.0.45
     class BroadcastRecord < CommandRecord
-      def create_augeas
-        { key: "broadcast[]", value: nil }
-      end
+      AUGEAS_KEY = "broadcast[]"
     end
 
     # class to represent a ntp broadcastclient entry.
     class BroadcastclientRecord < CommandRecord
-      def create_augeas
-        { key: "broadcastclient[]", value: nil }
-      end
+      AUGEAS_KEY = "broadcastclient[]"
     end
 
     # class to represent a ntp fudge entry.
@@ -346,9 +335,7 @@ module CFA
     #
     # Fudge entry has its own options interpretation.
     class FudgeRecord < CommandRecord
-      def create_augeas
-        { key: "fudge[]", value: nil }
-      end
+      AUGEAS_KEY = "fudge[]"
 
       def options
         return {} unless tree_value?
@@ -380,9 +367,7 @@ module CFA
     #
     # Restrict entry has its own options interpretation.
     class RestrictRecord < Record
-      def create_augeas
-        { key: "restrict[]", value: nil }
-      end
+      AUGEAS_KEY = "restrict[]"
 
       def options
         return [] unless tree_value?
