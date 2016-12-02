@@ -119,7 +119,8 @@ module CFA
         @augeas_tree = augeas_tree
       end
 
-      # Iterates the elements of the collection.
+      # Iterates the elements of the collection (@see Array#each).
+      # @yield [Record] gives a record of the collection
       def each(&block)
         record_entries.each(&block)
       end
@@ -143,6 +144,7 @@ module CFA
       end
 
       # Removes all records that satisfy a condition.
+      # @yield [Record] gives a record of the collection
       def delete_if(&block)
         records = select(&block)
         records.each { |record| delete(record) }
