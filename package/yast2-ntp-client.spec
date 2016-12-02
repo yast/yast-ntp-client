@@ -31,6 +31,8 @@ BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
+BuildRequires:  augeas-lenses
+BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.4.2
 
 #SLPAPI.pm 
 # Hostname::CurrentDomain
@@ -38,6 +40,8 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 Requires:       yast2 >= 3.1.11
 Requires:       yast2-country-data
 Requires:       yast2-ruby-bindings >= 1.0.0
+Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.4.2
+Requires:       augeas-lenses
 BuildArch:      noarch
 # New sntp command line syntax
 Conflicts:      ntp < 4.2.8
