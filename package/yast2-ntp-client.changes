@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec  2 14:37:28 UTC 2016 - joseivanlopez@gmail.com
+
+- Updated client to read/write NTP configuration using CFA
+  (bsc#983486 and bsc#929694)
+- 3.2.1 
+
+-------------------------------------------------------------------
 Tue Oct 18 13:53:24 UTC 2016 - jreidinger@suse.com
 
 - properly report that test failed if server without running ntp is
