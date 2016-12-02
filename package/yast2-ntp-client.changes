@@ -3,7 +3,14 @@ Fri Dec  2 14:37:28 UTC 2016 - joseivanlopez@gmail.com
 
 - Updated client to read/write NTP configuration using CFA
   (bsc#983486 and bsc#929694)
-- 3.2.1 
+- 3.2.2 
+
+-------------------------------------------------------------------
+Fri Nov 25 16:44:58 UTC 2016 - igonzalezsosa@suse.com
+
+- Remove warning message from a wrong widget definition 
+  (bsc#1012185)
+- 3.2.1
 
 -------------------------------------------------------------------
 Tue Oct 18 13:53:24 UTC 2016 - jreidinger@suse.com
