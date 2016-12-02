@@ -83,3 +83,7 @@ Style/MethodName:
 Style/VariableName:
   Include:
     - 'src/lib/**/*.rb' # force known variables only for new code
+
+# method_alias is safer and more predictable
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
