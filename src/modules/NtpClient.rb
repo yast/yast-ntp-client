@@ -297,7 +297,7 @@ module Yast
     end
 
     def read_ntp_conf
-      if !File.exist?(NTP_FILE)
+      if !FileUtils.Exists(NTP_FILE)
         log.error("File #{NTP_FILE} does not exist")
         return false
       end

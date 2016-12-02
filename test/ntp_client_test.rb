@@ -663,7 +663,7 @@ describe Yast::NtpClient do
     end
 
     it "returns false if config doesn't exist" do
-      allow(File).to receive(:exist?).and_return(false)
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(false)
       expect(subject.ProcessNtpConf).to eql(false)
     end
 
