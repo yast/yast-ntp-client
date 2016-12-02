@@ -99,8 +99,19 @@ module CFA
 
     # class to manage ntp entries as a collection.
     #
-    # Each element of the collection is a subclass of Record.
-    # A Record object is a wrapper of an AugeasElement.
+    # The collection preserves the order of the
+    # ntp entries in the file and only contains the
+    # entries of interest (see RECORD_ENTRIES).
+    #
+    # For example:
+    #
+    # server 1.pool.ntp.org iburst
+    # server 2.pool.ntp.org
+    # peer 128.100.0.45
+    #
+    # The collection contents a derived Record class
+    # object for each line. In this case, two
+    # ServerRecord and a PeerRecord.
     class RecordCollection
       include Enumerable
 
@@ -108,6 +119,7 @@ module CFA
         @augeas_tree = augeas_tree
       end
 
+      # Iterates the elements of the collection.
       def each(&block)
         record_entries.each(&block)
       end
@@ -130,6 +142,7 @@ module CFA
         reset_cache
       end
 
+      # Removes all records that satisfy a condition.
       def delete_if(&block)
         records = select(&block)
         records.each { |record| delete(record) }
