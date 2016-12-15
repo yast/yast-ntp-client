@@ -359,13 +359,13 @@ describe CFA::NtpConf::RestrictRecord do
 
   describe "#options" do
     it "obtains the options of the record" do
-      expect(record.options).to eq(%w(default notrap nomodify nopeer))
+      expect(record.options).to eq(%w(notrap nomodify nopeer))
     end
   end
 
   context "#options=" do
     it "sets options to the record" do
-      options = ["default", "notrap"]
+      options = ["notrap"]
       record.options = options
       expect(record.options).to eq(options)
       ntp.save
@@ -375,14 +375,14 @@ describe CFA::NtpConf::RestrictRecord do
 
   describe "#raw_options" do
     it "obtains options as string" do
-      expect(record.raw_options).to eq("default notrap nomodify nopeer")
+      expect(record.raw_options).to eq("notrap nomodify nopeer")
     end
   end
 
   describe "#raw_options=" do
     it "sets options from a string" do
-      record.raw_options = "default notrap"
-      expect(record.options).to eq(["default", "notrap"])
+      record.raw_options = "notrap"
+      expect(record.options).to eq(["notrap"])
       ntp.save
       expect(file.content).to include("restrict -4 default notrap\n")
     end
