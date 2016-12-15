@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.2.2
+Version:        3.2.3
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -65,7 +65,7 @@ rake install DESTDIR="%{buildroot}"
 %files
 %defattr(-,root,root)
 %dir %{yast_yncludedir}/ntp-client
-%{yast_dir}/clients/*
+%{yast_clientdir}/*
 %{yast_dir}/lib
 %{yast_yncludedir}/ntp-client/*
 %{yast_scrconfdir}/cfg_ntp.scr
