@@ -294,6 +294,7 @@ describe Yast::NtpClient do
   describe "#DeActivateRandomPoolServersFunction" do
     it "removes random pool ntp servers from @ntp_records" do
       allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
@@ -523,6 +524,7 @@ describe Yast::NtpClient do
     end
 
     it "returns a list of NTP servers used in the current configuration" do
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
       allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
@@ -621,6 +623,7 @@ describe Yast::NtpClient do
     end
 
     before do
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
       allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
       load_records
@@ -655,6 +658,7 @@ describe Yast::NtpClient do
     before do
       allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
       subject.instance_variable_set(:@config_has_been_read, false)
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
     end
 
     it "returns false if config has been read previously" do
@@ -679,7 +683,7 @@ describe Yast::NtpClient do
     end
 
     it "initializes restrict records" do
-      expect(subject.restrict_map.size).to eql(4)
+      expect(subject.restrict_map.size).to eql(3)
       subject.ProcessNtpConf
     end
   end
