@@ -26,7 +26,7 @@ describe Yast::NtpClient do
     FIXTURES_PATH = File.join(File.dirname(__FILE__), "fixtures")
 
     let(:ntp_client_section) do
-      file = File.join(FIXTURES_PATH, 'autoyast', profile_name)
+      file = File.join(FIXTURES_PATH, "autoyast", profile_name)
       Yast::Profile.ReadXML(file)
       Yast::Profile.current["ntp-client"]
     end
