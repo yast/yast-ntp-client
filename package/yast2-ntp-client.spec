@@ -29,7 +29,7 @@ BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 3.1.11
 BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
-BuildRequires:  autoyast2
+BuildRequires:  autoyast2-installation
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  augeas-lenses
