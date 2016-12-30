@@ -697,14 +697,16 @@ module Yast
       # restrict_map is a map with the key ip,ipv4-tag or ipv6-tag.
       # This will be converted into a list in order to use it in
       # autoyast XML file properly.
-      restricts = deep_copy(@restrict_map)
-      restricts = restricts.collect do |target, values|
-        values["target"] = target
-        values.delete("cfa_record") # not needed for export
-        values
+
+      restricts = @restrict_map.collect do |target, values|
+        # cfa_record not needed for export
+        export_values = values.dup
+        export_values.delete("cfa_record")
+        export_values["target"] = target
+        export_values
       end
 
-      peers = deep_copy(@ntp_records)
+      peers = @ntp_records.dup
       peers.each { |peer| peer.delete("cfa_record") } # not needed for export
 
       {
