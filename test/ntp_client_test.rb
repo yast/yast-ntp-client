@@ -7,6 +7,7 @@ Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
 Yast.import "PackageSystem"
 Yast.import "Service"
+Yast.import "Profile"
 
 describe Yast::NtpClient do
 
@@ -19,6 +20,20 @@ describe Yast::NtpClient do
   let(:ntp_conf) do
     file_handler = CFA::MemoryFile.new(File.read(ntp_file_path))
     CFA::NtpConf.new(file_handler: file_handler)
+  end
+
+  describe "#AutoYaST" do
+    FIXTURES_PATH = File.join(File.dirname(__FILE__), 'fixtures')
+    let(:profile) { File.join(FIXTURES_PATH, 'autoyast', 'autoinst.xml') }
+
+    before(:each) do
+      Yast::Profile.ReadXML(profile)
+    end
+
+    it "imports/exports settings from/to AutoYaST configuration file" do
+      subject.Import(Yast::Profile.current["ntp-client"])
+      expect(subject.Export()).to eql(Yast::Profile.current["ntp-client"])
+    end
   end
 
   describe "#Read" do
