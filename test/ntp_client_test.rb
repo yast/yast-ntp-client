@@ -23,8 +23,8 @@ describe Yast::NtpClient do
   end
 
   describe "#AutoYaST" do
-    FIXTURES_PATH = File.join(File.dirname(__FILE__), 'fixtures')
-    let(:profile) { File.join(FIXTURES_PATH, 'autoyast', 'autoinst.xml') }
+    FIXTURES_PATH = File.join(File.dirname(__FILE__), "fixtures")
+    let(:profile) { File.join(FIXTURES_PATH, "autoyast", "autoinst.xml") }
 
     before(:each) do
       Yast::Profile.ReadXML(profile)
