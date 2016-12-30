@@ -22,17 +22,98 @@ describe Yast::NtpClient do
     CFA::NtpConf.new(file_handler: file_handler)
   end
 
-  describe "#AutoYaST" do
+  describe "#AutoYaST methods" do
     FIXTURES_PATH = File.join(File.dirname(__FILE__), "fixtures")
-    let(:profile) { File.join(FIXTURES_PATH, "autoyast", "autoinst.xml") }
 
-    before(:each) do
-      Yast::Profile.ReadXML(profile)
+    let(:ntp_client_section) do
+      file = File.join(FIXTURES_PATH, 'autoyast', profile_name)
+      Yast::Profile.ReadXML(file)
+      Yast::Profile.current["ntp-client"]
     end
 
-    it "imports/exports settings from/to AutoYaST configuration file" do
-      subject.Import(Yast::Profile.current["ntp-client"])
-      expect(subject.Export()).to eql(Yast::Profile.current["ntp-client"])
+    describe "#Import" do
+      context "with a correct AutoYaST configuration file" do
+        let(:profile_name) { "autoinst.xml" }
+
+        before(:each) do
+          subject.Import(ntp_client_section)
+        end
+
+        it "reads the list of peers" do
+          expect(subject.ntp_records.size).to eq 4
+        end
+
+        it "reads the list of restricts" do
+          expect(subject.restrict_map.keys).to contain_exactly(
+            "default", "127.0.0.1", "::1"
+          )
+        end
+
+        it "reads synchronize flag" do
+          expect(subject.synchronize_time).to eq true
+        end
+
+        it "reads start at boot flag" do
+          expect(subject.run_service).to eq true
+        end
+
+        it "reads start in chroot environment flag" do
+          expect(subject.run_chroot).to eq false
+        end
+
+        it "reads policy" do
+          expect(subject.ntp_policy).to eq "STATIC"
+        end
+
+        it "reads sync intervall" do
+          expect(subject.sync_interval).to eq 15
+        end
+      end
+
+      context "with an empty AutoYaST configuration" do
+        let(:ntp_client_section) { {} }
+
+        before(:each) do
+          subject.Import(ntp_client_section)
+        end
+
+        it "sets an empty peer list" do
+          expect(subject.ntp_records).to be_empty
+        end
+
+        it "sets an empty restricts list" do
+          expect(subject.restrict_map).to be_empty
+        end
+
+        it "sets default synchronize flag" do
+          expect(subject.synchronize_time).to eq false
+        end
+
+        it "sets default start at boot flag" do
+          expect(subject.run_service).to eq false
+        end
+
+        it "sets default start in chroot environment flag" do
+          expect(subject.run_chroot).to eq true
+        end
+
+        it "sets default policy" do
+          expect(subject.ntp_policy).to eq ""
+        end
+
+        it "set default sync intervall" do
+          expect(subject.sync_interval).to eq 5
+        end
+      end
+    end
+
+    describe "#Export" do
+      let(:profile_name) { "autoinst.xml" }
+
+      it "produces an output equivalent to #Import" do
+        subject.Import(ntp_client_section)
+        expect(subject.Export()).to eq ntp_client_section
+      end
     end
   end
 

@@ -2,7 +2,7 @@
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
   <ntp-client>
-    <ntp_policy>auto</ntp_policy>
+    <ntp_policy>STATIC</ntp_policy>
     <peers config:type="list">
       <peer>
         <address>0.opensuse.pool.ntp.org</address>
@@ -51,7 +51,7 @@
     </restricts>
     <start_at_boot config:type="boolean">true</start_at_boot>
     <start_in_chroot config:type="boolean">false</start_in_chroot>
-    <sync_interval config:type="integer">5</sync_interval>
-    <synchronize_time config:type="boolean">false</synchronize_time>
+    <sync_interval config:type="integer">15</sync_interval>
+    <synchronize_time config:type="boolean">true</synchronize_time>
   </ntp-client>
 </profile>
