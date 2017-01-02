@@ -8,6 +8,7 @@ RUN zypper --gpg-auto-import-keys --non-interactive in \
       yast2 \
       yast2-country-data \
       yast2-devtools \
+      autoyast2-installation \
       'rubygem(rspec)' \
       'rubygem(yast-rake)' \
       augeas-lenses \

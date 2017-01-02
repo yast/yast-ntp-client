@@ -697,17 +697,25 @@ module Yast
       # restrict_map is a map with the key ip,ipv4-tag or ipv6-tag.
       # This will be converted into a list in order to use it in
       # autoyast XML file properly.
+
       restricts = @restrict_map.collect do |target, values|
-        values["target"] = target
-        values
+        # cfa_record not needed for export
+        export_values = values.dup
+        export_values.delete("cfa_record")
+        export_values["target"] = target
+        export_values
       end
+
+      peers = @ntp_records.dup
+      peers.each { |peer| peer.delete("cfa_record") } # not needed for export
+
       {
         "synchronize_time" => @synchronize_time,
         "sync_interval"    => @sync_interval,
         "start_at_boot"    => @run_service,
         "start_in_chroot"  => @run_chroot,
         "ntp_policy"       => @ntp_policy,
-        "peers"            => @ntp_records,
+        "peers"            => peers,
         "restricts"        => restricts
       }
     end
