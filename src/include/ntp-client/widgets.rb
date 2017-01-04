@@ -263,7 +263,7 @@ module Yast
           elsif !Builtins.contains(
             NtpClient.random_pool_servers,
             Ops.get_string(one_record, "address", "")
-            )
+          )
             ret = true
             raise Break
           end
@@ -511,7 +511,7 @@ module Yast
               "replace the current NTP server.\n\n"               \
               "Really replace the current NTP server?"
             )
-            )
+          )
             # user has cancelled the operation, return it back
             UI.ChangeWidget(Id("use_random_servers"), :Value, false)
             return nil
@@ -792,10 +792,8 @@ module Yast
             ),
             :result_popup
           )
-        else
-          if serverAddressValidate("server_address", {})
-            NtpClient.TestNtpServer(server, :result_popup)
-          end
+        elsif serverAddressValidate("server_address", {})
+          NtpClient.TestNtpServer(server, :result_popup)
         end
       elsif ev_id == :select_local
         return :select_local
@@ -836,16 +834,14 @@ module Yast
       address = Ops.get_string(NtpClient.selected_record, "address", "")
       if NtpClient.restrict_map == {} || NtpClient.PolicyIsNonstatic
         UI.ChangeWidget(Id("ac_options"), :Enabled, false)
+      elsif Builtins.haskey(NtpClient.restrict_map, address)
+        UI.ChangeWidget(
+          Id("ac_options"),
+          :Value,
+          Ops.get_string(NtpClient.restrict_map, [address, "options"], "")
+        )
       else
-        if Builtins.haskey(NtpClient.restrict_map, address)
-          UI.ChangeWidget(
-            Id("ac_options"),
-            :Value,
-            Ops.get_string(NtpClient.restrict_map, [address, "options"], "")
-          )
-        else
-          UI.ChangeWidget(Id("ac_options"), :Value, "notrap nomodify noquery")
-        end
+        UI.ChangeWidget(Id("ac_options"), :Value, "notrap nomodify noquery")
       end
 
       nil
@@ -1265,10 +1261,10 @@ module Yast
       # fate#302863: suggest ntp.$domain
       if @found_servers_cache.nil?
         guessed = Ops.add("ntp.", Hostname.CurrentDomain)
-        if NtpClient.TestNtpServer(guessed, :transient_popup)
-          @found_servers_cache = [guessed]
+        @found_servers_cache = if NtpClient.TestNtpServer(guessed, :transient_popup)
+          [guessed]
         else
-          @found_servers_cache = []
+          []
         end
       end
 

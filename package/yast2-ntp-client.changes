@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan  4 08:18:24 UTC 2017 - lslezak@suse.cz
+
+- Update the Rubocop style to version 0.41.2 (to match the other
+  YaST modules)
+
+-------------------------------------------------------------------
 Fri Dec 30 12:08:30 CET 2016 - schubi@suse.de
 
 - AutoYaST: Fixed crash while exporting settings. Do not export

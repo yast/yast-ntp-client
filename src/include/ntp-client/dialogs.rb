@@ -734,8 +734,8 @@ module Yast
         # number of listed servers is the same as the needed servers for
         # random_pool_servers function
         Builtins.size(servers) == Builtins.size(NtpClient.random_pool_servers) &&
-          # enabled means that all of needed servers are listed
-          NtpClient.IsRandomServersServiceEnabled
+        # enabled means that all of needed servers are listed
+        NtpClient.IsRandomServersServiceEnabled
 
       if Builtins.size(peers) !=
           Ops.add(Builtins.size(servers), Builtins.size(clocks))

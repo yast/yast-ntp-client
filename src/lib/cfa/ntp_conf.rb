@@ -321,26 +321,26 @@ module CFA
     # For example:
     #   server 0.opensuse.pool.ntp.org iburst
     class ServerRecord < CommandRecord
-      AUGEAS_KEY = "server[]"
+      AUGEAS_KEY = "server[]".freeze
     end
 
     # class to represent a ntp peer entry.
     # For example:
     #   peer 128.100.0.45
     class PeerRecord < CommandRecord
-      AUGEAS_KEY = "peer[]"
+      AUGEAS_KEY = "peer[]".freeze
     end
 
     # class to represent a ntp broadcast entry.
     # For example:
     #   broadcast 128.100.0.45
     class BroadcastRecord < CommandRecord
-      AUGEAS_KEY = "broadcast[]"
+      AUGEAS_KEY = "broadcast[]".freeze
     end
 
     # class to represent a ntp broadcastclient entry.
     class BroadcastclientRecord < CommandRecord
-      AUGEAS_KEY = "broadcastclient[]"
+      AUGEAS_KEY = "broadcastclient[]".freeze
     end
 
     # class to represent a ntp fudge entry.
@@ -350,7 +350,7 @@ module CFA
     #
     # Fudge entry has its own options interpretation.
     class FudgeRecord < CommandRecord
-      AUGEAS_KEY = "fudge[]"
+      AUGEAS_KEY = "fudge[]".freeze
 
       def options
         return {} unless tree_value?
@@ -382,7 +382,7 @@ module CFA
     #
     # Restrict entry has its own options interpretation.
     class RestrictRecord < Record
-      AUGEAS_KEY = "restrict[]"
+      AUGEAS_KEY = "restrict[]".freeze
 
       def options
         return [] unless tree_value?

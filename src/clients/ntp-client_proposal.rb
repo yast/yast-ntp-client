@@ -372,17 +372,15 @@ module Yast
         Yast.import "Packages"
         Packages.addAdditionalPackage(required_package)
       # Otherwise, prompt user for confirming pkg installation
-      else
-        if !PackageSystem.CheckAndInstallPackages([required_package])
-          Report.Error(
-            Builtins.sformat(
-              _(
-                "Synchronization with NTP server is not possible\nwithout package %1 installed."
-              ),
-              required_package
-            )
+      elsif !PackageSystem.CheckAndInstallPackages([required_package])
+        Report.Error(
+          Builtins.sformat(
+            _(
+              "Synchronization with NTP server is not possible\nwithout package %1 installed."
+            ),
+            required_package
           )
-        end
+        )
       end
 
       ret = 0
@@ -402,7 +400,7 @@ module Yast
           path(".target.bash"),
           "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log " \
           "-t 5 -c '#{String.Quote(ntp_server)}'"
-              )
+        )
         Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
         Popup.ClearFeedback
       end
@@ -474,7 +472,7 @@ module Yast
             ),
             server
           )
-          )
+        )
           return false # loop on
         elsif !Ops.get_boolean(argmap, "ntpdate_only", false)
           WriteNtpSettings(

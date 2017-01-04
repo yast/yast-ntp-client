@@ -331,15 +331,17 @@ describe Yast::NtpClient do
 
   describe "#GetNtpServers" do
     let(:country_servers) do
-      { "tick.nap.com.ar" =>
-        { "access_policy "  => "open access, please send a message to notify",
-          "address"         => "tick.nap.com.ar",
-          "country"         => "AR",
-          "exact_location"  => "Network Access Point, Buenos Aires, Argentina",
-          "location"        => "Argentina",
-          "stratum"         => "2",
-          "synchronization" => "NTP V3 secondary (stratum 2), Cisco IOS"
-        }
+      {
+        "tick.nap.com.ar" =>
+                             {
+                               "access_policy "  => "open access, please send a message to notify",
+                               "address"         => "tick.nap.com.ar",
+                               "country"         => "AR",
+                               "exact_location"  => "Network Access Point, Buenos Aires, Argentina",
+                               "location"        => "Argentina",
+                               "stratum"         => "2",
+                               "synchronization" => "NTP V3 secondary (stratum 2), Cisco IOS"
+                             }
       }
     end
 
@@ -473,7 +475,7 @@ describe Yast::NtpClient do
       end
 
       context "when there is cron entry" do
-        let(:cron_entry) { [{ "events"   => [{ "active"   => "1", "minute" => "*/10" }] }] }
+        let(:cron_entry) { [{ "events"   => [{ "active" => "1", "minute" => "*/10" }] }] }
 
         it "sets synchronize time as true if first cron entry is valid" do
           expect(subject.ReadSynchronization).to eql(true)
@@ -867,8 +869,7 @@ describe Yast::NtpClient do
         "exact_location"  => "Network Access Point, Buenos Aires, Argentina",
         "location"        => "Argentina",
         "stratum"         => "2",
-        "synchronization" => "NTP V3 secondary (stratum 2), Cisco IOS"
-      }
+        "synchronization" => "NTP V3 secondary (stratum 2), Cisco IOS" }
     end
     let(:country_server) do
       { "address" => "ca.pool.ntp.org", "country" => "CA", "location" => "Canada" }
