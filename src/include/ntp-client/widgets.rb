@@ -263,7 +263,7 @@ module Yast
           elsif !Builtins.contains(
             NtpClient.random_pool_servers,
             Ops.get_string(one_record, "address", "")
-            )
+          )
             ret = true
             raise Break
           end
@@ -511,7 +511,7 @@ module Yast
               "replace the current NTP server.\n\n"               \
               "Really replace the current NTP server?"
             )
-            )
+          )
             # user has cancelled the operation, return it back
             UI.ChangeWidget(Id("use_random_servers"), :Value, false)
             return nil
@@ -1265,10 +1265,10 @@ module Yast
       # fate#302863: suggest ntp.$domain
       if @found_servers_cache.nil?
         guessed = Ops.add("ntp.", Hostname.CurrentDomain)
-        if NtpClient.TestNtpServer(guessed, :transient_popup)
-          @found_servers_cache = [guessed]
+        @found_servers_cache = if NtpClient.TestNtpServer(guessed, :transient_popup)
+          [guessed]
         else
-          @found_servers_cache = []
+          []
         end
       end
 

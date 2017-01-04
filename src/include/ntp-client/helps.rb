@@ -40,7 +40,7 @@ module Yast
           "Selecting <b>Synchronize without Daemon</b> the NTP daemon will not be activated\n" \
           "and the system time will be set periodically by a <i>cron</i> script. \n"           \
           "The interval is configurable, by default it is %d minutes."
-      ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
+        ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
         # help text 2/5
         "chroot_environment" => _(
           "<p><b><big>Chroot Jail</big></b><br>\n"                                       \

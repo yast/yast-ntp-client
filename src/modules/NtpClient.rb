@@ -25,14 +25,14 @@ module Yast
     # List of servers defined by the pool.ntp.org to get random ntp servers
     #
     # @see #http://www.pool.ntp.org/
-    RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]
+    RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"].freeze
 
     # Different kinds of records which the server can syncronize with and
     # reference clock record
     #
     # @see http://doc.ntp.org/4.1.0/confopt.htm
     # @see http://doc.ntp.org/4.1.0/clockopt.htm
-    SYNC_RECORDS = ["server", "__clock", "peer", "broadcast", "broadcastclient"]
+    SYNC_RECORDS = ["server", "__clock", "peer", "broadcast", "broadcastclient"].freeze
 
     NTP_FILE = "/etc/ntp.conf".freeze
 
@@ -785,7 +785,7 @@ module Yast
       SYNC_RECORDS.each do |t|
         type_records = @ntp_records.select { |r| r["type"] == t }
         names = type_records.map { |r| r["address"].to_s }.select { |n| n != "" }
-        summary = Summary.AddLine(summary, "#{types[t]}#{names.join(", ")}") if names.size > 0
+        summary = Summary.AddLine(summary, "#{types[t]}#{names.join(", ")}") if !names.empty?
       end
 
       summary
