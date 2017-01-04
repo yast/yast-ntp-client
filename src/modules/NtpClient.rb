@@ -673,10 +673,8 @@ module Yast
           if Builtins.haskey(p, "param")
             Ops.set(p, "options", Ops.get_string(p, "param", ""))
           end
-          next deep_copy(p)
-        else
-          next deep_copy(p)
         end
+        next deep_copy(p)
       end
       # restricts is a list of entries whereas restrict_map
       # is a map with target key (ip, ipv4-tag, ipv6-tag,...).

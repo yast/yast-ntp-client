@@ -372,17 +372,15 @@ module Yast
         Yast.import "Packages"
         Packages.addAdditionalPackage(required_package)
       # Otherwise, prompt user for confirming pkg installation
-      else
-        if !PackageSystem.CheckAndInstallPackages([required_package])
-          Report.Error(
-            Builtins.sformat(
-              _(
-                "Synchronization with NTP server is not possible\nwithout package %1 installed."
-              ),
-              required_package
-            )
+      elsif !PackageSystem.CheckAndInstallPackages([required_package])
+        Report.Error(
+          Builtins.sformat(
+            _(
+              "Synchronization with NTP server is not possible\nwithout package %1 installed."
+            ),
+            required_package
           )
-        end
+        )
       end
 
       ret = 0

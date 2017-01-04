@@ -792,10 +792,8 @@ module Yast
             ),
             :result_popup
           )
-        else
-          if serverAddressValidate("server_address", {})
-            NtpClient.TestNtpServer(server, :result_popup)
-          end
+        elsif serverAddressValidate("server_address", {})
+          NtpClient.TestNtpServer(server, :result_popup)
         end
       elsif ev_id == :select_local
         return :select_local
@@ -836,16 +834,14 @@ module Yast
       address = Ops.get_string(NtpClient.selected_record, "address", "")
       if NtpClient.restrict_map == {} || NtpClient.PolicyIsNonstatic
         UI.ChangeWidget(Id("ac_options"), :Enabled, false)
+      elsif Builtins.haskey(NtpClient.restrict_map, address)
+        UI.ChangeWidget(
+          Id("ac_options"),
+          :Value,
+          Ops.get_string(NtpClient.restrict_map, [address, "options"], "")
+        )
       else
-        if Builtins.haskey(NtpClient.restrict_map, address)
-          UI.ChangeWidget(
-            Id("ac_options"),
-            :Value,
-            Ops.get_string(NtpClient.restrict_map, [address, "options"], "")
-          )
-        else
-          UI.ChangeWidget(Id("ac_options"), :Value, "notrap nomodify noquery")
-        end
+        UI.ChangeWidget(Id("ac_options"), :Value, "notrap nomodify noquery")
       end
 
       nil
