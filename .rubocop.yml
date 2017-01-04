@@ -18,6 +18,11 @@ Metrics/ClassLength:
   Exclude:
     - 'src/lib/**/*.rb' # be more strict for new code in lib
 
+Metrics/ModuleLength:
+  Max: 1350
+  Exclude:
+    - 'src/lib/**/*.rb' # be more strict for new code in lib
+
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
   Max: 250 # TODO this should be lower for new code
