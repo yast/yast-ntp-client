@@ -1311,7 +1311,7 @@ module Yast
 
     # CFA instance for reading/writing /etc/ntp.conf
     def ntp_conf
-       @ntp_conf ||= CFA::NtpConf.new
+      @ntp_conf ||= CFA::NtpConf.new
     end
 
     publish variable: :AbortFunction, type: "boolean ()"
