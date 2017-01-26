@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jan 26 10:17:50 CET 2017 - schubi@suse.de
+
+- AutoYaST writing settings crash: Initialize CFA instance
+  correctly (bnc#1019292)
+- 3.2.5
+
+-------------------------------------------------------------------
 Wed Jan  4 08:18:24 UTC 2017 - lslezak@suse.cz
 
 - Update the Rubocop style to version 0.41.2 (to match the other
