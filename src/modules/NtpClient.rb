@@ -140,6 +140,10 @@ module Yast
       @random_pool_servers = RANDOM_POOL_NTP_SERVERS
 
       @deleted_records = []
+
+      # CFA instance for reading/writing /etc/ntp.conf
+      @ntp_conf = CFA::NtpConf.new
+
     end
 
     def add_to_deleted_records(records)
@@ -303,7 +307,6 @@ module Yast
       end
 
       begin
-        @ntp_conf = CFA::NtpConf.new
         @ntp_conf.load
       rescue StandardError => e
         log.error("Failed to read #{NTP_FILE}: #{e.message}")
@@ -328,7 +331,7 @@ module Yast
       end
     end
 
-    # Read and parse /etc.ntp.conf
+    # Read and parse /etc/ntp.conf
     # @return true on success
     def ProcessNtpConf
       if @config_has_been_read
