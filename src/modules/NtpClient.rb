@@ -303,8 +303,7 @@ module Yast
       end
 
       begin
-        @ntp_conf = CFA::NtpConf.new
-        @ntp_conf.load
+        ntp_conf.load
       rescue StandardError => e
         log.error("Failed to read #{NTP_FILE}: #{e.message}")
         return false
@@ -312,12 +311,12 @@ module Yast
 
       load_ntp_records
 
-      log.info("Raw ntp conf #{@ntp_conf.raw}")
+      log.info("Raw ntp conf #{ntp_conf.raw}")
       true
     end
 
     def load_ntp_records
-      @ntp_records = @ntp_conf.records.map do |record|
+      @ntp_records = ntp_conf.records.map do |record|
         {
           "type"       => record.type,
           "address"    => record.value,
@@ -328,7 +327,7 @@ module Yast
       end
     end
 
-    # Read and parse /etc.ntp.conf
+    # Read and parse /etc/ntp.conf
     # @return true on success
     def ProcessNtpConf
       if @config_has_been_read
@@ -414,7 +413,7 @@ module Yast
                 ""
               )
             )
-            m["cfa_fudge_record"] = @ntp_conf.records.find do |record|
+            m["cfa_fudge_record"] = ntp_conf.records.find do |record|
               record.type == "fudge" && record.value == m["address"]
             end
           end
@@ -1101,15 +1100,15 @@ module Yast
       records_for_write.each do |record|
         unless record["cfa_record"]
           record["cfa_record"] = CFA::NtpConf::Record.record_class(record["type"]).new
-          @ntp_conf.records << record["cfa_record"]
+          ntp_conf.records << record["cfa_record"]
         end
         update_cfa_record(record)
       end
 
-      @ntp_conf.records.delete_if { |record| @deleted_records.include?(record) }
+      ntp_conf.records.delete_if { |record| @deleted_records.include?(record) }
 
       begin
-        @ntp_conf.save
+        ntp_conf.save
       rescue StandardError => e
         log.error("Failed to write #{NTP_FILE}: #{e.message}")
       end
@@ -1308,6 +1307,11 @@ module Yast
     # @return [Boolean] result of the assignation
     def cache_server(server)
       @ntp_servers[server["address"].to_s] = server
+    end
+
+    # CFA instance for reading/writing /etc/ntp.conf
+    def ntp_conf
+      @ntp_conf ||= CFA::NtpConf.new
     end
 
     publish variable: :AbortFunction, type: "boolean ()"
