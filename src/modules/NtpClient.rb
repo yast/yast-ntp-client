@@ -143,7 +143,6 @@ module Yast
 
       # CFA instance for reading/writing /etc/ntp.conf
       @ntp_conf = CFA::NtpConf.new
-
     end
 
     def add_to_deleted_records(records)
