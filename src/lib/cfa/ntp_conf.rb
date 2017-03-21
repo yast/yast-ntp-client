@@ -128,7 +128,7 @@ module CFA
       # Adds a new Record object to the collection.
       # @param [Record] record
       def <<(record)
-        @augeas_tree.data << record.augeas
+        @augeas_tree.add(record.augeas[:key], record.augeas[:value])
         reset_cache
       end
 
@@ -217,6 +217,7 @@ module CFA
           tree_value.value = value
         else
           @augeas[:value] = value
+          @augeas[:operation] = :modify
         end
       end
 
@@ -247,9 +248,7 @@ module CFA
       end
 
       def ==(other)
-        [:class, :augeas].all? do |a|
-          public_send(a) == other.public_send(a)
-        end
+        other.class == self.class && value == other.value
       end
 
       alias_method :eql?, :==
