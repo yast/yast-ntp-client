@@ -11,7 +11,11 @@ Yast.import "Profile"
 
 describe Yast::NtpClient do
 
-  subject { Yast::NtpClient }
+  subject do
+    cl = Yast::NtpClientClass.new
+    cl.main
+    cl
+  end
 
   let(:ntp_file_path) do
     File.expand_path("../data/scr_root_read/etc/ntp.conf", __FILE__)
