@@ -125,7 +125,14 @@ module CFA
         record_entries.each(&block)
       end
 
+      # Get last record in collection
+      def last
+        record_entries.last
+      end
+
       # Adds a new Record object to the collection.
+      # @note it creates new instance of record after this.
+      # So added record need to be obtained by #last
       # @param [Record] record
       def <<(record)
         @augeas_tree.add(record.augeas[:key], record.augeas[:value])

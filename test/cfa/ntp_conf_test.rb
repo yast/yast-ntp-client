@@ -59,9 +59,11 @@ describe CFA::NtpConf do
       it "writes a new entry" do
         record = CFA::NtpConf::ServerRecord.new
         record.value = "3.pool.ntp.org"
+        record.raw_options = "iburst"
+        record.comment = nil
         ntp.records << record
         ntp.save
-        expect(file.content.lines).to include("server 3.pool.ntp.org\n")
+        expect(file.content.lines).to include("server 3.pool.ntp.org iburst\n")
       end
     end
 

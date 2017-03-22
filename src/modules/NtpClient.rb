@@ -1099,9 +1099,10 @@ module Yast
     def write_ntp_conf
       records_for_write.each do |record|
         unless record["cfa_record"]
-          record["cfa_record"] = CFA::NtpConf::Record.record_class(record["type"]).new
-          ntp_conf.records << record["cfa_record"]
+          ntp_conf.records << CFA::NtpConf::Record.record_class(record["type"]).new
+          record["cfa_record"] = ntp_conf.records.last
         end
+
         update_cfa_record(record)
         log.info "new record #{record.inspect}"
       end
