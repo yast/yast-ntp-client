@@ -1103,6 +1103,7 @@ module Yast
           ntp_conf.records << record["cfa_record"]
         end
         update_cfa_record(record)
+        log.info "new record #{record.inspect}"
       end
 
       ntp_conf.records.delete_if { |record| @deleted_records.include?(record) }
@@ -1111,6 +1112,7 @@ module Yast
         ntp_conf.save
       rescue StandardError => e
         log.error("Failed to write #{NTP_FILE}: #{e.message}")
+        return false
       end
 
       FileChanges.StoreFileCheckSum(NTP_FILE)
