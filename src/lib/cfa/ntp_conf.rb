@@ -131,8 +131,9 @@ module CFA
       end
 
       # Adds a new Record object to the collection.
-      # @note it creates new instance of record after this.
-      # So added record need to be obtained by #last
+      # @note argument is not member of collection and instead new instance
+      # is created from its augeas content.
+      # So for later modification please get new instance with `#last`.
       # @param [Record] record
       def <<(record)
         @augeas_tree.add(record.augeas[:key], record.augeas[:value])
