@@ -246,6 +246,7 @@ describe Yast::NtpClient do
     end
 
     before do
+      subject.config_has_been_read = false
       allow(subject).to receive(:Abort).and_return(false)
       allow(subject).to receive(:go_next).and_return(true)
       allow(subject).to receive(:progress?).and_return(false)
@@ -268,6 +269,21 @@ describe Yast::NtpClient do
       expect(subject).to receive(:write_ntp_conf)
 
       subject.Write
+    end
+
+    it "writes new ntp records to ntp config" do
+      expect(subject).to receive(:write_ntp_conf).and_call_original
+
+      # don't shoot messenger, this API is horrible and I just test it
+      subject.selectSyncRecord(-1)
+      subject.selected_record["type"] = "server"
+      subject.selected_record["options"] = "iburst"
+      subject.selected_record["address"] = "tik.cesnet.cz"
+      subject.storeSyncRecord
+
+      expect(subject.Write).to eq true
+      lines = File.read(File.join(data_dir, "scr_root/etc/ntp.conf"))
+      expect(lines.lines).to include("server tik.cesnet.cz iburst\n")
     end
 
     it "writes ntp policy and updates ntp with netconfig" do

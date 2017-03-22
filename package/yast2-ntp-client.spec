@@ -26,7 +26,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
-BuildRequires:  yast2 >= 3.1.11
+BuildRequires:  yast2 >= 3.2.20
 BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  autoyast2-installation
@@ -35,10 +35,10 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  augeas-lenses
 BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 
-#SLPAPI.pm 
+#SLPAPI.pm
 # Hostname::CurrentDomain
 # Wizard::SetDesktopTitleAndIcon
-Requires:       yast2 >= 3.1.11
+Requires:       yast2 >= 3.2.20
 Requires:       yast2-country-data
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
