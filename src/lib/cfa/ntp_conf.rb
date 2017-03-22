@@ -217,7 +217,8 @@ module CFA
           tree_value.value = value
         else
           @augeas[:value] = value
-          @augeas[:operation] = :modify
+          @augeas[:operation] ||= :add
+          @augeas[:operation] = :modify if @augeas[:operation] != :add
         end
       end
 
