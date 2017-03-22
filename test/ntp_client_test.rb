@@ -796,13 +796,13 @@ describe Yast::NtpClient do
 
     # FIXME: Add fudge entries to test
     it "initializes ntp records excluding restrict and fudge entries" do
-      expect(subject.ntp_records.map { |r| r["type"] }).not_to include("restrict")
       subject.ProcessNtpConf
+      expect(subject.ntp_records.map { |r| r["type"] }).not_to include("restrict")
     end
 
     it "initializes restrict records" do
-      expect(subject.restrict_map.size).to eql(3)
       subject.ProcessNtpConf
+      expect(subject.restrict_map.size).to eql(3)
     end
   end
 
