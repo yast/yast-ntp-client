@@ -28,7 +28,7 @@ Fri Dec 30 12:08:30 CET 2016 - schubi@suse.de
 Thu Dec 15 12:19:27 UTC 2016 - kanderssen@suse.com
 
 - Fixed some tests that were passing because of an old ntp augeas
-  lense (bsc#983486).
+  lens (bsc#983486).
 - 3.2.3
 
 -------------------------------------------------------------------

@@ -395,9 +395,9 @@ module CFA
       def options
         return [] unless tree_value?
         res = augeas_options.map { |option| option[:value] }
-        # backward compatibility with old lense that set value ip restriction
+        # backward compatibility with old lens that set value ip restriction
         # instead of address
-        # for old lenses data can look like:
+        # for old lens data can look like:
         #   line in configuration file:
         #     restrict -4 default nofail
         #   augeas tree:
@@ -413,7 +413,7 @@ module CFA
         #     value:     default
         #     action[1]: nofail
         #
-        # with new lense value is always address like:
+        # with new lens value is always address like:
         #   line in configuration file:
         #     restrict -4 default nofail
         #   augeas tree:
@@ -434,7 +434,7 @@ module CFA
       end
 
       def options=(options)
-        # backward compatibility with old lense that set value ip restriction
+        # backward compatibility with old lens that set value ip restriction
         # instead of address
         if ["-6", "-4"].include?(value)
           options = options.dup
