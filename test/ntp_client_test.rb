@@ -250,13 +250,13 @@ describe Yast::NtpClient do
     end
 
     before do
-      subject.config_has_been_read = false
       allow(subject).to receive(:Abort).and_return(false)
       allow(subject).to receive(:go_next).and_return(true)
       allow(subject).to receive(:progress?).and_return(false)
       allow(subject).to receive(:write_ntp_conf).and_return(true)
       allow(subject).to receive(:write_and_update_policy).and_return(true)
       allow(subject).to receive(:write_chroot_config)
+      allow(subject).to receive(:check_service)
 
       allow(Yast::SuSEFirewall)
       allow(Yast::Report)
@@ -277,6 +277,7 @@ describe Yast::NtpClient do
 
     it "writes new ntp records to ntp config" do
       expect(subject).to receive(:write_ntp_conf).and_call_original
+      expect(Yast::Report).to_not receive(:Error)
 
       # don't shoot messenger, this API is horrible and I just test it
       subject.selectSyncRecord(-1)

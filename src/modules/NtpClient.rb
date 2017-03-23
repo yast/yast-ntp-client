@@ -12,6 +12,7 @@
 require "yast"
 require "yaml"
 require "cfa/ntp_conf"
+require "yast2/target_file" # required to cfa work on changed scr
 
 module Yast
   class NtpClientClass < Module
