@@ -427,7 +427,7 @@ module CFA
         #   augeas tree:
         #     key: restrict
         #     value: default
-        #     action[1]: default
+        #     action[1]: nofail
         res.shift if ["-6", "-4"].include?(value)
 
         res
