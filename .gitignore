@@ -5,3 +5,4 @@ tmp.*
 /doc/autodocs
 /.yardoc
 /coverage
+test/data/scr_root/var/lib/YaST2/file_checksums.ycp

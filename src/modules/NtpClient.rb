@@ -12,6 +12,7 @@
 require "yast"
 require "yaml"
 require "cfa/ntp_conf"
+require "yast2/target_file" # required to cfa work on changed scr
 
 module Yast
   class NtpClientClass < Module
@@ -1099,10 +1100,12 @@ module Yast
     def write_ntp_conf
       records_for_write.each do |record|
         unless record["cfa_record"]
-          record["cfa_record"] = CFA::NtpConf::Record.record_class(record["type"]).new
-          ntp_conf.records << record["cfa_record"]
+          ntp_conf.records << CFA::NtpConf::Record.record_class(record["type"]).new
+          record["cfa_record"] = ntp_conf.records.last
         end
+
         update_cfa_record(record)
+        log.info "new record #{record.inspect}"
       end
 
       ntp_conf.records.delete_if { |record| @deleted_records.include?(record) }
@@ -1111,6 +1114,7 @@ module Yast
         ntp_conf.save
       rescue StandardError => e
         log.error("Failed to write #{NTP_FILE}: #{e.message}")
+        return false
       end
 
       FileChanges.StoreFileCheckSum(NTP_FILE)

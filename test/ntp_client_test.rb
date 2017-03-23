@@ -11,24 +11,34 @@ Yast.import "Profile"
 
 describe Yast::NtpClient do
 
-  subject { Yast::NtpClient }
-
-  let(:ntp_file_path) do
-    File.expand_path("../data/scr_root_read/etc/ntp.conf", __FILE__)
+  subject do
+    cl = Yast::NtpClientClass.new
+    cl.main
+    cl
   end
 
-  let(:ntp_conf) do
-    file_handler = CFA::MemoryFile.new(File.read(ntp_file_path))
-    CFA::NtpConf.new(file_handler: file_handler)
+  let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
+
+  around do |example|
+    ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
+      File.join(data_dir, "scr_root/etc/ntp.conf"))
+    change_scr_root(File.join(data_dir, "scr_root"), &example)
+    ::FileUtils.rm(File.join(data_dir, "scr_root/etc/ntp.conf"))
   end
 
   describe "#AutoYaST methods" do
     FIXTURES_PATH = File.join(File.dirname(__FILE__), "fixtures")
 
     let(:ntp_client_section) do
+      # Yast Profile respect changed SCR, but xmlagent not, so it crashed in
+      # changed SCR root, so reset it back for this part
+      reset_scr_root
       file = File.join(FIXTURES_PATH, "autoyast", profile_name)
       Yast::Profile.ReadXML(file)
-      Yast::Profile.current["ntp-client"]
+      profile = Yast::Profile.current["ntp-client"]
+      change_scr_root(File.join(data_dir, "scr_root"))
+
+      profile
     end
 
     describe "#Import" do
@@ -118,12 +128,6 @@ describe Yast::NtpClient do
   end
 
   describe "#Read" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
-
     before do
       subject.config_has_been_read = false
       allow(subject).to receive(:Abort).and_return(false)
@@ -237,14 +241,6 @@ describe Yast::NtpClient do
   end
 
   describe "#Write" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-    around do |example|
-      ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
-        File.join(data_dir, "scr_root/etc/ntp.conf"))
-      change_scr_root(File.join(data_dir, "scr_root"), &example)
-      ::FileUtils.rm(File.join(data_dir, "scr_root/etc/ntp.conf"))
-    end
-
     before do
       allow(subject).to receive(:Abort).and_return(false)
       allow(subject).to receive(:go_next).and_return(true)
@@ -252,6 +248,7 @@ describe Yast::NtpClient do
       allow(subject).to receive(:write_ntp_conf).and_return(true)
       allow(subject).to receive(:write_and_update_policy).and_return(true)
       allow(subject).to receive(:write_chroot_config)
+      allow(subject).to receive(:check_service)
 
       allow(Yast::SuSEFirewall)
       allow(Yast::Report)
@@ -268,6 +265,40 @@ describe Yast::NtpClient do
       expect(subject).to receive(:write_ntp_conf)
 
       subject.Write
+    end
+
+    it "writes new ntp records to ntp config" do
+      expect(subject).to receive(:write_ntp_conf).and_call_original
+      expect(Yast::Report).to_not receive(:Error)
+      subject.ProcessNtpConf
+
+      # don't shoot messenger, this API is horrible and I just test it
+      subject.selectSyncRecord(-1)
+      subject.selected_record["type"] = "server"
+      subject.selected_record["options"] = "iburst"
+      subject.selected_record["address"] = "tik.cesnet.cz"
+      subject.storeSyncRecord
+
+      expect(subject.Write).to eq true
+      lines = File.read(File.join(data_dir, "scr_root/etc/ntp.conf"))
+      expect(lines.lines).to include("server tik.cesnet.cz iburst\n")
+    end
+
+    it "does not write removed records to ntp config" do
+      expect(subject).to receive(:write_ntp_conf).and_call_original
+      expect(Yast::Report).to_not receive(:Error)
+      subject.ProcessNtpConf
+
+      index_to_delete = subject.ntp_records.index { |r| r["address"] == "3.pool.ntp.org" }
+      expect(index_to_delete).to_not eq nil
+      subject.deleteSyncRecord(index_to_delete)
+
+      expect(subject.Write).to eq true
+      lines = File.read(File.join(data_dir, "scr_root/etc/ntp.conf"))
+      expect(lines.lines).to_not include("server 3.pool.ntp.org\n")
+      expect(lines.lines).to include("server 0.pool.ntp.org\n")
+      expect(lines.lines).to include("server 1.pool.ntp.org\n")
+      expect(lines.lines).to include("server 2.pool.ntp.org\n")
     end
 
     it "writes ntp policy and updates ntp with netconfig" do
@@ -391,9 +422,6 @@ describe Yast::NtpClient do
 
   describe "#DeActivateRandomPoolServersFunction" do
     it "removes random pool ntp servers from @ntp_records" do
-      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
-      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
-      subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
       expect(subject.GetUsedNtpServers.size).to eql(4)
@@ -405,12 +433,6 @@ describe Yast::NtpClient do
   end
 
   describe "#GetNtpServersByCountry" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
-
     it "gets all ntp servers" do
       expect(subject).to receive(:GetNtpServers).and_call_original
 
@@ -622,9 +644,6 @@ describe Yast::NtpClient do
     end
 
     it "returns a list of NTP servers used in the current configuration" do
-      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
-      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
-      subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
       expect(subject.GetUsedNtpServers).to eql(used_ntp_servers)
@@ -632,15 +651,8 @@ describe Yast::NtpClient do
   end
 
   describe "#getSyncRecords" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
 
     it "returns a map's list with current synchronization related entries with index" do
-      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
-      subject.instance_variable_set(:@config_has_been_read, false)
       load_records
 
       expect(subject.getSyncRecords.size).to eql(6)
@@ -651,8 +663,6 @@ describe Yast::NtpClient do
 
   describe "#selectSyncRecord" do
     before do
-      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
-      subject.instance_variable_set(:@config_has_been_read, false)
       load_records
     end
 
@@ -721,9 +731,6 @@ describe Yast::NtpClient do
     end
 
     before do
-      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
-      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
-      subject.instance_variable_set(:@config_has_been_read, false)
       load_records
     end
 
@@ -753,12 +760,6 @@ describe Yast::NtpClient do
   end
 
   describe "#ProcessNtpConf" do
-    before do
-      allow(CFA::NtpConf).to receive(:new).and_return(ntp_conf)
-      subject.instance_variable_set(:@config_has_been_read, false)
-      allow(Yast::FileUtils).to receive(:Exists).with("/etc/ntp.conf").and_return(true)
-    end
-
     it "returns false if config has been read previously" do
       subject.instance_variable_set(:@config_has_been_read, true)
       expect(subject.ProcessNtpConf).to eql(false)
@@ -776,22 +777,17 @@ describe Yast::NtpClient do
 
     # FIXME: Add fudge entries to test
     it "initializes ntp records excluding restrict and fudge entries" do
-      expect(subject.ntp_records.map { |r| r["type"] }).not_to include("restrict")
       subject.ProcessNtpConf
+      expect(subject.ntp_records.map { |r| r["type"] }).not_to include("restrict")
     end
 
     it "initializes restrict records" do
-      expect(subject.restrict_map.size).to eql(3)
       subject.ProcessNtpConf
+      expect(subject.restrict_map.size).to eql(3)
     end
   end
 
   describe "#read_ad_address!" do
-    let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
-    end
 
     context "when there is an active directory data file" do
       before do
@@ -873,10 +869,6 @@ describe Yast::NtpClient do
     end
     let(:country_server) do
       { "address" => "ca.pool.ntp.org", "country" => "CA", "location" => "Canada" }
-    end
-
-    around do |example|
-      change_scr_root(File.join(data_dir, "scr_root_read"), &example)
     end
 
     it "initializes ntp_servers as an empty hash" do

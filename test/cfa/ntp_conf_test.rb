@@ -63,6 +63,25 @@ describe CFA::NtpConf do
         ntp.save
         expect(file.content.lines).to include("server 3.pool.ntp.org\n")
       end
+
+      it "writes it together with its options" do
+        record = CFA::NtpConf::ServerRecord.new
+        record.value = "3.pool.ntp.org"
+        record.raw_options = "iburst dynamic"
+        ntp.records << record
+        ntp.save
+        expect(file.content.lines).to include("server 3.pool.ntp.org iburst dynamic\n")
+      end
+
+      it "writes comment from entry" do
+        record = CFA::NtpConf::ServerRecord.new
+        record.value = "3.pool.ntp.org"
+        record.comment = "# test comment"
+        ntp.records << record
+        ntp.save
+        expect(file.content.lines).to include("server 3.pool.ntp.org# test comment\n")
+
+      end
     end
 
     context "when a record is deleted" do

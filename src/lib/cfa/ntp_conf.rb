@@ -125,10 +125,18 @@ module CFA
         record_entries.each(&block)
       end
 
+      # Get last record in collection
+      def last
+        record_entries.last
+      end
+
       # Adds a new Record object to the collection.
+      # @note argument is not member of collection and instead new instance
+      # is created from its augeas content.
+      # So for later modification please get new instance with `#last`.
       # @param [Record] record
       def <<(record)
-        @augeas_tree.data << record.augeas
+        @augeas_tree.add(record.augeas[:key], record.augeas[:value])
         reset_cache
       end
 
@@ -217,6 +225,8 @@ module CFA
           tree_value.value = value
         else
           @augeas[:value] = value
+          @augeas[:operation] ||= :add
+          @augeas[:operation] = :modify if @augeas[:operation] != :add
         end
       end
 
@@ -247,9 +257,7 @@ module CFA
       end
 
       def ==(other)
-        [:class, :augeas].all? do |a|
-          public_send(a) == other.public_send(a)
-        end
+        other.class == self.class && value == other.value
       end
 
       alias_method :eql?, :==

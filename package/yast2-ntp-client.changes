@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar 21 14:48:29 UTC 2017 - jreidinger@suse.com
+
+- Adapt to new version of rubygem-cfa ( updated for bsc#1023204)
+- 3.2.6
+
+-------------------------------------------------------------------
 Thu Jan 26 10:17:50 CET 2017 - schubi@suse.de
 
 - AutoYaST writing settings crash: Initialize CFA instance
