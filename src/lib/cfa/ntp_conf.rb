@@ -394,10 +394,54 @@ module CFA
 
       def options
         return [] unless tree_value?
-        augeas_options.map { |option| option[:value] }
+        res = augeas_options.map { |option| option[:value] }
+        # backward compatibility with old lens that set value ip restriction
+        # instead of address
+        # for old lens data can look like:
+        #   line in configuration file:
+        #     restrict -4 default nofail
+        #   augeas tree:
+        #     key:       restrict
+        #     value:     -4
+        #     action[1]: default
+        #     action[2]: nofail
+        #
+        #   line in configuration file:
+        #     restrict default nofail
+        #   augeas tree:
+        #     key:       restrict
+        #     value:     default
+        #     action[1]: nofail
+        #
+        # with new lens value is always address like:
+        #   line in configuration file:
+        #     restrict -4 default nofail
+        #   augeas tree:
+        #     key:       restrict
+        #     value:     default
+        #     action[1]: nofail
+        #     ipv4:      nil
+        #
+        #   line in configuration file:
+        #     restrict default nofail
+        #   augeas tree:
+        #     key: restrict
+        #     value: default
+        #     action[1]: nofail
+        res.shift if ["-6", "-4"].include?(value)
+
+        res
       end
 
       def options=(options)
+        # backward compatibility with old lens that set value ip restriction
+        # instead of address
+        if ["-6", "-4"].include?(value)
+          options = options.dup
+          address = augeas_options.map { |option| option[:value] }.first
+          options.unshift(address) if address
+        end
+
         ensure_tree_value
         tree_value.tree.delete(options_matcher)
         options.each { |option| tree_value.tree.add("action[]", option) }
