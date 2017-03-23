@@ -278,6 +278,7 @@ describe Yast::NtpClient do
     it "writes new ntp records to ntp config" do
       expect(subject).to receive(:write_ntp_conf).and_call_original
       expect(Yast::Report).to_not receive(:Error)
+      subject.ProcessNtpConf
 
       # don't shoot messenger, this API is horrible and I just test it
       subject.selectSyncRecord(-1)
@@ -289,6 +290,23 @@ describe Yast::NtpClient do
       expect(subject.Write).to eq true
       lines = File.read(File.join(data_dir, "scr_root/etc/ntp.conf"))
       expect(lines.lines).to include("server tik.cesnet.cz iburst\n")
+    end
+
+    it "does not write removed records to ntp config" do
+      expect(subject).to receive(:write_ntp_conf).and_call_original
+      expect(Yast::Report).to_not receive(:Error)
+      subject.ProcessNtpConf
+
+      index_to_delete = subject.ntp_records.index { |r| r["address"] == "3.pool.ntp.org" }
+      expect(index_to_delete).to_not eq nil
+      subject.deleteSyncRecord(index_to_delete)
+
+      expect(subject.Write).to eq true
+      lines = File.read(File.join(data_dir, "scr_root/etc/ntp.conf"))
+      expect(lines.lines).to_not include("server 3.pool.ntp.org\n")
+      expect(lines.lines).to include("server 0.pool.ntp.org\n")
+      expect(lines.lines).to include("server 1.pool.ntp.org\n")
+      expect(lines.lines).to include("server 2.pool.ntp.org\n")
     end
 
     it "writes ntp policy and updates ntp with netconfig" do
