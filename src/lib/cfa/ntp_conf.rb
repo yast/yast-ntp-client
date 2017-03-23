@@ -395,7 +395,7 @@ module CFA
       def options
         return [] unless tree_value?
         res = augeas_options.map { |option| option[:value] }
-        res.shift if old_lense?
+        res.shift if old_lens?
 
         res
       end
@@ -403,7 +403,7 @@ module CFA
       def options=(options)
         # backward compatibility with old lens that set value ip restriction
         # instead of address
-        if ["-6", "-4"].include?(orig_value)
+        if old_lens?
           options = options.dup
           address = augeas_options.map { |option| option[:value] }.first
           options.unshift(address) if address
@@ -416,11 +416,11 @@ module CFA
 
       alias_method :orig_value, :value
       def value
-        old_lense? ? augeas_options.map { |option| option[:value] }.first : orig_value
+        old_lens? ? augeas_options.map { |option| option[:value] }.first : orig_value
       end
 
       def value= (value)
-        if old_lense?
+        if old_lens?
           holder = tree_value.tree.select(options_matcher).first
           holder[:value] = value
           holder[:operation] = :modify
@@ -468,7 +468,7 @@ module CFA
       #     key: restrict
       #     value: default
       #     action[1]: nofail
-      def old_lense?
+      def old_lens?
         ["-6", "-4"].include?(orig_value)
       end
     end
