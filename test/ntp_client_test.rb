@@ -17,8 +17,7 @@ describe Yast::NtpClient do
     cl
   end
 
-  let (:data_dir) { File.join(File.dirname(__FILE__), "data") }
-
+  let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
 
   around do |example|
     ::FileUtils.cp(File.join(data_dir, "scr_root/etc/ntp.conf.original"),
