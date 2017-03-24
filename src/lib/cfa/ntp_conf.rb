@@ -419,7 +419,7 @@ module CFA
         old_lens? ? augeas_options.map { |option| option[:value] }.first : orig_value
       end
 
-      def value= (value)
+      def value=(value)
         if old_lens?
           holder = tree_value.tree.select(options_matcher).first
           holder[:value] = value
