@@ -783,6 +783,8 @@ describe Yast::NtpClient do
 
     it "initializes restrict records" do
       subject.ProcessNtpConf
+      # FIXME: this is in fact wrong, as there are 4 entries, but two have same address
+      # and map have address as key
       expect(subject.restrict_map.size).to eql(3)
     end
   end
