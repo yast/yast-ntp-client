@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Apr 21 15:32:37 UTC 2017 - igonzalezsosa@suse.com
+
+- Add a CFA class to handle ntp.conf (backported from the 3.2.x
+  branch)
+- NtpClient module does not use this new class
+- 3.1.28.1
+
+-------------------------------------------------------------------
 Tue Mar 21 14:48:29 UTC 2017 - jreidinger@suse.com
 
 - Adapt to new version of rubygem-cfa ( updated for bsc#1023204)
