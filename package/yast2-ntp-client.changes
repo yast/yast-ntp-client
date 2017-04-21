@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Apr 21 15:32:37 UTC 2017 - igonzalezsosa@suse.com
+
+- Add a CFA class to handle ntp.conf (backported from the 3.2.x
+  branch)
+- NtpClient module does not use this new class
+- 3.1.28.1
+
+-------------------------------------------------------------------
 Thu Aug 11 14:24:42 CEST 2016 - schubi@suse.de
 
 - Error while using <type>__clock</type> in AutoYaST.
