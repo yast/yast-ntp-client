@@ -73,6 +73,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/ntp-client.desktop
 %{yast_ydatadir}/ntp_servers.yml
 %{yast_schemadir}/autoyast/rnc/ntpclient.rnc
+%{yast_dir}/lib
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
