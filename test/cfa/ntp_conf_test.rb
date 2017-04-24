@@ -84,6 +84,25 @@ describe CFA::NtpConf do
       end
     end
 
+    context "when more than one record is added" do
+      it "writes all entries" do
+        record1 = CFA::NtpConf::ServerRecord.new
+        record1.value = "3.pool.ntp.org"
+        record1.raw_options = "iburst dynamic"
+        record2 = CFA::NtpConf::ServerRecord.new
+        record2.value = "4.pool.ntp.org"
+        record2.raw_options = "iburst"
+
+        ntp.records << record1
+        ntp.records << record2
+
+        ntp.save
+        expect(file.content.lines).to include("server 3.pool.ntp.org iburst dynamic\n")
+        expect(file.content.lines).to include("server 4.pool.ntp.org iburst\n")
+      end
+    end
+
+
     context "when a record is deleted" do
       it "removes an entry" do
         record = ntp.records.find { |r| r.value == "0.pool.ntp.org" }
