@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.1.28
+Version:        3.1.28.1
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -31,6 +31,7 @@ BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
+BuildRequires:  augeas-lenses
 
 #SLPAPI.pm 
 # Hostname::CurrentDomain
@@ -70,6 +71,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/ntp-client.desktop
 %{yast_ydatadir}/ntp_servers.yml
 %{yast_schemadir}/autoyast/rnc/ntpclient.rnc
+%{yast_dir}/lib
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
