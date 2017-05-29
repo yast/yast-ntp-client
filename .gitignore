@@ -3,6 +3,9 @@
 tmp.*
 *.log
 /doc/autodocs
+/doc/*.html
+/doc/css
+/doc/js
 /.yardoc
 /coverage
 test/data/scr_root/var/lib/YaST2/file_checksums.ycp
