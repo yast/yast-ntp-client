@@ -39,6 +39,12 @@ module CFA
       manycastclient
       fudge
       restrict
+      driftfile
+      logfile
+      keys
+      trustedkey
+      requestkey
+      controlkey
     ).freeze
 
     COLLECTION_KEYS = (RECORD_ENTRIES + ["action"]).freeze
@@ -323,6 +329,48 @@ module CFA
         tree_value.tree.delete(options_matcher)
         options.each { |option| tree_value.tree.add(option, nil) }
       end
+    end
+
+    # class to represent a driftfile entry.
+    # For example:
+    #   driftfile /var/lib/ntp/drift/ntp.drift
+    class DriftfileRecord < CommandRecord
+      AUGEAS_KEY = "driftfile[]".freeze
+    end
+
+    # class to represent a logfile entry.
+    # For example:
+    #   logfile /var/log/ntp
+    class LogfileRecord < CommandRecord
+      AUGEAS_KEY = "logfile[]".freeze
+    end
+
+    # class to represent a keys entry.
+    # For example:
+    #   keys /etc/ntp.keys
+    class KeysRecord < CommandRecord
+      AUGEAS_KEY = "keys[]".freeze
+    end
+
+    # class to represent a trustedkey entry.
+    # For example:
+    #   trustedkey 1
+    class TrustedkeyRecord < CommandRecord
+      AUGEAS_KEY = "trustedkey[]".freeze
+    end
+
+    # class to represent a requestkey entry.
+    # For example:
+    #   requestkey 1
+    class RequestkeyRecord < CommandRecord
+      AUGEAS_KEY = "requestkey[]".freeze
+    end
+
+    # class to represent a controlkey entry.
+    # For example:
+    #   controlkey 1
+    class ControlkeyRecord < CommandRecord
+      AUGEAS_KEY = "controlkey[]".freeze
     end
 
     # class to represent a ntp server entry.
