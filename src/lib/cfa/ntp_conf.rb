@@ -70,6 +70,20 @@ module CFA
       fix_keys(data)
     end
 
+    def save
+      records.each do |r|
+        next unless r.augeas[:multiline]
+
+        comments = r.augeas[:multiline].split("\n")
+        matcher = Matcher.new(key: r.augeas[:key], value_matcher: r.augeas[:value])
+        placer = BeforePlacer.new(matcher)
+        comments.each do |c|
+          data.add("#comment[]", c, placer)
+        end
+      end
+      super
+    end
+
     # Obtains a collection that represents the
     # entries of the file.
     # @return [CollectionRecord] collection to
@@ -79,7 +93,7 @@ module CFA
     # ntp entries in the file and only contains the
     # entries of interest (see RECORD_ENTRIES).
     def records
-      RecordCollection.new(data)
+      @records ||= RecordCollection.new(data)
     end
 
     # Obtains raw content of the file.
@@ -137,6 +151,8 @@ module CFA
       # @param [Record] record
       def <<(record)
         @augeas_tree.add(record.augeas[:key], record.augeas[:value])
+        # TODO: nasty workaround to survive multiline key with long comments
+        @augeas_tree.all_data.last[:multiline] = record.augeas[:multiline]
         reset_cache
       end
 
@@ -212,6 +228,7 @@ module CFA
       def initialize(augeas = nil)
         augeas ||= create_augeas
         @augeas = augeas
+        @multiline_comment = ""
       end
 
       attr_reader :augeas
@@ -231,6 +248,7 @@ module CFA
       end
 
       def comment
+        return augeas[:mutline] if augeas[:multiline]
         return nil unless tree_value?
         tree_value.tree["#comment"]
       end
@@ -241,8 +259,13 @@ module CFA
         ensure_tree_value
         if comment.to_s == ""
           tree_value.tree.delete("#comment")
+          augeas[:multiline] = nil
+        # backward compatibility for autoyast which allows multiline comments
+        elsif comment.include?("\n")
+          augeas[:multiline] = comment
         else
           tree_value.tree["#comment"] = comment
+          augeas[:multiline] = nil
         end
       end
 
