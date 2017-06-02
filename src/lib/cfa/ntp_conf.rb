@@ -380,6 +380,33 @@ module CFA
     #   trustedkey 1
     class TrustedkeyRecord < CommandRecord
       AUGEAS_KEY = "trustedkey[]".freeze
+
+      def initialize(augeas = nil)
+        super
+        ensure_tree_value
+        tree_value.value = nil
+      end
+
+      # for trustedkey it is subtree of keys
+      def value
+        return [] unless tree_value?
+        keys = augeas_options.select { |e| e[:key] = "key" }
+        keys.map { |option| option[:value] }.join(" ")
+      end
+
+      def value=(options)
+        values = options.split("\s")
+        ensure_tree_value
+        tree_value.tree.delete("key")
+        tree_value.tree.delete("key[]")
+        values.each { |value| tree_value.tree.add("key[]", value) }
+      end
+
+      # here key is actually value and not option
+      def augeas_options
+        Matcher.new { |k, _v| !k.include?("#comment") && !k.include?("key") }
+        tree_value.tree.select(options_matcher)
+      end
     end
 
     # class to represent a requestkey entry.

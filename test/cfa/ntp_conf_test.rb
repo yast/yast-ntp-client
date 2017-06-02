@@ -418,3 +418,19 @@ describe CFA::NtpConf::RestrictRecord do
     end
   end
 end
+
+describe CFA::NtpConf::TrustedkeyRecord do
+
+  let(:ntp) { ntp_conf(file) }
+
+  let(:file) { ntp_file("") }
+
+  it "adds proper type to conf when saving" do
+    ntp.records << subject
+    record = ntp.records.last
+    record.value = "1"
+    record.comment = "# path for keys file\n"
+
+    ntp.save
+  end
+end
