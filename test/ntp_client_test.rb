@@ -714,7 +714,7 @@ describe Yast::NtpClient do
       end
 
       it "sets selected_record as the ntp_records entry for given index" do
-        subject.selectSyncRecord(3)
+        subject.selectSyncRecord(9)
         record = subject.selected_record.reject { |k| k == "cfa_record" }
         expect(record).to eql(selected_record)
       end
@@ -750,12 +750,13 @@ describe Yast::NtpClient do
     end
 
     it "removes record entry from ntp records at given index position" do
+      old_size = subject.ntp_records.size
       expect(subject.deleteSyncRecord(0)).to eql(true)
 
       subject.selectSyncRecord(0)
       record = subject.selected_record.reject { |k| k == "cfa_record" }
       expect(record).not_to eql(deleted_record)
-      expect(subject.ntp_records.size).to eql(5)
+      expect(subject.ntp_records.size).to eql(old_size - 1)
     end
   end
 

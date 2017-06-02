@@ -38,6 +38,8 @@ if ENV["COVERAGE"]
 end
 
 def load_records
+  subject.instance_variable_set(:@ntp_conf, nil)
+  subject.ntp_records = []
   subject.GetNtpServers()
   subject.GetCountryNames()
   subject.ProcessNtpConf()

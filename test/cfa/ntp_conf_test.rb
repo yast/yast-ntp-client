@@ -40,7 +40,7 @@ describe CFA::NtpConf do
     let(:content) { ntp_disk_content }
 
     it "obtains the corrent amount of records" do
-      expect(ntp.records.count).to eq(12)
+      expect(ntp.records.count).to eq(18)
     end
 
     it "obtains a collection of records" do
