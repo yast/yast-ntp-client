@@ -429,7 +429,9 @@ describe CFA::NtpConf::TrustedkeyRecord do
     ntp.records << subject
     record = ntp.records.last
     record.value = "1"
+    record.raw_options = ""
     record.comment = "# path for keys file\n"
+    expect(record.value).to eq "1"
 
     ntp.save
   end

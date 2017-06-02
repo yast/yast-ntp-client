@@ -390,7 +390,8 @@ module CFA
       # for trustedkey it is subtree of keys
       def value
         return [] unless tree_value?
-        keys = augeas_options.select { |e| e[:key] = "key" }
+        key_matcher = CFA::Matcher.new { |k, v| k == "key" || k == "key[]" }
+        keys = tree_value.tree.select(key_matcher)
         keys.map { |option| option[:value] }.join(" ")
       end
 
@@ -403,9 +404,8 @@ module CFA
       end
 
       # here key is actually value and not option
-      def augeas_options
+      def options_matcher
         Matcher.new { |k, _v| !k.include?("#comment") && !k.include?("key") }
-        tree_value.tree.select(options_matcher)
       end
     end
 
