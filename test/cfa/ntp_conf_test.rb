@@ -87,6 +87,7 @@ describe CFA::NtpConf do
         record.value = "3.pool.ntp.org"
         record.comment = "# test comment\n#test comment 2\n#test comment3"
         ntp.records << record
+        expect(record.comment).to eq "# test comment\n#test comment 2\n#test comment3"
         ntp.save
         expect(file.content.lines).to include("server 3.pool.ntp.org\n")
         expect(file.content.lines).to include("## test comment\n")

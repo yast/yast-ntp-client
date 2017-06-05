@@ -76,6 +76,8 @@ module CFA
       fix_keys(data)
     end
 
+    # Saves handle beside common {BaseModel#save} also initial conversion of
+    # multiline part of element to common augeas "#comment[]" collection.
     def save
       records.each do |r|
         next unless r.augeas[:multiline]
@@ -254,7 +256,7 @@ module CFA
       end
 
       def comment
-        return augeas[:mutline] if augeas[:multiline]
+        return augeas[:multiline] if augeas[:multiline]
         return nil unless tree_value?
         tree_value.tree["#comment"]
       end
