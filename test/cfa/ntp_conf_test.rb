@@ -85,14 +85,14 @@ describe CFA::NtpConf do
       it "can write multi lines comments from autoyast profiles" do
         record = CFA::NtpConf::ServerRecord.new
         record.value = "3.pool.ntp.org"
-        record.comment = "# test comment\n#test comment 2\n#test comment3"
+        record.comment = "test comment\ntest comment 2\ntest comment3"
         ntp.records << record
-        expect(record.comment).to eq "# test comment\n#test comment 2\n#test comment3"
+        expect(record.comment).to eq "test comment\ntest comment 2\ntest comment3"
         ntp.save
         expect(file.content.lines).to include("server 3.pool.ntp.org\n")
-        expect(file.content.lines).to include("## test comment\n")
-        expect(file.content.lines).to include("##test comment 2\n")
-        expect(file.content.lines).to include("##test comment3\n")
+        expect(file.content.lines).to include("#test comment\n")
+        expect(file.content.lines).to include("#test comment 2\n")
+        expect(file.content.lines).to include("#test comment3\n")
       end
     end
 
