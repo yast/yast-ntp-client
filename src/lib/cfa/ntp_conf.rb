@@ -76,8 +76,8 @@ module CFA
       fix_keys(data)
     end
 
-    # Saves handle beside common {BaseModel#save} also initial conversion of
-    # multiline part of element to common augeas "#comment[]" collection.
+    # The method converts the multiline part of an element to a common augeas
+    # "#comment[]" before call {BaseModel#save}.
     def save
       records.each do |r|
         next unless r.augeas[:multiline]
