@@ -40,7 +40,7 @@ describe CFA::NtpConf do
     let(:content) { ntp_disk_content }
 
     it "obtains the corrent amount of records" do
-      expect(ntp.records.count).to eq(12)
+      expect(ntp.records.count).to eq(18)
     end
 
     it "obtains a collection of records" do
@@ -80,7 +80,19 @@ describe CFA::NtpConf do
         ntp.records << record
         ntp.save
         expect(file.content.lines).to include("server 3.pool.ntp.org# test comment\n")
+      end
 
+      it "can write multi lines comments from autoyast profiles" do
+        record = CFA::NtpConf::ServerRecord.new
+        record.value = "3.pool.ntp.org"
+        record.comment = "test comment\ntest comment 2\ntest comment3"
+        ntp.records << record
+        expect(record.comment).to eq "test comment\ntest comment 2\ntest comment3"
+        ntp.save
+        expect(file.content.lines).to include("server 3.pool.ntp.org\n")
+        expect(file.content.lines).to include("#test comment\n")
+        expect(file.content.lines).to include("#test comment 2\n")
+        expect(file.content.lines).to include("#test comment3\n")
       end
     end
 
@@ -405,5 +417,25 @@ describe CFA::NtpConf::RestrictRecord do
       ntp.save
       expect(file.content).to include("restrict -4 default notrap\n")
     end
+  end
+end
+
+describe CFA::NtpConf::TrustedkeyRecord do
+
+  let(:ntp) { ntp_conf(file) }
+
+  let(:file) { ntp_file("") }
+
+  it "adds proper type to conf when saving" do
+    ntp.records << subject
+    record = ntp.records.last
+    record.value = "1"
+    record.raw_options = ""
+    record.comment = "# path to keys file"
+    expect(record.value).to eq "1"
+
+    ntp.save
+
+    expect(file.content.lines).to include("trustedkey 1# path to keys file\n")
   end
 end

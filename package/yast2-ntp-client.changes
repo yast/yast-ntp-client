@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jun  2 16:37:27 CEST 2017 - schubi@suse.de
+
+- AutoYaST: Fixed crash in CFA class while writing settings to
+  ntp.conf. (bnc#1040350)
+- 3.2.8
+
+-------------------------------------------------------------------
 Fri Apr 21 15:32:37 UTC 2017 - igonzalezsosa@suse.com
 
 - Add a CFA class to handle ntp.conf

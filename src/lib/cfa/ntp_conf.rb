@@ -39,6 +39,12 @@ module CFA
       manycastclient
       fudge
       restrict
+      driftfile
+      logfile
+      keys
+      trustedkey
+      requestkey
+      controlkey
     ).freeze
 
     COLLECTION_KEYS = (RECORD_ENTRIES + ["action"]).freeze
@@ -70,6 +76,22 @@ module CFA
       fix_keys(data)
     end
 
+    # The method converts the multiline part of an element to a common augeas
+    # "#comment[]" before call {BaseModel#save}.
+    def save
+      records.each do |r|
+        next unless r.augeas[:multiline]
+
+        comments = r.augeas[:multiline].split("\n")
+        matcher = Matcher.new(key: r.augeas[:key], value_matcher: r.augeas[:value])
+        placer = BeforePlacer.new(matcher)
+        comments.each do |c|
+          data.add("#comment[]", c, placer)
+        end
+      end
+      super
+    end
+
     # Obtains a collection that represents the
     # entries of the file.
     # @return [CollectionRecord] collection to
@@ -79,7 +101,7 @@ module CFA
     # ntp entries in the file and only contains the
     # entries of interest (see RECORD_ENTRIES).
     def records
-      RecordCollection.new(data)
+      @records ||= RecordCollection.new(data)
     end
 
     # Obtains raw content of the file.
@@ -137,6 +159,8 @@ module CFA
       # @param [Record] record
       def <<(record)
         @augeas_tree.add(record.augeas[:key], record.augeas[:value])
+        # TODO: nasty workaround to survive multiline key with long comments
+        @augeas_tree.all_data.last[:multiline] = record.augeas[:multiline]
         reset_cache
       end
 
@@ -212,6 +236,7 @@ module CFA
       def initialize(augeas = nil)
         augeas ||= create_augeas
         @augeas = augeas
+        @multiline_comment = ""
       end
 
       attr_reader :augeas
@@ -231,6 +256,7 @@ module CFA
       end
 
       def comment
+        return augeas[:multiline] if augeas[:multiline]
         return nil unless tree_value?
         tree_value.tree["#comment"]
       end
@@ -241,8 +267,13 @@ module CFA
         ensure_tree_value
         if comment.to_s == ""
           tree_value.tree.delete("#comment")
+          augeas[:multiline] = nil
+        # backward compatibility for autoyast which allows multiline comments
+        elsif comment.include?("\n")
+          augeas[:multiline] = comment
         else
           tree_value.tree["#comment"] = comment
+          augeas[:multiline] = nil
         end
       end
 
@@ -323,6 +354,75 @@ module CFA
         tree_value.tree.delete(options_matcher)
         options.each { |option| tree_value.tree.add(option, nil) }
       end
+    end
+
+    # class to represent a driftfile entry.
+    # For example:
+    #   driftfile /var/lib/ntp/drift/ntp.drift
+    class DriftfileRecord < CommandRecord
+      AUGEAS_KEY = "driftfile[]".freeze
+    end
+
+    # class to represent a logfile entry.
+    # For example:
+    #   logfile /var/log/ntp
+    class LogfileRecord < CommandRecord
+      AUGEAS_KEY = "logfile[]".freeze
+    end
+
+    # class to represent a keys entry.
+    # For example:
+    #   keys /etc/ntp.keys
+    class KeysRecord < CommandRecord
+      AUGEAS_KEY = "keys[]".freeze
+    end
+
+    # class to represent a trustedkey entry.
+    # For example:
+    #   trustedkey 1
+    class TrustedkeyRecord < CommandRecord
+      AUGEAS_KEY = "trustedkey[]".freeze
+
+      def initialize(augeas = nil)
+        super
+        ensure_tree_value
+        tree_value.value = nil
+      end
+
+      # for trustedkey it is subtree of keys
+      def value
+        return [] unless tree_value?
+        key_matcher = CFA::Matcher.new { |k, _v| k == "key" || k == "key[]" }
+        keys = tree_value.tree.select(key_matcher)
+        keys.map { |option| option[:value] }.join(" ")
+      end
+
+      def value=(options)
+        values = options.split("\s")
+        ensure_tree_value
+        tree_value.tree.delete("key")
+        tree_value.tree.delete("key[]")
+        values.each { |value| tree_value.tree.add("key[]", value) }
+      end
+
+      # here key is actually value and not option
+      def options_matcher
+        Matcher.new { |k, _v| !k.include?("#comment") && !k.include?("key") }
+      end
+    end
+
+    # class to represent a requestkey entry.
+    # For example:
+    #   requestkey 1
+    class RequestkeyRecord < CommandRecord
+      AUGEAS_KEY = "requestkey[]".freeze
+    end
+
+    # class to represent a controlkey entry.
+    # For example:
+    #   controlkey 1
+    class ControlkeyRecord < CommandRecord
+      AUGEAS_KEY = "controlkey[]".freeze
     end
 
     # class to represent a ntp server entry.
