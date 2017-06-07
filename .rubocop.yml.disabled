@@ -1,3 +1,6 @@
+# disabled in SP2 branch as it failing too much and create too big patch in next
+# maintenance updated
+
 # use the shared Yast defaults
 inherit_from:
   /usr/share/YaST2/data/devtools/data/rubocop_yast_style.yml
