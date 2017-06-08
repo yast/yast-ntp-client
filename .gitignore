@@ -5,3 +5,4 @@ tmp.*
 /doc/autodocs
 /.yardoc
 /coverage
+/doc/autodocs
