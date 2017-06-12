@@ -22,7 +22,7 @@ module Yast
 
       Yast.include include_target, "ntp-client/clocktypes.rb"
 
-      # FIXME this is quite ugly ... the whole checkinf if something was changed
+      # FIXME: this is quite ugly ... the whole checkinf if something was changed
       # ... but it works :-)
       @sync_record_modified = false
     end
@@ -36,10 +36,8 @@ module Yast
     end
 
     def reallyExitSimple
-      if NtpClient.run_service ==
-          (UI.QueryWidget(Id("start"), :CurrentButton) == "boot") &&
-          Ops.get_string(NtpClient.selected_record, "address", "") ==
-            UI.QueryWidget(Id("server_address"), :Value)
+      if NtpClient.run_service == (UI.QueryWidget(Id("start"), :CurrentButton) == "boot") &&
+          NtpClient.selected_record["address"] == UI.QueryWidget(Id("server_address"), :Value)
         return true
       end
       reallyExit
@@ -52,7 +50,6 @@ module Yast
       elsif UI.QueryWidget(Id("policy_combo"), :Value) == :custom
         pol = Convert.to_string(UI.QueryWidget(Id("custom_policy"), :Value))
       end
-
 
       if NtpClient.run_service ==
           (UI.QueryWidget(Id("start"), :CurrentButton) == "boot") &&
@@ -82,40 +79,32 @@ module Yast
       nil
     end
 
-
     # Parse string to map of options
     # @param [String] options_string string of options
     # @param [Array<String>] with_param a list of options that must have a parameter
     # @param [Array<String>] without_param a list of options that don't have any parameter
     # @return [Hash] options as a map
     def string2opts(options_string, with_param, without_param)
-      with_param = deep_copy(with_param)
-      without_param = deep_copy(without_param)
-      l = Builtins.splitstring(options_string, " ")
-      l = Builtins.filter(l) { |e| e != "" }
-      ignore_next = false
-      index = -1
+      options_list = options_string.split(" ")
+      option_parse = nil
+      parsed = {}
       unknown = []
-      ret = Builtins.listmap(l) do |e|
-        index = Ops.add(index, 1)
-        if ignore_next
-          ignore_next = false
-          next { e => nil }
+      options_list.each do |option|
+        if option_parse
+          parsed[option_parse] = option
+          option_parse = nil
+          next
         end
-        ignore_next = false
-        if Builtins.contains(with_param, e)
-          ignore_next = true
-          next { e => Ops.get(l, Ops.add(index, 1), "") }
-        elsif Builtins.contains(without_param, e)
-          next { e => true }
+        if with_param.include? option
+          option_parse = option
+        elsif without_param.include? option
+          parsed[option] = true
         else
-          unknown = Builtins.add(unknown, e)
-          next { e => nil }
+          unknown << option
         end
       end
-      ret = Builtins.filter(ret) { |k, v| v != nil }
-      ret = { "parsed" => ret, "unknown" => Builtins.mergestring(unknown, " ") }
-      deep_copy(ret)
+
+      { "parsed" => parsed, "unknown" => unknown.join(" ") }
     end
 
     # Create options string from a map
@@ -217,7 +206,6 @@ module Yast
       ret
     end
 
-
     # Get entries for the clock type combo box
     # @return [Array] of items for the combo box
     def getClockTypesCombo
@@ -239,7 +227,7 @@ module Yast
           Ops.get_string(r, "type", "") == "broadcastclient"
       end
       addresses = Builtins.maplist(recs) { |r| Ops.get_string(r, "address", "") }
-      addresses = Builtins.filter(addresses) { |a| a != "" && a != nil }
+      addresses = Builtins.filter(addresses) { |a| a != "" && !a.nil? }
       addresses = Builtins.maplist(addresses) do |a|
         next a if IP.Check4(a)
         m = Convert.to_map(
@@ -253,7 +241,7 @@ module Yast
         out = Builtins.regexpsub(out, "has address (.*)$", "\\1")
         out
       end
-      addresses = Builtins.filter(addresses) { |a| a != "" && a != nil }
+      addresses = Builtins.filter(addresses) { |a| a != "" && !a.nil? }
       ifaces = Builtins.maplist(addresses) do |a|
         m = Convert.to_map(
           SCR.Execute(
@@ -268,7 +256,7 @@ module Yast
         out
       end
       ifaces = Builtins.toset(ifaces)
-      ifaces = Builtins.filter(ifaces) { |i| i != nil }
+      ifaces = Builtins.filter(ifaces) { |i| !i.nil? }
       deep_copy(ifaces)
     end
   end

@@ -1,4 +1,255 @@
 -------------------------------------------------------------------
+Fri Jun  2 16:37:27 CEST 2017 - schubi@suse.de
+
+- AutoYaST: Fixed crash in CFA class while writing settings to
+  ntp.conf. (bnc#1040350)
+- 3.2.8
+
+-------------------------------------------------------------------
+Fri Apr 21 15:32:37 UTC 2017 - igonzalezsosa@suse.com
+
+- Add a CFA class to handle ntp.conf
+- Fixed build.
+- NtpClient module does not use this new class
+- These are additional fixed for bsc#983486 and bsc#929694.
+- 3.2.7
+
+-------------------------------------------------------------------
+Tue Mar 21 14:48:29 UTC 2017 - jreidinger@suse.com
+
+- Adapt to new version of rubygem-cfa ( updated for bsc#1023204)
+- 3.2.6
+
+-------------------------------------------------------------------
+Thu Jan 26 10:17:50 CET 2017 - schubi@suse.de
+
+- AutoYaST writing settings crash: Initialize CFA instance
+  correctly (bnc#1019292)
+- 3.2.5
+
+-------------------------------------------------------------------
+Wed Jan  4 08:18:24 UTC 2017 - lslezak@suse.cz
+
+- Update the Rubocop style to version 0.41.2 (to match the other
+  YaST modules)
+
+-------------------------------------------------------------------
+Fri Dec 30 12:08:30 CET 2016 - schubi@suse.de
+
+- AutoYaST: Fixed crash while exporting settings. Do not export
+  Augeas objects (bnc#1017490)
+- 3.2.4
+
+-------------------------------------------------------------------
+Thu Dec 15 12:19:27 UTC 2016 - kanderssen@suse.com
+
+- Fixed some tests that were passing because of an old ntp augeas
+  lens (bsc#983486).
+- 3.2.3
+
+-------------------------------------------------------------------
+Fri Dec  2 14:37:28 UTC 2016 - joseivanlopez@gmail.com
+
+- Updated client to read/write NTP configuration using CFA
+  (bsc#983486 and bsc#929694)
+- 3.2.2 
+
+-------------------------------------------------------------------
+Fri Nov 25 16:44:58 UTC 2016 - igonzalezsosa@suse.com
+
+- Remove warning message from a wrong widget definition 
+  (bsc#1012185)
+- 3.2.1
+
+-------------------------------------------------------------------
+Tue Oct 18 13:53:24 UTC 2016 - jreidinger@suse.com
+
+- properly report that test failed if server without running ntp is
+  checked as ntp server (bsc#972842)
+- 3.2.0
+
+-------------------------------------------------------------------
+Thu Aug 11 14:24:42 CEST 2016 - schubi@suse.de
+
+- Error while using <type>__clock</type> in AutoYaST.
+  Fixed typo.
+  (bnc#992854)
+- 3.1.28
+
+-------------------------------------------------------------------
+Thu Jun 30 06:51:52 UTC 2016 - jreidinger@suse.com
+
+- Fix regression: crash when reading cron entry failed
+  ( discovered by sap-ha module ) (bsc#977610, bsc#987064)
+- 3.1.27
+
+-------------------------------------------------------------------
+Tue Jun 14 06:54:54 UTC 2016 - kanderssen@suse.com
+
+- Fix handling of NTP records without comments (bsc#977610)
+- 3.1.26
+
+-------------------------------------------------------------------
+Thu Jun  2 07:40:56 UTC 2016 - kanderssen@suse.com
+
+- Fixed Ntp Test adding a workaround to return false in case given
+  server is not reachable (bsc#977610)
+- Replaced old testsuite with Rspec tests
+- Added rubocop and coveralls
+- Removed autotools
+- 3.1.25
+
+-------------------------------------------------------------------
+Wed Jun  1 15:33:15 UTC 2016 - igonzalezsosa@suse.com
+
+- Drop yast2-ntp-client-devel-doc package (fate#320256)
+- 3.1.24
+
+-------------------------------------------------------------------
+Fri May  6 16:09:50 UTC 2016 - lslezak@suse.cz
+
+- Fixed the default synchronization interval in the help text
+  (bsc#978453)
+- Unify the default value in the code (the proposal client used
+  a different default)
+- Set the initial state of the interval widget according to
+  the current synchronization mode (bsc#978892)
+- Fixed firewall widget layout (double frame widget)
+- 3.1.23
+
+-------------------------------------------------------------------
+Thu Apr 14 09:16:37 CEST 2016 - kanderssen@suse.com
+
+- Calls to sntp adjusted to the syntax of ntp 4.2.8
+  (bnc#937837, bnc#916617, FATE#320392)
+- 3.1.22
+
+-------------------------------------------------------------------
+Fri Nov 13 10:59:21 UTC 2015 - igonzalezsosa@suse.com
+
+- Fix validation of AutoYaST profiles (bsc#954412)
+- 3.1.21
+
+-------------------------------------------------------------------
+Thu Oct 29 12:05:53 UTC 2015 - ancor@suse.com
+
+- Fixed an error in the "run NTP as daemon" checkbox (bsc#952144)
+- 3.1.20
+
+-------------------------------------------------------------------
+Mon Aug 17 15:57:24 UTC 2015 - ancor@suse.com
+
+- Always use a server from pool.ntp.org as default (bnc#940881)
+- 3.1.19
+
+-------------------------------------------------------------------
+Fri Aug  7 12:35:42 UTC 2015 - varkoly@suse.com
+
+- bnc#799473 - Do not use chronos.cru.fr which is is not really
+  freely accessible: Access policy : acces sous conditions
+- 3.1.18
+
+-------------------------------------------------------------------
+Thu Aug  6 08:51:13 UTC 2015 - mvidner@suse.com
+
+- If Install Recommended Packages is disabled during system
+  installation, explicitly install ntp.rpm, avoiding error pop-up
+  "Cannot adjust 'NTP' service" (boo#938951).
+- 3.1.17
+
+-------------------------------------------------------------------
+Mon Jul 20 10:38:30 UTC 2015 - ancor@suse.com
+
+- Calls to sntp adjusted to the syntax of ntp 4.2.8
+  (bnc#937837, bnc#916617)
+- 3.1.16
+
+-------------------------------------------------------------------
+Fri Jun 26 11:34:00 UTC 2015 - jreidinger@suse.com
+
+- do not crash if ntp is not installed to target system during
+  cloning (bnc#936178)
+- 3.1.15
+
+-------------------------------------------------------------------
+Fri May  8 09:39:11 CEST 2015 - schubi@suse.de
+
+- AutoYaST (bnc#928987):
+  -- Read ntp.conf again before generating autoinst.xml file
+     (after the ntp rpm has been installed)
+  -- New section "restricts"
+- 3.1.14
+
+-------------------------------------------------------------------
+Thu Dec  4 09:50:34 UTC 2014 - jreidinger@suse.com
+
+- remove X-KDE-Library from desktop file (bnc#899104)
+
+-------------------------------------------------------------------
+Tue Sep  2 10:00:18 UTC 2014 - cwh@suse.com
+
+- Using Report.Error to be autoyast-proof
+- Fixed variable replacement int gettext string;
+- Added linebreaks in too long popup content (bnc#894573)
+- 3.1.12
+
+-------------------------------------------------------------------
+Mon Sep  1 15:34:23 UTC 2014 - cwh@suse.com
+
+- Aligned "Synchronize now" button and "NTP Server Address" box (bnc#893065)
+- Fixed checking of return value of "sntp -s" (bnc#893094)
+- 3.1.11
+
+-------------------------------------------------------------------
+Wed Aug 20 16:27:49 CEST 2014 - schubi@suse.de
+
+- Autoyast cloning: Do not show error popup if ntp server has not
+  installed. (bnc#891422)
+- 3.1.10
+
+-------------------------------------------------------------------
+Thu Jun  5 09:45:40 UTC 2014 - varkoly@suse.com
+
+- bnc#881026 - YaST ntp-client: "sync without daemon" not documented in help
+  3.1.9
+
+-------------------------------------------------------------------
+Tue Apr 15 09:58:18 CEST 2014 - locilka@suse.com
+
+- Fixed evaluation of starting the NTP service (bnc#872389)
+- 3.1.8
+
+-------------------------------------------------------------------
+Thu Apr  3 11:52:14 UTC 2014 - jreidinger@suse.com
+
+- change path for ntptimeset(bnc#871367)
+- 3.1.7
+
+-------------------------------------------------------------------
+Tue Apr  1 11:22:41 UTC 2014 - coolo@suse.com
+
+- adapt to new ntp service name (see bnc#871367)
+- 3.1.6
+
+-------------------------------------------------------------------
+Fri Mar 28 13:31:07 UTC 2014 - vmoravec@suse.com
+
+- Fix failing testsuite
+- 3.1.5
+
+-------------------------------------------------------------------
+Thu Mar 27 14:25:29 UTC 2014 - varkoly@suse.com
+
+- bnc#866313 - NTP in Installer: Offers remote functionality, but no network is configured
+- 3.1.4 
+
+-------------------------------------------------------------------
+Wed Mar  5 15:18:31 UTC 2014 - varkoly@suse.com
+
+- bnc#863965 - NTP servers should be selected by timezone not keyboard layout
+- 3.1.3
+
+-------------------------------------------------------------------
 Sat Feb  1 21:17:29 UTC 2014 - mfilka@suse.com
 
 - bnc#861560

@@ -16,10 +16,16 @@
 # @return [Hash] edited settings, Summary or boolean on success depending on called function
 # @example map mm = $[ "FAIL_DELAY" : "77" ];
 # @example map ret = WFM::CallFunction ("ntp-client_auto", [ "Summary", mm ]);
+
+require "fileutils"
+
 module Yast
   class NtpClientAutoClient < Client
     def main
       Yast.import "UI"
+      Yast.import "Mode"
+      Yast.import "Stage"
+      Yast.import "Installation"
 
       textdomain "ntp-client"
 
@@ -63,6 +69,25 @@ module Yast
         @ret = NtpClient.Import(@param)
       # Return actual state
       elsif @func == "Export"
+        # The ntp.conf has to be read after the
+        # package has been installed in the installation
+        # mode (bnc#928987)
+        # Mode.config : true during the installation when
+        #               cloning the just installed system
+        if Mode.config && Stage.initial
+          ntp_conf = "/etc/ntp.conf"
+          installed_ntp_conf = File.join(Installation.destdir, ntp_conf)
+          # if ntp is not installed at all we cannot copy it, so return empty values
+          if !::File.exist?(installed_ntp_conf)
+            Builtins.y2milestone("Ntp is not installed, so return empty hash")
+            return {}
+          end
+          # copy ntp.conf from the installed system to
+          # running system
+          ::FileUtils.cp installed_ntp_conf, ntp_conf
+          # read ntp.conf
+          NtpClient.ProcessNtpConf
+        end
         @ret = NtpClient.Export
       # did configuration change
       elsif @func == "GetModified"
@@ -93,7 +118,7 @@ module Yast
       Builtins.y2milestone("NtpClient auto finished")
       Builtins.y2milestone("----------------------------------------")
 
-      deep_copy(@ret) 
+      deep_copy(@ret)
 
       # EOF
     end

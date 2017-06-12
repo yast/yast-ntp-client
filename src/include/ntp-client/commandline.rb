@@ -10,12 +10,11 @@
 # Main file for ntp-client configuration. Uses all other files.
 module Yast
   module NtpClientCommandlineInclude
-    def initialize_ntp_client_commandline(include_target)
+    def initialize_ntp_client_commandline(_include_target)
       Yast.import "CommandLine"
       Yast.import "NtpClient"
 
       textdomain "ntp-client"
-
 
       @cmdline = {
         "id"         => "ntp-client",
@@ -244,14 +243,10 @@ module Yast
     # Handler for command line interface
     # @param [Hash] options map options from the command line
     # @return [Boolean] true if settings have been changed
-    def NtpStatusHandler(options)
-      options = deep_copy(options)
+    def NtpStatusHandler(_options)
       CommandLine.Print(
-        NtpClient.run_service ?
-          # status information for command line
-          _("NTP daemon is enabled.") :
-          # status information for command line
-          _("NTP daemon is disabled.")
+        # status information for command line
+        NtpClient.run_service ? _("NTP daemon is enabled.") : _("NTP daemon is disabled.")
       )
       false
     end
@@ -259,9 +254,8 @@ module Yast
     # Handler for command line interface
     # @param [Hash] options map options from the command line
     # @return [Boolean] true if settings have been changed
-    def NtpListHandler(options)
-      options = deep_copy(options)
-      # FIXME there is some code duplication with the initialization handler of the
+    def NtpListHandler(_options)
+      # FIXME: there is some code duplication with the initialization handler of the
       # overview widget
       types = {
         # table cell, NTP relationship type
@@ -278,7 +272,6 @@ module Yast
       Builtins.foreach(NtpClient.getSyncRecords) do |i|
         type = Ops.get_string(i, "type", "")
         address = Ops.get_string(i, "address", "")
-        index = Ops.get_integer(i, "index", -1)
         if type == "__clock"
           clock_type = getClockType(address)
           unit_number = getClockUnitNumber(address)
@@ -306,8 +299,7 @@ module Yast
     # Handler for command line interface
     # @param [Hash] options map options from the command line
     # @return [Boolean] true if settings have been changed
-    def NtpEnableHandler(options)
-      options = deep_copy(options)
+    def NtpEnableHandler(_options)
       NtpClient.modified = !NtpClient.run_service
       NtpClient.run_service = true
       true
@@ -316,8 +308,7 @@ module Yast
     # Handler for command line interface
     # @param [Hash] options map options from the command line
     # @return [Boolean] true if settings have been changed
-    def NtpDisableHandler(options)
-      options = deep_copy(options)
+    def NtpDisableHandler(_options)
       NtpClient.modified = NtpClient.run_service
       NtpClient.run_service = false
       true
