@@ -418,6 +418,17 @@ describe CFA::NtpConf::RestrictRecord do
       expect(file.content).to include("restrict -4 default notrap\n")
     end
   end
+
+  context "when creating a new record from scratch" do
+    it "sets values correctly" do
+      record = CFA::NtpConf::RestrictRecord.new
+      record.value = "192.168.0.1"
+      record.options = ["default"]
+      ntp.records << record
+      ntp.save
+      expect(file.content).to include("restrict 192.168.0.1 default\n")
+    end
+  end
 end
 
 describe CFA::NtpConf::TrustedkeyRecord do

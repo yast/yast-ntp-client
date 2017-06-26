@@ -501,6 +501,8 @@ module CFA
       end
 
       def options=(options)
+        ensure_tree_value
+
         # backward compatibility with old lens that set value ip restriction
         # instead of address
         if old_lens?
@@ -509,7 +511,6 @@ module CFA
           options.unshift(address) if address
         end
 
-        ensure_tree_value
         tree_value.tree.delete(options_matcher)
         options.each { |option| tree_value.tree.add("action[]", option) }
       end
