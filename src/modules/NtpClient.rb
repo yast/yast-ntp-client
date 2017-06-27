@@ -669,7 +669,7 @@ module Yast
       @ntp_records = Builtins.maplist(@ntp_records) do |p|
         if Builtins.haskey(p, "key") && Builtins.haskey(p, "value")
           Ops.set(p, "type", Ops.get_string(p, "key", ""))
-          Ops.set(p, "address", Ops.get_string(p, "value", ""))
+          Ops.set(p, "address", Ops.get_string(p, "value", "").strip)
           if Builtins.haskey(p, "param")
             Ops.set(p, "options", Ops.get_string(p, "param", ""))
           end
