@@ -1227,14 +1227,23 @@ module Yast
     # Returns current restrict map as a list of ntp records
     def restrict_map_records
       @restrict_map.map do |key, m|
-        options = " "
-        options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
-        options << m["options"].to_s
+        address = key
+        options = m["options"].to_s.split
+
+        if ["-4", "-6"].include?(key)
+          address = options.first
+          options.shift
+          options.unshift("ipv4") if key == "-4"
+          options.unshift("ipv6") if key == "-6"
+        end
+
+        options << "mask #{m["mask"]}" if !m["mask"].to_s.empty?
+
         {
           "type"       => "restrict",
-          "address"    => key,
+          "address"    => address,
           "comment"    => m["comment"].to_s,
-          "options"    => options,
+          "options"    => options.join(" "),
           "cfa_record" => m["cfa_record"]
         }
       end
