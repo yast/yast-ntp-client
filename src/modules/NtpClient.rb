@@ -669,7 +669,7 @@ module Yast
       @ntp_records = Builtins.maplist(@ntp_records) do |p|
         if Builtins.haskey(p, "key") && Builtins.haskey(p, "value")
           Ops.set(p, "type", Ops.get_string(p, "key", ""))
-          Ops.set(p, "address", Ops.get_string(p, "value", "").strip)
+          Ops.set(p, "address", Ops.get_string(p, "value", ""))
           if Builtins.haskey(p, "param")
             Ops.set(p, "options", Ops.get_string(p, "param", ""))
           end
@@ -1205,7 +1205,7 @@ module Yast
     def record_for_write(record)
       {
         "type"       => record["type"] == "__clock" ? "server" : record["type"],
-        "address"    => record["address"],
+        "address"    => record["address"].strip,
         "options"    => record["options"].to_s.strip,
         "comment"    => record["comment"].to_s,
         "cfa_record" => record["cfa_record"]
