@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Jun 29 15:19:51 UTC 2017 - jlopez@suse.com
+
+- AutoYaST: Comments from autoyast profile should not be sanitized
+  to avoid entries without space between value and comment (e.g
+  trustedkey 1# coment). This is caused by a bug in augeas adding
+  new entries.
+
+-------------------------------------------------------------------
 Mon Jun 26 17:23:52 UTC 2017 - jlopez@suse.com
 
 - AutoYaST: Fixed crash in CFA when creating restrict record from
