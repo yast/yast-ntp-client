@@ -988,9 +988,12 @@ module Yast
   private
 
     # Remove blank spaces in values
+    #
+    # @note comments are kept untouched to avoid possible errors with
+    #   inline comments that could produce entries like: trustedkey 1# comment
     def sanitize_record(record)
       sanitized = record.dup
-      sanitized.each_value(&:strip!)
+      sanitized.each_key { |k| sanitized[k].strip! unless k.include?("comment") }
       sanitized
     end
 
