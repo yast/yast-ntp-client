@@ -319,7 +319,7 @@ describe CFA::NtpConf::CommandRecord do
   describe "#options=" do
     it "sets options to the record" do
       record.options = ["iburst", "version", "3", "prefer"]
-      expect(record.options).to eq(["iburst", "version", "prefer"])
+      expect(record.options).to eq(["iburst", "version", "3", "prefer"])
       ntp.save
       expect(file.content).to include("server 0.pool.ntp.org iburst version 3 prefer\n")
     end

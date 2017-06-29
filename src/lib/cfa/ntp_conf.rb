@@ -356,7 +356,9 @@ module CFA
     class CommandRecord < Record
       def options
         return [] unless tree_value?
-        augeas_options.map { |option| option[:key] }
+        augeas_options.each_with_object({}) do |option, opts|
+          opts[option[:key]] = option[:value]
+        end.to_a.flatten.compact
       end
 
       def options=(options)
