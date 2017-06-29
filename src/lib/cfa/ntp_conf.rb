@@ -49,6 +49,16 @@ module CFA
 
     COLLECTION_KEYS = (RECORD_ENTRIES + ["action"]).freeze
 
+    KEY_VALUE_CMD_OPTIONS = %w(
+      ident,
+      key,
+      minpoll,
+      maxpoll,
+      mode,
+      ttl,
+      version
+    )
+
     def initialize(file_handler: nil)
       super(PARSER, PATH, file_handler: file_handler)
     end
@@ -352,7 +362,24 @@ module CFA
       def options=(options)
         ensure_tree_value
         tree_value.tree.delete(options_matcher)
-        options.each { |option| tree_value.tree.add(option, nil) }
+
+        key = nil
+
+        # Some options can be a key value pair or just a single one
+        options.each do |option|
+          if KEY_VALUE_CMD_OPTIONS.include?(option)
+            key = option
+          else
+            add_option(option, key)
+            key = nil
+          end
+        end
+      end
+
+      def add_option(option, key)
+        return tree_value.tree.add(key, option) if key
+
+        tree_value.tree.add(option, nil)
       end
     end
 
