@@ -488,8 +488,8 @@ module CFA
     # For example:
     #   restrict -4 default notrap nomodify nopeer noquery
     #
-    # FIXME: right now there is not way to create an ipv4 restrict
-    #   record from scratch using old lense. The reason is that it
+    # FIXME: right now there is no way to create an ipv4 restrict
+    #   record from scratch using old lens. The reason is that it
     #   is not possible to detect an old_lens? case for a new record.
     #
     # Restrict entry has its own options interpretation.
