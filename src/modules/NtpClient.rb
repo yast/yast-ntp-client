@@ -677,15 +677,16 @@ module Yast
         next deep_copy(p)
       end
 
-      @ntp_records.each { |record| record["address"].strip! }
+      # sanitize records
+      @ntp_records = @ntp_records.map { |r| sanitize_record(r) }
 
       # restricts is a list of entries whereas restrict_map
       # is a map with target key (ip, ipv4-tag, ipv6-tag,...).
       restricts = settings["restricts"] || []
       @restrict_map = {}
       restricts.each do |entry|
-        target = entry.delete("target")
-        @restrict_map[target] = entry
+        target = entry.delete("target").strip
+        @restrict_map[target] = sanitize_record(entry)
       end
       @modified = true
       true
@@ -985,6 +986,13 @@ module Yast
     end
 
   private
+
+    # Remove blank spaces in values
+    def sanitize_record(record)
+      sanitized = record.dup
+      sanitized.each_value(&:strip!)
+      sanitized
+    end
 
     # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
     # /etc/sysconfig/network/config or with "auto" if not found
