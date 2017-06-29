@@ -49,6 +49,16 @@ describe Yast::NtpClient do
           subject.Import(ntp_client_section)
         end
 
+        it "sanitizes values" do
+          record = subject.ntp_records.first
+          expect(record["address"]).to eq "0.opensuse.pool.ntp.org"
+        end
+
+        it "keeps comments untouched" do
+          record = subject.ntp_records.first
+          expect(record["comment"]).to eq " # a comment with spaces "
+        end
+
         it "reads the list of peers" do
           expect(subject.ntp_records.size).to eq 4
         end
