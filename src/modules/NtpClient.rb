@@ -676,6 +676,9 @@ module Yast
         end
         next deep_copy(p)
       end
+
+      @ntp_records.each { |record| record["address"].strip! }
+
       # restricts is a list of entries whereas restrict_map
       # is a map with target key (ip, ipv4-tag, ipv6-tag,...).
       restricts = settings["restricts"] || []
@@ -1205,7 +1208,7 @@ module Yast
     def record_for_write(record)
       {
         "type"       => record["type"] == "__clock" ? "server" : record["type"],
-        "address"    => record["address"].strip,
+        "address"    => record["address"],
         "options"    => record["options"].to_s.strip,
         "comment"    => record["comment"].to_s,
         "cfa_record" => record["cfa_record"]
