@@ -365,23 +365,21 @@ module CFA
         ensure_tree_value
         tree_value.tree.delete(options_matcher)
 
-        key = nil
+        i = 0
 
-        # Some options can be a key value pair or just a single one
-        options.each do |option|
-          if KEY_VALUE_CMD_OPTIONS.include?(option)
-            key = option
+        while i < options.size
+          if KEY_VALUE_CMD_OPTIONS.include?(options[i])
+            add_option(options[i], options[i + 1])
+            i += 2
           else
-            add_option(key, option)
-            key = nil
+            add_option(options[i], nil)
+            i += 1
           end
         end
       end
 
       def add_option(key, option)
-        return tree_value.tree.add(key, option) if key
-
-        tree_value.tree.add(option, nil)
+        tree_value.tree.add(key, option)
       end
     end
 
