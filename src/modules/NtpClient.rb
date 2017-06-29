@@ -676,13 +676,17 @@ module Yast
         end
         next deep_copy(p)
       end
+
+      # sanitize records
+      @ntp_records = @ntp_records.map { |r| sanitize_record(r) }
+
       # restricts is a list of entries whereas restrict_map
       # is a map with target key (ip, ipv4-tag, ipv6-tag,...).
       restricts = settings["restricts"] || []
       @restrict_map = {}
       restricts.each do |entry|
-        target = entry.delete("target")
-        @restrict_map[target] = entry
+        target = entry.delete("target").strip
+        @restrict_map[target] = sanitize_record(entry)
       end
       @modified = true
       true
@@ -983,6 +987,13 @@ module Yast
 
   private
 
+    # Remove blank spaces in values
+    def sanitize_record(record)
+      sanitized = record.dup
+      sanitized.each_value(&:strip!)
+      sanitized
+    end
+
     # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
     # /etc/sysconfig/network/config or with "auto" if not found
     #
@@ -1227,14 +1238,23 @@ module Yast
     # Returns current restrict map as a list of ntp records
     def restrict_map_records
       @restrict_map.map do |key, m|
-        options = " "
-        options << "mask #{m["mask"]} " if !m["mask"].to_s.empty?
-        options << m["options"].to_s
+        address = key
+        options = m["options"].to_s.split
+
+        if ["-4", "-6"].include?(key)
+          address = options.first
+          options.shift
+          options.unshift("ipv4") if key == "-4"
+          options.unshift("ipv6") if key == "-6"
+        end
+
+        options << "mask #{m["mask"]}" if !m["mask"].to_s.empty?
+
         {
           "type"       => "restrict",
-          "address"    => key,
+          "address"    => address,
           "comment"    => m["comment"].to_s,
-          "options"    => options,
+          "options"    => options.join(" "),
           "cfa_record" => m["cfa_record"]
         }
       end

@@ -488,30 +488,46 @@ module CFA
     # For example:
     #   restrict -4 default notrap nomodify nopeer noquery
     #
+    # FIXME: right now there is no way to create an ipv4 restrict
+    #   record from scratch using old lens. The reason is that it
+    #   is not possible to detect an old_lens? case for a new record.
+    #
     # Restrict entry has its own options interpretation.
     class RestrictRecord < Record
       AUGEAS_KEY = "restrict[]".freeze
 
       def options
         return [] unless tree_value?
-        res = augeas_options.map { |option| option[:value] }
-        res.shift if old_lens?
+        res = augeas_options.map { |augeas_option| option(augeas_option) }
+
+        if old_lens?
+          res.shift
+          res.unshift("ipv4") if orig_value == "-4"
+        end
 
         res
       end
 
+      # Set restrict options
+      # @param options [Array<String>] It can contain values as "ipv4", "ipv6",
+      #   "notrap", "nomodify", "nopeer", "noquery".
+      #
+      # @note ip version is an option: "ipv4" or "ipv6"
       def options=(options)
+        ensure_tree_value
+
         # backward compatibility with old lens that set value ip restriction
         # instead of address
         if old_lens?
           options = options.dup
+          self.orig_value = "-4" if options.include?("ipv4")
+          options.delete("ipv4")
           address = augeas_options.map { |option| option[:value] }.first
           options.unshift(address) if address
         end
 
-        ensure_tree_value
         tree_value.tree.delete(options_matcher)
-        options.each { |option| tree_value.tree.add("action[]", option) }
+        options.each { |option| add_option(option) }
       end
 
       alias_method :orig_value, :value
@@ -519,6 +535,7 @@ module CFA
         old_lens? ? augeas_options.map { |option| option[:value] }.first : orig_value
       end
 
+      alias_method :orig_value=, :value=
       def value=(value)
         if old_lens?
           holder = tree_value.tree.select(options_matcher).first
@@ -531,8 +548,25 @@ module CFA
 
     private
 
+      def add_option(option)
+        if ["ipv4", "ipv6"].include?(option)
+          key = option
+          value = nil
+        else
+          key = "action[]"
+          value = option
+        end
+        tree_value.tree.add(key, value)
+      end
+
+      def option(augeas_option)
+        key = augeas_option[:key]
+        return key if ["ipv4", "ipv6"].include?(key)
+        augeas_option[:value]
+      end
+
       def options_matcher
-        Matcher.new { |k, _v| k.include?("action") }
+        Matcher.new { |k, _v| !k.match(/action|ipv4|ipv6/).nil? }
       end
 
       # backward compatibility with old lens that set value ip restriction
