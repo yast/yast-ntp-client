@@ -50,14 +50,14 @@ module CFA
     COLLECTION_KEYS = (RECORD_ENTRIES + ["action"]).freeze
 
     KEY_VALUE_CMD_OPTIONS = %w(
-      ident,
-      key,
-      minpoll,
-      maxpoll,
-      mode,
-      ttl,
+      ident
+      key
+      minpoll
+      maxpoll
+      mode
+      ttl
       version
-    )
+    ).freeze
 
     def initialize(file_handler: nil)
       super(PARSER, PATH, file_handler: file_handler)
@@ -372,13 +372,13 @@ module CFA
           if KEY_VALUE_CMD_OPTIONS.include?(option)
             key = option
           else
-            add_option(option, key)
+            add_option(key, option)
             key = nil
           end
         end
       end
 
-      def add_option(option, key)
+      def add_option(key, option)
         return tree_value.tree.add(key, option) if key
 
         tree_value.tree.add(option, nil)
