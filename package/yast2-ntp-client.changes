@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jun 26 17:23:52 UTC 2017 - jlopez@suse.com
+
+- AutoYaST: Fixed crash in CFA when creating restrict record from
+  scratch (bsc#1045777)
+- 3.2.9
+
+-------------------------------------------------------------------
 Fri Jun  2 16:37:27 CEST 2017 - schubi@suse.de
 
 - AutoYaST: Fixed crash in CFA class while writing settings to
