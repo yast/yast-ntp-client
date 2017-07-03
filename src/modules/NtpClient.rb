@@ -617,7 +617,9 @@ module Yast
       # write settings
       return false if !go_next
 
-      @ntp_records += restrict_map_records
+      # Restrict map records are written first to not mangle the config file
+      # (bsc#983486)
+      @ntp_records = restrict_map_records + @ntp_records
 
       log.info "Writing settings #{@ntp_records}"
 
@@ -988,9 +990,19 @@ module Yast
   private
 
     # Remove blank spaces in values
+    #
+    # @note to avoid augeas parsing errors, comments should be sanitized by
+    #   removing blank spaces at the beginning and adding line break.
     def sanitize_record(record)
       sanitized = record.dup
-      sanitized.each_value(&:strip!)
+      sanitized.each do |key, value|
+        if key.include?("comment")
+          value.sub!(/^ */, "")
+          value << "\n" unless value.include?("\n")
+        elsif value.respond_to?(:strip!)
+          value.strip!
+        end
+      end
       sanitized
     end
 
