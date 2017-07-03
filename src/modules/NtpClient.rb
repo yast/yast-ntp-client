@@ -598,7 +598,9 @@ module Yast
       # write settings
       return false if !go_next
 
-      @ntp_records += restrict_map_records
+      # Restrict map records are written first to not mangle the config file
+      # (bsc#983486)
+      @ntp_records = restrict_map_records + @ntp_records
 
       log.info "Writing settings #{@ntp_records}"
 
