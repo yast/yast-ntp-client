@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.2.11
+Version:        3.2.12
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Jun 30 16:58:16 UTC 2017 - knut.anderssen@suse.com
+
+- Resrict records are written at the end but the default file and
+  most profiles use them at the beginning, which mangles the file
+  completely (bsc#983486).
+  To fix it we have just changed the order of writing.
+- 3.2.12
+
+-------------------------------------------------------------------
 Fri Jun 30 09:36:48 UTC 2017 - jlopez@suse.com
 
 - AutoYaST: Fix crash when trying to sanitize not string values,
