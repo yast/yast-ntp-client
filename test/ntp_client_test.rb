@@ -54,9 +54,9 @@ describe Yast::NtpClient do
           expect(record["address"]).to eq "0.opensuse.pool.ntp.org"
         end
 
-        it "keeps comments untouched" do
+        it "sanitizes comments by removing blank spaces at the beginning and adding line break" do
           record = subject.ntp_records.first
-          expect(record["comment"]).to eq " # a comment with spaces "
+          expect(record["comment"]).to eq "# a comment with spaces \n"
         end
 
         it "reads the list of peers" do

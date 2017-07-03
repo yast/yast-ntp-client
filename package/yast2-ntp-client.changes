@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Fri Jun 30 09:36:48 UTC 2017 - jlopez@suse.com
+
+- AutoYaST: Fix crash when trying to sanitize not string values,
+  for example initial_sync.
+- AutoYaST: Sanitize comments by only removing blank spaces at
+  the beginning and adding line break. This avoids augeas parse
+  errors (bsc#1045777).
+- 3.2.11
+
+-------------------------------------------------------------------
 Thu Jun 30 09:32:02 UTC 2017 - knut.anderssen@suse.com
 
 - AutoYaST: Fix crash in CFA when creating a command record with
