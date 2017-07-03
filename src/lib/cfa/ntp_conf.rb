@@ -49,6 +49,16 @@ module CFA
 
     COLLECTION_KEYS = (RECORD_ENTRIES + ["action"]).freeze
 
+    KEY_VALUE_CMD_OPTIONS = %w(
+      ident
+      key
+      minpoll
+      maxpoll
+      mode
+      ttl
+      version
+    ).freeze
+
     def initialize(file_handler: nil)
       super(PARSER, PATH, file_handler: file_handler)
     end
@@ -346,13 +356,30 @@ module CFA
     class CommandRecord < Record
       def options
         return [] unless tree_value?
-        augeas_options.map { |option| option[:key] }
+        augeas_options.each_with_object({}) do |option, opts|
+          opts[option[:key]] = option[:value]
+        end.to_a.flatten.compact
       end
 
       def options=(options)
         ensure_tree_value
         tree_value.tree.delete(options_matcher)
-        options.each { |option| tree_value.tree.add(option, nil) }
+
+        i = 0
+
+        while i < options.size
+          if KEY_VALUE_CMD_OPTIONS.include?(options[i])
+            add_option(options[i], options[i + 1])
+            i += 2
+          else
+            add_option(options[i], nil)
+            i += 1
+          end
+        end
+      end
+
+      def add_option(key, option)
+        tree_value.tree.add(key, option)
       end
     end
 

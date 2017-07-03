@@ -5,8 +5,9 @@
     <ntp_policy>STATIC</ntp_policy>
     <peers config:type="list">
       <peer>
-        <address>0.opensuse.pool.ntp.org</address>
-        <comment/>
+        <address> 0.opensuse.pool.ntp.org </address>
+        <comment> # a comment with spaces </comment>
+        <initial_sync config:type="boolean">true</initial_sync>
         <options>iburst</options>
         <type>server</type>
       </peer>
