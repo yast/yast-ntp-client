@@ -425,7 +425,7 @@ module CFA
       end
 
       def value=(options)
-        values = options.split("\s")
+        values = options.to_s.split("\s")
         ensure_tree_value
         tree_value.tree.delete("key")
         tree_value.tree.delete("key[]")
