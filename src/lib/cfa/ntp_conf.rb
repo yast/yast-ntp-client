@@ -332,10 +332,20 @@ module CFA
       end
 
       def ensure_tree_value
-        @augeas[:value] = AugeasTreeValue.new(
-          AugeasTree.new,
-          @augeas[:value]
-        ) unless tree_value?
+        case @augeas[:value]
+        when AugeasTreeValue
+          return # we are already there
+        when AugeasTree
+          @augeas[:value] = AugeasTreeValue.new(
+            @augeas[:value],
+            nil
+          )
+        else
+          @augeas[:value] = AugeasTreeValue.new(
+            AugeasTree.new,
+            @augeas[:value]
+          )
+        end
       end
 
       def split_raw_options(raw_options)

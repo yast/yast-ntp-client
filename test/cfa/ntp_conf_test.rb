@@ -451,7 +451,7 @@ describe CFA::NtpConf::TrustedkeyRecord do
   end
 
   it "loads properly when it is defined in file" do
-    file.content << "##stefanmurks\ntrustedkey 1\n"
+    file.content << "##comment1\ntrustedkey 1\n"
     ntp.load
 
     trustedkey = ntp.records.last
