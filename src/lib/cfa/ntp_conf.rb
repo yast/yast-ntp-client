@@ -332,10 +332,20 @@ module CFA
       end
 
       def ensure_tree_value
-        @augeas[:value] = AugeasTreeValue.new(
-          AugeasTree.new,
-          @augeas[:value]
-        ) unless tree_value?
+        case @augeas[:value]
+        when AugeasTreeValue
+          return # we are already there
+        when AugeasTree
+          @augeas[:value] = AugeasTreeValue.new(
+            @augeas[:value],
+            nil
+          )
+        else
+          @augeas[:value] = AugeasTreeValue.new(
+            AugeasTree.new,
+            @augeas[:value]
+          )
+        end
       end
 
       def split_raw_options(raw_options)
@@ -425,11 +435,14 @@ module CFA
       end
 
       def value=(options)
-        values = options.split("\s")
+        values = options.to_s.split("\s")
         ensure_tree_value
         tree_value.tree.delete("key")
         tree_value.tree.delete("key[]")
-        values.each { |value| tree_value.tree.add("key[]", value) }
+        # fix writting order as key have to be before trailing comment
+        any_matcher = CFA::Matcher.new { true }
+        placer = CFA::BeforePlacer.new(any_matcher)
+        values.reverse.each { |value| tree_value.tree.add("key[]", value, placer) }
       end
 
       # here key is actually value and not option
