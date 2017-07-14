@@ -439,7 +439,10 @@ module CFA
         ensure_tree_value
         tree_value.tree.delete("key")
         tree_value.tree.delete("key[]")
-        values.each { |value| tree_value.tree.add("key[]", value) }
+        # fix writting order as key have to be before trailing comment
+        any_matcher = CFA::Matcher.new { true }
+        placer = CFA::BeforePlacer.new(any_matcher)
+        values.reverse.each { |value| tree_value.tree.add("key[]", value, placer) }
       end
 
       # here key is actually value and not option
