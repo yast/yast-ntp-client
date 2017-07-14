@@ -3,6 +3,8 @@ Thu Jul 13 14:23:11 UTC 2017 - jreidinger@suse.com
 
 - fix crash when restrict entry in autoyast have empty value
   (bsc#1043370)
+- fix wrong export for trustedkey config entry
+  (bsc#1043370)
 - 3.2.13
 
 -------------------------------------------------------------------
