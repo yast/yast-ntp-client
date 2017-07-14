@@ -449,4 +449,12 @@ describe CFA::NtpConf::TrustedkeyRecord do
 
     expect(file.content.lines).to include("trustedkey 1# path to keys file\n")
   end
+
+  it "loads properly when it is defined in file" do
+    file.content << "##comment1\ntrustedkey 1\n"
+    ntp.load
+
+    trustedkey = ntp.records.last
+    expect(trustedkey.value).to eq "1"
+  end
 end
