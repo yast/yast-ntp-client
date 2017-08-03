@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug  3 08:51:24 UTC 2017 - jreidinger@suse.com
+
+- fix crash in ntp-client (bsc#1051899)
+- 3.2.14
+
+-------------------------------------------------------------------
 Thu Jul 13 14:23:11 UTC 2017 - jreidinger@suse.com
 
 - fix crash when restrict entry in autoyast have empty value
