@@ -282,7 +282,7 @@ module Yast
       if event["ID"] == "complex_button"
         # true  - check and report the missing server value
         # false - the opposite
-        handle_the_server = !UI.QueryWidget(Id("server_address"), :Value).to_s.emtpy?
+        handle_the_server = !UI.QueryWidget(Id("server_address"), :Value).to_s.empty?
 
         conf_check = CheckCurrentSimpleConfiguration(handle_the_server)
         log.info("Checking the current simple configuration returned: #{conf_check}")
