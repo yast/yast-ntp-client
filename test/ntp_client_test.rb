@@ -2,6 +2,7 @@ require_relative "test_helper"
 
 require "fileutils"
 require "cfa/memory_file"
+require "cfa/ntp_conf"
 
 Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
@@ -129,10 +130,26 @@ describe Yast::NtpClient do
 
     describe "#Export" do
       let(:profile_name) { "autoinst.xml" }
+      let(:ntp_conf) do
+        path = File.expand_path("../fixtures/cfa/ntp.conf", __FILE__)
+        text = File.read(path)
+        file = CFA::MemoryFile.new(text)
+        CFA::NtpConf.new(file_handler: file)
+      end
 
       it "produces an output equivalent to #Import" do
         subject.Import(ntp_client_section)
         expect(subject.Export()).to eq ntp_client_section
+      end
+
+      it "clones without encountering a CFA object" do
+        allow(subject).to receive(:ntp_conf).and_return(ntp_conf)
+        subject.config_has_been_read = false
+        subject.ProcessNtpConf
+        exported = subject.Export
+        # This passes the exported value thru the component system.
+        # It would blow up if we forgot a CFA object inside, bsc#1058510
+        expect { Yast::WFM.Execute(path(".foo"), exported) }.to_not raise_error
       end
     end
   end
