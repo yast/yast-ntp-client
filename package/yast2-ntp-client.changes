@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct 11 08:40:26 UTC 2017 - mvidner@suse.com
+
+- Avoid Internal Error during AutoYaST cloning
+  when fudge records are present (bsc#1058510)
+- 3.2.15
+
+-------------------------------------------------------------------
 Thu Aug  3 08:51:24 UTC 2017 - jreidinger@suse.com
 
 - fix crash in ntp-client (bsc#1051899)
