@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-ntp-client
 #
-# Copyright (c) 2014 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -24,23 +24,23 @@ License:        GPL-2.0+
 Group:          System/YaST
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
+BuildRequires:  augeas-lenses
+BuildRequires:  autoyast2-installation
 BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 3.2.21
 BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
-BuildRequires:  autoyast2-installation
+BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
-BuildRequires:  augeas-lenses
-BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 
 # proper acting TargetFile when scr is switched
+Requires:       augeas-lenses
 Requires:       yast2 >= 3.2.21
 Requires:       yast2-country-data
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
-Requires:       augeas-lenses
 BuildArch:      noarch
 # New sntp command line syntax
 Conflicts:      ntp < 4.2.8
