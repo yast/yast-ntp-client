@@ -711,7 +711,10 @@ module Yast
       end
 
       peers = @ntp_records.dup
-      peers.each { |peer| peer.delete("cfa_record") } # not needed for export
+      peers.each do |peer|
+        peer.delete("cfa_record")
+        peer.delete("cfa_fudge_record")
+      end
 
       {
         "synchronize_time" => @synchronize_time,
