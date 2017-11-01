@@ -362,7 +362,7 @@ module Yast
       return :success if param["write_only"]
 
       # One-time adjusment without running the ntp daemon
-      # Meanwhile, ntpdate was replaced by sntp
+      # Meanwhile, ntpdate was replaced by sntp and later by chrony
       ntpdate_only = param["ntpdate_only"]
 
       required_package = "chrony"
@@ -388,26 +388,24 @@ module Yast
         # Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
 
-        Builtins.y2milestone("Running sntp to sync with %1", ntp_server)
+        Builtins.y2milestone("Running ont time sync with %1", ntp_server)
 
-        # -S: do set the system time
+        # -q: set system time and quit
         # -t 5: timeout of 5 seconds
-        # -K /dev/null: use /dev/null as KoD history file (if not specified,
-        #               /var/db/ntp-kod will be used and it doesn't exist)
         # -l <file>: log to a file to not mess text mode installation
         # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
         ret = SCR.Execute(
-          path(".target.bash"),
-          "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log " \
-          "-t 5 -c '#{String.Quote(ntp_server)}'"
+          path(".target.bash_output"),
+          # TODO: ensure that we can use always pool instead of server?
+          "/usr/sbin/chronyd -q -t 5 'pool #{String.Quote(ntp_server)} iburst'"
         )
-        Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
+        Builtins.y2milestone("'one-time chrony for %1' returned %2", ntp_server, ret)
         Popup.ClearFeedback
       end
 
       return :ntpdate_failed if ret != 0
 
-      # User wants to more than running sntp (synchronize on boot)
+      # User wants to more than running one time sync (synchronize on boot)
       WriteNtpSettings(ntp_servers, ntp_server, run_service) if !ntpdate_only
 
       :success

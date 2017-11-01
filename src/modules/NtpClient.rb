@@ -803,7 +803,7 @@ module Yast
     # @param [String] server string host name or IP address of the NTP server
     # @return [Boolean] true if NTP server answers properly
     def reachable_ntp_server?(server)
-      sntp_test(server) || sntp_test(server, 6)
+      ntp_test(server) || ntp_test(server, 6)
     end
 
     # Test NTP server answer for a given IP version.
@@ -811,28 +811,17 @@ module Yast
     # @param [Fixnum] integer ip version to use (4 or 6)
     # @return [Boolean] true if stderr does not include lookup error and exit
     # code is 0
-    def sntp_test(server, ip_version = 4)
+    def ntp_test(server, ip_version = 4)
       output = SCR.Execute(
         path(".target.bash_output"),
-        # -K /dev/null: use /dev/null as KoD history file (if not specified,
-        #               /var/db/ntp-kod will be used and it doesn't exist)
-        # -c: concurrently query all IPs; -t 5: five seconds of timeout
-        "LANG=C /usr/sbin/sntp -#{ip_version} -K /dev/null -t 5 -c #{server}"
+        # -t 5: five seconds of timeout
+        # -Q: print only offset, if failed exit is non-zero
+        "LANG=C /usr/sbin/chronyd -#{ip_version} -t 5 -Q 'pool #{server} iburst'"
       )
 
-      Builtins.y2milestone("sntp test response: #{output}")
+      Builtins.y2milestone("chronyd test response: #{output}")
 
-      return false if output["exit"] != 0
-      # sntp returns always 0 if not called with option -S or -s (set system time)
-      # so this is a workaround at least to return false in case server is not
-      # reachable.
-      return false if output["stderr"].include?("lookup error")
-      # this happens for valid address, but without ntp server. If it breaks in the
-      # future start complaining to sntp maintainer to not return 0 in this case.
-      # customer case: bsc#972842
-      return false if output["stdout"] =~ /no (U|B)CST/
-
-      true
+      output["exit"] == 0
     end
 
     # Handle UI of NTP server test answers
