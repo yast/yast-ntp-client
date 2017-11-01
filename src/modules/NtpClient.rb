@@ -35,7 +35,7 @@ module Yast
     # @see http://doc.ntp.org/4.1.0/clockopt.htm
     SYNC_RECORDS = ["server", "__clock", "peer", "broadcast", "broadcastclient"].freeze
 
-    NTP_FILE = "/etc/ntp.conf".freeze
+    NTP_FILE = "/etc/chrony.conf".freeze
 
     def main
       Yast.import "UI"
