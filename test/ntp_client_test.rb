@@ -167,7 +167,7 @@ describe Yast::NtpClient do
       allow(subject).to receive(:read_chroot_config!)
       allow(subject).to receive(:read_policy!)
       allow(Yast::SuSEFirewall).to receive(:Read)
-      allow(Yast::Service).to receive(:Enabled).with("ntpd").and_return(true)
+      allow(Yast::Service).to receive(:Enabled).with("chronyd").and_return(true)
       allow(Yast::NetworkInterfaces).to receive(:Read)
       allow(Yast::Progress)
       allow(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
@@ -229,8 +229,8 @@ describe Yast::NtpClient do
         end
       end
 
-      it "checks if ntpd service is enable" do
-        expect(Yast::Service).to receive(:Enabled).with("ntpd")
+      it "checks if chronyd service is enable" do
+        expect(Yast::Service).to receive(:Enabled).with("chronyd")
 
         subject.Read
       end

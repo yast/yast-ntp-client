@@ -89,7 +89,7 @@ module Yast
       @cron_file = "/etc/cron.d/novell.ntp-synchronize"
 
       # Service name of the NTP daemon
-      @service_name = "ntpd"
+      @service_name = "chronyd"
 
       # Should the daemon be started in chroot environment?
       @run_chroot = false
@@ -1207,7 +1207,7 @@ module Yast
         SCR.Write(
           path(".target.string"),
           @cron_file,
-          "-*/#{@sync_interval} * * * * root /usr/sbin/start-ntpd ntptimeset &>/dev/null\n"
+          "-*/#{@sync_interval} * * * * root /usr/sbin/chronyd -q &>/dev/null\n"
         )
       else
         SCR.Execute(
