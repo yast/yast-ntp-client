@@ -25,10 +25,11 @@ module CFA
   #
   # Important keys (that are to be read and written) are
   # server, peer, fudge, broadcast and broadcastclient.
+  # XXX: FIXME: just POC to use it for chrony
   class NtpConf < ::CFA::BaseModel
-    PARSER = CFA::AugeasParser.new("ntp.lns")
+    PARSER = CFA::AugeasParser.new("chrony.lns")
 
-    PATH = "/etc/ntp.conf".freeze
+    PATH = "/etc/chrony.conf".freeze
 
     RECORD_ENTRIES = %w(
       server
