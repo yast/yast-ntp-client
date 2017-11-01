@@ -112,7 +112,7 @@ module Yast
       @change_firewall = false
 
       # Required packages
-      @required_packages = ["ntp"]
+      @required_packages = ["chrony"]
 
       # ports in firewall to open
       @firewall_services = ["service:ntp"]
@@ -481,7 +481,7 @@ module Yast
       # read current settings
       return false if !go_next
 
-      if !Mode.installation && !PackageSystem.CheckAndInstallPackagesInteractive(["ntp"])
+      if !Mode.installation && !PackageSystem.CheckAndInstallPackagesInteractive(["chrony"])
         log.info("PackageSystem::CheckAndInstallPackagesInteractive failed")
         return false
       end

@@ -365,7 +365,7 @@ module Yast
       # Meanwhile, ntpdate was replaced by sntp
       ntpdate_only = param["ntpdate_only"]
 
-      required_package = "ntp"
+      required_package = "chrony"
 
       # In 1st stage, schedule packages for installation
       if Stage.initial
