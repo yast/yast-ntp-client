@@ -15,7 +15,7 @@ def ntp_conf(file)
   CFA::NtpConf.new(file_handler: file)
 end
 
-describe CFA::NtpConf do
+xdescribe CFA::NtpConf do
   subject(:ntp) { ntp_conf(file) }
 
   let(:file) { ntp_file(content) }
@@ -117,7 +117,7 @@ describe CFA::NtpConf do
   end
 end
 
-describe CFA::NtpConf::RecordCollection do
+xdescribe CFA::NtpConf::RecordCollection do
   let(:ntp) { ntp_conf(file) }
 
   let(:file) { ntp_file(content) }
@@ -181,7 +181,7 @@ describe CFA::NtpConf::RecordCollection do
   end
 end
 
-describe CFA::NtpConf::Record do
+xdescribe CFA::NtpConf::Record do
   let(:ntp) { ntp_conf(file) }
 
   let(:file) { ntp_file(content) }
@@ -295,7 +295,7 @@ describe CFA::NtpConf::Record do
   end
 end
 
-describe CFA::NtpConf::CommandRecord do
+xdescribe CFA::NtpConf::CommandRecord do
   let(:ntp) { ntp_conf(file) }
 
   let(:file) { ntp_file(content) }
@@ -326,7 +326,7 @@ describe CFA::NtpConf::CommandRecord do
   end
 end
 
-describe CFA::NtpConf::FudgeRecord do
+xdescribe CFA::NtpConf::FudgeRecord do
   let(:ntp) { ntp_conf(file) }
 
   let(:file) { ntp_file(content) }
@@ -373,7 +373,7 @@ describe CFA::NtpConf::FudgeRecord do
   end
 end
 
-describe CFA::NtpConf::RestrictRecord do
+xdescribe CFA::NtpConf::RestrictRecord do
   let(:ntp) { ntp_conf(file) }
 
   let(:file) { ntp_file(content) }
@@ -431,7 +431,7 @@ describe CFA::NtpConf::RestrictRecord do
   end
 end
 
-describe CFA::NtpConf::TrustedkeyRecord do
+xdescribe CFA::NtpConf::TrustedkeyRecord do
 
   let(:ntp) { ntp_conf(file) }
 
