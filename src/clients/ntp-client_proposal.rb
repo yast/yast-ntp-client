@@ -391,13 +391,13 @@ module Yast
         Builtins.y2milestone("Running ont time sync with %1", ntp_server)
 
         # -q: set system time and quit
-        # -t 5: timeout of 5 seconds
+        # -t: timeout in seconds
         # -l <file>: log to a file to not mess text mode installation
         # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
         ret = SCR.Execute(
           path(".target.bash_output"),
           # TODO: ensure that we can use always pool instead of server?
-          "/usr/sbin/chronyd -q -t 5 'pool #{String.Quote(ntp_server)} iburst'"
+          "/usr/sbin/chronyd -q -t 30 'pool #{String.Quote(ntp_server)} iburst'"
         )
         Builtins.y2milestone("'one-time chrony for %1' returned %2", ntp_server, ret)
         Popup.ClearFeedback

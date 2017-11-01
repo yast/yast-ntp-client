@@ -814,9 +814,9 @@ module Yast
     def ntp_test(server, ip_version = 4)
       output = SCR.Execute(
         path(".target.bash_output"),
-        # -t 5: five seconds of timeout
+        # -t : seconds of timeout
         # -Q: print only offset, if failed exit is non-zero
-        "LANG=C /usr/sbin/chronyd -#{ip_version} -t 5 -Q 'pool #{server} iburst'"
+        "LANG=C /usr/sbin/chronyd -#{ip_version} -t 30 -Q 'pool #{server} iburst'"
       )
 
       Builtins.y2milestone("chronyd test response: #{output}")
