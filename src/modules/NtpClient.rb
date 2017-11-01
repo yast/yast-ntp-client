@@ -1037,13 +1037,18 @@ module Yast
     #
     # @return [Boolean] true when value is "yes"; false in any other case.
     def read_chroot_config!
-      run_chroot_s = SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
+      # FIXME: do we need it with chrony?
+      @run_chroot = false
 
-      @run_chroot = run_chroot_s == "yes"
+      true
 
-      log.error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED") if run_chroot_s.nil?
+      #run_chroot_s = SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
 
-      run_chroot_s.nil? ? false : true
+      #@run_chroot = run_chroot_s == "yes"
+
+      #log.error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED") if run_chroot_s.nil?
+
+      #run_chroot_s.nil? ? false : true
     end
 
     # Set @ntp_servers with known servers and known countries pool ntp servers
