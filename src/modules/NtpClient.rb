@@ -277,7 +277,6 @@ module Yast
         return false
       end
 
-      load_ntp_records
       true
     end
 
