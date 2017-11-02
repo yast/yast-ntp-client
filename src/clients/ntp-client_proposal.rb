@@ -304,7 +304,8 @@ module Yast
         ntp_server2 = Convert.to_string(
           UI.QueryWidget(Id(:ntp_address), :Value)
         )
-        AddSingleServer(ntp_server2)
+        NtpClient.ntp_conf.clear_pools
+        NtpClient.ntp_conf.add_pool(ntp_server2)
         retval = Convert.to_boolean(WFM.CallFunction("ntp-client"))
         ret = :next if retval
         MakeProposal()
@@ -316,9 +317,11 @@ module Yast
       ntp_servers = deep_copy(ntp_servers)
       NtpClient.modified = true
       if ntp_servers != []
-        Builtins.foreach(ntp_servers) { |server| AddSingleServer(server) }
+        ntp_servers.each do |server|
+          NtpClient.ntp_conf.add_pool(server)
+        end
       else
-        AddSingleServer(ntp_server)
+        NtpClient.ntp_conf.add_pool(ntp_server)
       end
       NtpClient.run_service = run_service
       if !run_service

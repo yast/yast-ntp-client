@@ -22,7 +22,9 @@ module CFA
     end
 
     # options hash with key value, where value can be nil for keyword options
-    def add_pool(address, options)
+    # or :default to use default options
+    def add_pool(address, options = :default)
+      options = default_pool_options if options == :default
       # if there is already pool entry, place it after, if not, try use comment
       existing_pools = pure_pools
       if existing_pools.empty?
@@ -45,9 +47,33 @@ module CFA
       data.add(key, value, placer)
     end
 
+    def default_pool_options
+      { "iburst" => nil }
+    end
+
     # delete all pools defined
     def clear_pools
       data.delete(POOLS_MATCHER)
+    end
+
+    # returns copy of available pools
+    # TODO allow modify of specific pool
+    # hash with key server and value is options hash
+    def pools
+      pools_data = pure_pools.map { |p| p[:value] }
+      pools_map = pools_data.map do |entry|
+        case entry
+        when String
+          [entry, {}]
+        when AugeasTreeValue
+          options = Hash[entry.tree.data.map { |e| [e[:key], e[:value]] }]
+          [entry.value, options]
+        else
+          raise "invalid pool data #{entry.inspect}"
+        end
+      end
+
+      Hash[pools_map]
     end
 
   private

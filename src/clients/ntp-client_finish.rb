@@ -42,27 +42,17 @@ module Yast
 
         # User config from installation time:
         # fortunately so far we only have the server address(es)
-        @ss = NtpClient.GetUsedNtpServers
+        pools = NtpClient.ntp_conf.pools
 
         # ntp.conf from the RPM
         NtpClient.config_has_been_read = false
         NtpClient.ProcessNtpConf
-        Builtins.y2milestone(
-          "ntp-client_finish NtpClient::Read::ntp_records %1",
-          NtpClient.ntp_records
-        )
 
         # put users server(s) back
-        Builtins.foreach(@ss) do |server|
-          # if not present, it adds it,
-          # otherwise it preserves what is there. uff what an API
-          idx = NtpClient.findSyncRecord("server", server) # -1: new
-          NtpClient.selectSyncRecord(idx)
-          Ops.set(NtpClient.selected_record, "address", server)
-          Ops.set(NtpClient.selected_record, "type", "server")
-          # bnc#450418, add a recommended option
-          NtpClient.enableOptionInSyncRecord("iburst")
-          NtpClient.storeSyncRecord
+        NtpClient.ntp_conf.clear_pools
+
+        pools.each_pair do |server, options|
+          NtpClient.ntp_conf.add_pool(server, options)
         end
 
         NtpClient.write_only = true

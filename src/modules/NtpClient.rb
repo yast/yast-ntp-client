@@ -11,7 +11,7 @@
 # Input and output routines.
 require "yast"
 require "yaml"
-require "cfa/ntp_conf"
+require "cfa/chrony_conf"
 require "yast2/target_file" # required to cfa work on changed scr
 
 module Yast
@@ -141,6 +141,11 @@ module Yast
       @random_pool_servers = RANDOM_POOL_NTP_SERVERS
 
       @deleted_records = []
+    end
+
+    # CFA instance for reading/writing /etc/ntp.conf
+    def ntp_conf
+      @chrony_conf ||= CFA::ChronyConf.new
     end
 
     def add_to_deleted_records(records)
@@ -273,21 +278,7 @@ module Yast
       end
 
       load_ntp_records
-
-      log.info("Raw ntp conf #{ntp_conf.raw}")
       true
-    end
-
-    def load_ntp_records
-      @ntp_records = ntp_conf.records.map do |record|
-        {
-          "type"       => record.type,
-          "address"    => record.value,
-          "options"    => record.raw_options,
-          "comment"    => record.comment.to_s,
-          "cfa_record" => record
-        }
-      end
     end
 
     # Read and parse /etc/ntp.conf
@@ -301,102 +292,6 @@ module Yast
       return false unless read_ntp_conf
 
       @config_has_been_read = true
-
-      fudge_records = Builtins.filter(@ntp_records) do |m|
-        Ops.get_string(m, "type", "") == "fudge"
-      end
-
-      fudge_map = Convert.convert(
-        Builtins.listmap(fudge_records) do |m|
-          key = Ops.get_string(m, "address", "")
-          { key => m }
-        end,
-        from: "map <string, map>",
-        to:   "map <string, map <string, any>>"
-      )
-
-      restrict_records = Builtins.filter(@ntp_records) do |m|
-        Ops.get_string(m, "type", "") == "restrict"
-      end
-
-      @restrict_map = Convert.convert(
-        Builtins.listmap(restrict_records) do |m|
-          key = Ops.get_string(m, "address", "")
-          value2 = {}
-          opts = Builtins.splitstring(
-            String.CutBlanks(Ops.get_string(m, "options", "")),
-            " \t"
-          )
-          if Ops.get(opts, 0, "") == "mask"
-            Ops.set(value2, "mask", Ops.get(opts, 1, ""))
-            Ops.set(opts, 0, "")
-            Ops.set(opts, 1, "")
-          else
-            Ops.set(value2, "mask", "")
-          end
-          Ops.set(
-            value2,
-            "options",
-            String.CutBlanks(Builtins.mergestring(opts, " "))
-          )
-          Ops.set(value2, "comment", Ops.get_string(m, "comment", ""))
-          value2["cfa_record"] = m["cfa_record"]
-          { key => value2 }
-        end,
-        from: "map <string, map>",
-        to:   "map <string, map <string, any>>"
-      )
-
-      @ntp_records = Builtins.filter(@ntp_records) do |m|
-        Ops.get_string(m, "type", "") != "fudge"
-      end
-
-      @ntp_records = Builtins.filter(@ntp_records) do |m|
-        Ops.get_string(m, "type", "") != "restrict"
-      end
-
-      @ntp_records = Convert.convert(
-        Builtins.maplist(@ntp_records) do |m|
-          if Builtins.haskey(fudge_map, Ops.get_string(m, "address", ""))
-            Ops.set(
-              m,
-              "fudge_options",
-              Ops.get_string(
-                fudge_map,
-                [Ops.get_string(m, "address", ""), "options"],
-                ""
-              )
-            )
-            Ops.set(
-              m,
-              "fudge_comment",
-              Ops.get_string(
-                fudge_map,
-                [Ops.get_string(m, "address", ""), "comment"],
-                ""
-              )
-            )
-            m["cfa_fudge_record"] = ntp_conf.records.find do |record|
-              record.type == "fudge" && record.value == m["address"]
-            end
-          end
-          m
-        end,
-        from: "list <map>",
-        to:   "list <map <string, any>>"
-      )
-
-      # mark local clock to be local clock and not real servers
-      @ntp_records = Builtins.maplist(@ntp_records) do |p|
-        if Ops.get_string(p, "type", "") == "server" &&
-            Builtins.regexpmatch(
-              Ops.get_string(p, "address", ""),
-              "^127.127.[0-9]+.[0-9]+$"
-            )
-          Ops.set(p, "type", "__clock")
-        end
-        p
-      end
 
       true
     end
@@ -578,12 +473,6 @@ module Yast
 
       # write settings
       return false if !go_next
-
-      # Restrict map records are written first to not mangle the config file
-      # (bsc#983486)
-      @ntp_records = restrict_map_records + @ntp_records
-
-      log.info "Writing settings #{@ntp_records}"
 
       Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if !write_ntp_conf
 
@@ -1165,18 +1054,6 @@ module Yast
     # Write current /etc/ntp.conf with @ntp_records
     # @return [Boolean] true on success
     def write_ntp_conf
-      records_for_write.each do |record|
-        unless record["cfa_record"]
-          ntp_conf.records << CFA::NtpConf::Record.record_class(record["type"]).new
-          record["cfa_record"] = ntp_conf.records.last
-        end
-
-        update_cfa_record(record)
-        log.info "new record #{record.inspect}"
-      end
-
-      ntp_conf.records.delete_if { |record| @deleted_records.include?(record) }
-
       begin
         ntp_conf.save
       rescue StandardError => e
@@ -1388,13 +1265,6 @@ module Yast
     def cache_server(server)
       @ntp_servers[server["address"].to_s] = server
     end
-
-    # CFA instance for reading/writing /etc/ntp.conf
-    def ntp_conf
-      @ntp_conf ||= CFA::NtpConf.new
-    end
-
-
   end
 
   NtpClient = NtpClientClass.new
