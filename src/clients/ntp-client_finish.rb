@@ -43,6 +43,7 @@ module Yast
         # User config from installation time:
         # fortunately so far we only have the server address(es)
         pools = NtpClient.ntp_conf.pools
+        Builtins.y2milestone("pools added during installation #{pools.inspect}")
 
         # ntp.conf from the RPM
         NtpClient.config_has_been_read = false
