@@ -42,12 +42,6 @@ module Yast
           "The interval is configurable, by default it is %d minutes."
         ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
         # help text 2/5
-        "chroot_environment" => _(
-          "<p><b><big>Chroot Jail</big></b><br>\n"                                       \
-          "To run the NTP daemon in chroot jail, set\n"                                  \
-          "<b>Run NTP Daemon in Chroot Jail</b>. Starting any daemon in a chroot jail\n" \
-          "is more secure and strongly recommended.</p>"
-        ),
         "secure"             => _(
           "<p><b><big>Secure NTP Configuration</big></b><br>\n"                                \
           "By selecting <b>Restrict NTP Service to Configured Servers Only</b>, remote hosts " \

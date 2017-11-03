@@ -53,7 +53,6 @@ module Yast
 
       if NtpClient.run_service ==
           (UI.QueryWidget(Id("start"), :CurrentButton) == "boot") &&
-          NtpClient.run_chroot == UI.QueryWidget(Id("run_chroot"), :Value) &&
           NtpClient.ntp_policy == pol &&
           !CWMFirewallInterfaces.OpenFirewallModified("firewall") &&
           !@sync_record_modified

@@ -91,9 +91,6 @@ module Yast
       # Service name of the NTP daemon
       @service_name = "chronyd"
 
-      # Should the daemon be started in chroot environment?
-      @run_chroot = false
-
       # Netconfig policy: for merging and prioritizing static and DHCP config.
       # FIXME: get a public URL
       # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
@@ -349,12 +346,10 @@ module Yast
 
       # Stay away if the user may have made changes which we cannot parse.
       # But bnc#456553, no pop-ups for CLI.
-      failed = !Mode.commandline && !FileChanges.CheckFiles(["/etc/ntp.conf"])
+      failed = !Mode.commandline && !FileChanges.CheckFiles(["/etc/chrony.conf"])
 
       ProcessNtpConf()
       ReadSynchronization()
-
-      failed = true unless read_chroot_config!
 
       if failed
         # While calling "yast clone_system" it is possible that
@@ -477,8 +472,6 @@ module Yast
 
       write_and_update_policy
 
-      write_chroot_config
-
       # restart daemon
       return false if !go_next
 
@@ -509,7 +502,6 @@ module Yast
       @synchronize_time = Ops.get_boolean(settings, "synchronize_time", false)
       @sync_interval = Ops.get_integer(settings, "sync_interval", DEFAULT_SYNC_INTERVAL)
       @run_service = Ops.get_boolean(settings, "start_at_boot", false)
-      @run_chroot = Ops.get_boolean(settings, "start_in_chroot", true)
       # compatibility: configure_dhcp:true translates to ntp_policy:auto
       config_dhcp = Ops.get_boolean(settings, "configure_dhcp", false)
       @ntp_policy = Ops.get_string(
@@ -570,7 +562,6 @@ module Yast
         "synchronize_time" => @synchronize_time,
         "sync_interval"    => @sync_interval,
         "start_at_boot"    => @run_service,
-        "start_in_chroot"  => @run_chroot,
         "ntp_policy"       => @ntp_policy,
         "peers"            => peers,
         "restricts"        => restricts
@@ -838,7 +829,6 @@ module Yast
     publish variable: :synchronize_time, type: "boolean"
     publish variable: :sync_interval, type: "integer"
     publish variable: :service_name, type: "string"
-    publish variable: :run_chroot, type: "boolean"
     publish variable: :ntp_policy, type: "string"
     publish variable: :selected_record, type: "map <string, any>"
     publish variable: :ad_controller, type: "string"
@@ -967,25 +957,6 @@ module Yast
       end
     end
 
-    # Set @run_chroot according to NTPD_RUN_CHROOTED value found in
-    # /etc/sysconfig/ntp
-    #
-    # @return [Boolean] true when value is "yes"; false in any other case.
-    def read_chroot_config!
-      # FIXME: do we need it with chrony?
-      @run_chroot = false
-
-      true
-
-      #run_chroot_s = SCR.Read(path(".sysconfig.ntp.NTPD_RUN_CHROOTED"))
-
-      #@run_chroot = run_chroot_s == "yes"
-
-      #log.error("Failed reading .sysconfig.ntp.NTPD_RUN_CHROOTED") if run_chroot_s.nil?
-
-      #run_chroot_s.nil? ? false : true
-    end
-
     # Set @ntp_servers with known servers and known countries pool ntp servers
     def update_ntp_servers!
       @ntp_servers = {}
@@ -1092,19 +1063,6 @@ module Yast
       Report.Error(_("Cannot update the dynamic configuration policy.")) unless success
 
       success
-    end
-
-    # Writes /etc/sysconfig/ntp NTPD_RUN_CHROOTED with "yes" if current
-    # @run_chroot is true or with "no" in other case
-    #
-    # @return [Boolean] true on success
-    def write_chroot_config
-      SCR.Write(
-        path(".sysconfig.ntp.NTPD_RUN_CHROOTED"),
-        @run_chroot ? "yes" : "no"
-      )
-
-      SCR.Write(path(".sysconfig.ntp"), nil)
     end
 
     # Enable or disable ntp service depending on @run_service value

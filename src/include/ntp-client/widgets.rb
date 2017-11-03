@@ -329,31 +329,6 @@ module Yast
       :fudge
     end
 
-    # Initialize the widget
-    # @param [String] id any widget id
-    def chrootInit(id)
-      UI.ChangeWidget(Id(id), :Value, NtpClient.run_chroot)
-
-      nil
-    end
-
-    # Store settings of the widget
-    # @param [String] id any widget id
-    # @param [Hash] event map event that caused storing process
-    def chrootStore(id, _event)
-      tmp = NtpClient.run_chroot
-      NtpClient.run_chroot = Convert.to_boolean(UI.QueryWidget(Id(id), :Value))
-      if tmp != NtpClient.run_chroot
-        Builtins.y2milestone(
-          "set modified from %1 to true 2",
-          NtpClient.modified
-        )
-        NtpClient.modified = true
-      end
-
-      nil
-    end
-
     def secureInit(_id)
       Builtins.y2milestone("Restrict %1", NtpClient.restrict_map)
       if NtpClient.PolicyIsNonstatic
@@ -1399,18 +1374,6 @@ module Yast
           ),
           "handle_events" => ["boot", "never", "sync"],
           "opt"           => [:notify]
-        },
-        "run_chroot"         => {
-          "widget" => :checkbox,
-          # check box
-          "label"  => _("Run NTP Daemon in Chroot &Jail"),
-          "init"   => fun_ref(method(:chrootInit), "void (string)"),
-          "store"  => fun_ref(method(:chrootStore), "void (string, map)"),
-          "handle" => fun_ref(
-            method(:ntpEnabledOrDisabled),
-            "symbol (string, map)"
-          ),
-          "help"   => Ops.get_string(@HELPS, "chroot_environment", "")
         },
         "secure"             => {
           "widget" => :checkbox,
