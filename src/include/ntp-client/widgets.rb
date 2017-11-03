@@ -63,7 +63,8 @@ module Yast
       tmp_file = Tempfile.new("yast_chronylog")
       tmp_file.close
       begin
-        SCR.Execute(path(".target.bash"), "/usr/bin/journalctl --boot --unit chronyd --no-pager --no-tail > '#{tmp_file.path}'")
+        SCR.Execute(path(".target.bash"),
+          "/usr/bin/journalctl --boot --unit chronyd --no-pager --no-tail > '#{tmp_file.path}'")
         LogView.Display(
           "file"    => tmp_file.path,
           "save"    => true,

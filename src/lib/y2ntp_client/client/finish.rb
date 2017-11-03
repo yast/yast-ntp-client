@@ -7,6 +7,7 @@ Yast.import "NtpClient"
 
 module Y2NtpClient
   module Client
+    # Client to write ntp configuration at the end of installation
     class Finish < Installation::FinishClient
       include Yast::I18n
 
@@ -21,7 +22,6 @@ module Y2NtpClient
       def modes
         Yast::NtpClient.modified ? [:installation, :autoinst] : []
       end
-
 
       def write
         # bnc#449615, must merge the configs which Export/Import fails to do.

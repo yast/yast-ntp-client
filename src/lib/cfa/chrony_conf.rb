@@ -30,11 +30,11 @@ module CFA
       if existing_pools.empty?
         # for now first chrony have pools under comment mentioning pool.ntp.org
         # so try to place it below
-        matcher = Matcher.new { |k,v| k.start_with?("#comment") && v =~ /www\.pool\.ntp\.org/ }
+        matcher = Matcher.new { |k, v| k.start_with?("#comment") && v =~ /www\.pool\.ntp\.org/ }
       else
         # place after the last pool available
-        matcher = Matcher.new(key: existing_pools.last[:key],
-          value_matcher: existing_pools.last[:value])
+        matcher = Matcher.new(key:           existing_pools.last[:key],
+                              value_matcher: existing_pools.last[:value])
       end
       placer = AfterPlacer.new(matcher)
 
@@ -80,7 +80,7 @@ module CFA
 
     COLLECTION_KEYS = [
       "pool"
-    ]
+    ].freeze
     # if there is only one element of collection, augeas does not add [],
     # so fix it here for known keys which we modify ( and can be hitted with it )
     def fix_collection_names(tree)
@@ -97,6 +97,5 @@ module CFA
     def pure_pools
       data.select(POOLS_MATCHER)
     end
-
   end
 end
