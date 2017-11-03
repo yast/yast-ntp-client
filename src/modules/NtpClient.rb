@@ -377,12 +377,7 @@ module Yast
     #
     # @return [Array<String>] of servers
     def GetUsedNtpServers
-      used_servers = []
-      @ntp_records.each do |record|
-        used_servers << record["address"] if record["type"] == "server"
-      end
-
-      used_servers
+      ntp_conf.pools.keys
     end
 
     # Checks whether all servers listed in the random_pool_servers list

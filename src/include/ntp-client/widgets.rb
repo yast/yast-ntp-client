@@ -8,6 +8,9 @@
 # $Id$
 #
 # Main file for ntp-client configuration. Uses all other files.
+
+require "tempfile"
+
 module Yast
   module NtpClientWidgetsInclude
     include Logger
@@ -57,22 +60,29 @@ module Yast
 
     # Show popup with NTP daemon's log
     def showLogPopup
-      LogView.Display(
-        "file"    => "/var/log/ntp",
-        "save"    => true,
-        "actions" => [
-          # menubutton entry, try to keep short
-          [
-            _("Restart NTP Daemon"),
-            fun_ref(method(:restartNtpDaemon), "void ()")
-          ],
-          # menubutton entry, try to keep short
-          [
-            _("Save Settings and Restart NTP Daemon"),
-            fun_ref(method(:SilentWrite), "boolean ()")
+      tmp_file = Tempfile.new("yast_chronylog")
+      tmp_file.close
+      begin
+        SCR.Execute(path(".target.bash"), "/usr/bin/journalctl --boot --unit chronyd --no-pager --no-tail > '#{tmp_file.path}'")
+        LogView.Display(
+          "file"    => tmp_file.path,
+          "save"    => true,
+          "actions" => [
+            # menubutton entry, try to keep short
+            [
+              _("Restart NTP Daemon"),
+              fun_ref(method(:restartNtpDaemon), "void ()")
+            ],
+            # menubutton entry, try to keep short
+            [
+              _("Save Settings and Restart NTP Daemon"),
+              fun_ref(method(:SilentWrite), "boolean ()")
+            ]
           ]
-        ]
-      )
+        )
+      ensure
+        tmp_file.unlink
+      end
       nil
     end
 
