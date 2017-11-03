@@ -316,6 +316,7 @@ module Yast
     def WriteNtpSettings(ntp_servers, ntp_server, run_service)
       ntp_servers = deep_copy(ntp_servers)
       NtpClient.modified = true
+      NtpClient.ntp_conf.clear_pools
       if ntp_servers != []
         ntp_servers.each do |server|
           NtpClient.ntp_conf.add_pool(server)
@@ -352,6 +353,7 @@ module Yast
     # return:
     #   `success, `invalid_hostname or `ntpdate_failed
     def Write(param)
+      Builtins.y2milestone("ntp client proposal Write with #{param.inspect}")
       ntp_servers = param["servers"] || []
       ntp_server = param["server"] || ""
       run_service = param.fetch("run_service", true)
