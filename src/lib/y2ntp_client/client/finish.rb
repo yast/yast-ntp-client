@@ -5,7 +5,7 @@ require "installation/finish_client"
 
 Yast.import "NtpClient"
 
-module Y2NtpCliet
+module Y2NtpClient
   module Client
     class Finish < Installation::FinishClient
       include Yast::I18n
@@ -48,5 +48,3 @@ module Y2NtpCliet
     end
   end
 end
-
-Yast::NtpClientFinishClient.new.main
