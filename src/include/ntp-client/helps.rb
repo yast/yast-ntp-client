@@ -41,15 +41,6 @@ module Yast
           "and the system time will be set periodically by a <i>cron</i> script. \n"           \
           "The interval is configurable, by default it is %d minutes."
         ) % NtpClientClass::DEFAULT_SYNC_INTERVAL,
-        # help text 2/5
-        "secure"             => _(
-          "<p><b><big>Secure NTP Configuration</big></b><br>\n"                                \
-          "By selecting <b>Restrict NTP Service to Configured Servers Only</b>, remote hosts " \
-          "will not be able to view and modify NTP settings on your \ncomputer. The NTP "      \
-          "service is restricted to servers in the <tt>/etc/ntp.conf</tt> file and to "        \
-          "localhost.<br> \nAccess control flags can be fine-tuded in the servers overview "   \
-          "table. This option is not available if NTP is configured via DHCP.</p>\n"
-        ),
         # help text 3/5
         "config_dhcp"        => _(
           "<p><b><big>Configuring via DHCP</big></b><br>\n"                            \

@@ -167,8 +167,6 @@ module Yast
           VSpacing(1),
           HBox(
             VBox(
-              Left("secure"),
-              VSpacing(),
               "firewall"
             )
           ),
@@ -192,7 +190,7 @@ module Yast
         "security" => {
           "header"       => _("Security Settings"),
           "contents"     => tab2,
-          "widget_names" => ["secure", "firewall"]
+          "widget_names" => ["firewall"]
         }
       }
 

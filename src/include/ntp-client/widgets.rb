@@ -340,53 +340,6 @@ module Yast
       :fudge
     end
 
-    def secureInit(_id)
-      Builtins.y2milestone("Restrict %1", NtpClient.restrict_map)
-      if NtpClient.PolicyIsNonstatic
-        UI.ChangeWidget(Id("secure"), :Enabled, false)
-      else
-        UI.ChangeWidget(Id("secure"), :Value, NtpClient.restrict_map != {})
-      end
-
-      nil
-    end
-
-    def secureStore(id, _event)
-      restrict = Convert.to_boolean(UI.QueryWidget(Id(id), :Value))
-
-      if restrict
-        servers = NtpClient.GetUsedNtpServers
-
-        if NtpClient.restrict_map == {}
-          Ops.set(
-            NtpClient.restrict_map,
-            "default",
-            "mask" => "", "comment" => "", "options" => "ignore"
-          )
-
-          Ops.set(
-            NtpClient.restrict_map,
-            "127.0.0.1",
-            "mask" => "", "comment" => "", "options" => ""
-          )
-
-          Builtins.foreach(servers) do |s|
-            Ops.set(
-              NtpClient.restrict_map,
-              s,
-              "mask"    => "",
-              "comment" => "",
-              "options" => "nomodify notrap noquery"
-            )
-          end
-        end
-      else
-        NtpClient.restrict_map = {}
-      end
-
-      nil
-    end
-
     # Initialize the widget
     # @param [String] id any widget id
     def PolicyInit(_id)
@@ -538,15 +491,11 @@ module Yast
     # @param [Hash] event map event that caused storing process
     # @return [Object] event to pass to WS or nil
     def overviewHandle(id, event)
-      event = deep_copy(event)
-      #    ntpEnabledOrDisabled (id, event);
-      if Ops.get(event, "ID") == :display_log
+      event_id = event["ID"]
+      case event_id
+      when :display_log
         showLogPopup
-        return nil
-      end
-      ev_id = Ops.get(event, "ID")
-      if ev_id == "boot" || ev_id == "never" || ev_id == "sync" ||
-          ev_id == "policy_combo"
+      when "boot", "never", "sync", "policy_combo"
         pol = Convert.to_symbol(UI.QueryWidget(Id("policy_combo"), :Value))
 
         enabled = UI.QueryWidget(Id("start"), :CurrentButton) != "never"
@@ -571,40 +520,11 @@ module Yast
           event
         )
         NtpClient.modified = true
-        return nil
-      end
-      types = {
-        "server"          => :server,
-        "peer"            => :peer,
-        "__clock"         => :clock,
-        "broadcast"       => :bcast,
-        "broadcastclient" => :bcastclient
-      }
-      if Ops.get(event, "ID") == :add
-        NtpClient.selectSyncRecord(-1)
-        @peer_type_selected = nil
-        Builtins.y2milestone(
-          "set modified from %1 to true 4.2 id %2 map %3",
-          NtpClient.modified,
-          id,
-          event
-        )
-        NtpClient.modified = true
-        return :add
-      elsif Ops.get(event, "ID") == :edit || Ops.get(event, "ID") == :overview
-        NtpClient.selectSyncRecord(
-          Convert.to_integer(UI.QueryWidget(Id(:overview), :CurrentItem))
-        )
-        type = Ops.get_string(NtpClient.selected_record, "type", "")
-        Builtins.y2milestone(
-          "set modified from %1 to true 4.3 id %2 map %3",
-          NtpClient.modified,
-          id,
-          event
-        )
-        NtpClient.modified = true
-        return Ops.get(types, type)
-      elsif Ops.get(event, "ID") == :delete
+      when :add
+        # TODO:
+      when :edit, :overview
+        # TODO:
+      when :delete
         # yes-no popup
         if Confirm.DeleteSelected
           NtpClient.deleteSyncRecord(
@@ -620,7 +540,10 @@ module Yast
           )
           NtpClient.modified = true
         end
+      else
+        #CWM internal events or from other widget, just ignore
       end
+
       nil
     end
 
@@ -1353,16 +1276,6 @@ module Yast
           ),
           "handle_events" => ["boot", "never", "sync"],
           "opt"           => [:notify]
-        },
-        "secure"             => {
-          "widget" => :checkbox,
-          # TRANSLATORS:
-          "label"  => _(
-            "&Restrict NTP Service to Configured Servers Only "
-          ),
-          "init"   => fun_ref(method(:secureInit), "void (string)"),
-          "store"  => fun_ref(method(:secureStore), "void (string, map)"),
-          "help"   => Ops.get_string(@HELPS, "secure", "")
         },
         "policy_combo"       => { # FIXME
           "widget" => :combobox,
