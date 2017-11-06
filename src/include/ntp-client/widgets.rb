@@ -523,41 +523,9 @@ module Yast
 
     # Redraw the overview table
     def overviewRedraw
-      types = {
+      items = NtpClient.GetUsedNtpServers.map do |server|
         # table cell, NTP relationship type
-        "server"          => _("Server"),
-        # table cell, NTP relationship type
-        "peer"            => _("Peer"),
-        # table cell, NTP relationship type
-        "broadcast"       => _(
-          "Outgoing Broadcast"
-        ),
-        # table cell, NTP relationship type
-        "broadcastclient" => _(
-          "Incoming Broadcast"
-        )
-      }
-      items = Builtins.maplist(NtpClient.getSyncRecords) do |i|
-        type = Ops.get_string(i, "type", "")
-        address = Ops.get_string(i, "address", "")
-        index = Ops.get_integer(i, "index", -1)
-        if type == "__clock"
-          clock_type = getClockType(address)
-          unit_number = getClockUnitNumber(address)
-          device = Ops.get_string(i, "device", "")
-          if device == ""
-            # table cell, %1 is integer 0-3
-            device = Builtins.sformat(_("Unit Number: %1"), unit_number)
-          end
-          device = "" if clock_type == 1 && unit_number == 0
-          clock_name = Ops.get(@clock_types, [clock_type, "name"], "")
-          if clock_name == ""
-            # table cell, NTP relationship type
-            clock_name = _("Local Radio Clock")
-          end
-          next Item(Id(index), clock_name, device)
-        end
-        Item(Id(index), Ops.get_string(types, type, ""), address)
+        Item(Id(server), _("Server"), server)
       end
       UI.ChangeWidget(Id(:overview), :Items, items)
       UI.SetFocus(Id(:overview))
