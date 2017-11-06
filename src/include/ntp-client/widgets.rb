@@ -521,9 +521,9 @@ module Yast
         )
         NtpClient.modified = true
       when :add
-        # TODO:
+        # TODO: implement
       when :edit, :overview
-        # TODO:
+        # TODO: implement
       when :delete
         # yes-no popup
         if Confirm.DeleteSelected
@@ -540,8 +540,6 @@ module Yast
           )
           NtpClient.modified = true
         end
-      else
-        #CWM internal events or from other widget, just ignore
       end
 
       nil
