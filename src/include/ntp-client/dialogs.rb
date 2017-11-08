@@ -8,6 +8,9 @@
 # $Id$
 #
 # Main file for ntp-client configuration. Uses all other files.
+
+require "y2ntp_client/widgets"
+
 module Yast
   module NtpClientDialogsInclude
     def initialize_ntp_client_dialogs(include_target)
@@ -138,102 +141,24 @@ module Yast
     # Main dialog
     # @return [Symbol] for wizard sequencer
     def MainDialog
-      NtpClient.simple_dialog = false
-
-      tab1 = HBox(
-        HSpacing(1),
-        VBox(
-          VSpacing(1),
-          HBox(
-            VBox(
-              "start",
-              VSpacing(),
-              HBox("policy_combo", "custom_policy"),
-              VSpacing(),
-              "interval",
-              VSpacing()
-            )
-          ),
-          VSpacing(1),
-          "overview",
-          VSpacing(1)
-        ),
-        HSpacing(1)
-      )
-
-      tab2 = HBox(
-        HSpacing(1),
-        VBox(
-          VSpacing(1),
-          HBox(
-            VBox(
-              "firewall"
-            )
-          ),
-          VStretch()
-        ),
-        HSpacing(1)
-      )
-
-      tabs = {
-        "general"  => {
-          "header"       => _("General Settings"),
-          "contents"     => tab1,
-          "widget_names" => [
-            "start",
-            "policy_combo",
-            "custom_policy",
-            "interval",
-            "overview"
-          ]
-        },
-        "security" => {
-          "header"       => _("Security Settings"),
-          "contents"     => tab2,
-          "widget_names" => ["firewall"]
-        }
-      }
-
-      wd = {
-        "tab" => CWMTab.CreateWidget(
-          "tab_order"    => ["general", "security"],
-          "tabs"         => tabs,
-          "widget_descr" => GetWidgets(),
-          "initial_tab"  => "general",
-          "tab_help"     => ""
-        )
-      }
-
-      contents = VBox("tab")
-      w = CWM.CreateWidgets(
-        ["tab"],
-        Convert.convert(
-          wd,
-          from: "map <string, any>",
-          to:   "map <string, map <string, any>>"
-        )
-      )
-
       # dialog caption
-      caption = _("Advanced NTP Configuration")
-      help = CWM.MergeHelps(w)
-      contents = CWM.PrepareDialog(contents, w)
-      Wizard.SetContentsButtons(
-        caption,
-        contents,
-        help,
-        Label.BackButton,
-        Stage.initial ? Label.AcceptButton : Label.OKButton
-      )
-      Wizard.HideBackButton
-      Wizard.SetAbortButton(:abort, Label.CancelButton)
+      caption = _("NTP Configuration")
 
-      # CWM::handleWidgets (w, $["ID" : "never"]);
-
-      CWM.Run(
-        w,
-        abort: fun_ref(method(:reallyExitComplex), "boolean ()")
+      content = VBox(
+        NtpStart.new,
+        VSpacing(1),
+        PolicyCombo.new,
+        VSpacing(1),
+        ServersTable.new
       )
+      CWM.show(
+        content,
+        caption: caption,
+        abort: Label.CancelButton,
+        back_button: "",
+        next_button: Stage.initial ? Label.AcceptButton : Label.OKButton
+      )
+
     end
 
     # Type of new peer selection dialog
