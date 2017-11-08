@@ -19,8 +19,13 @@ module Y2NtpClient
       end
 
       def contents
+        replace_point = CWM::ReplacePoint.new(widget: CWM::Empty.new("empty_interval"))
         VBox(
-          Y2NtpClient::NtpStart.new,
+          HBox(
+            Y2NtpClient::NtpStart.new(replace_point),
+            HSpacing(1),
+            replace_point
+          ),
           VSpacing(1),
           Left(Y2NtpClient::PolicyCombo.new),
           VSpacing(1),

@@ -60,8 +60,10 @@ module Y2NtpClient
   end
 
   class NtpStart < CWM::RadioButtons
-    def initialize
+    def initialize(replace_point)
       textdomain "ntp-client"
+
+      @replace_point = replace_point
     end
 
     def label
@@ -91,16 +93,41 @@ module Y2NtpClient
       else
         "never"
       end
+      handle
     end
 
     def handle
-      # TODO: display interval for sync without daemon
+      widget = value == "sync" ? SyncInterval.new : CWM::Empty.new("empty_interval")
+      @replace_point.replace(widget)
+
       nil
     end
 
     def store
       Yast::NtpClient.run_service = value == "boot"
       Yast::NtpClient.synchronize_time = value == "sync"
+    end
+  end
+
+  class SyncInterval < CWM::IntField
+    def initialize
+      textdomain "ntp-client"
+    end
+
+    def label
+      _("Synchronization &Interval in Minutes")
+    end
+
+    def minimal
+      1
+    end
+
+    def init
+      self.value = Yast::NtpClient.sync_interval
+    end
+
+    def store
+      Yast::NtpClient.sync_interval = value
     end
   end
 
