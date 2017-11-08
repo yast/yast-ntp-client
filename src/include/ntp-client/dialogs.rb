@@ -147,7 +147,7 @@ module Yast
       content = VBox(
         Y2NtpClient::NtpStart.new,
         VSpacing(1),
-        Y2NtpClient::PolicyCombo.new,
+        Left(Y2NtpClient::PolicyCombo.new),
         VSpacing(1),
         Y2NtpClient::ServersTable.new
       )
