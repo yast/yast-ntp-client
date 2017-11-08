@@ -138,29 +138,6 @@ module Yast
       ret
     end
 
-    # Main dialog
-    # @return [Symbol] for wizard sequencer
-    def MainDialog
-      # dialog caption
-      caption = _("NTP Configuration")
-
-      content = VBox(
-        Y2NtpClient::NtpStart.new,
-        VSpacing(1),
-        Left(Y2NtpClient::PolicyCombo.new),
-        VSpacing(1),
-        Y2NtpClient::ServersTable.new
-      )
-      CWM.show(
-        content,
-        caption: caption,
-        abort_button: Label.CancelButton,
-        back_button: "",
-        next_button: Stage.initial ? Label.AcceptButton : Label.OKButton
-      )
-
-    end
-
     # Type of new peer selection dialog
     # @return [Symbol] for wizard sequencer
     def TypeSelectDialog

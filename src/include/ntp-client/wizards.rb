@@ -6,6 +6,9 @@
 # Authors:	Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
+
+require "y2ntp_client/dialog/main"
+
 module Yast
   module NtpClientWizardsInclude
     def initialize_ntp_client_wizards(include_target)
@@ -25,7 +28,7 @@ module Yast
     def NtpClientSequence
       aliases = {
         "read"  => [lambda { ReadDialog() }, true],
-        "main"  => lambda { MainDialog() },
+        "main"  => lambda { Y2NtpClient::Dialog::Main.run },
         "write" => [lambda { WriteDialog() }, true]
       }
 
@@ -47,7 +50,7 @@ module Yast
     # Autoyast configuration of ntp-client
     # @return sequence result
     def NtpClientAutoSequence
-      aliases = { "main" => lambda { MainDialog() } }
+      aliases = { "main" => lambda { Y2NtpClient::Dialog::Main.run } }
 
       sequence = {
         "ws_start" => "main",
