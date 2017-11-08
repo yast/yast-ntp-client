@@ -2,7 +2,8 @@
 
 require "yast"
 
-require "yast/cwm"
+require "cwm/widget"
+require "cwm/table"
 require "tempfile"
 
 Yast.import "LogView"
@@ -41,6 +42,8 @@ module Y2NtpClient
       if !["", "auto"].include?(current_policy)
         items << [current_policy, current_policy]
       end
+
+      items
     end
 
     def init

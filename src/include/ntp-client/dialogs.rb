@@ -145,16 +145,16 @@ module Yast
       caption = _("NTP Configuration")
 
       content = VBox(
-        NtpStart.new,
+        Y2NtpClient::NtpStart.new,
         VSpacing(1),
-        PolicyCombo.new,
+        Y2NtpClient::PolicyCombo.new,
         VSpacing(1),
-        ServersTable.new
+        Y2NtpClient::ServersTable.new
       )
       CWM.show(
         content,
         caption: caption,
-        abort: Label.CancelButton,
+        abort_button: Label.CancelButton,
         back_button: "",
         next_button: Stage.initial ? Label.AcceptButton : Label.OKButton
       )
