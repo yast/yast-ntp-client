@@ -98,4 +98,27 @@ describe CFA::ChronyConf do
       end
     end
   end
+
+  describe "hardware_clock?" do
+    context "hardware clock defined" do
+      let(:content) do
+        "refclock PPS /dev/pps0 lock NMEA refid GPS\n"
+      end
+
+      it "return true" do
+        expect(subject.hardware_clock?).to eq true
+      end
+    end
+
+    context "no hardware clock defined" do
+      let(:content) do
+        "rtcsync\n" \
+        "pool ntp.suse.cz offline\n"
+      end
+
+      it "return true" do
+        expect(subject.hardware_clock?).to eq false
+      end
+    end
+  end
 end

@@ -76,10 +76,16 @@ module CFA
       Hash[pools_map]
     end
 
+    # Is there any hardware clock settings?
+    def hardware_clock?
+      !data.select(Matcher.new(collection: "refclock")).empty?
+    end
+
   private
 
     COLLECTION_KEYS = [
-      "pool"
+      "pool",
+      "refclock"
     ].freeze
     # if there is only one element of collection, augeas does not add [],
     # so fix it here for known keys which we modify ( and can be hitted with it )
