@@ -149,4 +149,42 @@ module Y2NtpClient
       end
     end
   end
+
+  class PoolAddress < CWM::InputField
+    attr_reader :address
+
+    def initialize(initial_value)
+      textdomain "ntp-client"
+      @address = initial_value
+    end
+
+    def label
+      _("A&ddress")
+    end
+
+    def init
+      self.value = @address
+    end
+
+    def store
+      @address = value
+    end
+  end
+
+  class TestButton < CWM::PushButton
+    def initialize(address_widget)
+      textdomain "ntp-client"
+      @address_widget = address_widget
+    end
+
+    def label
+      _("Test")
+    end
+
+    def handle
+      Yast::NtpClient.TestNtpServer(@address_widget.value, :result_popup)
+
+      nil
+    end
+  end
 end
