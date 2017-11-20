@@ -57,7 +57,6 @@ module Yast
       Yast.import "String"
       Yast.import "Summary"
       Yast.import "SuSEFirewall"
-      Yast.import "FileChanges"
 
       # Abort function
       # return boolean return true if abort
@@ -344,20 +343,8 @@ module Yast
       # Poke to /var/lib/YaST if there is Active Directory controller address dumped in .ycp file
       read_ad_address!
 
-      # Stay away if the user may have made changes which we cannot parse.
-      # But bnc#456553, no pop-ups for CLI.
-      failed = !Mode.commandline && !FileChanges.CheckFiles(["/etc/chrony.conf"])
-
       ProcessNtpConf()
       ReadSynchronization()
-
-      if failed
-        # While calling "yast clone_system" it is possible that
-        # the ntp server has not already been installed at that time.
-        # (This would be done if yast2-ntp-client will be called in the UI)
-        # In that case the error popup will not be shown. (bnc#889557)
-        Report.Error(Message.CannotReadCurrentSettings) unless Mode.config
-      end
 
       progress_orig2 = Progress.set(false)
       SuSEFirewall.Read
@@ -1025,8 +1012,6 @@ module Yast
         log.error("Failed to write #{NTP_FILE}: #{e.message}")
         return false
       end
-
-      FileChanges.StoreFileCheckSum(NTP_FILE)
 
       true
     end
