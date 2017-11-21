@@ -2,7 +2,6 @@ require_relative "test_helper"
 
 require "fileutils"
 require "cfa/memory_file"
-require "cfa/ntp_conf"
 
 Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
