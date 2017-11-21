@@ -216,6 +216,64 @@ module Y2NtpClient
     end
   end
 
+  class Iburst < CWM::CheckBox
+    def initialize(options)
+      textdomain "ntp-client"
+      @options = options
+    end
+
+    def label
+      _("Quick Initial Sync")
+    end
+
+    def init
+      self.value = @options.key?("iburst")
+    end
+
+    def store
+      if value
+        @options["iburst"] = nil
+      else
+        @options.delete("iburst")
+      end
+    end
+
+    def help
+      _("<b>Quick Initial Sync</b> specifies if option iburst is used. This option during " \
+        "initialization send four poll requests with two seconds interval. Useful to quick " \
+        "synchronization during start of machine.")
+    end
+  end
+
+  class Offline < CWM::CheckBox
+    def initialize(options)
+      textdomain "ntp-client"
+      @options = options
+    end
+
+    def label
+      _("Start Offline")
+    end
+
+    def init
+      self.value = @options.key?("offline")
+    end
+
+    def store
+      if value
+        @options["offline"] = nil
+      else
+        @options.delete("offline")
+      end
+    end
+
+    def help
+      _("<b>Start Offline</b> specifies if option offline is used. This option skip this server " \
+        "during start. It is useful for machine which start without network, because it speed up " \
+        " boot and sync when machine is connected to network.")
+    end
+  end
+
   class AddPoolButton < CWM::PushButton
     def initialize
       textdomain "ntp-client"

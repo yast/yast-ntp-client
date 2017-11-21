@@ -54,7 +54,7 @@ module CFA
         v == original_address ||
         ( v.respond_to?(:value) && v.value = original_address )
       end
-      value = AugeasTreeValue.new(AugeasTree.new, address)
+      value = AugeasTreeValue.new(AugeasTree.new, new_address)
       options.each_pair do |k, v|
         value.tree[k] = v
       end

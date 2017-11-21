@@ -29,6 +29,12 @@ module Y2NtpClient
             @address_widget,
             HSpacing(),
             TestButton.new(@address_widget)
+          ),
+          VSpacing(),
+          HBox(
+            Iburst.new(@options),
+            HSpacing(),
+            Offline.new(@options),
           )
         )
       end
