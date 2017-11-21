@@ -262,4 +262,26 @@ module Y2NtpClient
       @table.handle
     end
   end
+
+  class DeletePoolButton < CWM::PushButton
+    def initialize(table)
+      textdomain "ntp-client"
+
+      @table = table
+    end
+
+    def label
+      _("&Delete")
+    end
+
+    def handle
+      address = @table.value
+      if address
+        Yast::Popup.Error(_("No table item is selected"))
+        return nil
+      end
+
+      Yast::NtpClient.ntp_conf.delete_pool(address)
+    end
+  end
 end

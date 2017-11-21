@@ -36,8 +36,12 @@ module Y2NtpClient
             table,
             HSpacing(0.2),
             VBox(
+              VSpacing(),
               Y2NtpClient::AddPoolButton.new,
+              VSpacing(),
               Y2NtpClient::EditPoolButton.new(table),
+              VSpacing(),
+              Y2NtpClient::DeletePoolButton.new(table),
               VStretch()
             )
           )

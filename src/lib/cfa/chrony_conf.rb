@@ -64,6 +64,17 @@ module CFA
       data.add(key, value, placer)
     end
 
+    def delete_pool(address)
+      key = "pool[]"
+      matcher = Matcher.new do |k, v|
+        k == key &&
+        v == address ||
+        ( v.respond_to?(:value) && v.value = address )
+      end
+
+      data.delete(matcher)
+    end
+
     def default_pool_options
       { "iburst" => nil }
     end
