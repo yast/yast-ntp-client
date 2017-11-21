@@ -37,6 +37,15 @@ module Y2NtpClient
         Yast::Label.OKButton
       end
 
+      def back_button
+        Yast::Label.CancelButton
+      end
+
+      def abort_button
+        # does not show abort, onlyce cancel/ok
+        ""
+      end
+
       def resulting_pool
         [@address_widget.address, @options]
       end

@@ -6,6 +6,7 @@ require "cwm/widget"
 require "cwm/table"
 require "tempfile"
 
+Yast.import "Confirm"
 Yast.import "LogView"
 Yast.import "NtpClient"
 Yast.import "Popup"
@@ -281,7 +282,12 @@ module Y2NtpClient
         return nil
       end
 
-      Yast::NtpClient.ntp_conf.delete_pool(address)
+      if Yast::Confirm.Delete(address)
+        Yast::NtpClient.ntp_conf.delete_pool(address)
+        return :redraw
+      end
+
+      nil
     end
   end
 end

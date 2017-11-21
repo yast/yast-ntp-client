@@ -68,8 +68,7 @@ module CFA
       key = "pool[]"
       matcher = Matcher.new do |k, v|
         k == key &&
-        v == address ||
-        ( v.respond_to?(:value) && v.value = address )
+        (v.respond_to?(:value) ? v.value == address : v == address)
       end
 
       data.delete(matcher)
