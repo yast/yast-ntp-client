@@ -137,11 +137,32 @@ module Y2NtpClient
       textdomain "ntp-client"
     end
 
+    def opt
+      [:notify]
+    end
+
     def header
       [
         # table header for list of servers
         _("Synchronization Servers")
       ]
+    end
+
+    def handle
+      address = value
+
+      options = Yast::NtpClient.ntp_conf.pools[address]
+      dialog = Dialog::Pool.new(address, options)
+
+      res = dialog.run
+
+      if res == :next
+        Yast::NtpClient.ntp_conf.modify_pool(address, *dialog.resulting_pool)
+
+        return :redraw
+      end
+
+      nil
     end
 
     def items
@@ -238,18 +259,7 @@ module Y2NtpClient
         return nil
       end
 
-      options = Yast::NtpClient.ntp_conf.pools[address]
-      dialog = Dialog::Pool.new(address, options)
-
-      res = dialog.run
-
-      if res == :next
-        Yast::NtpClient.ntp_conf.modify_pool(address, *dialog.resulting_pool)
-
-        return :redraw
-      end
-
-      nil
+      @table.handle
     end
   end
 end
