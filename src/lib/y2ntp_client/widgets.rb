@@ -254,7 +254,7 @@ module Y2NtpClient
 
     def handle
       address = @table.value
-      if address
+      if !address
         Yast::Popup.Error(_("No table item is selected"))
         return nil
       end
@@ -276,7 +276,7 @@ module Y2NtpClient
 
     def handle
       address = @table.value
-      if address
+      if !address
         Yast::Popup.Error(_("No table item is selected"))
         return nil
       end
