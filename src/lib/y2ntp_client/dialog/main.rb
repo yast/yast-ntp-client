@@ -21,6 +21,7 @@ module Y2NtpClient
 
       def contents
         replace_point = CWM::ReplacePoint.new(widget: CWM::Empty.new("empty_interval"))
+        table = Y2NtpClient::ServersTable.new
         VBox(
           HBox(
             HWeight(1, Y2NtpClient::NtpStart.new(replace_point)),
@@ -32,9 +33,13 @@ module Y2NtpClient
           VSpacing(1),
           *hardware_clock_widgets,
           HBox(
-            Y2NtpClient::ServersTable.new,
+            table,
             HSpacing(0.2),
-            Y2NtpClient::AddPoolButton.new
+            VBox(
+              Y2NtpClient::AddPoolButton.new,
+              Y2NtpClient::EditPoolButton.new(table),
+              VStretch()
+            )
           )
         )
       end

@@ -8,6 +8,7 @@ require "tempfile"
 
 Yast.import "LogView"
 Yast.import "NtpClient"
+Yast.import "Popup"
 Yast.import "Progress"
 Yast.import "Service"
 
@@ -166,6 +167,11 @@ module Y2NtpClient
       self.value = @address
     end
 
+    def validate
+      # TODO: validate address and also that it is not yet used
+      true
+    end
+
     def store
       @address = value
     end
@@ -205,6 +211,40 @@ module Y2NtpClient
 
       if res == :next
         Yast::NtpClient.ntp_conf.add_pool(*dialog.resulting_pool)
+
+        return :redraw
+      end
+
+      nil
+    end
+  end
+
+  class EditPoolButton < CWM::PushButton
+    def initialize(table)
+      textdomain "ntp-client"
+      require "y2ntp_client/dialog/pool"
+
+      @table = table
+    end
+
+    def label
+      _("&Edit")
+    end
+
+    def handle
+      address = @table.value
+      if address
+        Yast::Popup.Error(_("No table item is selected"))
+        return nil
+      end
+
+      options = Yast::NtpClient.ntp_conf.pools[address]
+      dialog = Dialog::Pool.new(address, options)
+
+      res = dialog.run
+
+      if res == :next
+        Yast::NtpClient.ntp_conf.modify_pool(address, *dialog.resulting_pool)
 
         return :redraw
       end

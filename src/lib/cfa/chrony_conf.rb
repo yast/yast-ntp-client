@@ -47,6 +47,23 @@ module CFA
       data.add(key, value, placer)
     end
 
+    def modify_pool(original_address, new_address, options)
+      key = "pool[]"
+      matcher = Matcher.new do |k, v|
+        k == key &&
+        v == original_address ||
+        ( v.respond_to?(:value) && v.value = original_address )
+      end
+      value = AugeasTreeValue.new(AugeasTree.new, address)
+      options.each_pair do |k, v|
+        value.tree[k] = v
+      end
+
+      placer = ReplacePlacer.new(matcher)
+
+      data.add(key, value, placer)
+    end
+
     def default_pool_options
       { "iburst" => nil }
     end
