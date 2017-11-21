@@ -48,28 +48,21 @@ module CFA
     end
 
     def modify_pool(original_address, new_address, options)
-      key = "pool[]"
-      matcher = Matcher.new do |k, v|
-        k == key &&
-        v == original_address ||
-        ( v.respond_to?(:value) && v.value = original_address )
-      end
+      matcher = pool_matcher(original_address)
       value = AugeasTreeValue.new(AugeasTree.new, new_address)
       options.each_pair do |k, v|
         value.tree[k] = v
       end
 
-      placer = ReplacePlacer.new(matcher)
+      placer = AfterPlacer.new(matcher)
 
+      key = "pool[]"
+      data.delete(matcher)
       data.add(key, value, placer)
     end
 
     def delete_pool(address)
-      key = "pool[]"
-      matcher = Matcher.new do |k, v|
-        k == key &&
-        (v.respond_to?(:value) ? v.value == address : v == address)
-      end
+      matcher = pool_matcher(address)
 
       data.delete(matcher)
     end
@@ -129,6 +122,13 @@ module CFA
     # list of pools in internal data structure
     def pure_pools
       data.select(POOLS_MATCHER)
+    end
+
+    def pool_matcher(address)
+      Matcher.new do |k, v|
+        k == "pool[]" &&
+        (v.respond_to?(:value) ? v.value == address : v == address)
+      end
     end
   end
 end
