@@ -187,4 +187,29 @@ module Y2NtpClient
       nil
     end
   end
+
+  class AddPoolButton < CWM::PushButton
+    def initialize(address_widget)
+      textdomain "ntp-client"
+      require "y2ntp_client/dialog/pool"
+    end
+
+    def label
+      _("&Add")
+    end
+
+    def handle
+      dialog = Dialog::Pool.new("", Yast::NtpClient.ntp_conf.default_pool_options)
+
+      res = dialog.run
+
+      if res == :next
+        Yast::NtpClient.ntp_conf.add_pool(*dialog.resulting_pool)
+
+        return :redraw
+      end
+
+      nil
+    end
+  end
 end

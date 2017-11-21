@@ -31,8 +31,19 @@ module Y2NtpClient
           Left(Y2NtpClient::PolicyCombo.new),
           VSpacing(1),
           *hardware_clock_widgets,
-          Y2NtpClient::ServersTable.new
+          HBox(
+            Y2NtpClient::ServersTable.new,
+            HSpacing(0.2),
+            Y2NtpClient::AddPoolButton.new
+          )
         )
+      end
+
+      def run
+        loop do
+          res = super
+          return res if res != :redraw
+        end
       end
 
       def abort_button

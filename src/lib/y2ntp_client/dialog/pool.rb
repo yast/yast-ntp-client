@@ -9,10 +9,12 @@ Yast.import "Stage"
 
 module Y2NtpClient
   module Dialog
-    class Main < CWM::Dialog
+    class Pool < CWM::Dialog
       # @param pool_entry [nil, Hash]
-      def initialize(pool_entry = nil)
+      def initialize(address = "", options = {})
         textdomain "ntp-client"
+        @address = address
+        @options = options
       end
 
       def title
@@ -21,19 +23,30 @@ module Y2NtpClient
       end
 
       def contents
+        @address_widget = PoolAddress.new(@address)
+        VBox(
+          HBox(
+            address,
+            HSpacing(),
+            TestButton.new(@address_widget)
+          )
+        )
       end
 
       def next_button
         Yast::Label.OKButton
       end
 
+      def resulting_pool
+        [address_widget.address, @options]
+      end
+
     private
 
       # always open new wizard dialog
-      def def should_open_dialog?
+      def should_open_dialog?
         true
       end
-
     end
   end
 end
