@@ -26,7 +26,7 @@ module Y2NtpClient
         @address_widget = PoolAddress.new(@address)
         VBox(
           HBox(
-            address,
+            @address_widget,
             HSpacing(),
             TestButton.new(@address_widget)
           )
@@ -38,7 +38,7 @@ module Y2NtpClient
       end
 
       def resulting_pool
-        [address_widget.address, @options]
+        [@address_widget.address, @options]
       end
 
     private

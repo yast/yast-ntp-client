@@ -189,7 +189,7 @@ module Y2NtpClient
   end
 
   class AddPoolButton < CWM::PushButton
-    def initialize(address_widget)
+    def initialize
       textdomain "ntp-client"
       require "y2ntp_client/dialog/pool"
     end
