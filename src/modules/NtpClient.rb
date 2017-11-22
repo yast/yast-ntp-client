@@ -460,10 +460,6 @@ module Yast
       # SuSEFirewall::Write checks on its own whether there are pending
       # changes, so call it always. bnc#476951
 
-      progress_orig = Progress.set(false)
-      SuSEFirewall.Write
-      Progress.set(progress_orig)
-
       check_service
 
       update_cron_settings

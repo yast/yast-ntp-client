@@ -39,6 +39,8 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 Requires:       augeas-lenses
 Requires:       yast2 >= 3.2.21
 Requires:       yast2-country-data
+# needed for network/config agent
+Requires:       yast2-network
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildArch:      noarch
