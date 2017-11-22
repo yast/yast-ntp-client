@@ -1,7 +1,7 @@
 require "yast"
 
 require "cwm/dialog"
-require "y2ntp_client/widgets"
+require "y2ntp_client/widgets/pool_widgets"
 
 Yast.import "Label"
 Yast.import "NtpClient"
@@ -23,18 +23,18 @@ module Y2NtpClient
       end
 
       def contents
-        @address_widget = PoolAddress.new(@address)
+        @address_widget = Widgets::PoolAddress.new(@address)
         VBox(
           HBox(
             @address_widget,
             HSpacing(),
-            TestButton.new(@address_widget)
+            Widgets::TestButton.new(@address_widget)
           ),
           VSpacing(),
           HBox(
-            Iburst.new(@options),
+            Widgets::Iburst.new(@options),
             HSpacing(),
-            Offline.new(@options),
+            Widgets::Offline.new(@options),
           )
         )
       end

@@ -1,7 +1,7 @@
 require "yast"
 
 require "cwm/dialog"
-require "y2ntp_client/widgets"
+require "y2ntp_client/widgets/main_widgets"
 
 Yast.import "Label"
 Yast.import "NtpClient"
@@ -21,15 +21,15 @@ module Y2NtpClient
 
       def contents
         replace_point = CWM::ReplacePoint.new(widget: CWM::Empty.new("empty_interval"))
-        table = Y2NtpClient::ServersTable.new
+        table = Widgets::ServersTable.new
         VBox(
           HBox(
-            HWeight(1, Y2NtpClient::NtpStart.new(replace_point)),
+            HWeight(1, Widgets::NtpStart.new(replace_point)),
             HSpacing(1),
             HWeight(1, replace_point)
           ),
           VSpacing(1),
-          Left(Y2NtpClient::PolicyCombo.new),
+          Left(Widgets::PolicyCombo.new),
           VSpacing(1),
           *hardware_clock_widgets,
           HBox(
@@ -37,11 +37,11 @@ module Y2NtpClient
             HSpacing(0.2),
             VBox(
               VSpacing(),
-              Y2NtpClient::AddPoolButton.new,
+              Widgets::AddPoolButton.new,
               VSpacing(),
-              Y2NtpClient::EditPoolButton.new(table),
+              Widgets::EditPoolButton.new(table),
               VSpacing(),
-              Y2NtpClient::DeletePoolButton.new(table),
+              Widgets::DeletePoolButton.new(table),
               VStretch()
             )
           )
