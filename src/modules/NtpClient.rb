@@ -476,6 +476,7 @@ module Yast
     # @param [Hash] settings The YCP structure to be imported.
     # @return [Boolean] True on success
     def Import(settings)
+      log.info "Import with #{settings}"
       # TODO: implement for chrony
       @modified = true
       true

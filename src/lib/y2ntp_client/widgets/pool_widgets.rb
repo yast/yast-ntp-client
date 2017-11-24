@@ -6,6 +6,7 @@ Yast.import "NtpClient"
 
 module Y2NtpClient
   module Widgets
+    # Input field with address
     class PoolAddress < CWM::InputField
       attr_reader :address
 
@@ -32,6 +33,7 @@ module Y2NtpClient
       end
     end
 
+    # Button that tests if server is reachable
     class TestButton < CWM::PushButton
       def initialize(address_widget)
         textdomain "ntp-client"
@@ -49,6 +51,7 @@ module Y2NtpClient
       end
     end
 
+    # Enable iburst option
     class Iburst < CWM::CheckBox
       def initialize(options)
         textdomain "ntp-client"
@@ -78,6 +81,7 @@ module Y2NtpClient
       end
     end
 
+    # Enable offline option
     class Offline < CWM::CheckBox
       def initialize(options)
         textdomain "ntp-client"
@@ -101,9 +105,9 @@ module Y2NtpClient
       end
 
       def help
-        _("<b>Start Offline</b> specifies if option offline is used. This option skip this server " \
-          "during start. It is useful for machine which start without network, because it speed up " \
-          " boot and sync when machine is connected to network.")
+        _("<b>Start Offline</b> specifies if option offline is used. This option skip this " \
+          "server during start. It is useful for machine which start without network, because " \
+          "it speed up boot and sync when machine is connected to network.")
       end
     end
   end

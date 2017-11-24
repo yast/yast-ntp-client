@@ -9,6 +9,7 @@ Yast.import "Stage"
 
 module Y2NtpClient
   module Dialog
+    # Dialog to add/edit ntp pool server
     class Pool < CWM::Dialog
       # @param pool_entry [nil, Hash]
       def initialize(address = "", options = {})
@@ -34,7 +35,7 @@ module Y2NtpClient
           HBox(
             Widgets::Iburst.new(@options),
             HSpacing(),
-            Widgets::Offline.new(@options),
+            Widgets::Offline.new(@options)
           )
         )
       end

@@ -127,7 +127,7 @@ module CFA
     def pool_matcher(address)
       Matcher.new do |k, v|
         k == "pool[]" &&
-        (v.respond_to?(:value) ? v.value == address : v == address)
+          (v.respond_to?(:value) ? v.value == address : v == address)
       end
     end
   end

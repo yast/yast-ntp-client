@@ -11,6 +11,7 @@ Yast.import "Popup"
 
 module Y2NtpClient
   module Widgets
+    # Widget for netconfig policy
     class PolicyCombo < CWM::ComboBox
       def initialize
         textdomain "ntp-client"
@@ -50,14 +51,15 @@ module Y2NtpClient
       end
 
       def store
-        if value != Yast::NtpClient.ntp_policy
-          log.info "ntp policy modifed to #{value.inspect}"
-          Yast::NtpClient.modified = true
-          Yast::NtpClient.ntp_policy = value
-        end
+        return if value == Yast::NtpClient.ntp_policy
+
+        log.info "ntp policy modifed to #{value.inspect}"
+        Yast::NtpClient.modified = true
+        Yast::NtpClient.ntp_policy = value
       end
     end
 
+    # Widget to configure how ntp will be started
     class NtpStart < CWM::RadioButtons
       def initialize(replace_point)
         textdomain "ntp-client"
@@ -108,6 +110,7 @@ module Y2NtpClient
       end
     end
 
+    # Widget representing how often synchronize via cron
     class SyncInterval < CWM::IntField
       def initialize
         textdomain "ntp-client"
@@ -130,6 +133,7 @@ module Y2NtpClient
       end
     end
 
+    # Table with ntp pool servers
     class ServersTable < CWM::Table
       def initialize
         textdomain "ntp-client"
@@ -170,6 +174,7 @@ module Y2NtpClient
       end
     end
 
+    # Button to add ntp pool server
     class AddPoolButton < CWM::PushButton
       def initialize
         textdomain "ntp-client"
@@ -194,6 +199,7 @@ module Y2NtpClient
       end
     end
 
+    # Button to edit ntp pool server
     class EditPoolButton < CWM::PushButton
       def initialize(table)
         textdomain "ntp-client"
@@ -216,6 +222,7 @@ module Y2NtpClient
       end
     end
 
+    # Button to delete ntp pool server
     class DeletePoolButton < CWM::PushButton
       def initialize(table)
         textdomain "ntp-client"
