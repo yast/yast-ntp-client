@@ -9,8 +9,6 @@
 #
 # Main file for ntp-client configuration. Uses all other files.
 
-require "y2ntp_client/widgets"
-
 module Yast
   module NtpClientDialogsInclude
     def initialize_ntp_client_dialogs(include_target)
