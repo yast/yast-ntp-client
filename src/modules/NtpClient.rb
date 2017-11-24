@@ -476,40 +476,7 @@ module Yast
     # @param [Hash] settings The YCP structure to be imported.
     # @return [Boolean] True on success
     def Import(settings)
-      settings = deep_copy(settings)
-      @synchronize_time = Ops.get_boolean(settings, "synchronize_time", false)
-      @sync_interval = Ops.get_integer(settings, "sync_interval", DEFAULT_SYNC_INTERVAL)
-      @run_service = Ops.get_boolean(settings, "start_at_boot", false)
-      # compatibility: configure_dhcp:true translates to ntp_policy:auto
-      config_dhcp = Ops.get_boolean(settings, "configure_dhcp", false)
-      @ntp_policy = Ops.get_string(
-        settings,
-        "ntp_policy",
-        config_dhcp ? "auto" : ""
-      )
-      @ntp_records = Ops.get_list(settings, "peers", [])
-      @ntp_records = Builtins.maplist(@ntp_records) do |p|
-        if Builtins.haskey(p, "key") && Builtins.haskey(p, "value")
-          Ops.set(p, "type", Ops.get_string(p, "key", ""))
-          Ops.set(p, "address", Ops.get_string(p, "value", ""))
-          if Builtins.haskey(p, "param")
-            Ops.set(p, "options", Ops.get_string(p, "param", ""))
-          end
-        end
-        next deep_copy(p)
-      end
-
-      # sanitize records
-      @ntp_records = @ntp_records.map { |r| sanitize_record(r) }
-
-      # restricts is a list of entries whereas restrict_map
-      # is a map with target key (ip, ipv4-tag, ipv6-tag,...).
-      restricts = settings["restricts"] || []
-      @restrict_map = {}
-      restricts.each do |entry|
-        target = entry.delete("target").strip
-        @restrict_map[target] = sanitize_record(entry)
-      end
+      # TODO: implement for chrony
       @modified = true
       true
     end
@@ -518,103 +485,9 @@ module Yast
     # (For use by autoinstallation.)
     # @return [Hash] Dumped settings (later acceptable by Import ())
     def Export
-      # restrict_map is a map with the key ip,ipv4-tag or ipv6-tag.
-      # This will be converted into a list in order to use it in
-      # autoyast XML file properly.
-
-      restricts = @restrict_map.collect do |target, values|
-        # cfa_record not needed for export
-        export_values = values.dup
-        export_values.delete("cfa_record")
-        export_values["target"] = target
-        export_values
-      end
-
-      peers = @ntp_records.dup
-      peers.each do |peer|
-        peer.delete("cfa_record")
-        peer.delete("cfa_fudge_record")
-      end
-
-      {
-        "synchronize_time" => @synchronize_time,
-        "sync_interval"    => @sync_interval,
-        "start_at_boot"    => @run_service,
-        "ntp_policy"       => @ntp_policy,
-        "peers"            => peers,
-        "restricts"        => restricts
-      }
-    end
-
-    # Create a textual summary and a list of unconfigured cards
-    # @return [String] summary of the current configuration
-    def Summary
-      summary = ""
-      if @run_service
-        # summary string
-        summary = Summary.AddLine(
-          summary,
-          _("The NTP daemon starts when starting the system.")
-        )
-      else
-        # summary string
-        summary = Summary.AddLine(
-          summary,
-          _("The NTP daemon does not start automatically.")
-        )
-      end
-
-      types = {
-        # summary string, %1 is list of addresses
-        "server"          => _(
-          "Servers: %1"
-        ),
-        # summary string, %1 is list of addresses
-        "__clock"         => _(
-          "Radio Clocks: %1"
-        ),
-        # summary string, %1 is list of addresses
-        "peer"            => _(
-          "Peers: %1"
-        ),
-        # summary string, %1 is list of addresses
-        "broadcast"       => _(
-          "Broadcast time information to: %1"
-        ),
-        # summary string, %1 is list of addresses
-        "broadcastclient" => _(
-          "Accept broadcasted time information from: %1"
-        )
-      }
-      #   if (config_dhcp)
-      #   {
-      #   summary = Summary::AddLine (summary,
-      #   // summary string
-      #   _("Configure NTP daemon via DHCP."));
-      #   return summary;
-      #   }
-      # netconfig policy
-      if PolicyIsAuto()
-        # summary string, FIXME
-        summary = Summary.AddLine(
-          summary,
-          _("Combine static and DHCP configuration.")
-        )
-      elsif PolicyIsNomodify()
-        # summary string, FIXME
-        summary = Summary.AddLine(summary, _("Static configuration only."))
-      else
-        # summary string, FIXME: too generic!
-        summary = Summary.AddLine(summary, _("Custom configuration policy."))
-      end
-
-      SYNC_RECORDS.each do |t|
-        type_records = @ntp_records.select { |r| r["type"] == t }
-        names = type_records.map { |r| r["address"].to_s }.select { |n| n != "" }
-        summary = Summary.AddLine(summary, "#{types[t]}#{names.join(", ")}") if !names.empty?
-      end
-
-      summary
+      # TODO: implement for chrony
+      @modified = true
+      {}
     end
 
     # Test if a specified NTP server is reachable by IPv4 or IPv6 (bsc#74076),
