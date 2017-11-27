@@ -25,6 +25,7 @@ module Y2NtpClient
 
       def help
         # TODO: not written previously, but really deserve something
+        _("<b>Configuration Source</b> defines if network itself can adds ntp sources.")
       end
 
       def opt
