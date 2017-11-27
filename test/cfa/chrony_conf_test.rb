@@ -20,6 +20,8 @@ describe CFA::ChronyConf do
 
   let(:file) { ntp_file(content) }
 
+  let(:content) { "" }
+
   before do
     subject.load
   end
@@ -99,7 +101,7 @@ describe CFA::ChronyConf do
     end
   end
 
-  describe "hardware_clock?" do
+  describe "#hardware_clock?" do
     context "hardware clock defined" do
       let(:content) do
         "refclock PPS /dev/pps0 lock NMEA refid GPS\n"
@@ -119,6 +121,80 @@ describe CFA::ChronyConf do
       it "return true" do
         expect(subject.hardware_clock?).to eq false
       end
+    end
+  end
+
+  describe "#modify_pool" do
+    let(:content) do
+      "pool test.ntp.org iburst\n"
+    end
+
+    it "sets new address for original address" do
+      subject.modify_pool("test.ntp.org", "lest.ntp.org", {})
+      subject.save
+
+      expect(file.content.lines).to include "pool lest.ntp.org\n"
+    end
+
+    it "modifies options according to passed ones" do
+      subject.modify_pool("test.ntp.org", "lest.ntp.org", "offline" => nil, "maxsources" => "5")
+      subject.save
+
+      expect(file.content.lines).to include "pool lest.ntp.org offline maxsources 5\n"
+    end
+
+    it "works when address does not change" do
+      subject.modify_pool("test.ntp.org", "test.ntp.org", {})
+      subject.save
+
+      expect(file.content.lines).to include "pool test.ntp.org\n"
+    end
+
+    it "appends new pool entry if original address does not exist" do
+      subject.modify_pool("lest.ntp.org", "lest.ntp.org", {})
+      subject.save
+
+      expect(file.content.lines).to eq ["pool test.ntp.org iburst\n", "pool lest.ntp.org\n"]
+    end
+  end
+
+  describe "#delete_pool" do
+    let(:content) do
+      "pool test.ntp.org iburst\n" \
+      "pool lest.ntp.org offline\n"
+    end
+
+    it "deletes pool entry with given address" do
+      subject.delete_pool("lest.ntp.org")
+      subject.save
+
+      expect(file.content.lines).to eq ["pool test.ntp.org iburst\n"]
+    end
+
+    it "does nothing if pool entry with given address does not exist" do
+      subject.delete_pool("not.exist.ntp.org")
+      subject.save
+
+      expect(file.content.lines).to eq ["pool test.ntp.org iburst\n", "pool lest.ntp.org offline\n"]
+    end
+  end
+
+  describe "#default_pool_options" do
+    it "returns Hash of default options for pool" do
+      expect(subject.default_pool_options).to be_a(Hash)
+    end
+  end
+
+  describe "#pools" do
+    let(:content) do
+      "pool test.ntp.org iburst\n" \
+      "pool lest.ntp.org offline\n" \
+      "pool lest2.ntp.org\n" \
+      "# fancy comment\n"
+    end
+
+    it "returns Hash with address as key and options as value" do
+      expect(subject.pools.size).to eq 3
     end
   end
 end

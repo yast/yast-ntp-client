@@ -16,6 +16,7 @@ module CFA
       super(CFA::AugeasParser.new("chrony.lns"), PATH, file_handler: file_handler)
     end
 
+    # loads cfa model and ensure all collection keys have [] suffix
     def load
       super
       fix_collection_names(data)
@@ -47,6 +48,11 @@ module CFA
       data.add(key, value, placer)
     end
 
+    # modifies pool entry with original address to new adress and specified options
+    # @param original_address [String] address to modify
+    # @param new_address [String] new adress of pool entry. Can be same as original one
+    # @param options [Hash<String, nil | String>] options format is that key is option name and
+    #   value is either nil for keyword options or String with value for key value options
     def modify_pool(original_address, new_address, options)
       matcher = pool_matcher(original_address)
       value = AugeasTreeValue.new(AugeasTree.new, new_address)
@@ -61,6 +67,8 @@ module CFA
       data.add(key, value, placer)
     end
 
+    # deletes pool entry
+    # @param address [String] pool to delete
     def delete_pool(address)
       matcher = pool_matcher(address)
 
