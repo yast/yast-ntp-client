@@ -15,7 +15,7 @@ module Yast
       # All helps are here
       @HELPS = {
         # Read dialog help 1/2
-        "read"               => _(
+        "read"  => _(
           "<p><b><big>Initializing NTP Client Configuration</big></b><br>\nPlease wait...<br></p>"
         ) +
           # Read dialog help 2/2
@@ -24,7 +24,7 @@ module Yast
             "Safely abort the configuration utility by pressing <b>Abort</b> now.</p>"
           ),
         # Write dialog help 1/2
-        "write"              => _(
+        "write" => _(
           "<p><b><big>Saving NTP Client Configuration</big></b><br>\nPlease wait...<br></p>"
         ) +
           # Write dialog help 2/2

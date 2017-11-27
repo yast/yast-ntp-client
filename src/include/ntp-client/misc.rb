@@ -8,7 +8,7 @@
 # $Id$
 module Yast
   module NtpClientMiscInclude
-    def initialize_ntp_client_misc(include_target)
+    def initialize_ntp_client_misc(_include_target)
       Yast.import "UI"
 
       textdomain "ntp-client"
