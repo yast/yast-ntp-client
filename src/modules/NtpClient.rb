@@ -31,7 +31,6 @@ module Yast
     NTP_FILE = "/etc/chrony.conf".freeze
 
     def main
-      Yast.import "UI"
       textdomain "ntp-client"
 
       Yast.import "Directory"
@@ -49,7 +48,6 @@ module Yast
       Yast.import "Stage"
       Yast.import "String"
       Yast.import "Summary"
-      Yast.import "SuSEFirewall"
 
       # Abort function
       # return boolean return true if abort
@@ -61,12 +59,6 @@ module Yast
       # Write only, used during autoinstallation.
       # Don't run services and SuSEconfig, it's all done at one place.
       @write_only = false
-
-      # Read all ntp-client settings
-      # @return true on success
-      @ntp_records = []
-
-      @restrict_map = {}
 
       # Should the daemon be started when system boots?
       @run_service = true
@@ -88,23 +80,11 @@ module Yast
       # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
       @ntp_policy = "auto"
 
-      # Index of the currently sellected item
-      @selected_index = -1
-
-      # The currently sellected item
-      @selected_record = {}
-
       # Active Directory controller
       @ad_controller = ""
 
-      # Should the firewall settings be changed?
-      @change_firewall = false
-
       # Required packages
       @required_packages = ["chrony"]
-
-      # ports in firewall to open
-      @firewall_services = ["service:ntp"]
 
       # List of known NTP servers
       # server address -> information
@@ -117,19 +97,13 @@ module Yast
       # Mapping between country codes and country names ("CZ" -> "Czech Republic")
       @country_names = nil
 
-      @simple_dialog = false
-
       @config_has_been_read = false
-
-      @ntp_selected = false
 
       # for lazy loading
       @countries_already_read = false
       @known_countries = {}
 
       @random_pool_servers = RANDOM_POOL_NTP_SERVERS
-
-      @deleted_records = []
     end
 
     # CFA instance for reading/writing /etc/ntp.conf
@@ -307,10 +281,6 @@ module Yast
       ProcessNtpConf()
       ReadSynchronization()
 
-      progress_orig2 = Progress.set(false)
-      SuSEFirewall.Read
-      Progress.set(progress_orig2)
-
       return false if !go_next
       Progress.Title(_("Finished")) if progress?
 
@@ -341,9 +311,6 @@ module Yast
 
       # restart daemon
       return false if !go_next
-
-      # SuSEFirewall::Write checks on its own whether there are pending
-      # changes, so call it always. bnc#476951
 
       check_service
 
@@ -474,20 +441,13 @@ module Yast
     publish variable: :AbortFunction, type: "boolean ()"
     publish variable: :modified, type: "boolean"
     publish variable: :write_only, type: "boolean"
-    publish variable: :ntp_records, type: "list <map <string, any>>"
-    publish variable: :restrict_map, type: "map <string, map <string, any>>"
     publish variable: :run_service, type: "boolean"
     publish variable: :synchronize_time, type: "boolean"
     publish variable: :sync_interval, type: "integer"
     publish variable: :service_name, type: "string"
     publish variable: :ntp_policy, type: "string"
-    publish variable: :selected_record, type: "map <string, any>"
     publish variable: :ad_controller, type: "string"
-    publish variable: :change_firewall, type: "boolean"
-    publish variable: :firewall_services, type: "list <string>"
-    publish variable: :simple_dialog, type: "boolean"
     publish variable: :config_has_been_read, type: "boolean"
-    publish variable: :ntp_selected, type: "boolean"
     publish function: :GetNtpServers, type: "map <string, map <string, string>> ()"
     publish function: :GetCountryNames, type: "map <string, string> ()"
     publish function: :GetNtpServersByCountry, type: "list (string, boolean)"
@@ -642,7 +602,7 @@ module Yast
       cfa_record.comment = record["comment"]
     end
 
-    # Write current /etc/ntp.conf with @ntp_records
+    # Write current /etc/chrony.conf
     # @return [Boolean] true on success
     def write_ntp_conf
       begin
