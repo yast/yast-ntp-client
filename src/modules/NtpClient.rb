@@ -127,6 +127,27 @@ module Yast
       Mode.normal
     end
 
+    # Synchronize against specified server only one time and does not modify
+    # any configuration
+    # @param server [String] to sync against
+    # @return [Integer] exit code of sync command
+    def sync_once(server)
+      log.info "Running ont time sync with #{server}"
+
+      # -q: set system time and quit
+      # -t: timeout in seconds
+      # -l <file>: log to a file to not mess text mode installation
+      # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
+      ret = SCR.Execute(
+        path(".target.bash_output"),
+        # TODO: ensure that we can use always pool instead of server?
+        "/usr/sbin/chronyd -q -t 30 'pool #{String.Quote(server)} iburst'"
+      )
+      log.info "'one-time chrony for #{server}' returned #{ret}"
+
+      ret["exit"]
+    end
+
     # Given a country code and a location returns a hash with pool
     # ntp address for given country, country code and location
     # @return [Hash{String => String}] ntp pool address for given country
