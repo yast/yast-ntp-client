@@ -382,7 +382,7 @@ module Yast
 
       return :ntpdate_failed if ret != 0
 
-      # User wants to more than running one time sync (synchronize on boot)
+      # User wants more than running one time sync (synchronize on boot)
       WriteNtpSettings(ntp_servers, ntp_server, run_service) if !ntpdate_only
 
       :success
