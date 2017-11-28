@@ -169,22 +169,6 @@ module Yast
       true
     end
 
-    def AddSingleServer(server)
-      idx = NtpClient.findSyncRecord("server", server)
-
-      # -1 means adding new server
-      if idx == -1
-        Ops.set(NtpClient.selected_record, "address", server)
-        Ops.set(NtpClient.selected_record, "type", "server")
-      else
-        NtpClient.selectSyncRecord(idx)
-      end
-
-      NtpClient.storeSyncRecord
-
-      nil
-    end
-
     def MakeProposal
       ntp_items = []
 

@@ -9,6 +9,7 @@ Yast.import "Stage"
 
 module Y2NtpClient
   module Dialog
+    # Main entry point for Ntp Client
     class Main < CWM::Dialog
       def initialize
         textdomain "ntp-client"
@@ -63,10 +64,10 @@ module Y2NtpClient
         if Yast::NtpClient.ntp_conf.hardware_clock?
           [
             Label(_("Hardware clock configured as source. YaST will keep it untouched.")),
-            VSpacing(1),
+            VSpacing(1)
           ]
         else
-          [ Empty() ]
+          [Empty()]
         end
       end
 
