@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Nov 28 09:03:56 UTC 2017 - jreidinger@suse.com
+
+- Switch ntp-client from ntp to chrony (FATE#323432)
+- 4.0.1
+
+-------------------------------------------------------------------
 Wed Oct 11 08:40:26 UTC 2017 - mvidner@suse.com
 
 - Avoid Internal Error during AutoYaST cloning

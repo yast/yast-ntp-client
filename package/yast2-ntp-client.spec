@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        4.0.0
+Version:        4.0.1
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -44,8 +44,6 @@ Requires:       yast2-network
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildArch:      noarch
-# New sntp command line syntax
-Conflicts:      ntp < 4.2.8
 
 Obsoletes:      yast2-ntp-client-devel-doc
 
