@@ -20,7 +20,7 @@ module Yast
         "id"         => "ntp-client",
         # command line help text for NTP client module
         "help"       => _(
-          "NTP client configuration module."
+          "Please use 'chronyc' instead."
         ),
         "guihandler" => fun_ref(method(:GuiHandler), "boolean ()")
       }

@@ -29,11 +29,6 @@ module Yast
 
       Yast.include self, "ntp-client/commandline.rb"
 
-      if !Yast::WFM.Args.empty?
-        puts "Command line not supported yet for chrony."
-        return nil
-      end
-
       # main ui function
       @ret = CommandLine.Run(@cmdline)
       Builtins.y2debug("ret=%1", @ret)
