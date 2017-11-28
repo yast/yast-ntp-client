@@ -33,19 +33,15 @@ module Y2NtpClient
           Left(Widgets::PolicyCombo.new),
           VSpacing(1),
           *hardware_clock_widgets,
-          HBox(
-            table,
-            HSpacing(0.2),
-            VBox(
-              VSpacing(),
-              Widgets::AddPoolButton.new,
-              VSpacing(),
-              Widgets::EditPoolButton.new(table),
-              VSpacing(),
-              Widgets::DeletePoolButton.new(table),
-              VStretch()
-            )
-          )
+          table,
+          HSpacing(0.2),
+          Left(HBox(
+            Widgets::AddPoolButton.new,
+            HSpacing(),
+            Widgets::EditPoolButton.new(table),
+            HSpacing(),
+            Widgets::DeletePoolButton.new(table)
+          ))
         )
       end
 
