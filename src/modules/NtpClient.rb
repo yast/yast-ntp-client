@@ -353,7 +353,7 @@ module Yast
 
     # Test NTP server answer for a given IP version.
     # @param [String] server string host name or IP address of the NTP server
-    # @param [Fixnum] integer ip version to use (4 or 6)
+    # @param [Integer] ip_version ip version to use (4 or 6)
     # @return [Boolean] true if stderr does not include lookup error and exit
     # code is 0
     def ntp_test(server, ip_version = 4)
@@ -710,8 +710,8 @@ module Yast
     #   country_server_label("Nürnberg", "")            # => " (Nürnberg)"
     #   country_server_label("", "Deutschland")         # => " (Deutschland)"
     #
-    # @param [String] server location
-    # @param [String] server country
+    # @param [String] location of server
+    # @param [String] country of server
     # @return [String] concatenate location and country if not empty
     def country_server_label(location = "", country = "")
       return "" if location.empty? && country.empty?
@@ -724,7 +724,7 @@ module Yast
     # each country.
     # @see #MakePoolRecord
     #
-    # @param [Hash <String, String>] known countries
+    # @param [Hash <String, String>] known_countries
     # @return [Array <Hash>] pool records for given countries
     def pool_servers_for(known_countries)
       known_countries.map do |short_country, country_name|

@@ -11,12 +11,6 @@
 # goes through the configuration and return the setting.
 # Does not do any changes to the configuration.
 
-# @param function to execute
-# @param map/list of ntp-client settings
-# @return [Hash] edited settings, Summary or boolean on success depending on called function
-# @example map mm = $[ "FAIL_DELAY" : "77" ];
-# @example map ret = WFM::CallFunction ("ntp-client_auto", [ "Summary", mm ]);
-
 require "fileutils"
 
 module Yast

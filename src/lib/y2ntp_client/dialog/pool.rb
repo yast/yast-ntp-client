@@ -11,7 +11,10 @@ module Y2NtpClient
   module Dialog
     # Dialog to add/edit ntp pool server
     class Pool < CWM::Dialog
-      # @param pool_entry [nil, Hash]
+      # @param address [String] initial address for pool to show
+      # @param options [Hash] pool options in format where
+      #   key is option and value is string for key value options
+      #   or nil for keyword options
       def initialize(address = "", options = {})
         textdomain "ntp-client"
         @address = address
@@ -53,6 +56,9 @@ module Y2NtpClient
         ""
       end
 
+      # Returns value set in dialog.
+      # @return [Array<String, Hash>] returns pair, where first one is address and second
+      #   is modified options ( see #initialize options parameter ).
       def resulting_pool
         [@address_widget.address, @options]
       end
