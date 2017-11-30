@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-# File:	clients/ntp-client_proposal.ycp
-# Summary:	Installation client for ntp configuration
-# Author:	Bubli <kmachalkova@suse.cz>
-#
-# This is used as the general interface between yast2-country
-# (time,timezone) and yast2-ntp-client.
+require "yast"
+
 module Yast
+
+  # This is used as the general interface between yast2-country
+  # (time,timezone) and yast2-ntp-client.
   class NtpClientProposalClient < Client
+    include Yast::Logger
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -297,16 +297,18 @@ module Yast
       ret
     end
 
+    # Writes configuration for ntp client.
+    # @param ntp_servers [Array<String>] list of servers to configure as ntp sync sources
+    # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
+    # @param run_service [Boolean] define if synchronize with systemd services or via cron sync
+    # @return true
     def WriteNtpSettings(ntp_servers, ntp_server, run_service)
       ntp_servers = deep_copy(ntp_servers)
       NtpClient.modified = true
       NtpClient.ntp_conf.clear_pools
-      if ntp_servers != []
-        ntp_servers.each do |server|
-          NtpClient.ntp_conf.add_pool(server)
-        end
-      else
-        NtpClient.ntp_conf.add_pool(ntp_server)
+      ntp_servers << ntp_server if ntp_servers.empty?
+      ntp_servers.each do |server|
+        NtpClient.ntp_conf.add_pool(server)
       end
       NtpClient.run_service = run_service
       if !run_service
@@ -337,7 +339,7 @@ module Yast
     # return:
     #   `success, `invalid_hostname or `ntpdate_failed
     def Write(param)
-      Builtins.y2milestone("ntp client proposal Write with #{param.inspect}")
+      log.info  "ntp client proposal Write with #{param.inspect}"
       ntp_servers = param["servers"] || []
       ntp_server = param["server"] || ""
       run_service = param.fetch("run_service", true)
@@ -349,10 +351,6 @@ module Yast
 
       WriteNtpSettings(ntp_servers, ntp_server, run_service)
       return :success if param["write_only"]
-
-      # One-time adjusment without running the ntp daemon
-      # Meanwhile, ntpdate was replaced by sntp and later by chrony
-      ntpdate_only = param["ntpdate_only"]
 
       required_package = "chrony"
 
@@ -383,7 +381,7 @@ module Yast
       return :ntpdate_failed if ret != 0
 
       # User wants more than running one time sync (synchronize on boot)
-      WriteNtpSettings(ntp_servers, ntp_server, run_service) if !ntpdate_only
+      WriteNtpSettings(ntp_servers, ntp_server, run_service) if !param["ntpdate_only"]
 
       :success
     end

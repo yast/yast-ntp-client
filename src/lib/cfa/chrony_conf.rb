@@ -22,8 +22,19 @@ module CFA
       fix_collection_names(data)
     end
 
-    # options hash with key value, where value can be nil for keyword options
-    # or :default to use default options
+    # Adds pool entry to configuration.
+    #
+    # Strategy for placing new entry is:
+    #
+    #   1. If there is a already pool entry, place it afterwards.
+    #   2. If there is common comment line above pool entries, place it afterwards.
+    #   3. Append to end of file.
+    #
+    # @param address [String] pool address. Can be either hostname or ip address.
+    # @param options [Symbol, Hash<String, nil | String>] can be either `:default` symbol of Hash.
+    #   When `:default` is used, then default options is used. See {#default_pool_options}.
+    #   When hash is used, then format is that key is option name and
+    #   value is either nil for keyword options or String with value for key value options
     def add_pool(address, options = :default)
       options = default_pool_options if options == :default
       # if there is already pool entry, place it after, if not, try use comment
