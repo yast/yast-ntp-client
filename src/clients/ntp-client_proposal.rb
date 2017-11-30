@@ -3,11 +3,11 @@
 require "yast"
 
 module Yast
-
   # This is used as the general interface between yast2-country
   # (time,timezone) and yast2-ntp-client.
   class NtpClientProposalClient < Client
     include Yast::Logger
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -339,7 +339,7 @@ module Yast
     # return:
     #   `success, `invalid_hostname or `ntpdate_failed
     def Write(param)
-      log.info  "ntp client proposal Write with #{param.inspect}"
+      log.info "ntp client proposal Write with #{param.inspect}"
       ntp_servers = param["servers"] || []
       ntp_server = param["server"] || ""
       run_service = param.fetch("run_service", true)
