@@ -75,9 +75,9 @@ module Y2NtpClient
       end
 
       def help
-        _("<b>Quick Initial Sync</b> specifies if option iburst is used. This option during " \
-          "initialization send four poll requests with two seconds interval. Useful to quick " \
-          "synchronization during start of machine.")
+        _("<b>Quick Initial Sync</b> specifies whether the 'iburst' option is used. This option " \
+        "sends 4 poll requests in 2 second intervals during the initialization. It is useful for " \
+        "a quick synchronization during the start of the machine.")
       end
     end
 
@@ -105,9 +105,10 @@ module Y2NtpClient
       end
 
       def help
-        _("<b>Start Offline</b> specifies if option offline is used. This option skip this " \
-          "server during start. It is useful for machine which start without network, because " \
-          "it speed up boot and sync when machine is connected to network.")
+        _("<b>Start Offline</b> specifies whether the 'offline' option is used. This option " \
+          "skips this server during the start-up. It is useful for a machine which starts " \
+          "without the network, because it speeds up the boot, and synchronizes when the machine " \
+          "gets connected to the network.")
       end
     end
   end

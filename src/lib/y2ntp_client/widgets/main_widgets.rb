@@ -24,8 +24,13 @@ module Y2NtpClient
       end
 
       def help
-        # TODO: not written previously, but really deserve something
-        _("<b>Configuration Source</b> defines if network itself can adds ntp sources.")
+        # TRANSLATORS: 'man 8 netconfig' is a command, do not translate that
+        _(
+          "The NTP configuration may be provided by the local network over DHCP. " \
+          "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
+          "In cases where there may be multiple DHCP sources, it can prioritize them: " \
+          "see 'man 8 netconfig'."
+        )
       end
 
       def opt
@@ -53,7 +58,9 @@ module Y2NtpClient
 
       def validate
         if value =~ /["']/
-          Yast::Popup.Error(_("Configuration source contain invalid character"))
+          # TRANSLATORS: single quote (') and double quote (") are invalid
+          Yast::Popup.Error(_("Configuration Source may not contain single or double quotes"))
+          Yast::UI.SetFocus(Id(widget_id))
           return false
         end
 
