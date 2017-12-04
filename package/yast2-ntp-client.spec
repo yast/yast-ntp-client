@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        4.0.0
+Version:        4.0.1
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -39,11 +39,11 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 Requires:       augeas-lenses
 Requires:       yast2 >= 3.2.21
 Requires:       yast2-country-data
+# needed for network/config agent
+Requires:       yast2-network
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildArch:      noarch
-# New sntp command line syntax
-Conflicts:      ntp < 4.2.8
 
 Obsoletes:      yast2-ntp-client-devel-doc
 
@@ -67,8 +67,6 @@ rake install DESTDIR="%{buildroot}"
 %{yast_clientdir}/*
 %{yast_dir}/lib
 %{yast_yncludedir}/ntp-client/*
-%{yast_scrconfdir}/cfg_ntp.scr
-%{yast_scrconfdir}/etc_ntp.scr
 %{yast_moduledir}/*.rb
 %{yast_desktopdir}/ntp-client.desktop
 %{yast_ydatadir}/ntp_servers.yml

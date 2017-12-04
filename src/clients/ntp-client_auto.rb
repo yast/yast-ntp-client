@@ -11,12 +11,6 @@
 # goes through the configuration and return the setting.
 # Does not do any changes to the configuration.
 
-# @param function to execute
-# @param map/list of ntp-client settings
-# @return [Hash] edited settings, Summary or boolean on success depending on called function
-# @example map mm = $[ "FAIL_DELAY" : "77" ];
-# @example map ret = WFM::CallFunction ("ntp-client_auto", [ "Summary", mm ]);
-
 require "fileutils"
 
 module Yast
@@ -24,6 +18,7 @@ module Yast
     def main
       Yast.import "UI"
       Yast.import "Mode"
+      Yast.import "Report"
       Yast.import "Stage"
       Yast.import "Installation"
 
@@ -53,7 +48,7 @@ module Yast
 
       # Create a summary
       if @func == "Summary"
-        @ret = NtpClient.Summary
+        @ret = "<p>Not supported now</p>"
       # Reset configuration
       elsif @func == "Reset"
         NtpClient.Import({})
@@ -63,32 +58,17 @@ module Yast
         @ret = NtpClient.AutoPackages
       # Change configuration (run AutoSequence)
       elsif @func == "Change"
-        @ret = NtpClientAutoSequence()
+        # TODO: implement
+        Yast::Report.Error("Not supported yet for chrony")
+        @ret = :next
       # Import configuration
       elsif @func == "Import"
-        @ret = NtpClient.Import(@param)
+        Yast::Report.Error("Not supported yet for chrony")
+        @ret = true
       # Return actual state
       elsif @func == "Export"
-        # The ntp.conf has to be read after the
-        # package has been installed in the installation
-        # mode (bnc#928987)
-        # Mode.config : true during the installation when
-        #               cloning the just installed system
-        if Mode.config && Stage.initial
-          ntp_conf = "/etc/ntp.conf"
-          installed_ntp_conf = File.join(Installation.destdir, ntp_conf)
-          # if ntp is not installed at all we cannot copy it, so return empty values
-          if !::File.exist?(installed_ntp_conf)
-            Builtins.y2milestone("Ntp is not installed, so return empty hash")
-            return {}
-          end
-          # copy ntp.conf from the installed system to
-          # running system
-          ::FileUtils.cp installed_ntp_conf, ntp_conf
-          # read ntp.conf
-          NtpClient.ProcessNtpConf
-        end
-        @ret = NtpClient.Export
+        Yast::Report.Error("Not supported yet for chrony")
+        @ret = {}
       # did configuration change
       elsif @func == "GetModified"
         @ret = NtpClient.modified

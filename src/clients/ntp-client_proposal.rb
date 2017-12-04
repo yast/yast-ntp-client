@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-# File:	clients/ntp-client_proposal.ycp
-# Summary:	Installation client for ntp configuration
-# Author:	Bubli <kmachalkova@suse.cz>
-#
-# This is used as the general interface between yast2-country
-# (time,timezone) and yast2-ntp-client.
+require "yast"
+
 module Yast
+  # This is used as the general interface between yast2-country
+  # (time,timezone) and yast2-ntp-client.
   class NtpClientProposalClient < Client
+    include Yast::Logger
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -169,22 +169,6 @@ module Yast
       true
     end
 
-    def AddSingleServer(server)
-      idx = NtpClient.findSyncRecord("server", server)
-
-      # -1 means adding new server
-      if idx == -1
-        Ops.set(NtpClient.selected_record, "address", server)
-        Ops.set(NtpClient.selected_record, "type", "server")
-      else
-        NtpClient.selectSyncRecord(idx)
-      end
-
-      NtpClient.storeSyncRecord
-
-      nil
-    end
-
     def MakeProposal
       ntp_items = []
 
@@ -301,10 +285,8 @@ module Yast
       if !ValidateSingleServer(ntp_server)
         ret = :invalid_hostname
       else
-        ntp_server2 = Convert.to_string(
-          UI.QueryWidget(Id(:ntp_address), :Value)
-        )
-        AddSingleServer(ntp_server2)
+        NtpClient.ntp_conf.clear_pools
+        NtpClient.ntp_conf.add_pool(ntp_server)
         retval = Convert.to_boolean(WFM.CallFunction("ntp-client"))
         ret = :next if retval
         MakeProposal()
@@ -312,13 +294,18 @@ module Yast
       ret
     end
 
+    # Writes configuration for ntp client.
+    # @param ntp_servers [Array<String>] list of servers to configure as ntp sync sources
+    # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
+    # @param run_service [Boolean] define if synchronize with systemd services or via cron sync
+    # @return true
     def WriteNtpSettings(ntp_servers, ntp_server, run_service)
       ntp_servers = deep_copy(ntp_servers)
       NtpClient.modified = true
-      if ntp_servers != []
-        Builtins.foreach(ntp_servers) { |server| AddSingleServer(server) }
-      else
-        AddSingleServer(ntp_server)
+      NtpClient.ntp_conf.clear_pools
+      ntp_servers << ntp_server if ntp_servers.empty?
+      ntp_servers.each do |server|
+        NtpClient.ntp_conf.add_pool(server)
       end
       NtpClient.run_service = run_service
       if !run_service
@@ -349,6 +336,7 @@ module Yast
     # return:
     #   `success, `invalid_hostname or `ntpdate_failed
     def Write(param)
+      log.info "ntp client proposal Write with #{param.inspect}"
       ntp_servers = param["servers"] || []
       ntp_server = param["server"] || ""
       run_service = param.fetch("run_service", true)
@@ -361,11 +349,7 @@ module Yast
       WriteNtpSettings(ntp_servers, ntp_server, run_service)
       return :success if param["write_only"]
 
-      # One-time adjusment without running the ntp daemon
-      # Meanwhile, ntpdate was replaced by sntp
-      ntpdate_only = param["ntpdate_only"]
-
-      required_package = "ntp"
+      required_package = "chrony"
 
       # In 1st stage, schedule packages for installation
       if Stage.initial
@@ -387,28 +371,14 @@ module Yast
       if NetworkService.isNetworkRunning
         # Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
-
-        Builtins.y2milestone("Running sntp to sync with %1", ntp_server)
-
-        # -S: do set the system time
-        # -t 5: timeout of 5 seconds
-        # -K /dev/null: use /dev/null as KoD history file (if not specified,
-        #               /var/db/ntp-kod will be used and it doesn't exist)
-        # -l <file>: log to a file to not mess text mode installation
-        # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
-        ret = SCR.Execute(
-          path(".target.bash"),
-          "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log " \
-          "-t 5 -c '#{String.Quote(ntp_server)}'"
-        )
-        Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
+        NtpClient.sync_once(ntp_server)
         Popup.ClearFeedback
       end
 
       return :ntpdate_failed if ret != 0
 
-      # User wants to more than running sntp (synchronize on boot)
-      WriteNtpSettings(ntp_servers, ntp_server, run_service) if !ntpdate_only
+      # User wants more than running one time sync (synchronize on boot)
+      WriteNtpSettings(ntp_servers, ntp_server, run_service) if !param["ntpdate_only"]
 
       :success
     end
