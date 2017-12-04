@@ -51,6 +51,15 @@ module Y2NtpClient
         self.value = Yast::NtpClient.ntp_policy
       end
 
+      def validate
+        if value =~ /["']/
+          Yast::Popup.Error(_("Configuration source contain invalid character"))
+          return false
+        end
+
+        true
+      end
+
       def store
         return if value == Yast::NtpClient.ntp_policy
 

@@ -285,11 +285,8 @@ module Yast
       if !ValidateSingleServer(ntp_server)
         ret = :invalid_hostname
       else
-        ntp_server2 = Convert.to_string(
-          UI.QueryWidget(Id(:ntp_address), :Value)
-        )
         NtpClient.ntp_conf.clear_pools
-        NtpClient.ntp_conf.add_pool(ntp_server2)
+        NtpClient.ntp_conf.add_pool(ntp_server)
         retval = Convert.to_boolean(WFM.CallFunction("ntp-client"))
         ret = :next if retval
         MakeProposal()
