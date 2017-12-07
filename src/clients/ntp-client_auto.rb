@@ -67,8 +67,7 @@ module Yast
         @ret = true
       # Return actual state
       elsif @func == "Export"
-        Yast::Report.Error("Not supported yet for chrony")
-        @ret = {}
+        @ret = NtpClient.Export
       # did configuration change
       elsif @func == "GetModified"
         @ret = NtpClient.modified

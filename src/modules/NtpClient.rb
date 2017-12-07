@@ -359,9 +359,25 @@ module Yast
     # (For use by autoinstallation.)
     # @return [Hash] Dumped settings (later acceptable by Import ())
     def Export
-      # TODO: implement for chrony
-      @modified = true
-      {}
+      sync_value = if @run_service
+                     "systemd"
+                   elsif @synchronize_time
+                     @sync_interval.to_s
+                   else
+                     "manual"
+                   end
+      pools_export = ntp_conf.pools.map do |(name, options)|
+        {
+          "name"    => name,
+          "iburst"  => options.key?("iburst"),
+          "offline" => options.key?("offline")
+        }
+      end
+      {
+        "ntp_sync"    => sync_value,
+        "ntp_policy"  => @ntp_policy,
+        "ntp_servers" => pools_export
+      }
     end
 
     # Test if a specified NTP server is reachable by IPv4 or IPv6 (bsc#74076),
