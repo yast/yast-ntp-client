@@ -364,7 +364,7 @@ module Yast
     def Import(settings)
       log.info "Import with #{settings}"
 
-      unsupported  = UNSUPPORTED_AUTOYAST_OPTIONS.select { |p| settings.key?(o) }
+      unsupported  = UNSUPPORTED_AUTOYAST_OPTIONS.select { |o| settings.key?(o) }
       if !unsupported.empty?
         Yast::Report.Error(
           format(
