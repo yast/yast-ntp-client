@@ -152,7 +152,6 @@ module Yast
         progress_orig = Progress.set(false)
         NtpClient.Read
         Progress.set(progress_orig)
-        NtpClient.ReadSynchronization
       end
 
       Builtins.y2milestone("synchronize_time %1", NtpClient.synchronize_time)
