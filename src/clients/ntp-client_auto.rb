@@ -48,7 +48,7 @@ module Yast
 
       # Create a summary
       if @func == "Summary"
-        @ret = "<p>Not supported now</p>"
+        @ret = NtpClient.Summary
       # Reset configuration
       elsif @func == "Reset"
         NtpClient.Import({})

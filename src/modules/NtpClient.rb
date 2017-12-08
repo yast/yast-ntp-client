@@ -409,6 +409,34 @@ module Yast
       true
     end
 
+    # Summary text about ntp configuration
+    def Summary
+      result = ""
+      sync_line = if @run_service
+                    _("The NTP daemon starts when starting the system.")
+                  elsif @synchronize_time
+                    # TRANSLATORS %i is number of seconds.
+                    format(_("The NTP will be synchronized every %i seconds."), @sync_interval)
+                  else
+                    _("The NTP won't be automatically synchronized.")
+                  end
+      result = Yast::Summary.AddLine(result, sync_line)
+      policy_line = case @ntp_policy
+                    when "auto"
+                      _("Combine static and DHCP configuration.")
+                    when ""
+                      _("Static configuration only.")
+                    else
+                      format(_("Custom configuration policy: '%s'."), @ntp_policy)
+                    end
+      result = Yast::Summary.AddLine(result, policy_line)
+      # TRANSLATORS: summary line. %s is formatted list of addresses.
+      servers_line = format(_("Servers: %s."), GetUsedNtpServers().join(", "))
+      result = Yast::Summary.AddLine(result, servers_line)
+
+      result
+    end
+
     # Dump the ntp-client settings to a single map
     # (For use by autoinstallation.)
     # @return [Hash] Dumped settings (later acceptable by Import ())
