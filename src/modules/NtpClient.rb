@@ -117,6 +117,9 @@ module Yast
       @known_countries = {}
 
       @random_pool_servers = RANDOM_POOL_NTP_SERVERS
+
+      # helper variable to hold config from ntp client proposal
+      @ntp_selected = false
     end
 
     # CFA instance for reading/writing /etc/ntp.conf
@@ -565,6 +568,7 @@ module Yast
     publish variable: :sync_interval, type: "integer"
     publish variable: :service_name, type: "string"
     publish variable: :ntp_policy, type: "string"
+    publish variable: :ntp_selected, type: "boolean"
     publish variable: :ad_controller, type: "string"
     publish variable: :config_has_been_read, type: "boolean"
     publish function: :GetNtpServers, type: "map <string, map <string, string>> ()"
