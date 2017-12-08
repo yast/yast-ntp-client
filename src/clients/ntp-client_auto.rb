@@ -58,8 +58,7 @@ module Yast
         @ret = NtpClient.AutoPackages
       # Change configuration (run AutoSequence)
       elsif @func == "Change"
-        # TODO: implement
-        Yast::Report.Error("Not supported yet for chrony")
+        NtpClientAutoSequence()
         @ret = :next
       # Import configuration
       elsif @func == "Import"
