@@ -46,36 +46,5 @@ module Yast
       UI.CloseDialog
       ret
     end
-
-    # Autoyast configuration of ntp-client
-    # @return sequence result
-    def NtpClientAutoSequence
-      aliases = { "main" => lambda { Y2NtpClient::Dialog::Main.run } }
-
-      sequence = {
-        "ws_start" => "main",
-        "main"     => { abort: :abort, next: :next }
-      }
-
-      # dialog caption
-      caption = _("NTP Client Configuration")
-      # label
-      contents = Label(_("Initializing ..."))
-
-      Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("ntp-client")
-      Wizard.SetContentsButtons(
-        caption,
-        contents,
-        "",
-        Label.BackButton,
-        Label.NextButton
-      )
-
-      ret = Sequencer.Run(aliases, sequence)
-
-      UI.CloseDialog
-      ret
-    end
   end
 end
