@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec  8 13:25:04 UTC 2017 - jreidinger@suse.com
+
+- support also autoyast for chrony (FATE#323432)
+  NOTE: autoyast profile is not backward compatible
+- 4.0.3
+
+-------------------------------------------------------------------
 Fri Dec  8 09:58:40 UTC 2017 - jreidinger@suse.com
 
 - fix crash with missing method ntp_selected (bsc#1071735)
