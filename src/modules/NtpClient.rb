@@ -23,12 +23,25 @@ module Yast
     # Note: the UI field currently uses maximum of 60 minutes
     DEFAULT_SYNC_INTERVAL = 5
 
+    # the default netconfig policy for ntp
+    DEFAULT_NTP_POLICY = "auto"
+
     # List of servers defined by the pool.ntp.org to get random ntp servers
     #
     # @see #http://www.pool.ntp.org/
     RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"].freeze
 
     NTP_FILE = "/etc/chrony.conf".freeze
+
+    UNSUPPORTED_AUTOYAST_OPTIONS = [
+      "configure_dhcp",
+      "peers",
+      "restricts",
+      "start_at_boot",
+      "start_in_chroot",
+      "sync_interval",
+      "synchronize_time"
+    ]
 
     def main
       textdomain "ntp-client"
@@ -78,7 +91,7 @@ module Yast
       # Netconfig policy: for merging and prioritizing static and DHCP config.
       # FIXME: get a public URL
       # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
-      @ntp_policy = "auto"
+      @ntp_policy = DEFAULT_NTP_POLICY
 
       # Active Directory controller
       @ad_controller = ""
@@ -350,8 +363,49 @@ module Yast
     # @return [Boolean] True on success
     def Import(settings)
       log.info "Import with #{settings}"
-      # TODO: implement for chrony
+
+      unsupported  = UNSUPPORTED_AUTOYAST_OPTIONS.select { |p| settings.key?(o) }
+      if !unsupported.empty?
+        Yast::Report.Error(
+          format(
+            # TRANSLATORS: error report. %s stands unsuported keys.
+            _("Old unsupported profile detected. Ntp is not configured. Unsupported keys: '%s'."),
+            unsupported.join("', '")
+          )
+        )
+        return false
+      end
+
+      sync = (settings["ntp_sync"] || "systemd").strip
+      case sync
+      when "systemd"
+        @run_service = true
+        @synchronize_time = false
+      when /[0-9]/
+        @run_service = false
+        @synchronize_time = true
+        @sync_interval = sync.to_i
+      when /manual/
+        @run_service = false
+        @synchronize_time = false
+      else
+        # TRANSLATORS: error report. %s stands for invalid content.
+        Yast::Report.Error(format(_("Invalid value for ntp_sync key: '%s'"), sync))
+        return false
+      end
+
       @modified = true
+      @ntp_policy = settings["ntp_policy"] || DEFAULT_NTP_POLICY
+      ntp_conf.clear_pools
+      (settings["ntp_servers"] || []).each do |server|
+        options = {}
+        options["iburst"] if server["iburst"]
+        options["offline"] if server["offline"]
+        name = server["name"]
+        log.info "adding server '#{name.inspect}' with options #{options.inspect}"
+        ntp_conf.add_pool(name, options)
+      end
+
       true
     end
 
@@ -542,13 +596,13 @@ module Yast
     end
 
     # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
-    # /etc/sysconfig/network/config or with "auto" if not found
+    # /etc/sysconfig/network/config or with {DEFAULT_NTP_POLICY} if not found
     #
-    # @return [String] read value or "auto" as default
+    # @return [String] read value or {DEFAULT_NTP_POLICY} as default
     def read_policy!
       # SCR::Read may return nil (no such value in sysconfig, file not there etc. )
       # set if not nil, otherwise use 'auto' as safe fallback (#449362)
-      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || "auto"
+      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || DEFAULT_NTP_POLICY
     end
 
     # Set @ad_controller according to ad_ntp_data["ads"] value found in

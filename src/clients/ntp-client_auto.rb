@@ -63,8 +63,7 @@ module Yast
         @ret = :next
       # Import configuration
       elsif @func == "Import"
-        Yast::Report.Error("Not supported yet for chrony")
-        @ret = true
+        @ret = NtpClient.Import(@param)
       # Return actual state
       elsif @func == "Export"
         @ret = NtpClient.Export
