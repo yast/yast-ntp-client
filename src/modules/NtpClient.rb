@@ -372,7 +372,8 @@ module Yast
         Yast::Report.Error(
           format(
             # TRANSLATORS: error report. %s stands unsuported keys.
-            _("Old unsupported profile detected. Ntp is not configured. Unsupported keys: '%s'."),
+            _("Ignoring the NTP configuration. The profile format has changed in an " \
+              "incompatible way. These keys are no longer supported: '%s'."),
             unsupported.join("', '")
           )
         )
@@ -404,9 +405,9 @@ module Yast
         options = {}
         options["iburst"] = nil if server["iburst"]
         options["offline"] = nil if server["offline"]
-        name = server["name"]
-        log.info "adding server '#{name.inspect}' with options #{options.inspect}"
-        ntp_conf.add_pool(name, options)
+        address = server["address"]
+        log.info "adding server '#{address.inspect}' with options #{options.inspect}"
+        ntp_conf.add_pool(address, options)
       end
 
       true
@@ -451,9 +452,9 @@ module Yast
       else
         "manual"
       end
-      pools_export = ntp_conf.pools.map do |(name, options)|
+      pools_export = ntp_conf.pools.map do |(address, options)|
         {
-          "name"    => name,
+          "address" => address,
           "iburst"  => options.key?("iburst"),
           "offline" => options.key?("offline")
         }

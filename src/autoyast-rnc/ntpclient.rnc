@@ -11,14 +11,15 @@ ntp-client =
 
 ntp_policy =
     element ntp_policy { text }
-# possible values are systemd, manual and number,
-# where number is for synchronize in given number of seconds
+
+# Possible values are "systemd", "manual",
+# or a positive integer which means the interval in seconds between synchronizations
 ntp_sync = element ntp_sync { text }
 
 ntp_servers = element ntp_servers {
       LIST,
       element ntp_server {
-        element name {text } &
+        element address { text } &
         element iburst { BOOLEAN }? &
         element offline { BOOLEAN }?
       }

@@ -28,7 +28,7 @@ describe Y2NtpClient::Client::Auto do
 
   describe "#import" do
     it "pass its arguments to NtpClient.Import" do
-      arguments = {"ntp_policy" => "auto"}
+      arguments = { "ntp_policy" => "auto" }
       expect(Yast::NtpClient).to receive(:Import).with(arguments)
       subject.import(arguments)
     end

@@ -21,7 +21,7 @@
     <ntp_servers config:type="list">
       <ntp_server>
         <iburst config:type="boolean">false</iburst>
-        <name>cz.pool.ntp.org</name>
+        <address>cz.pool.ntp.org</address>
         <offline config:type="boolean">true</offline>
       </ntp_server>
     </ntp_servers>
