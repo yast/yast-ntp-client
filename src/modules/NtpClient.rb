@@ -402,8 +402,8 @@ module Yast
       ntp_conf.clear_pools
       (settings["ntp_servers"] || []).each do |server|
         options = {}
-        options["iburst"] if server["iburst"]
-        options["offline"] if server["offline"]
+        options["iburst"] = nil if server["iburst"]
+        options["offline"] = nil if server["offline"]
         name = server["name"]
         log.info "adding server '#{name.inspect}' with options #{options.inspect}"
         ntp_conf.add_pool(name, options)

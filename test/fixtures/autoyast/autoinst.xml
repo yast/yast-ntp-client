@@ -17,14 +17,14 @@
     </signature-handling>
   </general>
   <ntp-client>
-    <ntp_policy>auto</ntp_policy>
+    <ntp_policy>eth*</ntp_policy>
     <ntp_servers config:type="list">
       <ntp_server>
-        <iburst config:type="boolean">true</iburst>
+        <iburst config:type="boolean">false</iburst>
         <name>cz.pool.ntp.org</name>
-        <offline config:type="boolean">false</offline>
+        <offline config:type="boolean">true</offline>
       </ntp_server>
     </ntp_servers>
-    <ntp_sync>systemd</ntp_sync>
+    <ntp_sync>15</ntp_sync>
   </ntp-client>
 </profile>
