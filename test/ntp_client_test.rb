@@ -74,9 +74,7 @@ describe Yast::NtpClient do
 
         it "sets new servers" do
           expect(subject.ntp_conf.pools).to eq(
-            {
-              "cz.pool.ntp.org" => { "offline" => nil }
-            }
+            "cz.pool.ntp.org" => { "offline" => nil }
           )
         end
       end
@@ -273,7 +271,6 @@ describe Yast::NtpClient do
 
       subject.ntp_conf.clear_pools
       subject.ntp_conf.add_pool("tik.cesnet.cz")
-
 
       expect(subject.Write).to eq true
       lines = File.read(File.join(data_dir, "scr_root/etc/chrony.conf"))

@@ -24,7 +24,7 @@ module Yast
     DEFAULT_SYNC_INTERVAL = 5
 
     # the default netconfig policy for ntp
-    DEFAULT_NTP_POLICY = "auto"
+    DEFAULT_NTP_POLICY = "auto".freeze
 
     # List of servers defined by the pool.ntp.org to get random ntp servers
     #
@@ -41,7 +41,7 @@ module Yast
       "start_in_chroot",
       "sync_interval",
       "synchronize_time"
-    ]
+    ].freeze
 
     def main
       textdomain "ntp-client"
@@ -367,7 +367,7 @@ module Yast
     def Import(settings)
       log.info "Import with #{settings}"
 
-      unsupported  = UNSUPPORTED_AUTOYAST_OPTIONS.select { |o| settings.key?(o) }
+      unsupported = UNSUPPORTED_AUTOYAST_OPTIONS.select { |o| settings.key?(o) }
       if !unsupported.empty?
         Yast::Report.Error(
           format(
@@ -416,22 +416,22 @@ module Yast
     def Summary
       result = ""
       sync_line = if @run_service
-                    _("The NTP daemon starts when starting the system.")
-                  elsif @synchronize_time
-                    # TRANSLATORS %i is number of seconds.
-                    format(_("The NTP will be synchronized every %i seconds."), @sync_interval)
-                  else
-                    _("The NTP won't be automatically synchronized.")
-                  end
+        _("The NTP daemon starts when starting the system.")
+      elsif @synchronize_time
+        # TRANSLATORS %i is number of seconds.
+        format(_("The NTP will be synchronized every %i seconds."), @sync_interval)
+      else
+        _("The NTP won't be automatically synchronized.")
+      end
       result = Yast::Summary.AddLine(result, sync_line)
       policy_line = case @ntp_policy
-                    when "auto"
-                      _("Combine static and DHCP configuration.")
-                    when ""
-                      _("Static configuration only.")
-                    else
-                      format(_("Custom configuration policy: '%s'."), @ntp_policy)
-                    end
+      when "auto"
+        _("Combine static and DHCP configuration.")
+      when ""
+        _("Static configuration only.")
+      else
+        format(_("Custom configuration policy: '%s'."), @ntp_policy)
+      end
       result = Yast::Summary.AddLine(result, policy_line)
       # TRANSLATORS: summary line. %s is formatted list of addresses.
       servers_line = format(_("Servers: %s."), GetUsedNtpServers().join(", "))
@@ -445,12 +445,12 @@ module Yast
     # @return [Hash] Dumped settings (later acceptable by Import ())
     def Export
       sync_value = if @run_service
-                     "systemd"
-                   elsif @synchronize_time
-                     @sync_interval.to_s
-                   else
-                     "manual"
-                   end
+        "systemd"
+      elsif @synchronize_time
+        @sync_interval.to_s
+      else
+        "manual"
+      end
       pools_export = ntp_conf.pools.map do |(name, options)|
         {
           "name"    => name,
@@ -634,7 +634,8 @@ module Yast
     def read_policy!
       # SCR::Read may return nil (no such value in sysconfig, file not there etc. )
       # set if not nil, otherwise use 'auto' as safe fallback (#449362)
-      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) || DEFAULT_NTP_POLICY
+      @ntp_policy = SCR.Read(path(".sysconfig.network.config.NETCONFIG_NTP_POLICY")) ||
+        DEFAULT_NTP_POLICY
     end
 
     # Set @ad_controller according to ad_ntp_data["ads"] value found in
