@@ -23,6 +23,9 @@ module Y2NtpClient
       end
 
       def import(profile)
+        # as current import only modify existing configuration ( and does not contain complete
+        # conf file ) we need to read original configuration and just add changes
+        Yast::NtpClient.Read
         Yast::NtpClient.Import(profile)
       end
 
