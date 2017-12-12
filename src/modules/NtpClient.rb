@@ -371,7 +371,8 @@ module Yast
       if !unsupported.empty?
         Yast::Report.Error(
           format(
-            # TRANSLATORS: error report. %s stands unsuported keys.
+            # TRANSLATORS: error report. %s stands unsuported keys. The error message
+            # should fix in 70 columns as maximum. Move the '\n' (end of line) if needed.
             _("Ignoring the NTP configuration. The profile format has changed in an\n" \
               "incompatible way. These keys are no longer supported:\n" \
               "'%s'."),
