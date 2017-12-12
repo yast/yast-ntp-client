@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Dec 12 16:55:54 UTC 2017 - igonzalezsosa@suse.com
+
+- Improve AutoYaST error message adaptation when too many
+  unsupported keys are found (related to bsc#1072407)
+- 4.0.5
+
+-------------------------------------------------------------------
 Tue Dec 12 14:54:34 UTC 2017 - igonzalezsosa@suse.com
 
 - Adapt AutoYaST error message to 80x25 screens (bsc#1072407)
