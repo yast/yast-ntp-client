@@ -372,8 +372,9 @@ module Yast
         Yast::Report.Error(
           format(
             # TRANSLATORS: error report. %s stands unsuported keys.
-            _("Ignoring the NTP configuration. The profile format has changed in an " \
-              "incompatible way. These keys are no longer supported: '%s'."),
+            _("Ignoring the NTP configuration. The profile format has changed in an\n" \
+              "incompatible way. These keys are no longer supported:\n" \
+              "'%s'."),
             unsupported.join("', '")
           )
         )
