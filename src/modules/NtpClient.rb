@@ -13,10 +13,12 @@ require "yast"
 require "yaml"
 require "cfa/chrony_conf"
 require "yast2/target_file" # required to cfa work on changed scr
+require "ui/text_helpers"
 
 module Yast
   class NtpClientClass < Module
     include Logger
+    include ::UI::TextHelpers
 
     # the default synchronization interval in minutes when running in the manual
     # sync mode ("Synchronize without Daemon" option, ntp started from cron)
@@ -61,6 +63,7 @@ module Yast
       Yast.import "Stage"
       Yast.import "String"
       Yast.import "Summary"
+      Yast.import "UI"
 
       # Abort function
       # return boolean return true if abort
@@ -369,16 +372,7 @@ module Yast
 
       unsupported = UNSUPPORTED_AUTOYAST_OPTIONS.select { |o| settings.key?(o) }
       if !unsupported.empty?
-        Yast::Report.Error(
-          format(
-            # TRANSLATORS: error report. %s stands unsuported keys. The error message
-            # should fix in 70 columns as maximum. Move the '\n' (end of line) if needed.
-            _("Ignoring the NTP configuration. The profile format has changed in an\n" \
-              "incompatible way. These keys are no longer supported:\n" \
-              "'%s'."),
-            unsupported.join("', '")
-          )
-        )
+        unsupported_error(unsupported)
         return false
       end
 
@@ -866,6 +860,20 @@ module Yast
     # @return [Boolean] result of the assignation
     def cache_server(server)
       @ntp_servers[server["address"].to_s] = server
+    end
+
+    def unsupported_error(unsupported)
+      msg = format(
+        # TRANSLATORS: error report. %s stands unsupported keys.
+        _("Ignoring the NTP configuration. The profile format has changed in an " \
+          "incompatible way. These keys are no longer supported: '%s'."),
+        unsupported.join("', '")
+      )
+
+      displayinfo = Yast::UI.GetDisplayInfo
+      width = displayinfo["TextMode"] ? displayinfo.fetch("Width", 80) : 80
+
+      Yast::Report.Error(wrap_text(msg, width - 4))
     end
   end
 
