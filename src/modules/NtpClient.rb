@@ -412,7 +412,12 @@ module Yast
     # Merges config to existing system configuration. It is useful for delayed write.
     # When it at first set values, then chrony is installed and then it writes. So
     # before write it will merge to system. Result is that it keep majority of config
-    # untouched and modify and what is needed.
+    # untouched and modify what is needed.
+    # What it mean is that if it set values, it works on parsed configuration file,
+    # but if package is not yet installed, then it creates new configuration file
+    # which is missing many stuff like comments or values that yast2-ntp-client does not touch.
+    # So if package is installed later, then this method re-apply changes on top of newly parsed
+    # file.
     def merge_to_system
       config = Export()
       Read()
