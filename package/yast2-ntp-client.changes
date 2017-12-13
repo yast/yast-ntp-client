@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Dec 13 14:40:48 UTC 2017 - jreidinger@suse.com
+
+- Do minimal modification to default chrony.conf in autoyast
+  when chrony is not specified explicitelly in packages section of
+  profile (bsc#1072595)
+- 4.0.6
+
+-------------------------------------------------------------------
 Tue Dec 12 16:55:54 UTC 2017 - igonzalezsosa@suse.com
 
 - Improve AutoYaST error message adaptation when too many
