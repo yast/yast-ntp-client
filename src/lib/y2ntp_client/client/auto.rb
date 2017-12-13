@@ -23,9 +23,6 @@ module Y2NtpClient
       end
 
       def import(profile)
-        # as current import only modify existing configuration ( and does not contain complete
-        # conf file ) we need to read original configuration and just add changes
-        Yast::NtpClient.Read
         Yast::NtpClient.Import(profile)
       end
 
@@ -42,6 +39,8 @@ module Y2NtpClient
       end
 
       def write
+        # ensure to merge config to system chrony configuration to do minimal configuration
+        Yast::NtpClient.merge_to_system
         progress_orig = Yast::Progress.set(false)
         Yast::NtpClient.write_only = true
         ret = Yast::NtpClient.Write

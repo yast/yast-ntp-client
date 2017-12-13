@@ -409,6 +409,16 @@ module Yast
       true
     end
 
+    # Merges config to existing system configuration. It is useful for delayed write.
+    # When it at first set values, then chrony is installed and then it writes. So
+    # before write it will merge to system. Result is that it keep majority of config
+    # untouched and modify and what is needed.
+    def merge_to_system
+      config = Export()
+      Read()
+      Import(config)
+    end
+
     # Summary text about ntp configuration
     def Summary
       result = ""
