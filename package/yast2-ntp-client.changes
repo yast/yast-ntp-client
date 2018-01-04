@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jan  4 16:40:37 CET 2018 - schubi@suse.de
+
+- AutoYaST: Create UID for chrony if it does not exist.
+  (needed for FATE#323432)
+- 4.0.7
+
+-------------------------------------------------------------------
 Wed Dec 13 14:40:48 UTC 2017 - jreidinger@suse.com
 
 - Do minimal modification to default chrony.conf in autoyast
