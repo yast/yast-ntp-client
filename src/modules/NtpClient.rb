@@ -153,6 +153,12 @@ module Yast
     def sync_once(server)
       log.info "Running ont time sync with #{server}"
 
+      # E.g. in inst-sys there is no chrony user. We have to
+      # create one manually before calling chronyd.
+      if SCR.Execute(path(".target.bash"), "/usr/bin/id chrony") != 0
+        SCR.Execute(path(".target.bash"), "/usr/sbin/useradd chrony")
+      end
+
       # -q: set system time and quit
       # -t: timeout in seconds
       # -l <file>: log to a file to not mess text mode installation
