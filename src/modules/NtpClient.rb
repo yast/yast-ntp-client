@@ -345,7 +345,7 @@ module Yast
       # write settings
       return false if !go_next
 
-      Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if !write_ntp_conf
+      Report.Error(Message.CannotWriteSettingsTo("/etc/chrony.conf")) if !write_ntp_conf
 
       write_and_update_policy
 
@@ -385,6 +385,11 @@ module Yast
         @run_service = false
         @synchronize_time = true
         @sync_interval = sync.to_i
+        # if wrong number is passed log it and use default
+        if !(1..59).cover?(@sync_interval)
+          log.error "Invalid interval in sync interval #{@sync_interval}"
+          @sync_interval = DEFAULT_SYNC_INTERVAL
+        end
       when /manual/
         @run_service = false
         @synchronize_time = false

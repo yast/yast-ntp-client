@@ -147,8 +147,12 @@ module Y2NtpClient
         _("Synchronization &Interval in Minutes")
       end
 
-      def minimal
+      def minimum
         1
+      end
+
+      def maximum
+        59
       end
 
       def init
