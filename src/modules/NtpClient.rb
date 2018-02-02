@@ -385,6 +385,11 @@ module Yast
         @run_service = false
         @synchronize_time = true
         @sync_interval = sync.to_i
+        # if wrong number is passed log it and use default
+        if !(1..59).include?(@sync_interval)
+          log.error "Invalid interval in sync interval #{@sync_interval}"
+          @sync_interval = DEFAULT_SYNC_INTERVAL
+        end
       when /manual/
         @run_service = false
         @synchronize_time = false
