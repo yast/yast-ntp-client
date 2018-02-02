@@ -26,7 +26,7 @@ module Y2NtpClient
       end
 
       def validate
-        return true if Yast::Address.check(value)
+        return true if Yast::Address.Check(value)
 
         msg = _("Invalid pool address.")
         Yast::Popup.Error(msg)
