@@ -345,7 +345,7 @@ module Yast
       # write settings
       return false if !go_next
 
-      Report.Error(Message.CannotWriteSettingsTo("/etc/ntp.conf")) if !write_ntp_conf
+      Report.Error(Message.CannotWriteSettingsTo("/etc/chrony.conf")) if !write_ntp_conf
 
       write_and_update_policy
 

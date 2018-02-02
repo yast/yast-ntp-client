@@ -183,7 +183,7 @@ module Yast
       end
 
       if NtpClient.config_has_been_read || NtpClient.ntp_selected
-        Builtins.y2milestone("ntp_items will be filled from /etc/ntp.conf")
+        Builtins.y2milestone("ntp_items will be filled from /etc/chrony.conf")
         # grr, GUNS means all of them are used and here we just pick one
         ntp_items = Builtins.maplist(NtpClient.GetUsedNtpServers) do |server|
           Item(Id(server), server)
@@ -193,7 +193,7 @@ module Yast
       end
       if ntp_items == []
         Builtins.y2milestone(
-          "Nothing found in /etc/ntp.conf, proposing current timezone-based NTP server list"
+          "Nothing found in /etc/chrony.conf, proposing current timezone-based NTP server list"
         )
         time_zone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
         ntp_items = NtpClient.GetNtpServersByCountry(time_zone_country, true)
