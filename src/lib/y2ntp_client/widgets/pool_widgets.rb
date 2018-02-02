@@ -2,7 +2,9 @@ require "yast"
 
 require "cwm/widget"
 
+Yast.import "Address"
 Yast.import "NtpClient"
+Yast.import "Popup"
 
 module Y2NtpClient
   module Widgets
@@ -24,8 +26,11 @@ module Y2NtpClient
       end
 
       def validate
-        # TODO: validate address and also that it is not yet used
-        true
+        return true if Yast::Address.check(value)
+
+        msg = _("Invalid pool address.")
+        Yast::Popup.Error(msg)
+        false
       end
 
       def store
