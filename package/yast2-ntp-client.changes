@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Feb  2 16:38:55 UTC 2018 - jreidinger@suse.com
+
+- set properly range for sync interval (bsc#1079117)
+- Mention proper configuration file when write failed (bsc#1079120)
+- validate pool address (bsc#1079120)
+- 4.0.7
+
+-------------------------------------------------------------------
 Wed Dec 13 14:40:48 UTC 2017 - jreidinger@suse.com
 
 - Do minimal modification to default chrony.conf in autoyast
