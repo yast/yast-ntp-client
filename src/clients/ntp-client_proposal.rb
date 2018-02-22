@@ -370,7 +370,7 @@ module Yast
       if NetworkService.isNetworkRunning
         # Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
-        NtpClient.sync_once(ntp_server)
+        ret = NtpClient.sync_once(ntp_server)
         Popup.ClearFeedback
       end
 
