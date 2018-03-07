@@ -388,7 +388,7 @@ describe Yast::NtpClient do
   end
 
   describe "#ReadSynchronization" do
-    let(:cron_job_file) { "/etc/cron.d/novell.ntp-synchronize" }
+    let(:cron_job_file) { "/etc/cron.d/suse-ntp_synchronize" }
     let(:cron_entry) { [] }
 
     before do
