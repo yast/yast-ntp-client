@@ -35,6 +35,9 @@ module Yast
 
     NTP_FILE = "/etc/chrony.conf".freeze
 
+    # The cron file name for the synchronization.
+    CRON_FILE = "/etc/cron.d/suse-ntp_synchronize"
+
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
       "peers",
@@ -85,8 +88,6 @@ module Yast
       # The interval of synchronization in minutes.
       @sync_interval = DEFAULT_SYNC_INTERVAL
 
-      # The cron file name for the synchronization.
-      @cron_file = "/etc/cron.d/novell.ntp-synchronize"
 
       # Service name of the NTP daemon
       @service_name = "chronyd"
@@ -272,7 +273,7 @@ module Yast
     # synchronize_time and sync_interval variables
     # Return updated value of synchronize_time
     def ReadSynchronization
-      crontab = SCR.Read(path(".cron"), @cron_file, "")
+      crontab = SCR.Read(path(".cron"), CRON_FILE, "")
       log.info("NTP Synchronization crontab entry: #{crontab}")
       cron_entry = (crontab || []).fetch(0, {}).fetch("events", []).fetch(0, {})
       @synchronize_time = cron_entry["active"] == "1"
@@ -812,13 +813,13 @@ module Yast
       if @synchronize_time
         SCR.Write(
           path(".target.string"),
-          @cron_file,
+          CRON_FILE,
           "-*/#{@sync_interval} * * * * root /usr/sbin/chronyd -q &>/dev/null\n"
         )
       else
         SCR.Execute(
           path(".target.bash"),
-          "test -e #{@cron_file} && rm #{@cron_file};"
+          "test -e #{CRON_FILE} && rm #{CRON_FILE};"
         )
       end
     end
