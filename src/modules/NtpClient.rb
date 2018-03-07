@@ -88,7 +88,6 @@ module Yast
       # The interval of synchronization in minutes.
       @sync_interval = DEFAULT_SYNC_INTERVAL
 
-
       # Service name of the NTP daemon
       @service_name = "chronyd"
 
