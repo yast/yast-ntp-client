@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        4.0.8
+Version:        4.0.9
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0+
@@ -61,6 +61,13 @@ rake test:unit
 %install
 rake install DESTDIR="%{buildroot}"
 
+%post
+# upgrade old name and convert it to chrony (bsc#1079122)
+if [ -f /etc/cron.d/novell.ntp-synchronize ]; then
+  mv /etc/cron.d/novell.ntp-synchronize /etc/cron.d/suse-ntp_synchronize
+  sed -i 's:\* \* \* \* root .*:* * * * root /usr/sbin/chronyd -q \&>/dev/null:' /etc/cron.d/suse-ntp_synchronize
+fi
+
 %files
 %defattr(-,root,root)
 %dir %{yast_yncludedir}/ntp-client
@@ -72,6 +79,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_ydatadir}/ntp_servers.yml
 %{yast_schemadir}/autoyast/rnc/ntpclient.rnc
 %{yast_dir}/lib
+%ghost /etc/cron.d/suse-ntp_synchronize
 
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
