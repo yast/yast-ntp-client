@@ -3,9 +3,10 @@ Wed Mar  7 10:57:36 UTC 2018 - jreidinger@suse.com
 
 - change cron config file name to suse-ntp_synchronize
   (bsc#1079122)
-- convert old file to new one during upgrade, ensure that ntpd is 
+- convert old file to new one during upgrade, ensure that ntpd is
   replaced by chrony (FATE#323432)
-- ghost that config file, so it is easy to find who own it
+- ghost that config file, so it is easy to find which package owns
+  it
 - 4.0.9
 
 -------------------------------------------------------------------
