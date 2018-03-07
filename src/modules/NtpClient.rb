@@ -818,7 +818,7 @@ module Yast
       else
         SCR.Execute(
           path(".target.bash"),
-          "test -e #{CRON_FILE} && rm #{CRON_FILE};"
+          "rm -vf #{CRON_FILE}"
         )
       end
     end
