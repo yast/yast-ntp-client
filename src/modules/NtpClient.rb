@@ -36,7 +36,7 @@ module Yast
     NTP_FILE = "/etc/chrony.conf".freeze
 
     # The cron file name for the synchronization.
-    CRON_FILE = "/etc/cron.d/suse-ntp_synchronize"
+    CRON_FILE = "/etc/cron.d/suse-ntp_synchronize".freeze
 
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
