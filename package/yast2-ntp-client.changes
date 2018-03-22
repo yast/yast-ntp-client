@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Mar 22 08:16:37 UTC 2018 - knut.anderssen@suse.com
+
+- Permitted the use of 'listentry' element or 'ntp_server' and
+  allowed to be an empty list in the AutoYaST schema (bsc#1013047)
+- 4.0.10
+
+-------------------------------------------------------------------
 Wed Mar  7 10:57:36 UTC 2018 - jreidinger@suse.com
 
 - change cron config file name to suse-ntp_synchronize
