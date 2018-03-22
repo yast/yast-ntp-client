@@ -18,9 +18,9 @@ ntp_sync = element ntp_sync { text }
 
 ntp_servers = element ntp_servers {
       LIST,
-      element ntp_server {
+      element (ntp_server | listentry) {
         element address { text } &
         element iburst { BOOLEAN }? &
         element offline { BOOLEAN }?
-      }
+      }*
 }
