@@ -1,3 +1,4 @@
+require "yast/logger"
 require "cfa/base_model"
 require "cfa/augeas_parser"
 require "cfa/matcher"
@@ -209,7 +210,9 @@ module CFA
       def record_entries
         return @record_entries if @record_entries
         matcher = Matcher.new do |k, _v|
-          RECORD_ENTRIES.include?(k.gsub("[]", ""))
+          # we want to get all content except comments, as now we can process
+          # even not yet known options with MiscRecord
+          k !~ /#comment/
         end
         @record_entries = @augeas_tree.select(matcher).map do |e|
           Record.new_from_augeas(e)
@@ -228,6 +231,7 @@ module CFA
     # for its options in the AugeasElement. For each one,
     # a Record subclass is created.
     class Record
+      include ::Yast::Logger
       # Creates the corresponding subclass object according
       # to its AugeasElement key.
       # @param [String] key
@@ -239,8 +243,22 @@ module CFA
       # @param [string] key
       def self.record_class(key)
         entry_type = key.gsub("[]", "")
-        record_class = "::CFA::NtpConf::#{entry_type.capitalize}Record"
-        Kernel.const_get(record_class)
+        record_class = "#{entry_type.capitalize}Record"
+        if CFA::NtpConf.constants.include?(record_class.to_sym)
+          CFA::NtpConf.const_get(record_class.to_sym)
+        else
+          # it is not a predefined record type, so use a generic misc record
+          res = Class.new(MiscRecord)
+          # and specify there its augeas type
+          res.send(:define_method, :augeas_type) { entry_type + "[]" }
+          res
+        end
+      end
+
+      # default implementation just return constant AUGEAS_KEY, but can be
+      # redefined
+      def augeas_type
+        self.class.const_get("AUGEAS_KEY")
       end
 
       def initialize(augeas = nil)
@@ -320,7 +338,7 @@ module CFA
     protected
 
       def create_augeas
-        { key: self.class.const_get("AUGEAS_KEY"), value: nil }
+        { key: augeas_type, value: nil }
       end
 
       def tree_value?
@@ -358,6 +376,16 @@ module CFA
 
       def options_matcher
         Matcher.new { |k, _v| !k.include?("#comment") }
+      end
+    end
+
+    # class to represent generic non-specific key
+    class MiscRecord < Record
+      def options
+        []
+      end
+
+      def options=(_value)
       end
     end
 
