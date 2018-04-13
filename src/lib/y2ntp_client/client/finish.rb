@@ -12,7 +12,7 @@ module Y2NtpClient
     class Finish < Installation::FinishClient
       include Yast::I18n
 
-      REQUIRED_PACKAGE ||= "chrony"
+      REQUIRED_PACKAGE ||= "chrony".freeze
 
       def initialize
         textdomain "ntp-client"
@@ -31,8 +31,9 @@ module Y2NtpClient
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.
             _("Cannot save NTP configuration because the package %1 is not installed."),
-            REQUIRED_PACKAGE))
-         return false
+            REQUIRED_PACKAGE
+          ))
+          return false
         end
 
         # bnc#449615, must merge the configs which Export/Import fails to do.

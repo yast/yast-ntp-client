@@ -8,7 +8,7 @@ module Yast
   class NtpClientProposalClient < Client
     include Yast::Logger
 
-    REQUIRED_PACKAGE ||= "chrony"
+    REQUIRED_PACKAGE ||= "chrony".freeze
 
     def main
       Yast.import "UI"
@@ -410,11 +410,12 @@ module Yast
       if ui == :accept && Stage.initial
         # checking if chrony is available for installation.
         if UI.QueryWidget(Id(:ntp_save), :Value) == true &&
-           !Pkg.IsAvailable(REQUIRED_PACKAGE)
+            !Pkg.IsAvailable(REQUIRED_PACKAGE)
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.
             _("Cannot save NTP configuration because the package %1 is not available."),
-            REQUIRED_PACKAGE))
+            REQUIRED_PACKAGE
+          ))
           UI.ChangeWidget(Id(:ntp_save), :Value, false)
           redraw = true
         end
