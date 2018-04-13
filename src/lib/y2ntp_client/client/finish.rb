@@ -12,8 +12,6 @@ module Y2NtpClient
     class Finish < Installation::FinishClient
       include Yast::I18n
 
-      REQUIRED_PACKAGE ||= "chrony".freeze
-
       def initialize
         textdomain "ntp-client"
       end
@@ -27,11 +25,11 @@ module Y2NtpClient
       end
 
       def write
-        unless Pkg.PkgInstalled(REQUIRED_PACKAGE)
+        unless Pkg.PkgInstalled(NtpClientClass::REQUIRED_PACKAGE)
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.
             _("Cannot save NTP configuration because the package %1 is not installed."),
-            REQUIRED_PACKAGE
+            NtpClientClass::REQUIRED_PACKAGE
           ))
           return false
         end

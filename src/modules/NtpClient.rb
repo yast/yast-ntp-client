@@ -48,6 +48,9 @@ module Yast
       "synchronize_time"
     ].freeze
 
+    # Package which is needed for saving NTP configuration into system
+    REQUIRED_PACKAGE = "chrony".freeze
+
     def main
       textdomain "ntp-client"
 
@@ -100,7 +103,7 @@ module Yast
       @ad_controller = ""
 
       # Required packages
-      @required_packages = ["chrony"]
+      @required_packages = [REQUIRED_PACKAGE]
 
       # List of known NTP servers
       # server address -> information
