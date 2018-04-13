@@ -19,6 +19,7 @@ module Yast
       Yast.import "String"
       Yast.import "Stage"
       Yast.import "PackageSystem"
+      Yast.import "Pkg"
       Yast.import "Popup"
       Yast.import "Progress"
       Yast.import "Report"
@@ -348,20 +349,18 @@ module Yast
       WriteNtpSettings(ntp_servers, ntp_server, run_service)
       return :success if param["write_only"]
 
-      required_package = "chrony"
-
       # In 1st stage, schedule packages for installation
       if Stage.initial
         Yast.import "Packages"
-        Packages.addAdditionalPackage(required_package)
+        Packages.addAdditionalPackage(NtpClientClass::REQUIRED_PACKAGE)
       # Otherwise, prompt user for confirming pkg installation
-      elsif !PackageSystem.CheckAndInstallPackages([required_package])
+      elsif !PackageSystem.CheckAndInstallPackages([NtpClientClass::REQUIRED_PACKAGE])
         Report.Error(
           Builtins.sformat(
             _(
               "Synchronization with NTP server is not possible\nwithout package %1 installed."
             ),
-            required_package
+            NtpClientClass::REQUIRED_PACKAGE
           )
         )
       end
@@ -404,6 +403,19 @@ module Yast
           redraw = true # update time widgets
         else
           Report.Error(_("Connection to selected NTP server failed."))
+        end
+      end
+      if ui == :accept && Stage.initial
+        # checking if chrony is available for installation.
+        if UI.QueryWidget(Id(:ntp_save), :Value) == true &&
+            !Pkg.IsAvailable(NtpClientClass::REQUIRED_PACKAGE)
+          Report.Error(Builtins.sformat(
+            # TRANSLATORS: Popup message. %1 is the missing package name.
+            _("Cannot save NTP configuration because the package %1 is not available."),
+            NtpClientClass::REQUIRED_PACKAGE
+          ))
+          UI.ChangeWidget(Id(:ntp_save), :Value, false)
+          redraw = true
         end
       end
 
