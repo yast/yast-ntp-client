@@ -92,7 +92,7 @@ describe Yast::NtpClient do
         end
 
         it "following write succeed" do
-          allow(subject).to receive(:update_netconfig).and_return(true)
+          allow(subject).to receive(:write_and_update_policy).and_return(true)
           allow(subject).to receive(:check_service).and_return(true)
           expect(Yast::Report).to_not receive(:Error)
           expect(subject.Write).to eq true
