@@ -91,8 +91,10 @@ describe Yast::NtpClient do
           expect(subject.sync_interval).to eq 15
         end
 
-        it "does not crash during write" do
-          subject.Write
+        it "following write succeed" do
+          puts subject.ntp_records.inspect
+          expect(Yast::Report).to_not receive(:Error)
+          expect(subject.Write).to eq true
         end
       end
 
