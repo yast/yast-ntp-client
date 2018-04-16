@@ -40,6 +40,7 @@ module CFA
       manycastclient
       fudge
       restrict
+      tinker
       driftfile
       logfile
       keys
@@ -210,9 +211,7 @@ module CFA
       def record_entries
         return @record_entries if @record_entries
         matcher = Matcher.new do |k, _v|
-          # we want to get all content except comments, as now we can process
-          # even not yet known options with MiscRecord
-          k !~ /#comment/
+          RECORD_ENTRIES.include?(k.gsub("[]", ""))
         end
         @record_entries = @augeas_tree.select(matcher).map do |e|
           Record.new_from_augeas(e)
@@ -247,11 +246,7 @@ module CFA
         if CFA::NtpConf.constants.include?(record_class.to_sym)
           CFA::NtpConf.const_get(record_class.to_sym)
         else
-          # it is not a predefined record type, so use a generic misc record
-          res = Class.new(MiscRecord)
-          # and specify there its augeas type
-          res.send(:define_method, :augeas_type) { entry_type + "[]" }
-          res
+          raise "Unsupported entry #{key}."
         end
       end
 
@@ -379,16 +374,6 @@ module CFA
       end
     end
 
-    # class to represent generic non-specific key
-    class MiscRecord < Record
-      def options
-        []
-      end
-
-      def options=(_value)
-      end
-    end
-
     # class to represent a ntp command record entry. There is a
     # subclass for server, peer, broadcast and broacastclient.
     class CommandRecord < Record
@@ -420,6 +405,17 @@ module CFA
         tree_value.tree.add(key, option)
       end
     end
+
+    # class to represent generic non-specific key
+    class TinkerRecord < CommandRecord
+      AUGEAS_KEY = "tinker[]".freeze
+      # Tinker commands place values as options in subtree
+      def value=(val)
+        self.options=(val)
+        super(nil)
+      end
+    end
+
 
     # class to represent a driftfile entry.
     # For example:
