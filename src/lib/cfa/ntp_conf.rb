@@ -411,11 +411,10 @@ module CFA
       AUGEAS_KEY = "tinker[]".freeze
       # Tinker commands place values as options in subtree
       def value=(val)
-        self.options=(val)
+        self.options = val
         super(nil)
       end
     end
-
 
     # class to represent a driftfile entry.
     # For example:
