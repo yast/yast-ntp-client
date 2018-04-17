@@ -406,16 +406,6 @@ module CFA
       end
     end
 
-    # class to represent generic non-specific key
-    class TinkerRecord < CommandRecord
-      AUGEAS_KEY = "tinker[]".freeze
-      # Tinker commands place values as options in subtree
-      def value=(val)
-        self.options = val
-        super(nil)
-      end
-    end
-
     # class to represent a driftfile entry.
     # For example:
     #   driftfile /var/lib/ntp/drift/ntp.drift
@@ -471,6 +461,36 @@ module CFA
       # here key is actually value and not option
       def options_matcher
         Matcher.new { |k, _v| !k.include?("#comment") && !k.include?("key") }
+      end
+    end
+
+    # class to represent tinker misc option - https://www.eecis.udel.edu/~mills/ntp/html/miscopt.html#tinker
+    class TinkerRecord < CommandRecord
+      AUGEAS_KEY = "tinker[]".freeze
+
+      def value=(val)
+        values = val.to_s.split("\s")
+        map = Hash[*values]
+        ensure_tree_value
+        tree_value.tree.delete("key")
+        tree_value.tree.delete("key[]")
+        # fix writting order as key have to be before trailing comment
+        any_matcher = CFA::Matcher.new { true }
+        placer = CFA::BeforePlacer.new(any_matcher)
+        map.each_pair.reverse_each { |key, value| tree_value.tree.add(key, value, placer) }
+      end
+
+      def value
+        return [] unless tree_value?
+        key_matcher = CFA::Matcher.new { |k, _v| k == "key" || k == "key[]" }
+        keys = tree_value.tree.select(key_matcher)
+        keys.map { |option| option[:value] }.join(" ")
+      end
+
+      # overwrite options matcher as Tinker is stored in autoyast as address and not options
+      def options_matcher
+        # no options, everything is in value
+        Matcher.new { false }
       end
     end
 
