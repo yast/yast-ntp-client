@@ -441,7 +441,7 @@ module CFA
 
       # for trustedkey it is subtree of keys
       def value
-        return [] unless tree_value?
+        ensure_tree_value
         key_matcher = CFA::Matcher.new { |k, _v| k == "key" || k == "key[]" }
         keys = tree_value.tree.select(key_matcher)
         keys.map { |option| option[:value] }.join(" ")
@@ -481,7 +481,7 @@ module CFA
       end
 
       def value
-        return [] unless tree_value?
+        ensure_tree_value
         key_matcher = CFA::Matcher.new { |k, _v| k != "#comment" && k != "#comment[]" }
         keys = tree_value.tree.select(key_matcher)
         keys.map { |option| "#{option[:key]} #{option[:value]}" }.join(" ")
