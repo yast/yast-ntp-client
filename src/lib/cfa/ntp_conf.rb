@@ -1,3 +1,4 @@
+require "yast/logger"
 require "cfa/base_model"
 require "cfa/augeas_parser"
 require "cfa/matcher"
@@ -39,6 +40,7 @@ module CFA
       manycastclient
       fudge
       restrict
+      tinker
       driftfile
       logfile
       keys
@@ -228,6 +230,7 @@ module CFA
     # for its options in the AugeasElement. For each one,
     # a Record subclass is created.
     class Record
+      include ::Yast::Logger
       # Creates the corresponding subclass object according
       # to its AugeasElement key.
       # @param [String] key
@@ -239,8 +242,18 @@ module CFA
       # @param [string] key
       def self.record_class(key)
         entry_type = key.gsub("[]", "")
-        record_class = "::CFA::NtpConf::#{entry_type.capitalize}Record"
-        Kernel.const_get(record_class)
+        record_class = "#{entry_type.capitalize}Record"
+        if CFA::NtpConf.constants.include?(record_class.to_sym)
+          CFA::NtpConf.const_get(record_class.to_sym)
+        else
+          raise "Unsupported entry #{key}."
+        end
+      end
+
+      # default implementation just return constant AUGEAS_KEY, but can be
+      # redefined
+      def augeas_type
+        self.class.const_get("AUGEAS_KEY")
       end
 
       def initialize(augeas = nil)
@@ -320,7 +333,7 @@ module CFA
     protected
 
       def create_augeas
-        { key: self.class.const_get("AUGEAS_KEY"), value: nil }
+        { key: augeas_type, value: nil }
       end
 
       def tree_value?
@@ -428,7 +441,7 @@ module CFA
 
       # for trustedkey it is subtree of keys
       def value
-        return [] unless tree_value?
+        ensure_tree_value
         key_matcher = CFA::Matcher.new { |k, _v| k == "key" || k == "key[]" }
         keys = tree_value.tree.select(key_matcher)
         keys.map { |option| option[:value] }.join(" ")
@@ -448,6 +461,36 @@ module CFA
       # here key is actually value and not option
       def options_matcher
         Matcher.new { |k, _v| !k.include?("#comment") && !k.include?("key") }
+      end
+    end
+
+    # class to represent tinker misc option - https://www.eecis.udel.edu/~mills/ntp/html/miscopt.html#tinker
+    class TinkerRecord < CommandRecord
+      AUGEAS_KEY = "tinker[]".freeze
+
+      def value=(val)
+        values = val.to_s.split("\s")
+        map = Hash[*values]
+        ensure_tree_value
+        tree_value.tree.delete("key")
+        tree_value.tree.delete("key[]")
+        # fix writting order as key have to be before trailing comment
+        any_matcher = CFA::Matcher.new { true }
+        placer = CFA::BeforePlacer.new(any_matcher)
+        map.each_pair.reverse_each { |key, value| tree_value.tree.add(key, value, placer) }
+      end
+
+      def value
+        ensure_tree_value
+        key_matcher = CFA::Matcher.new { |k, _v| k != "#comment" && k != "#comment[]" }
+        keys = tree_value.tree.select(key_matcher)
+        keys.map { |option| "#{option[:key]} #{option[:value]}" }.join(" ")
+      end
+
+      # overwrite options matcher as Tinker is stored in autoyast as address and not options
+      def options_matcher
+        # no options, everything is in value
+        Matcher.new { false }
       end
     end
 

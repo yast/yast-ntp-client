@@ -29,6 +29,12 @@
         <options>iburst</options>
         <type>server</type>
       </peer>
+      <peer>
+        <address>panic 0</address>
+        <comment/>
+        <options/>
+        <type>tinker</type>
+      </peer>
     </peers>
     <restricts config:type="list">
       <restrict>

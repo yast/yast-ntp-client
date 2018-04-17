@@ -1,5 +1,6 @@
 require_relative "test_helper"
 
+require "yast2/target_file"
 require "fileutils"
 require "cfa/memory_file"
 require "cfa/ntp_conf"
@@ -61,7 +62,7 @@ describe Yast::NtpClient do
         end
 
         it "reads the list of peers" do
-          expect(subject.ntp_records.size).to eq 4
+          expect(subject.ntp_records.size).to eq 5
         end
 
         it "reads the list of restricts" do
@@ -88,6 +89,13 @@ describe Yast::NtpClient do
 
         it "reads sync intervall" do
           expect(subject.sync_interval).to eq 15
+        end
+
+        it "following write succeed" do
+          allow(subject).to receive(:write_and_update_policy).and_return(true)
+          allow(subject).to receive(:check_service).and_return(true)
+          expect(Yast::Report).to_not receive(:Error)
+          expect(subject.Write).to eq true
         end
       end
 
