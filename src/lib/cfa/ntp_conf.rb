@@ -482,9 +482,9 @@ module CFA
 
       def value
         return [] unless tree_value?
-        key_matcher = CFA::Matcher.new { |k, _v| k == "key" || k == "key[]" }
+        key_matcher = CFA::Matcher.new { |k, _v| k != "#comment" && k != "#comment[]" }
         keys = tree_value.tree.select(key_matcher)
-        keys.map { |option| option[:value] }.join(" ")
+        keys.map { |option| "#{option[:key]} #{option[:value]}" }.join(" ")
       end
 
       # overwrite options matcher as Tinker is stored in autoyast as address and not options
