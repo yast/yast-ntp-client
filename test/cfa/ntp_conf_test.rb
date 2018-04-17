@@ -458,3 +458,31 @@ describe CFA::NtpConf::TrustedkeyRecord do
     expect(trustedkey.value).to eq "1"
   end
 end
+
+describe CFA::NtpConf::TinkerRecord do
+
+  let(:ntp) { ntp_conf(file) }
+
+  let(:file) { ntp_file("") }
+
+  it "adds proper type to conf when saving" do
+    ntp.records << subject
+    record = ntp.records.last
+    record.value = "panic 0"
+    record.raw_options = ""
+    record.comment = "# path to keys file"
+    expect(record.value).to eq "panic 0"
+
+    ntp.save
+
+    expect(file.content.lines).to include("tinker panic 0# path to keys file\n")
+  end
+
+  it "loads properly when it is defined in file" do
+    file.content << "##comment1\ntinker panic 0 allan 2000\n"
+    ntp.load
+
+    tinker = ntp.records.last
+    expect(tinker.value).to eq "panic 0 allan 2000"
+  end
+end
