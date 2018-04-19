@@ -26,6 +26,8 @@ module Y2NtpClient
 
       def write
         unless Package.Installed(NtpClientClass::REQUIRED_PACKAGE)
+          # Not using Pkg.PkgInstalled because it is not working correctly here.
+          # (bnc#1089962)
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.
             _("Cannot save NTP configuration because the package %1 is not installed."),
