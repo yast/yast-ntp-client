@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr 19 08:56:08 CEST 2018 - schubi@suse.de
+
+- Fix in checking installed chrony package while writing ntp
+  settings. (bnc#1089962)
+- 4.0.12
+
+-------------------------------------------------------------------
 Fri Apr 13 10:34:33 CEST 2018 - schubi@suse.de
 
 - Improved robustness if chrony has not been installed.
