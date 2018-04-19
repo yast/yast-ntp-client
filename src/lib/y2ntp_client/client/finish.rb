@@ -4,7 +4,7 @@ require "yast"
 require "installation/finish_client"
 
 Yast.import "NtpClient"
-Yast.import "Pkg"
+Yast.import "Package"
 
 module Y2NtpClient
   module Client
@@ -25,7 +25,7 @@ module Y2NtpClient
       end
 
       def write
-        unless Pkg.PkgInstalled(NtpClientClass::REQUIRED_PACKAGE)
+        unless Package.Installed(NtpClientClass::REQUIRED_PACKAGE)
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.
             _("Cannot save NTP configuration because the package %1 is not installed."),
