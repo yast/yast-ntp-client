@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 21 08:46:30 CEST 2018 - schubi@suse.de
+
+- Changed dir of COPYING file.
+
+-------------------------------------------------------------------
 Thu Apr 19 08:56:08 CEST 2018 - schubi@suse.de
 
 - Fix in checking installed chrony package while writing ntp
