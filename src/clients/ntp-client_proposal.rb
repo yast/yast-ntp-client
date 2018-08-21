@@ -307,8 +307,11 @@ module Yast
       ntp_servers.each do |server|
         NtpClient.ntp_conf.add_pool(server)
       end
-      NtpClient.run_service = run_service
-      if !run_service
+      if run_service
+        NtpClient.run_service = true
+        NtpClient.synchronize_time = false
+      else
+        NtpClient.run_service = false
         NtpClient.synchronize_time = true
         NtpClient.sync_interval = NtpClientClass::DEFAULT_SYNC_INTERVAL
       end
