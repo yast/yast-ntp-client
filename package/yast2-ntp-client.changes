@@ -4,7 +4,7 @@ Tue Aug 21 08:46:30 CEST 2018 - schubi@suse.de
 - Changed dir of COPYING file.
 
 -------------------------------------------------------------------
- Aug 20 10:13:23 UTC 2018 - jreidinger@suse.com
+Mon Aug 20 10:13:23 UTC 2018 - jreidinger@suse.com
 
 - Properly disable cron service when running systemd service when
   called from Date and Time module (bsc#1102983)
