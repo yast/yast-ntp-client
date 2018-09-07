@@ -342,7 +342,7 @@ module Yast
       log.info "ntp client proposal Write with #{param.inspect}"
       ntp_servers = param["servers"] || []
       ntp_server = param["server"] || ""
-      run_service = param.fetch("run_service", true)
+      run_service = param.fetch("run_service", NtpClient.run_service)
       if ntp_server == ""
         # get the value from UI only when it wasn't given as a parameter
         ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
