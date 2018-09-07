@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Sep  7 15:20:26 UTC 2018 - dgonzalez@suse.com
+
+- Save the service status according to the user preferences
+  (bsc#1075039)
+- 4.1.1
+
+-------------------------------------------------------------------
 Wed Aug 22 16:08:46 CEST 2018 - schubi@suse.de
 
 - Switched license in spec file from SPDX2 to SPDX3 format. 
