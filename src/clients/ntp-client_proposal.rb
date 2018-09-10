@@ -329,57 +329,50 @@ module Yast
       true
     end
 
-    # params:
-    #   server (taken from UI if empty)
-    #   servers (intended to use all of opensuse.pool.ntp.org,
-    # 	   but I did not have time to make it work)
-    #   run_service (set to true if empty)
-    #   write_only (bnc#589296)
-    #   ntpdate_only (TODO rename to onetime)
-    # return:
-    #   `success, `invalid_hostname or `ntpdate_failed
-    def Write(param)
-      log.info "ntp client proposal Write with #{param.inspect}"
-      ntp_servers = param["servers"] || []
-      ntp_server = param["server"] || ""
-      run_service = param.fetch("run_service", true)
-      if ntp_server == ""
-        # get the value from UI only when it wasn't given as a parameter
-        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
-      end
-      return :invalid_hostname if !ValidateSingleServer(ntp_server)
+    # Writes the NTP settings
+    #
+    # @param [Hash] params
+    # @option params [String] "server" The NTP server address, taken from the UI if empty
+    # @option params [Array<String>] "servers" A collection of NTP servers
+    # @option params [Boolean] "run_service" Whether service should be active and enable
+    # @option params [Boolean] "write_only" If only is needed to write the settings, (bnc#589296)
+    # @option params [Boolean] "ntpdate_only" ? TODO: rename to onetime
+    #
+    # @return [Symbol] :invalid_hostname, when a not valid ntp_server is given
+    #                  :ntpdate_failed, when the ntp sychronization fails
+    #                  :success, when settings (and sync if proceed) were performed successfully
+    def Write(params)
+      log.info "ntp client proposal Write with #{params.inspect}"
+
+      # clean params
+      params.compact!
+
+      ntp_server  = params.fetch("server", "")
+      ntp_servers = params.fetch("servers", [])
+      run_service = params.fetch("run_service", NtpClient.run_service)
+
+      # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
+      ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) if ntp_server.strip.empty?
+
+      return :invalid_hostname unless ValidateSingleServer(ntp_server)
 
       WriteNtpSettings(ntp_servers, ntp_server, run_service)
-      return :success if param["write_only"]
 
-      # In 1st stage, schedule packages for installation
-      if Stage.initial
-        Yast.import "Packages"
-        Packages.addAdditionalPackage(NtpClientClass::REQUIRED_PACKAGE)
-      # Otherwise, prompt user for confirming pkg installation
-      elsif !PackageSystem.CheckAndInstallPackages([NtpClientClass::REQUIRED_PACKAGE])
-        Report.Error(
-          Builtins.sformat(
-            _(
-              "Synchronization with NTP server is not possible\nwithout package %1 installed."
-            ),
-            NtpClientClass::REQUIRED_PACKAGE
-          )
-        )
-      end
+      return :success if params["write_only"]
 
-      ret = 0
+      add_or_install_required_package
+
+      # Only if network is running try to synchronize the ntp server
       if NetworkService.isNetworkRunning
-        # Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
-        ret = NtpClient.sync_once(ntp_server)
+        exit_code = NtpClient.sync_once(ntp_server)
         Popup.ClearFeedback
-      end
 
-      return :ntpdate_failed if ret != 0
+        return :ntpdate_failed unless exit_code.zero?
+      end
 
       # User wants more than running one time sync (synchronize on boot)
-      WriteNtpSettings(ntp_servers, ntp_server, run_service) if !param["ntpdate_only"]
+      WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       :success
     end
@@ -468,6 +461,24 @@ module Yast
       end
       # success, exit
       true
+    end
+
+  private
+
+    def add_or_install_required_package
+      # In 1st stage, schedule packages for installation
+      if Stage.initial
+        Yast.import "Packages"
+        Packages.addAdditionalPackage(NtpClientClass::REQUIRED_PACKAGE)
+      # Otherwise, prompt user for confirming pkg installation
+      elsif !PackageSystem.CheckAndInstallPackages([NtpClientClass::REQUIRED_PACKAGE])
+        Report.Error(
+          Builtins.sformat(
+            _("Synchronization with NTP server is not possible\nwithout package %1 installed."),
+            NtpClientClass::REQUIRED_PACKAGE
+          )
+        )
+      end
     end
   end
 end
