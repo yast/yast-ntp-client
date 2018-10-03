@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct  3 14:11:34 UTC 2018 - knut.anderssen@suse.com
+
+- AutoYaST: Do not show the progress when merging the configuration
+  before writing it (bsc#1110598)
+- 4.0.13
+
+-------------------------------------------------------------------
 Thu Apr 19 08:56:08 CEST 2018 - schubi@suse.de
 
 - Fix in checking installed chrony package while writing ntp
