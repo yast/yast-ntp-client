@@ -39,9 +39,9 @@ module Y2NtpClient
       end
 
       def write
+        progress_orig = Yast::Progress.set(false)
         # ensure to merge config to system chrony configuration to do minimal configuration
         Yast::NtpClient.merge_to_system
-        progress_orig = Yast::Progress.set(false)
         Yast::NtpClient.write_only = true
         ret = Yast::NtpClient.Write
         Yast::Progress.set(progress_orig)
