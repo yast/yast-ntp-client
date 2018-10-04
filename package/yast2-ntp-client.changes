@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct  3 14:11:34 UTC 2018 - knut.anderssen@suse.com
+
+- AutoYaST: Do not show the progress when merging the configuration
+  before writing it (bsc#1110598)
+- 4.1.2
+
+-------------------------------------------------------------------
 Fri Sep  7 15:20:26 UTC 2018 - dgonzalez@suse.com
 
 - Save the service status according to the user preferences
