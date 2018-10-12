@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-# File:	clients/ntp-client_proposal.ycp
-# Summary:	Installation client for ntp configuration
-# Author:	Bubli <kmachalkova@suse.cz>
-#
-# This is used as the general interface between yast2-country
-# (time,timezone) and yast2-ntp-client.
+require "yast"
+
 module Yast
+  # This is used as the general interface between yast2-country
+  # (time,timezone) and yast2-ntp-client.
   class NtpClientProposalClient < Client
+    include Yast::Logger
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -19,6 +19,7 @@ module Yast
       Yast.import "String"
       Yast.import "Stage"
       Yast.import "PackageSystem"
+      Yast.import "Pkg"
       Yast.import "Popup"
       Yast.import "Progress"
       Yast.import "Report"
@@ -152,7 +153,6 @@ module Yast
         progress_orig = Progress.set(false)
         NtpClient.Read
         Progress.set(progress_orig)
-        NtpClient.ReadSynchronization
       end
 
       Builtins.y2milestone("synchronize_time %1", NtpClient.synchronize_time)
@@ -167,22 +167,6 @@ module Yast
       end
 
       true
-    end
-
-    def AddSingleServer(server)
-      idx = NtpClient.findSyncRecord("server", server)
-
-      # -1 means adding new server
-      if idx == -1
-        Ops.set(NtpClient.selected_record, "address", server)
-        Ops.set(NtpClient.selected_record, "type", "server")
-      else
-        NtpClient.selectSyncRecord(idx)
-      end
-
-      NtpClient.storeSyncRecord
-
-      nil
     end
 
     def MakeProposal
@@ -200,7 +184,7 @@ module Yast
       end
 
       if NtpClient.config_has_been_read || NtpClient.ntp_selected
-        Builtins.y2milestone("ntp_items will be filled from /etc/ntp.conf")
+        Builtins.y2milestone("ntp_items will be filled from /etc/chrony.conf")
         # grr, GUNS means all of them are used and here we just pick one
         ntp_items = Builtins.maplist(NtpClient.GetUsedNtpServers) do |server|
           Item(Id(server), server)
@@ -210,7 +194,7 @@ module Yast
       end
       if ntp_items == []
         Builtins.y2milestone(
-          "Nothing found in /etc/ntp.conf, proposing current timezone-based NTP server list"
+          "Nothing found in /etc/chrony.conf, proposing current timezone-based NTP server list"
         )
         time_zone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
         ntp_items = NtpClient.GetNtpServersByCountry(time_zone_country, true)
@@ -301,10 +285,8 @@ module Yast
       if !ValidateSingleServer(ntp_server)
         ret = :invalid_hostname
       else
-        ntp_server2 = Convert.to_string(
-          UI.QueryWidget(Id(:ntp_address), :Value)
-        )
-        AddSingleServer(ntp_server2)
+        NtpClient.ntp_conf.clear_pools
+        NtpClient.ntp_conf.add_pool(ntp_server)
         retval = Convert.to_boolean(WFM.CallFunction("ntp-client"))
         ret = :next if retval
         MakeProposal()
@@ -312,16 +294,24 @@ module Yast
       ret
     end
 
+    # Writes configuration for ntp client.
+    # @param ntp_servers [Array<String>] list of servers to configure as ntp sync sources
+    # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
+    # @param run_service [Boolean] define if synchronize with systemd services or via cron sync
+    # @return true
     def WriteNtpSettings(ntp_servers, ntp_server, run_service)
       ntp_servers = deep_copy(ntp_servers)
       NtpClient.modified = true
-      if ntp_servers != []
-        Builtins.foreach(ntp_servers) { |server| AddSingleServer(server) }
-      else
-        AddSingleServer(ntp_server)
+      NtpClient.ntp_conf.clear_pools
+      ntp_servers << ntp_server if ntp_servers.empty?
+      ntp_servers.each do |server|
+        NtpClient.ntp_conf.add_pool(server)
       end
-      NtpClient.run_service = run_service
-      if !run_service
+      if run_service
+        NtpClient.run_service = true
+        NtpClient.synchronize_time = false
+      else
+        NtpClient.run_service = false
         NtpClient.synchronize_time = true
         NtpClient.sync_interval = NtpClientClass::DEFAULT_SYNC_INTERVAL
       end
@@ -339,76 +329,50 @@ module Yast
       true
     end
 
-    # params:
-    #   server (taken from UI if empty)
-    #   servers (intended to use all of opensuse.pool.ntp.org,
-    # 	   but I did not have time to make it work)
-    #   run_service (set to true if empty)
-    #   write_only (bnc#589296)
-    #   ntpdate_only (TODO rename to onetime)
-    # return:
-    #   `success, `invalid_hostname or `ntpdate_failed
-    def Write(param)
-      ntp_servers = param["servers"] || []
-      ntp_server = param["server"] || ""
-      run_service = param.fetch("run_service", true)
-      if ntp_server == ""
-        # get the value from UI only when it wasn't given as a parameter
-        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
-      end
-      return :invalid_hostname if !ValidateSingleServer(ntp_server)
+    # Writes the NTP settings
+    #
+    # @param [Hash] params
+    # @option params [String] "server" The NTP server address, taken from the UI if empty
+    # @option params [Array<String>] "servers" A collection of NTP servers
+    # @option params [Boolean] "run_service" Whether service should be active and enable
+    # @option params [Boolean] "write_only" If only is needed to write the settings, (bnc#589296)
+    # @option params [Boolean] "ntpdate_only" ? TODO: rename to onetime
+    #
+    # @return [Symbol] :invalid_hostname, when a not valid ntp_server is given
+    #                  :ntpdate_failed, when the ntp sychronization fails
+    #                  :success, when settings (and sync if proceed) were performed successfully
+    def Write(params)
+      log.info "ntp client proposal Write with #{params.inspect}"
+
+      # clean params
+      params.compact!
+
+      ntp_server  = params.fetch("server", "")
+      ntp_servers = params.fetch("servers", [])
+      run_service = params.fetch("run_service", NtpClient.run_service)
+
+      # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
+      ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) if ntp_server.strip.empty?
+
+      return :invalid_hostname unless ValidateSingleServer(ntp_server)
 
       WriteNtpSettings(ntp_servers, ntp_server, run_service)
-      return :success if param["write_only"]
 
-      # One-time adjusment without running the ntp daemon
-      # Meanwhile, ntpdate was replaced by sntp
-      ntpdate_only = param["ntpdate_only"]
+      return :success if params["write_only"]
 
-      required_package = "ntp"
+      add_or_install_required_package
 
-      # In 1st stage, schedule packages for installation
-      if Stage.initial
-        Yast.import "Packages"
-        Packages.addAdditionalPackage(required_package)
-      # Otherwise, prompt user for confirming pkg installation
-      elsif !PackageSystem.CheckAndInstallPackages([required_package])
-        Report.Error(
-          Builtins.sformat(
-            _(
-              "Synchronization with NTP server is not possible\nwithout package %1 installed."
-            ),
-            required_package
-          )
-        )
-      end
-
-      ret = 0
+      # Only if network is running try to synchronize the ntp server
       if NetworkService.isNetworkRunning
-        # Only if network is running try to synchronize the ntp server
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
-
-        Builtins.y2milestone("Running sntp to sync with %1", ntp_server)
-
-        # -S: do set the system time
-        # -t 5: timeout of 5 seconds
-        # -K /dev/null: use /dev/null as KoD history file (if not specified,
-        #               /var/db/ntp-kod will be used and it doesn't exist)
-        # -l <file>: log to a file to not mess text mode installation
-        # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
-        ret = SCR.Execute(
-          path(".target.bash"),
-          "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log " \
-          "-t 5 -c '#{String.Quote(ntp_server)}'"
-        )
-        Builtins.y2milestone("'sntp %1' returned %2", ntp_server, ret)
+        exit_code = NtpClient.sync_once(ntp_server)
         Popup.ClearFeedback
+
+        return :ntpdate_failed unless exit_code.zero?
       end
 
-      return :ntpdate_failed if ret != 0
-
-      # User wants to more than running sntp (synchronize on boot)
-      WriteNtpSettings(ntp_servers, ntp_server, run_service) if !ntpdate_only
+      # User wants more than running one time sync (synchronize on boot)
+      WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       :success
     end
@@ -435,6 +399,19 @@ module Yast
           redraw = true # update time widgets
         else
           Report.Error(_("Connection to selected NTP server failed."))
+        end
+      end
+      if ui == :accept && Stage.initial
+        # checking if chrony is available for installation.
+        if UI.QueryWidget(Id(:ntp_save), :Value) == true &&
+            !Pkg.IsAvailable(NtpClientClass::REQUIRED_PACKAGE)
+          Report.Error(Builtins.sformat(
+            # TRANSLATORS: Popup message. %1 is the missing package name.
+            _("Cannot save NTP configuration because the package %1 is not available."),
+            NtpClientClass::REQUIRED_PACKAGE
+          ))
+          UI.ChangeWidget(Id(:ntp_save), :Value, false)
+          redraw = true
         end
       end
 
@@ -484,6 +461,24 @@ module Yast
       end
       # success, exit
       true
+    end
+
+  private
+
+    def add_or_install_required_package
+      # In 1st stage, schedule packages for installation
+      if Stage.initial
+        Yast.import "Packages"
+        Packages.addAdditionalPackage(NtpClientClass::REQUIRED_PACKAGE)
+      # Otherwise, prompt user for confirming pkg installation
+      elsif !PackageSystem.CheckAndInstallPackages([NtpClientClass::REQUIRED_PACKAGE])
+        Report.Error(
+          Builtins.sformat(
+            _("Synchronization with NTP server is not possible\nwithout package %1 installed."),
+            NtpClientClass::REQUIRED_PACKAGE
+          )
+        )
+      end
     end
   end
 end

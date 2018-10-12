@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-ntp-client
 #
-# Copyright (c) 2014 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -17,33 +17,33 @@
 
 
 Name:           yast2-ntp-client
-Version:        3.2.8
+Version:        4.1.2
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
-License:        GPL-2.0+
+License:        GPL-2.0-or-later
 Group:          System/YaST
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
+BuildRequires:  augeas-lenses
+BuildRequires:  autoyast2-installation
 BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 3.2.21
 BuildRequires:  yast2-country-data
 BuildRequires:  yast2-devtools >= 3.1.10
-BuildRequires:  autoyast2-installation
+BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
-BuildRequires:  augeas-lenses
-BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 
 # proper acting TargetFile when scr is switched
+Requires:       augeas-lenses
 Requires:       yast2 >= 3.2.21
 Requires:       yast2-country-data
+# needed for network/config agent
+Requires:       yast2-network
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
-Requires:       augeas-lenses
 BuildArch:      noarch
-# New sntp command line syntax
-Conflicts:      ntp < 4.2.8
 
 Obsoletes:      yast2-ntp-client-devel-doc
 
@@ -61,22 +61,28 @@ rake test:unit
 %install
 rake install DESTDIR="%{buildroot}"
 
+%post
+# upgrade old name and convert it to chrony (bsc#1079122)
+if [ -f /etc/cron.d/novell.ntp-synchronize ]; then
+  mv /etc/cron.d/novell.ntp-synchronize /etc/cron.d/suse-ntp_synchronize
+  sed -i 's:\* \* \* \* root .*:* * * * root /usr/sbin/chronyd -q \&>/dev/null:' /etc/cron.d/suse-ntp_synchronize
+fi
+
 %files
 %defattr(-,root,root)
 %dir %{yast_yncludedir}/ntp-client
 %{yast_clientdir}/*
 %{yast_dir}/lib
 %{yast_yncludedir}/ntp-client/*
-%{yast_scrconfdir}/cfg_ntp.scr
-%{yast_scrconfdir}/etc_ntp.scr
 %{yast_moduledir}/*.rb
 %{yast_desktopdir}/ntp-client.desktop
 %{yast_ydatadir}/ntp_servers.yml
 %{yast_schemadir}/autoyast/rnc/ntpclient.rnc
 %{yast_dir}/lib
+%ghost /etc/cron.d/suse-ntp_synchronize
 
 %dir %{yast_docdir}
-%doc %{yast_docdir}/COPYING
+%license %{yast_docdir}/COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/CONTRIBUTING.md
 
