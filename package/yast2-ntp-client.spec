@@ -82,7 +82,7 @@ fi
 %ghost /etc/cron.d/suse-ntp_synchronize
 
 %dir %{yast_docdir}
-%license %{yast_docdir}/COPYING
+%license COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/CONTRIBUTING.md
 
