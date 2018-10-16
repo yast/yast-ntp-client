@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct 16 10:28:35 CEST 2018 - schubi@suse.de
+
+- Fixed license path. Build error for bsc#1110598.
+- 4.1.3
+
+-------------------------------------------------------------------
 Wed Oct  3 14:11:34 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST: Do not show the progress when merging the configuration
