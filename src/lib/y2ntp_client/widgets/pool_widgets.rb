@@ -1,6 +1,7 @@
 require "yast"
 
 require "cwm/widget"
+require "y2ntp_client/dialog/add_pool"
 
 Yast.import "Address"
 Yast.import "NtpClient"
@@ -116,5 +117,84 @@ module Y2NtpClient
           "gets connected to the network.")
       end
     end
+
+    class SelectFrom < CWM::MenuButton
+      def initialize(address_widget)
+        Yast.import "Popup"
+        @address_widget = address_widget
+      end
+
+      def label
+        _("Select")
+      end
+
+      def opt
+        [:notify]
+      end
+
+      def items
+        [[:local, _("Local Server")], [:public, _("Public Server")]]
+      end
+
+      def handle(event)
+        case event["ID"]
+        when :local, :public
+          Dialog::AddPool.new(@address_widget, event["ID"]).run
+        end
+
+        nil
+      end
+
+      def cwm_definition
+        additional = {}
+        # handle_events are by default widget_id, but in radio buttons, events are
+        # in fact single RadioButton
+        if !handle_all_events
+          event_ids = items.map(&:first)
+          additional["handle_events"] = event_ids
+        end
+
+        super.merge(additional)
+      end
+    end
+
+    class LocalList < CWM::Table
+      def initialize
+        textdomain "ntp-client"
+      end
+
+      def header
+        [
+          _("Syncronization server")
+        ]
+      end
+
+      def items
+        [
+          ["2.pool.ntp.org", "2.pool.ntp.org"],
+          ["3.pool.ntp.org", "3.pool.ntp.org"]
+        ]
+      end
+    end
+
+    class PublicList < CWM::Table
+      def initialize
+        textdomain "ntp-client"
+      end
+
+      def header
+        [
+          _("Syncronization server")
+        ]
+      end
+
+      def items
+        [
+          ["2.pool.ntp.org", "2.pool.ntp.org"],
+          ["3.pool.ntp.org", "3.pool.ntp.org"]
+        ]
+      end
+    end
+
   end
 end
