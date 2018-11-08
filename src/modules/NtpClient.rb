@@ -128,7 +128,7 @@ module Yast
       @ntp_selected = false
     end
 
-    # CFA instance for reading/writing /etc/ntp.conf
+    # CFA instance for reading/writing /etc/chrony.conf
     def ntp_conf
       @chrony_conf ||= CFA::ChronyConf.new
     end
@@ -154,7 +154,7 @@ module Yast
     # @param server [String] to sync against
     # @return [Integer] exit code of sync command
     def sync_once(server)
-      log.info "Running ont time sync with #{server}"
+      log.info "Running one time sync with #{server}"
 
       # -q: set system time and quit
       # -t: timeout in seconds
