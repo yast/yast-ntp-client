@@ -180,6 +180,30 @@ module Yast
       Mode.normal
     end
 
+    # Synchronize against specified server only one time and does not modify
+    # any configuration
+    # @param server [String] to sync against
+    # @return [Integer] exit code of sync command
+    def sync_once(server)
+      log.info("Running sntp to sync with #{server}")
+
+      # -S: do set the system time
+      # -t 5: timeout of 5 seconds
+      # -K /dev/null: use /dev/null as KoD history file (if not specified,
+      #               /var/db/ntp-kod will be used and it doesn't exist)
+      # -l <file>: log to a file to not mess text mode installation
+      # -c: causes all IP addresses to which ntp_server resolves to be queried in parallel
+      ret = SCR.Execute(
+        path(".target.bash"),
+        "/usr/sbin/sntp -S -K /dev/null -l /var/log/YaST2/sntp.log " \
+        "-t 5 -c '#{String.Quote(server)}'"
+      )
+      log.info("'sntp #{server}' returned #{ret}")
+
+      ret["exit"]
+    end
+
+
     # Reads and returns all known countries with their country codes
     #
     # @return [Hash{String => String}] of known contries
