@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Nov  8 15:20:26 UTC 2018 - knut.andersse@suse.com
+
+- Only write the configuration once, and do not save changes when
+  we are only synchronizing the date. (bsc#1108497)
+- 4.1.4
+
+-------------------------------------------------------------------
 Tue Oct 16 10:28:35 CEST 2018 - schubi@suse.de
 
 - Fixed license path. Build error for bsc#1110598.
