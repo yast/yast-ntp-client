@@ -14,7 +14,7 @@ describe Yast::NtpClientProposalClient do
   describe "#Write" do
     let(:ntp_server) { "fake.pool.ntp.org" }
     let(:write_only) { false }
-    let(:ntpdate_only) { true }
+    let(:ntpdate_only) { false }
     let(:params) do
       {
         "server"       => ntp_server,
@@ -148,18 +148,18 @@ describe Yast::NtpClientProposalClient do
       end
 
       context "and user only wants to syncronize date" do
-        it "writes settings only once" do
-          expect(subject).to receive(:WriteNtpSettings).once
+        let(:ntpdate_only) { true }
+
+        it "does not write settings" do
+          expect(subject).to_not receive(:WriteNtpSettings)
 
           subject.Write(params)
         end
       end
 
       context "and user wants to syncronize on boot" do
-        let(:ntpdate_only) { false }
-
-        it "writes settings again?" do
-          expect(subject).to receive(:WriteNtpSettings).twice
+        it "writes settings only once" do
+          expect(subject).to receive(:WriteNtpSettings).once
 
           subject.Write(params)
         end

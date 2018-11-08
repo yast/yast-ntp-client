@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-# File:	clients/ntp-client_proposal.ycp
-# Summary:	Installation client for ntp configuration
-# Author:	Bubli <kmachalkova@suse.cz>
-#
-# This is used as the general interface between yast2-country
-# (time,timezone) and yast2-ntp-client.
+require "yast"
+
 module Yast
+  # This is used as the general interface between yast2-country
+  # (time,timezone) and yast2-ntp-client.
   class NtpClientProposalClient < Client
+    include Logger
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -366,11 +366,11 @@ module Yast
 
       return :invalid_hostname unless ValidateSingleServer(ntp_server)
 
-      WriteNtpSettings(ntp_servers, ntp_server, run_service)
+      add_or_install_required_package unless params["write_only"]
+
+      WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       return :success if params["write_only"]
-
-      add_or_install_required_package
 
       # Only if network is running try to synchronize the ntp server
       if NetworkService.isNetworkRunning
@@ -380,9 +380,6 @@ module Yast
 
         return :ntpdate_failed unless exit_code.zero?
       end
-
-      # User wants more than running one time sync (synchronize on boot)
-      WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       :success
     end

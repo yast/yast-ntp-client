@@ -37,6 +37,9 @@ module Yast
 
     NTP_FILE = "/etc/ntp.conf".freeze
 
+    # Package which is needed for saving NTP configuration into system
+    REQUIRED_PACKAGE = "ntp".freeze
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -202,7 +205,6 @@ module Yast
 
       ret["exit"]
     end
-
 
     # Reads and returns all known countries with their country codes
     #
