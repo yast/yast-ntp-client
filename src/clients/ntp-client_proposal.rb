@@ -355,7 +355,7 @@ module Yast
       log.info "ntp client proposal Write with #{params.inspect}"
 
       # clean params
-      params.compact!
+      params.delete_if { |_, v| v.nil? }
 
       ntp_server  = params.fetch("server", "")
       ntp_servers = params.fetch("servers", [])
