@@ -1,3 +1,4 @@
+#! /usr/bin/env rspec
 require_relative "../../test_helper"
 
 require "cwm/rspec"
@@ -25,4 +26,16 @@ describe Y2NtpClient::Widgets::Iburst do
   subject { described_class.new({}) }
 
   include_examples "CWM::CheckBox"
+end
+
+describe Y2NtpClient::Widgets::LocalList do
+  subject { described_class.new({}) }
+
+  include_examples "CWM::ComboBox"
+end
+
+describe Y2NtpClient::Widgets::PublicList do
+  subject { described_class.new({}) }
+
+  include_examples "CWM::CustomWidget"
 end

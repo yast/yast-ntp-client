@@ -26,10 +26,10 @@ module Y2NtpClient
       def help
         # TRANSLATORS: 'man 8 netconfig' is a command, do not translate that
         _(
-          "The NTP configuration may be provided by the local network over DHCP. " \
+          "<p>The NTP configuration may be provided by the local network over DHCP. " \
           "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
           "In cases where there may be multiple DHCP sources, it can prioritize them: " \
-          "see 'man 8 netconfig'."
+          "see 'man 8 netconfig'.</p>"
         )
       end
 
@@ -127,7 +127,7 @@ module Y2NtpClient
           "Select whether to start the NTP daemon now and on every system boot. \n"            \
           "Selecting <b>Synchronize without Daemon</b> the NTP daemon will not be activated\n" \
           "and the system time will be set periodically by a <i>cron</i> script. \n"           \
-          "The interval is configurable, by default it is %d minutes."
+          "The interval is configurable, by default it is %d minutes.</p>"
         ) % Yast::NtpClientClass::DEFAULT_SYNC_INTERVAL
       end
 

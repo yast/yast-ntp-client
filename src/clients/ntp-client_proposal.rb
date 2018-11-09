@@ -184,20 +184,18 @@ module Yast
       end
 
       if NtpClient.config_has_been_read || NtpClient.ntp_selected
-        Builtins.y2milestone("ntp_items will be filled from /etc/chrony.conf")
+        log.info("ntp_items will be filled from /etc/chrony.conf")
         # grr, GUNS means all of them are used and here we just pick one
-        ntp_items = Builtins.maplist(NtpClient.GetUsedNtpServers) do |server|
-          Item(Id(server), server)
-        end
+        ntp_items = configured_ntp_items
+
         # avoid calling Read again (bnc #427712)
         NtpClient.config_has_been_read = true
       end
-      if ntp_items == []
-        Builtins.y2milestone(
-          "Nothing found in /etc/chrony.conf, proposing current timezone-based NTP server list"
-        )
-        time_zone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
-        ntp_items = NtpClient.GetNtpServersByCountry(time_zone_country, true)
+
+      if ntp_items.empty?
+        log.info("Nothing found in /etc/chrony.conf, " \
+          "proposing current timezone-based NTP server list")
+        ntp_items = dhcp_ntp_items.empty? ? timezone_ntp_items : dhcp_ntp_items
         NtpClient.config_has_been_read = true
       end
       ntp_items = Builtins.add(ntp_items, "")
@@ -473,6 +471,31 @@ module Yast
           )
         )
       end
+    end
+
+    # Configured ntp servers Yast::Term items with the ntp address as the ID
+    # and label
+    #
+    # @return [Yast::Term] ntp address table Item
+    def configured_ntp_items
+      NtpClient.GetUsedNtpServers
+    end
+
+    # Public list of ntp servers Yast::Term items with the ntp address as the
+    # ID and label
+    #
+    # @return [Array<Yast::Term>] ntp address Item
+    def timezone_ntp_items
+      timezone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
+      NtpClient.GetNtpServersByCountry(timezone_country, true)
+    end
+
+    # List of ntp servers Yast::Term items with the ntp address as the ID and
+    # label
+    #
+    # @return [Array<Yast::Term>] ntp address table Item
+    def dhcp_ntp_items
+      NtpClient.dhcp_ntp_servers
     end
   end
 end
