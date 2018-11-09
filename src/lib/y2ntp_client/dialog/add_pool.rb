@@ -79,7 +79,6 @@ module Y2NtpClient
           public: Widgets::PublicList }.fetch(type, Widgets::LocalList).new(@address_widget.value)
       end
 
-      # @macro see
       def min_height
         8
       end

@@ -251,8 +251,14 @@ module Y2NtpClient
         )
       end
 
+      # The value of this widget is the current country pool entry selected
       def value
         @country_pools.value
+      end
+
+      # @macro seeAbstractWidget
+      def help
+        _("<p>List of public ntp servers filtered by Country.")
       end
 
     private
