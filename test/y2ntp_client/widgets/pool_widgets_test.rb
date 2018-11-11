@@ -22,7 +22,7 @@ describe Y2NtpClient::Widgets::Iburst do
   include_examples "CWM::CheckBox"
 end
 
-describe Y2NtpClient::Widgets::Iburst do
+describe Y2NtpClient::Widgets::Offline do
   subject { described_class.new({}) }
 
   include_examples "CWM::CheckBox"
@@ -38,4 +38,10 @@ describe Y2NtpClient::Widgets::PublicList do
   subject { described_class.new({}) }
 
   include_examples "CWM::CustomWidget"
+end
+
+describe Y2NtpClient::Widgets::SelectFrom do
+  subject { described_class.new({}) }
+
+  include_examples "CWM::AbstractWidget"
 end

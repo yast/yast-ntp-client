@@ -13,6 +13,7 @@ module Yast
       textdomain "ntp-client"
 
       Yast.import "Address"
+      Yast.import "Lan"
       Yast.import "NetworkService"
       Yast.import "NtpClient"
       Yast.import "Service"
@@ -62,7 +63,7 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       when "dhcp_ntp_servers"
-        @ret = NtpClient.dhcp_ntp_servers
+        @ret = Yast::Lan.dhcp_ntp_servers
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
@@ -506,7 +507,7 @@ module Yast
       dhcp_items = dhcp_ntp_items
 
       log.info("Nothing found in /etc/chrony.conf")
-      unless dhcp_items.empty?
+      if dhcp_items.empty?
         log.info("Proposing current timezone-based NTP server list")
         return timezone_ntp_items
       end

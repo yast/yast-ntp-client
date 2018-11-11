@@ -2,12 +2,11 @@ require "yast"
 
 require "cwm/widget"
 require "y2ntp_client/dialog/add_pool"
-require "y2ntp_client/dynamic_servers"
 
 Yast.import "Address"
 Yast.import "NtpClient"
 Yast.import "Popup"
-Yast.import "NetworkService"
+Yast.import "Lan"
 
 module Y2NtpClient
   module Widgets
@@ -172,25 +171,29 @@ module Y2NtpClient
 
         super.merge(additional)
       end
+
+      def help
+        _("<p><b>Select</b> permits to choose a server from the list of servers" \
+          "offered by DHCP or from a public list filtered by country.</p>") \
+      end
     end
 
     # List of ntp servers obtained from DHCP
     class LocalList < CWM::SelectionBox
-      include DynamicServers
       # Constructor
       #
       # @param address [String] current ntp pool address
       def initialize(address)
         textdomain "ntp-client"
         @address = address
-
-        Yast::Popup.Feedback(_("Getting ntp sources from DHCP"), Yast::Message.takes_a_while) do
-          @servers = ntp_servers
-        end
+        @servers = []
       end
 
       # @macro seeAbstractWidget
       def init
+        Yast::Popup.Feedback(_("Getting ntp sources from DHCP"), Yast::Message.takes_a_while) do
+          @servers = ntp_servers
+        end
         self.value = @address
       end
 
@@ -222,7 +225,7 @@ module Y2NtpClient
       #
       # @return [Array<String>] list of ntp servers provided by dhcp
       def ntp_servers
-        dhcp_ntp_servers.reject { |s| Yast::NtpClient.ntp_conf.pools.keys.include?(s) }
+        Yast::Lan.dhcp_ntp_servers.reject { |s| Yast::NtpClient.ntp_conf.pools.keys.include?(s) }
       end
     end
 

@@ -82,6 +82,10 @@ module Y2NtpClient
       def min_height
         8
       end
+
+      def buttons
+        [ok_button, cancel_button]
+      end
     end
   end
 end

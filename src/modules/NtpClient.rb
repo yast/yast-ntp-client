@@ -12,7 +12,6 @@
 require "yast"
 require "yaml"
 require "cfa/chrony_conf"
-require "y2ntp_client/dynamic_servers"
 require "yast2/target_file" # required to cfa work on changed scr
 require "ui/text_helpers"
 
@@ -20,7 +19,6 @@ module Yast
   class NtpClientClass < Module
     include Logger
     include ::UI::TextHelpers
-    include ::Y2NtpClient::DynamicServers
 
     # the default synchronization interval in minutes when running in the manual
     # sync mode ("Synchronize without Daemon" option, ntp started from cron)
