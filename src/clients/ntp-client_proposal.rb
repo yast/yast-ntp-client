@@ -198,8 +198,8 @@ module Yast
       # Once read or proposed any config we consider it as read (bnc#427712)
       NtpClient.config_has_been_read = true
 
-      ntp_items = Builtins.add(ntp_items, "")
-      Builtins.y2milestone("ntp_items :%1", ntp_items)
+      ntp_items << ""
+      log.info "ntp_items :#{ntp_items}"
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       nil
@@ -473,16 +473,15 @@ module Yast
       end
     end
 
-    # Configured ntp servers Yast::Term items with the ntp address as the ID
-    # and as the label
+    # Configured ntp servers Yast::Term items with the ntp address ID and label
     #
     # @return [Yast::Term] ntp address table Item
     def configured_ntp_items
       NtpClient.GetUsedNtpServers.map { |s| Item(Id(s), s) }
     end
 
-    # Public list of ntp servers Yast::Term items with the ntp address as the
-    # ID and as the label
+    # Public list of ntp servers Yast::Term items with the ntp address ID and
+    # label
     #
     # @return [Array<Yast::Term>] ntp address Item
     def timezone_ntp_items
@@ -490,16 +489,15 @@ module Yast
       NtpClient.GetNtpServersByCountry(timezone_country, true)
     end
 
-    # List of dhcp ntp servers Yast::Term items with the ntp address as the
-    # ID and as the label
+    # List of dhcp ntp servers Yast::Term items with the ntp address ID and
+    # label
     #
     # @return [Array<Yast::Term>] ntp address table Item
     def dhcp_ntp_items
       NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s), s) }
     end
 
-    # List of ntp servers Yast::Term items with the ntp address as the ID and
-    # label
+    # List of ntp servers Yast::Term items with the ntp address ID and label
     #
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items

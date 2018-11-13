@@ -24,13 +24,14 @@ module Y2NtpClient
       end
 
       def help
-        # TRANSLATORS: 'man 8 netconfig' is a command, do not translate that
-        _(
-          "<p>The NTP configuration may be provided by the local network over DHCP. " \
-          "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
-          "In cases where there may be multiple DHCP sources, it can prioritize them: " \
-          "see 'man 8 netconfig'.</p>"
-        )
+        "<p>" +
+          # TRANSLATORS: 'man 8 netconfig' is a command, do not translate that
+          _(
+            "<p>The NTP configuration may be provided by the local network over DHCP. " \
+            "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
+            "In cases where there may be multiple DHCP sources, it can prioritize them: " \
+            "see 'man 8 netconfig'.</p>"
+          ) + "</p>"
       end
 
       def opt

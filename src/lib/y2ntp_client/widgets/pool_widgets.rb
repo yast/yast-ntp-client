@@ -21,6 +21,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
+        # TRANSLATORS: widget label
         _("A&ddress")
       end
 
@@ -52,6 +53,7 @@ module Y2NtpClient
       end
 
       def label
+        # TRANSLATORS: widget label
         _("Test")
       end
 
@@ -70,6 +72,7 @@ module Y2NtpClient
       end
 
       def label
+        # TRANSLATORS: widget label
         _("Quick Initial Sync")
       end
 
@@ -89,8 +92,7 @@ module Y2NtpClient
         "<p>" +
           _("<b>Quick Initial Sync</b> specifies whether the 'iburst' option is used. This " \
           "option sends 4 poll requests in 2 second intervals during the initialization. It is " \
-          "useful for a quick synchronization during the start of the machine.") +
-          "</p>"
+          "useful for a quick synchronization during the start of the machine.") + "</p>"
       end
     end
 
@@ -102,6 +104,7 @@ module Y2NtpClient
       end
 
       def label
+        # TRANSLATORS: widget label
         _("Start Offline")
       end
 
@@ -118,10 +121,11 @@ module Y2NtpClient
       end
 
       def help
-        _("<p><b>Start Offline</b> specifies whether the 'offline' option is used. This option " \
-          "skips this server during the start-up. It is useful for a machine which starts " \
-          "without the network, because it speeds up the boot, and synchronizes when the machine " \
-          "gets connected to the network.</p>")
+        "<p>" +
+          _("<b>Start Offline</b> specifies whether the 'offline' option is used. This option " \
+            "skips this server during the start-up. It is useful for a machine which starts " \
+            "without the network, because it speeds up the boot, and synchronizes when the " \
+            "machine gets connected to the network.") + "</p>"
       end
     end
 
@@ -134,6 +138,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
+        # TRANSLATORS: widget label
         _("Select")
       end
 
@@ -160,8 +165,7 @@ module Y2NtpClient
       # @macro seeAbstractWidget
       def cwm_definition
         additional = {}
-        # handle_events are by default widget_id, but in radio buttons, events are
-        # in fact single RadioButton
+        # handle also the items id events
         if !handle_all_events
           event_ids = items.map(&:first)
           additional["handle_events"] = event_ids
@@ -170,6 +174,7 @@ module Y2NtpClient
         super.merge(additional)
       end
 
+      # @macro seeAbstractWidget
       def help
         _("<p><b>Select</b> permits to choose a server from the list of servers" \
           "offered by DHCP or from a public list filtered by country.</p>") \
@@ -183,6 +188,7 @@ module Y2NtpClient
       # @param address [String] current ntp pool address
       def initialize(address)
         textdomain "ntp-client"
+
         @address = address
         @servers = []
       end
@@ -200,6 +206,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
+        # TRANSLATORS: widget label
         _("Syncronization server")
       end
 
@@ -246,12 +253,14 @@ module Y2NtpClient
       # @param address [String] current ntp pool address
       def initialize(address)
         textdomain "ntp-client"
+
         @country_pools = CountryPools.new
         @country = Country.new(country_for(address), @country_pools)
       end
 
       # @macro seeAbstractWidget
       def label
+        # TRANSLATORS: widget label
         _("Public Servers")
       end
 
@@ -271,7 +280,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def help
-        _("<p>List of public ntp servers filtered by Country.")
+        _("<p>List of public ntp servers filtered by country.</p>")
       end
 
     private
@@ -303,6 +312,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
+        # TRANSLATORS: widget label
         _("Country")
       end
 
@@ -342,6 +352,7 @@ module Y2NtpClient
 
       # macro seeAbstractWidget
       def label
+        # TRANSLATORS: widget label
         _("Ntp Servers")
       end
 

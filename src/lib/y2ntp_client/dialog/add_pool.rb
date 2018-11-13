@@ -37,6 +37,7 @@ module Y2NtpClient
 
       # @macro seeDialog
       def title
+        # TRANSLATORS: dialog title
         _("Local ntp servers discovered")
       end
 
@@ -74,9 +75,12 @@ module Y2NtpClient
         PushButton(Id(:next), Opt(:default), ok_button_label)
       end
 
+      def available_pools
+        { local:  Widgets::LocalList, public: Widgets::PublicList }
+      end
+
       def pool_for(type)
-        { local:  Widgets::LocalList,
-          public: Widgets::PublicList }.fetch(type, Widgets::LocalList).new(@address_widget.value)
+        available_pools.fetch(type, Widgets::LocalList).new(@address_widget.value)
       end
 
       def min_height
