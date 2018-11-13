@@ -13,7 +13,6 @@ module Yast
       textdomain "ntp-client"
 
       Yast.import "Address"
-      Yast.import "Lan"
       Yast.import "NetworkService"
       Yast.import "NtpClient"
       Yast.import "Service"
@@ -63,7 +62,7 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       when "dhcp_ntp_servers"
-        @ret = Yast::Lan.dhcp_ntp_servers
+        @ret = NtpClient.dhcp_ntp_servers
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
@@ -496,7 +495,7 @@ module Yast
     #
     # @return [Array<Yast::Term>] ntp address table Item
     def dhcp_ntp_items
-      Yast::Lan.dhcp_ntp_servers.map { |s| Item(Id(s), s) }
+      NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s), s) }
     end
 
     # List of ntp servers Yast::Term items with the ntp address as the ID and

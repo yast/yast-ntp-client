@@ -56,6 +56,7 @@ module Yast
 
       Yast.import "Directory"
       Yast.import "FileUtils"
+      Yast.import "Lan"
       Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
@@ -578,6 +579,12 @@ module Yast
     # @return [Hash] of packages to be installed and to be removed
     def AutoPackages
       { "install" => @required_packages, "remove" => [] }
+    end
+
+    # Convenience method to obtain the list of ntp servers proposed by DHCP
+    # @see https://www.rubydoc.info/github/yast/yast-network/Yast/LanClass:${0}
+    def dhcp_ntp_servers
+      Yast::Lan.dhcp_ntp_servers
     end
 
     publish variable: :AbortFunction, type: "boolean ()"

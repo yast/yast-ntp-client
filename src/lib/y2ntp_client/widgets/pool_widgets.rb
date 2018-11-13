@@ -6,7 +6,6 @@ require "y2ntp_client/dialog/add_pool"
 Yast.import "Address"
 Yast.import "NtpClient"
 Yast.import "Popup"
-Yast.import "Lan"
 
 module Y2NtpClient
   module Widgets
@@ -130,7 +129,6 @@ module Y2NtpClient
     # address input field.
     class SelectFrom < CWM::MenuButton
       def initialize(address_widget)
-        Yast.import "Popup"
         @address_widget = address_widget
       end
 
@@ -191,9 +189,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def init
-        Yast::Popup.Feedback(_("Getting ntp sources from DHCP"), Yast::Message.takes_a_while) do
-          @servers = ntp_servers
-        end
+        read_available_servers
         self.value = @address
       end
 
@@ -220,12 +216,26 @@ module Y2NtpClient
 
     private
 
+      # Convenience method to read and initialize the list of available servers
+      def read_available_servers
+        Yast::Popup.Feedback(_("Getting ntp sources from DHCP"), Yast::Message.takes_a_while) do
+          @servers = available_servers
+        end
+      end
+
       # List of available ntp servers provided by DHCP. Servers already in use
       # are discarded.
       #
       # @return [Array<String>] list of ntp servers provided by dhcp
-      def ntp_servers
-        Yast::Lan.dhcp_ntp_servers.reject { |s| Yast::NtpClient.ntp_conf.pools.keys.include?(s) }
+      def available_servers
+        Yast::NtpClient.dhcp_ntp_servers.reject { |s| configured_servers.include?(s) }
+      end
+
+      # List of ntp servers in use.
+      #
+      # @return [Array<String>] list of already configured ntp servers
+      def configured_servers
+        Yast::NtpClient.ntp_conf.pools.keys
       end
     end
 
