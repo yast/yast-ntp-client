@@ -56,7 +56,7 @@ module Y2NtpClient
 
       def label
         # TRANSLATORS: push button label
-        _("&Test")
+        _("Test")
       end
 
       def handle
@@ -92,9 +92,16 @@ module Y2NtpClient
       end
 
       def help
+        "<p>#{help_text}</p>"
+      end
+
+    private
+
+      def help_text
         # TRANSLATORS: checkbox help for enabling quick synchronization
-        _("<p><b>Quick Initial Sync</b> is useful for a quick synchronization" \
-          "during the start of the machine.</p>")
+        _("<b>Quick Initial Sync</b> specifies whether the 'iburst' option is used. This option " \
+        "sends 4 poll requests in 2 second intervals during the initialization. It is useful for " \
+        "a quick synchronization during the start of the machine.")
       end
     end
 
@@ -130,9 +137,17 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def help
+        "<p>#{help_text}</p>"
+      end
+
+    private
+
+      def help_text
         # TRANSLATORS: help text for the offline check box
-        _("<p><b>Start Offline</b> marks the server to be skiped during the start-up, but" \
-          "will synchronize once the machine gets connected to the network.</p>")
+        _("<b>Start Offline</b> specifies whether the 'offline' option is used. This option " \
+          "skips this server during the start-up. It is useful for a machine which starts " \
+          "without the network, because it speeds up the boot, and synchronizes when the machine " \
+          "gets connected to the network.")
       end
     end
 
