@@ -30,6 +30,7 @@ module Y2NtpClient
       # @param pool_type [Symbol]
       def initialize(address_widget, pool_type)
         textdomain "ntp-client"
+
         @address_widget = address_widget
         @address = @address_widget.value
         @pool_chooser = pool_for(pool_type)
@@ -37,8 +38,8 @@ module Y2NtpClient
 
       # @macro seeDialog
       def title
-        # TRANSLATORS: dialog title
-        _("Local ntp servers discovered")
+        # TRANSLATORS: title for choosing a ntp server dialog
+        _("Available NTP servers")
       end
 
       # @macro seeDialog

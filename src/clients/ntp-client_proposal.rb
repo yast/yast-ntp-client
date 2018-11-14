@@ -198,7 +198,6 @@ module Yast
       # Once read or proposed any config we consider it as read (bnc#427712)
       NtpClient.config_has_been_read = true
 
-      ntp_items << ""
       log.info "ntp_items :#{ntp_items}"
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 

@@ -24,14 +24,11 @@ module Y2NtpClient
       end
 
       def help
-        "<p>" +
-          # TRANSLATORS: 'man 8 netconfig' is a command, do not translate that
-          _(
-            "<p>The NTP configuration may be provided by the local network over DHCP. " \
-            "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
-            "In cases where there may be multiple DHCP sources, it can prioritize them: " \
-            "see 'man 8 netconfig'.</p>"
-          ) + "</p>"
+        # TRANSLATORS: configuration source combo box help
+        _("<p>The NTP configuration may be provided by the local network over DHCP. " \
+          "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
+          "In cases where there may be multiple DHCP sources, it can prioritize them: " \
+          "see '%{manual}'.</p>") % { manual: "man 8 netconfig" }
       end
 
       def opt
@@ -40,9 +37,9 @@ module Y2NtpClient
 
       def items
         items = [
-          # combo box item
+          # TRANSLATORS: combo box item
           ["", _("Static")],
-          # combo box item
+          # TRANSLATORS: combo box item
           ["auto", _("Dynamic")]
         ]
         current_policy = Yast::NtpClient.ntp_policy

@@ -16,12 +16,13 @@ module Y2NtpClient
       # @macro seeAbstractWidget
       def initialize(initial_value)
         textdomain "ntp-client"
+
         @address = initial_value
       end
 
       # @macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: input field label
         _("A&ddress")
       end
 
@@ -49,12 +50,13 @@ module Y2NtpClient
     class TestButton < CWM::PushButton
       def initialize(address_widget)
         textdomain "ntp-client"
+
         @address_widget = address_widget
       end
 
       def label
-        # TRANSLATORS: widget label
-        _("Test")
+        # TRANSLATORS: push button label
+        _("&Test")
       end
 
       def handle
@@ -68,11 +70,12 @@ module Y2NtpClient
     class Iburst < CWM::CheckBox
       def initialize(options)
         textdomain "ntp-client"
+
         @options = options
       end
 
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: checkbox label
         _("Quick Initial Sync")
       end
 
@@ -89,29 +92,34 @@ module Y2NtpClient
       end
 
       def help
-        "<p>" +
-          _("<b>Quick Initial Sync</b> specifies whether the 'iburst' option is used. This " \
-          "option sends 4 poll requests in 2 second intervals during the initialization. It is " \
-          "useful for a quick synchronization during the start of the machine.") + "</p>"
+        # TRANSLATORS: checkbox help for enabling quick synchronization
+        _("<p><b>Quick Initial Sync</b> is useful for a quick synchronization" \
+          "during the start of the machine.</p>")
       end
     end
 
     # Enable offline option
     class Offline < CWM::CheckBox
+      # Constructor
+      #
+      # @param options [Hash] current ntp server address options
       def initialize(options)
         textdomain "ntp-client"
         @options = options
       end
 
+      # @macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: check box label
         _("Start Offline")
       end
 
+      # @macro seeAbstractWidget
       def init
         self.value = @options.key?("offline")
       end
 
+      # @macro seeAbstractWidget
       def store
         if value
           @options["offline"] = nil
@@ -120,25 +128,27 @@ module Y2NtpClient
         end
       end
 
+      # @macro seeAbstractWidget
       def help
-        "<p>" +
-          _("<b>Start Offline</b> specifies whether the 'offline' option is used. This option " \
-            "skips this server during the start-up. It is useful for a machine which starts " \
-            "without the network, because it speeds up the boot, and synchronizes when the " \
-            "machine gets connected to the network.") + "</p>"
+        # TRANSLATORS: help text for the offline check box
+        _("<p><b>Start Offline</b> marks the server to be skiped during the start-up, but" \
+          "will synchronize once the machine gets connected to the network.</p>")
       end
     end
 
     # Menu Button for choosing which type of server should be added to the
     # address input field.
     class SelectFrom < CWM::MenuButton
+      # Constructor
+      #
+      # @param address_widget [PoolAddress] the dialog pool address widget
       def initialize(address_widget)
         @address_widget = address_widget
       end
 
       # @macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: menu button label
         _("Select")
       end
 
@@ -149,15 +159,15 @@ module Y2NtpClient
 
       # @macro seeItemsSelection
       def items
+        # TRANSLATORS: Menu button entries for choosing an address from a local
+        #   servers list or from a public one
         [[:local, _("Local Server")], [:public, _("Public Server")]]
       end
 
       # @macro seeAbstractWidget
       def handle(event)
-        case event["ID"]
-        when :local, :public
-          Dialog::AddPool.new(@address_widget, event["ID"]).run
-        end
+        id = event["ID"]
+        Dialog::AddPool.new(@address_widget, id).run if [:local, :public].include?(id)
 
         nil
       end
@@ -176,16 +186,17 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def help
+        # TRANSLATORS: Help for the select menu button
         _("<p><b>Select</b> permits to choose a server from the list of servers" \
           "offered by DHCP or from a public list filtered by country.</p>") \
       end
     end
 
-    # List of ntp servers obtained from DHCP
+    # List of NTP servers obtained from DHCP
     class LocalList < CWM::SelectionBox
       # Constructor
       #
-      # @param address [String] current ntp pool address
+      # @param address [String] current NTP pool address
       def initialize(address)
         textdomain "ntp-client"
 
@@ -206,8 +217,8 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
-        _("Syncronization server")
+        # TRANSLATORS: selection box label
+        _("Synchronization Server")
       end
 
       # @macro seeItemsSelection
@@ -217,7 +228,8 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def help
-        _("<p>List of available ntp servers provided by DHCP. " \
+        # TRANSLATORS: help text for the local servers selection box
+        _("<p>List of available NTP servers provided by DHCP. " \
           "Servers already in use are discarded.</p>")
       end
 
@@ -225,32 +237,32 @@ module Y2NtpClient
 
       # Convenience method to read and initialize the list of available servers
       def read_available_servers
-        Yast::Popup.Feedback(_("Getting ntp sources from DHCP"), Yast::Message.takes_a_while) do
+        Yast::Popup.Feedback(_("Getting NTP sources from DHCP"), Yast::Message.takes_a_while) do
           @servers = available_servers
         end
       end
 
-      # List of available ntp servers provided by DHCP. Servers already in use
+      # List of available NTP servers provided by DHCP. Servers already in use
       # are discarded.
       #
-      # @return [Array<String>] list of ntp servers provided by dhcp
+      # @return [Array<String>] list of NTP servers provided by DHCP
       def available_servers
         Yast::NtpClient.dhcp_ntp_servers.reject { |s| configured_servers.include?(s) }
       end
 
-      # List of ntp servers in use.
+      # List of NTP servers in use.
       #
-      # @return [Array<String>] list of already configured ntp servers
+      # @return [Array<String>] list of already configured NTP servers
       def configured_servers
         Yast::NtpClient.ntp_conf.pools.keys
       end
     end
 
-    # List of public ntp servers filtered by country
+    # List of public NTP servers filtered by country
     class PublicList < CWM::CustomWidget
       # Constructor
       #
-      # @param address [String] current ntp pool address
+      # @param address [String] current NTP pool address
       def initialize(address)
         textdomain "ntp-client"
 
@@ -260,7 +272,8 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: custom widget label, the widget permits to select a
+        # public server from a selection box, filtering the list by country
         _("Public Servers")
       end
 
@@ -280,7 +293,8 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def help
-        _("<p>List of public ntp servers filtered by country.</p>")
+        # TRANSLATORS: help text for the public servers custom widget
+        _("<p>List of public NTP servers filtered by country.</p>")
       end
 
     private
@@ -312,7 +326,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: combo box label
         _("Country")
       end
 
@@ -335,6 +349,7 @@ module Y2NtpClient
       end
 
       def country_names
+        # TRANSLATORS: Combo box entry for not filtering entries
         { "" => _("ALL") }.merge(Yast::NtpClient.GetCountryNames)
       end
     end
@@ -352,7 +367,7 @@ module Y2NtpClient
 
       # macro seeAbstractWidget
       def label
-        # TRANSLATORS: widget label
+        # TRANSLATORS: combo box label
         _("Ntp Servers")
       end
 
