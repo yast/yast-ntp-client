@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        4.1.4
+Version:        4.1.5
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0-or-later
@@ -40,7 +40,8 @@ Requires:       augeas-lenses
 Requires:       yast2 >= 3.2.21
 Requires:       yast2-country-data
 # needed for network/config agent
-Requires:       yast2-network
+# Yast::Lan.dhcp_ntp_servers
+Requires:       yast2-network >= 4.1.17
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildArch:      noarch
