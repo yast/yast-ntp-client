@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Thu Nov  8 19:20:26 UTC 2018 - knut.andersse@suse.com
+
+- fate#323454
+  - Bring back the menu button for choosing an NTP address from a
+    public NTP servers list or from the ones returned by DHCP.
+  - When no configuration is proposed by default, then use the DHCP
+    offered servers as fallback.
+- Do not synchronize if chronyd service is running (bsc#1087048)
+- 4.0.15
+
+-------------------------------------------------------------------
 Thu Nov  8 15:20:26 UTC 2018 - knut.andersse@suse.com
 
 - Save the service status according to the user preferences

@@ -61,6 +61,8 @@ module Yast
       when "SetUseNTP"
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
+      when "dhcp_ntp_servers"
+        @ret = NtpClient.dhcp_ntp_servers
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
@@ -128,7 +130,10 @@ module Yast
     def ui_enable_disable_widgets(enabled)
       UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
       UI.ChangeWidget(Id(:run_service), :Enabled, enabled)
-      if !NetworkService.isNetworkRunning
+      # FIXME: With chronyd, we cannot synchronize if the service is already
+      # running, we could force a makestep in this case, but then the button
+      # should be reworded and maybe the user should confirm it (bsc#1087048)
+      if !NetworkService.isNetworkRunning || Service.Active(NtpClient.service_name)
         UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
       else
         UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
@@ -184,24 +189,16 @@ module Yast
       end
 
       if NtpClient.config_has_been_read || NtpClient.ntp_selected
-        Builtins.y2milestone("ntp_items will be filled from /etc/chrony.conf")
+        log.info("ntp_items will be filled from /etc/chrony.conf")
         # grr, GUNS means all of them are used and here we just pick one
-        ntp_items = Builtins.maplist(NtpClient.GetUsedNtpServers) do |server|
-          Item(Id(server), server)
-        end
-        # avoid calling Read again (bnc #427712)
-        NtpClient.config_has_been_read = true
+        ntp_items = configured_ntp_items
       end
-      if ntp_items == []
-        Builtins.y2milestone(
-          "Nothing found in /etc/chrony.conf, proposing current timezone-based NTP server list"
-        )
-        time_zone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
-        ntp_items = NtpClient.GetNtpServersByCountry(time_zone_country, true)
-        NtpClient.config_has_been_read = true
-      end
-      ntp_items = Builtins.add(ntp_items, "")
-      Builtins.y2milestone("ntp_items :%1", ntp_items)
+
+      ntp_items = fallback_ntp_items if ntp_items.empty?
+      # Once read or proposed any config we consider it as read (bnc#427712)
+      NtpClient.config_has_been_read = true
+
+      log.info "ntp_items :#{ntp_items}"
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       nil
@@ -360,7 +357,7 @@ module Yast
       return :success if params["write_only"]
 
       # Only if network is running try to synchronize the ntp server
-      if NetworkService.isNetworkRunning
+      if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
         exit_code = NtpClient.sync_once(ntp_server)
         Popup.ClearFeedback
@@ -473,6 +470,46 @@ module Yast
           )
         )
       end
+    end
+
+    # Configured ntp servers Yast::Term items with the ntp address ID and label
+    #
+    # @return [Yast::Term] ntp address table Item
+    def configured_ntp_items
+      NtpClient.GetUsedNtpServers.map { |s| Item(Id(s), s) }
+    end
+
+    # Public list of ntp servers Yast::Term items with the ntp address ID and
+    # label
+    #
+    # @return [Array<Yast::Term>] ntp address Item
+    def timezone_ntp_items
+      timezone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
+      NtpClient.GetNtpServersByCountry(timezone_country, true)
+    end
+
+    # List of dhcp ntp servers Yast::Term items with the ntp address ID and
+    # label
+    #
+    # @return [Array<Yast::Term>] ntp address table Item
+    def dhcp_ntp_items
+      NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s), s) }
+    end
+
+    # List of ntp servers Yast::Term items with the ntp address ID and label
+    #
+    # @return [Array<Yast::Term>] ntp address table Item
+    def fallback_ntp_items
+      dhcp_items = dhcp_ntp_items
+
+      log.info("Nothing found in /etc/chrony.conf")
+      if dhcp_items.empty?
+        log.info("Proposing current timezone-based NTP server list")
+        return timezone_ntp_items
+      end
+
+      log.info("Proposing NTP server list provided by DHCP")
+      dhcp_items
     end
   end
 end

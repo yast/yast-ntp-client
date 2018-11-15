@@ -1,3 +1,5 @@
+#! /usr/bin/env rspec
+
 require_relative "test_helper"
 
 require_relative "../src/clients/ntp-client_proposal.rb"
@@ -33,6 +35,7 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages)
       allow(Yast::Report).to receive(:Error)
       allow(Yast::NetworkService).to receive(:isNetworkRunning).and_return(network_running)
+      allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(false)
     end
 
     context "with a not valid hostname" do
@@ -152,6 +155,13 @@ describe Yast::NtpClientProposalClient do
 
         it "does not write settings" do
           expect(subject).to_not receive(:WriteNtpSettings)
+
+          subject.Write(params)
+        end
+
+        it "does not try to synchronize if the service is running" do
+          allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(true)
+          expect(Yast::NtpClient).to_not receive(:sync_once)
 
           subject.Write(params)
         end
