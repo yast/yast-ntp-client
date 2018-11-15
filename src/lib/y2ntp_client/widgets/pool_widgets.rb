@@ -157,7 +157,7 @@ module Y2NtpClient
       # @macro seeAbstractWidget
       def label
         # TRANSLATORS: menu button label
-        _("Select")
+        _("&Select")
       end
 
       # @macro seeAbstractWidget
@@ -376,7 +376,7 @@ module Y2NtpClient
       # macro seeAbstractWidget
       def label
         # TRANSLATORS: combo box label
-        _("Ntp Servers")
+        _("NTP Servers")
       end
 
       # macro seeItemsSelection
