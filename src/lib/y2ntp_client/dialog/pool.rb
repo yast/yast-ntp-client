@@ -32,10 +32,19 @@ module Y2NtpClient
           HBox(
             @address_widget,
             HSpacing(),
-            Widgets::TestButton.new(@address_widget)
+            VBox(
+              VSpacing(1),
+              Widgets::SelectFrom.new(@address_widget)
+            ),
+            HSpacing(),
+            VBox(
+              VSpacing(1),
+              Widgets::TestButton.new(@address_widget)
+            )
           ),
           VSpacing(),
           HBox(
+            HSpacing(),
             Widgets::Iburst.new(@options),
             HSpacing(),
             Widgets::Offline.new(@options)

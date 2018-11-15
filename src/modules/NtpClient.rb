@@ -56,6 +56,7 @@ module Yast
 
       Yast.import "Directory"
       Yast.import "FileUtils"
+      Yast.import "Lan"
       Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
@@ -95,8 +96,8 @@ module Yast
       @service_name = "chronyd"
 
       # Netconfig policy: for merging and prioritizing static and DHCP config.
-      # FIXME: get a public URL
-      # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
+      # https://github.com/openSUSE/sysconfig/blob/master/doc/README.netconfig
+      # https://github.com/openSUSE/sysconfig/blob/master/config/sysconfig.config-network
       @ntp_policy = DEFAULT_NTP_POLICY
 
       # Active Directory controller
@@ -192,7 +193,7 @@ module Yast
       deep_copy(@ntp_servers)
     end
 
-    # Get the mapping between country codea and names ("CZ" -> "Czech Republic")
+    # Get the mapping between country codes and names ("CZ" -> "Czech Republic")
     # @return a map the country codes and names mapping
     def GetCountryNames
       if @country_names.nil?
@@ -578,6 +579,12 @@ module Yast
     # @return [Hash] of packages to be installed and to be removed
     def AutoPackages
       { "install" => @required_packages, "remove" => [] }
+    end
+
+    # Convenience method to obtain the list of ntp servers proposed by DHCP
+    # @see https://www.rubydoc.info/github/yast/yast-network/Yast/LanClass:${0}
+    def dhcp_ntp_servers
+      Yast::Lan.dhcp_ntp_servers
     end
 
     publish variable: :AbortFunction, type: "boolean ()"

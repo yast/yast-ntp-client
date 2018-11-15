@@ -1,3 +1,5 @@
+#! /usr/bin/env rspec
+
 require_relative "test_helper"
 
 require_relative "../src/clients/ntp-client_proposal.rb"
@@ -33,6 +35,7 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages)
       allow(Yast::Report).to receive(:Error)
       allow(Yast::NetworkService).to receive(:isNetworkRunning).and_return(network_running)
+      allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(false)
     end
 
     context "with a not valid hostname" do
@@ -140,14 +143,14 @@ describe Yast::NtpClientProposalClient do
           expect(subject.Write(params)).to eq(:ntpdate_failed)
         end
 
-        it "returns :success if syncronization was successfully" do
+        it "returns :success if synchronization was successfully" do
           allow(Yast::NtpClient).to receive(:sync_once).with(ntp_server).and_return(0)
 
           expect(subject.Write(params)).to eq(:success)
         end
       end
 
-      context "and user only wants to syncronize date" do
+      context "and user only wants to synchronize date" do
         let(:ntpdate_only) { true }
 
         it "does not write settings" do
@@ -155,9 +158,16 @@ describe Yast::NtpClientProposalClient do
 
           subject.Write(params)
         end
+
+        it "does not try to synchronize if the service is running" do
+          allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(true)
+          expect(Yast::NtpClient).to_not receive(:sync_once)
+
+          subject.Write(params)
+        end
       end
 
-      context "and user wants to syncronize on boot" do
+      context "and user wants to synchronize on boot" do
         it "writes settings only once" do
           expect(subject).to receive(:WriteNtpSettings).once
 
