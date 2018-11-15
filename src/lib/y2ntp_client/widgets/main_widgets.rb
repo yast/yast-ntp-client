@@ -24,7 +24,12 @@ module Y2NtpClient
       end
 
       def help
-        "<p>#{help_text}</p>"
+        # TRANSLATORS: configuration source combo box help, %{manual} is a
+        # manual page reference, e.g. "man 8 netconfig"
+        _("<p>The NTP configuration may be provided by the local network over DHCP. " \
+          "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
+          "In cases where there may be multiple DHCP sources, it can prioritize them: " \
+          "see '%{manual}'.</p>") % { manual: "man 8 netconfig" }
       end
 
       def opt
@@ -67,18 +72,6 @@ module Y2NtpClient
         log.info "ntp policy modifed to #{value.inspect}"
         Yast::NtpClient.modified = true
         Yast::NtpClient.ntp_policy = value
-      end
-
-    private
-
-      def help_text
-        # TRANSLATORS: 'man 8 netconfig' is a command, do not translate that
-        _(
-          "The NTP configuration may be provided by the local network over DHCP. " \
-          "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
-          "In cases where there may be multiple DHCP sources, it can prioritize them: " \
-          "see 'man 8 netconfig'."
-        )
       end
     end
 
@@ -133,7 +126,7 @@ module Y2NtpClient
           "Select whether to start the NTP daemon now and on every system boot. \n"            \
           "Selecting <b>Synchronize without Daemon</b> the NTP daemon will not be activated\n" \
           "and the system time will be set periodically by a <i>cron</i> script. \n"           \
-          "The interval is configurable, by default it is %d minutes."
+          "The interval is configurable, by default it is %d minutes.</p>"
         ) % Yast::NtpClientClass::DEFAULT_SYNC_INTERVAL
       end
 

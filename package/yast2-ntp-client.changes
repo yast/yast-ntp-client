@@ -7,6 +7,8 @@ Thu Nov  8 19:20:26 UTC 2018 - knut.andersse@suse.com
   - When no configuration is proposed by default, then use the DHCP
     offered servers as fallback.
 - Do not synchronize if chronyd service is running (bsc#1087048)
+- Use the title style capitalization in "Synchronize Now" button
+  (bsc#1039987)
 - 4.1.5
 
 -------------------------------------------------------------------

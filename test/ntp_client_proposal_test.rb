@@ -143,14 +143,14 @@ describe Yast::NtpClientProposalClient do
           expect(subject.Write(params)).to eq(:ntpdate_failed)
         end
 
-        it "returns :success if syncronization was successfully" do
+        it "returns :success if synchronization was successfully" do
           allow(Yast::NtpClient).to receive(:sync_once).with(ntp_server).and_return(0)
 
           expect(subject.Write(params)).to eq(:success)
         end
       end
 
-      context "and user only wants to syncronize date" do
+      context "and user only wants to synchronize date" do
         let(:ntpdate_only) { true }
 
         it "does not write settings" do
@@ -167,7 +167,7 @@ describe Yast::NtpClientProposalClient do
         end
       end
 
-      context "and user wants to syncronize on boot" do
+      context "and user wants to synchronize on boot" do
         it "writes settings only once" do
           expect(subject).to receive(:WriteNtpSettings).once
 

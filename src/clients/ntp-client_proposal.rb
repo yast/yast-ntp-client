@@ -220,14 +220,14 @@ module Yast
                 ComboBox(
                   Id(:ntp_address),
                   Opt(:editable, :hstretch),
-                  # combo box label
+                  # TRANSLATORS: combo box label
                   _("&NTP Server Address")
                 )
               ),
               VSpacing(0.3),
               HBox(
                 HSpacing(0.5),
-                # check box label
+                # TRANSLATORS: check box label
                 Left(
                   CheckBox(
                     Id(:run_service),
@@ -238,7 +238,7 @@ module Yast
               ),
               HBox(
                 HSpacing(0.5),
-                # check box label
+                # TRANSLATORS: check box label
                 Left(
                   CheckBox(Id(:ntp_save), _("&Save NTP Configuration"), true)
                 )
@@ -249,10 +249,10 @@ module Yast
             1,
             VBox(
               Label(""),
-              # push button label
-              Left(PushButton(Id(:ntp_now), _("S&ynchronize now"))),
+              # TRANSLATORS: push button label
+              Left(PushButton(Id(:ntp_now), _("S&ynchronize Now"))),
               VSpacing(0.3),
-              # push button label
+              # TRANSLATORS: push button label
               # bnc#449615: only simple config for inst-sys
               Stage.initial ? Label("") : Left(PushButton(Id(:ntp_configure), _("&Configure..."))),
               Label("")
