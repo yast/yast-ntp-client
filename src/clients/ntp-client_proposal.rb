@@ -214,17 +214,29 @@ module Yast
           HSpacing(3),
           HWeight(
             1,
+            Left(
+              ComboBox(
+                Id(:ntp_address),
+                Opt(:editable, :hstretch),
+                # combo box label
+                _("&NTP Server Address")
+              )
+            )
+          ),
+          HWeight(
+            1,
             VBox(
-              VSpacing(0.5),
-              Left(
-                ComboBox(
-                  Id(:ntp_address),
-                  Opt(:editable, :hstretch),
-                  # combo box label
-                  _("&NTP Server Address")
-                )
-              ),
-              VSpacing(0.3),
+              VSpacing(1),
+              # push button label
+              Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
+            )
+          )
+        ),
+        HBox(
+          HSpacing(3),
+          HWeight(
+            1,
+            VBox(
               HBox(
                 HSpacing(0.5),
                 # check box label
@@ -248,10 +260,6 @@ module Yast
           HWeight(
             1,
             VBox(
-              Label(""),
-              # push button label
-              Left(PushButton(Id(:ntp_now), _("S&ynchronize now"))),
-              VSpacing(0.3),
               # push button label
               # bnc#449615: only simple config for inst-sys
               Stage.initial ? Label("") : Left(PushButton(Id(:ntp_configure), _("&Configure..."))),
