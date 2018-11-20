@@ -214,17 +214,32 @@ module Yast
           HSpacing(3),
           HWeight(
             1,
+            Left(
+              ComboBox(
+                Id(:ntp_address),
+                Opt(:editable, :hstretch),
+                # TRANSLATORS: combo box label
+                _("&NTP Server Address")
+              )
+            )
+          ),
+          HWeight(
+            1,
             VBox(
-              VSpacing(0.5),
-              Left(
-                ComboBox(
-                  Id(:ntp_address),
-                  Opt(:editable, :hstretch),
-                  # combo box label
-                  _("&NTP Server Address")
-                )
-              ),
-              VSpacing(0.3),
+              # In TextMode and empty label is not filling an extra space, so
+              # an explicit vertical space was added in order to move down the
+              # push button being aligned with the combo box input.
+              UI.TextMode ? VSpacing(1) : Label(""),
+              # TRANSLATORS: push button label
+              Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
+            )
+          )
+        ),
+        HBox(
+          HSpacing(3),
+          HWeight(
+            1,
+            VBox(
               HBox(
                 HSpacing(0.5),
                 # check box label
@@ -238,7 +253,7 @@ module Yast
               ),
               HBox(
                 HSpacing(0.5),
-                # check box label
+                # TRANSLATORS: check box label
                 Left(
                   CheckBox(Id(:ntp_save), _("&Save NTP Configuration"), true)
                 )
@@ -248,11 +263,7 @@ module Yast
           HWeight(
             1,
             VBox(
-              Label(""),
-              # push button label
-              Left(PushButton(Id(:ntp_now), _("S&ynchronize now"))),
-              VSpacing(0.3),
-              # push button label
+              # TRANSLATORS: push button label
               # bnc#449615: only simple config for inst-sys
               Stage.initial ? Label("") : Left(PushButton(Id(:ntp_configure), _("&Configure..."))),
               Label("")
