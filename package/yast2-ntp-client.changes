@@ -2,7 +2,8 @@
 Wed Nov 14 21:32:26 UTC 2018 - knut.andersse@suse.com
 
 - Aligned "Synchronize Now" button and "NTP Server Address" box not
-  breaking previous fix (bnc#893065, bsc#1039985)
+  breaking previous fix and not hiding the manual checkbox in
+  TextMode (bnc#893065, bsc#1039985).
 - 4.0.16
 
 -------------------------------------------------------------------
