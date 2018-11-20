@@ -226,7 +226,7 @@ module Yast
           HWeight(
             1,
             VBox(
-              VSpacing(1),
+              UI.TextMode ? VSpacing(1) : Label(""),
               # push button label
               Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
             )
