@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        4.1.6
+Version:        4.1.7
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0-or-later
@@ -81,7 +81,7 @@ fi
 %{yast_schemadir}/autoyast/rnc/ntpclient.rnc
 %{yast_dir}/lib
 %ghost /etc/cron.d/suse-ntp_synchronize
-
+%{_datadir}/icons/*
 %dir %{yast_docdir}
 %license COPYING
 %doc %{yast_docdir}/README.md

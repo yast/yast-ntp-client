@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sun Nov 25 20:37:21 UTC 2018 - Noah Davis <noahadvs@gmail.com>
+
+- Provide icon with module (boo#1109310)
+
+-------------------------------------------------------------------
 Wed Nov 14 21:32:26 UTC 2018 - knut.andersse@suse.com
 
 - Aligned "Synchronize Now" button and "NTP Server Address" box not
