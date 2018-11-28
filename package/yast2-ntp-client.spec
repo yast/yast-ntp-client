@@ -81,7 +81,7 @@ fi
 %{yast_schemadir}/autoyast/rnc/ntpclient.rnc
 %{yast_dir}/lib
 %ghost /etc/cron.d/suse-ntp_synchronize
-%{_datadir}/icons/*
+%{yast_icondir}
 %dir %{yast_docdir}
 %license COPYING
 %doc %{yast_docdir}/README.md
