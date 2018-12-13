@@ -203,7 +203,7 @@ module Yast
       )
       log.info("'sntp #{server}' returned #{ret}")
 
-      ret["exit"]
+      ret
     end
 
     # Reads and returns all known countries with their country codes
