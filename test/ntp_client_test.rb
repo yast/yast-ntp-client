@@ -475,6 +475,33 @@ describe Yast::NtpClient do
     end
   end
 
+  describe "#sync_once" do
+    let(:output) { { "stdout" => "", "stderr" => "", "exit" => 0 } }
+    let(:server) { "sntp.server.de" }
+
+    before do
+      allow(Yast::SCR).to receive(:Execute)
+    end
+
+    it "syncs the system time against the specified server" do
+      expect(Yast::SCR).to receive(:Execute)
+        .with(Yast::Path.new(".target.bash_output"),
+          "/usr/sbin/chronyd -q -t 30 'pool #{server} iburst'")
+        .and_return(output)
+
+      subject.sync_once(server)
+    end
+
+    it "returns the syncronization exit code" do
+      expect(Yast::SCR).to receive(:Execute)
+        .with(Yast::Path.new(".target.bash_output"),
+          "/usr/sbin/chronyd -q -t 30 'pool #{server} iburst'")
+        .and_return(output)
+
+      expect(subject.sync_once(server)).to eql(0)
+    end
+  end
+
   describe "#ntp_test" do
     let(:ip_version) { 4 }
     let(:server) { "sntp.server.de" }
