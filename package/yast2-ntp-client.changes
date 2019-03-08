@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar  8 14:39:23 UTC 2019 - knut.anderssen@suse.com
+
+- Added cwm/popup dependency (bsc#893065, bsc#1039985)
+- 4.0.17
+
+-------------------------------------------------------------------
 Wed Nov 14 21:32:26 UTC 2018 - knut.andersse@suse.com
 
 - Aligned "Synchronize Now" button and "NTP Server Address" box not
