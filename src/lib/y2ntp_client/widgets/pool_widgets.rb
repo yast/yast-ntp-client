@@ -151,6 +151,7 @@ module Y2NtpClient
       #
       # @param address_widget [PoolAddress] the dialog pool address widget
       def initialize(address_widget)
+        textdomain "ntp-client"
         @address_widget = address_widget
       end
 
