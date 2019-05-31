@@ -40,7 +40,7 @@ module Yast
       }
 
       Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("ntp-client")
+      Wizard.SetDesktopTitleAndIcon("org.openSUSE.YaST.NTPClient")
       ret = Sequencer.Run(aliases, sequence)
 
       UI.CloseDialog
