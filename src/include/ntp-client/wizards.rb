@@ -40,7 +40,7 @@ module Yast
       }
 
       Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("org.openSUSE.YaST.NTPClient")
+      Wizard.SetDesktopTitleAndIcon("org.opensuse.yast.NTPClient")
       ret = Sequencer.Run(aliases, sequence)
 
       UI.CloseDialog
