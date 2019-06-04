@@ -12,25 +12,27 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-ntp-client
-Version:        4.1.8
+Version:        4.2.0
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0-or-later
 Group:          System/YaST
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Url:            https://github.com/yast/yast-ntp-client
+
 Source0:        %{name}-%{version}.tar.bz2
+
 BuildRequires:  augeas-lenses
 BuildRequires:  autoyast2-installation
 BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 3.2.21
 BuildRequires:  yast2-country-data
-BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
@@ -44,23 +46,25 @@ Requires:       yast2-country-data
 Requires:       yast2-network >= 4.1.17
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
-BuildArch:      noarch
 
 Obsoletes:      yast2-ntp-client-devel-doc
+
+BuildArch:      noarch
 
 %description
 This package contains the YaST2 component for NTP client configuration.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %check
-rake test:unit
+%yast_check
 
 %build
 
 %install
-rake install DESTDIR="%{buildroot}"
+%yast_install
+%yast_metainfo
 
 %post
 # upgrade old name and convert it to chrony (bsc#1079122)
@@ -70,21 +74,17 @@ if [ -f /etc/cron.d/novell.ntp-synchronize ]; then
 fi
 
 %files
-%defattr(-,root,root)
-%dir %{yast_yncludedir}/ntp-client
-%{yast_clientdir}/*
-%{yast_dir}/lib
-%{yast_yncludedir}/ntp-client/*
-%{yast_moduledir}/*.rb
-%{yast_desktopdir}/ntp-client.desktop
-%{yast_ydatadir}/ntp_servers.yml
-%{yast_schemadir}/autoyast/rnc/ntpclient.rnc
-%{yast_dir}/lib
-%ghost /etc/cron.d/suse-ntp_synchronize
+%{yast_clientdir}
+%{yast_libdir}
+%{yast_yncludedir}
+%{yast_moduledir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_ydatadir}
+%{yast_schemadir}
+%ghost %{_sysconfdir}/cron.d/suse-ntp_synchronize
 %{yast_icondir}
-%dir %{yast_docdir}
 %license COPYING
-%doc %{yast_docdir}/README.md
-%doc %{yast_docdir}/CONTRIBUTING.md
+%doc %{yast_docdir}
 
 %changelog
