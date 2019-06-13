@@ -92,8 +92,9 @@ module Yast
       # The interval of synchronization in minutes.
       @sync_interval = DEFAULT_SYNC_INTERVAL
 
-      # Service name of the NTP daemon
+      # Service names of the NTP daemon
       @service_name = "chronyd"
+      @wait_service_name = "chrony-wait"
 
       # Netconfig policy: for merging and prioritizing static and DHCP config.
       # https://github.com/openSUSE/sysconfig/blob/master/doc/README.netconfig
@@ -594,6 +595,7 @@ module Yast
     publish variable: :synchronize_time, type: "boolean"
     publish variable: :sync_interval, type: "integer"
     publish variable: :service_name, type: "string"
+    publish variable: :wait_service_name, type: "string"
     publish variable: :ntp_policy, type: "string"
     publish variable: :ntp_selected, type: "boolean"
     publish variable: :ad_controller, type: "string"
@@ -795,24 +797,37 @@ module Yast
       success
     end
 
-    # Enable or disable ntp service depending on @run_service value
+    # Enable or disable chrony services depending on @run_service value
+    # "chrony-wait" service has also to be handled in order to ensure that
+    # "chronyd" is working correctly and do not depend on the network status.
     #
-    # * When disabling, it also stops the service.
-    # * When enabling, it tries to restart the service unless it's in write
+    # * When disabling, it also stops the services.
+    # * When enabling, it tries to restart the services unless it's in write
     #   only mode.
     def check_service
-      adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
-
-      # error report
-      Report.Error(Message.CannotAdjustService("NTP")) unless adjusted
+      if @run_service
+        if !Service.Enable(@service_name)
+          Report.Error(Message.CannotAdjustService(@service_name))
+        elsif !Service.Enable(@wait_service_name)
+          Report.Error(Message.CannotAdjustService(@wait_service_name))
+        end
+      elsif !Service.Disable(@service_name)
+        Report.Error(Message.CannotAdjustService(@service_name))
+      elsif !Service.Disable(@wait_service_name)
+        Report.Error(Message.CannotAdjustService(@wait_service_name))
+      end
 
       if @run_service
         unless @write_only
-          # error report
-          Report.Error(_("Cannot restart the NTP daemon.")) unless Service.Restart(@service_name)
+          if !Service.Restart(@service_name)
+            Report.Error(_("Cannot restart \"%s\" service.") % @service_name)
+          elsif !Service.Restart(@wait_service_name)
+            Report.Error(_("Cannot restart \"%s\" service.") % @wait_service_name)
+          end
         end
       else
         Service.Stop(@service_name)
+        Service.Stop(@wait_service_name)
       end
     end
 
