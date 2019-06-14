@@ -291,10 +291,10 @@ describe Yast::NtpClient do
 
       it "enables and restarts services" do
         allow(subject).to receive(:check_service).and_call_original
-        expect(Yast::Service).to receive(:Enable).with(subject.service_name).and_return(true)
-        expect(Yast::Service).to receive(:Enable).with(subject.wait_service_name).and_return(true)
-        expect(Yast::Service).to receive(:Restart).with(subject.service_name).and_return(true)
-        expect(Yast::Service).to receive(:Restart).with(subject.wait_service_name).and_return(true)
+        expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Enable).with("chrony-wait").and_return(true)
+        expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Restart).with("chrony-wait").and_return(true)
 
         subject.Write
       end
@@ -307,10 +307,10 @@ describe Yast::NtpClient do
 
       it "disables and stops services" do
         allow(subject).to receive(:check_service).and_call_original
-        expect(Yast::Service).to receive(:Disable).with(subject.service_name).and_return(true)
-        expect(Yast::Service).to receive(:Disable).with(subject.wait_service_name).and_return(true)
-        expect(Yast::Service).to receive(:Stop).with(subject.service_name).and_return(true)
-        expect(Yast::Service).to receive(:Stop).with(subject.wait_service_name).and_return(true)
+        expect(Yast::Service).to receive(:Disable).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Disable).with("chrony-wait").and_return(true)
+        expect(Yast::Service).to receive(:Stop).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Stop).with("chrony-wait").and_return(true)
 
         subject.Write
       end

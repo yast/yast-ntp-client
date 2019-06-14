@@ -94,6 +94,10 @@ module Yast
 
       # Service names of the NTP daemon
       @service_name = "chronyd"
+
+      # "chrony-wait" service has also to be handled in order to ensure that
+      # "chronyd" is working correctly and do not depend on the network status.
+      # bsc#1137196, bsc#1129730
       @wait_service_name = "chrony-wait"
 
       # Netconfig policy: for merging and prioritizing static and DHCP config.
@@ -595,7 +599,6 @@ module Yast
     publish variable: :synchronize_time, type: "boolean"
     publish variable: :sync_interval, type: "integer"
     publish variable: :service_name, type: "string"
-    publish variable: :wait_service_name, type: "string"
     publish variable: :ntp_policy, type: "string"
     publish variable: :ntp_selected, type: "boolean"
     publish variable: :ad_controller, type: "string"
@@ -806,19 +809,13 @@ module Yast
     #   only mode.
     def check_service
       if @run_service
+        # Enable and run services
         if !Service.Enable(@service_name)
           Report.Error(Message.CannotAdjustService(@service_name))
         elsif !Service.Enable(@wait_service_name)
           Report.Error(Message.CannotAdjustService(@wait_service_name))
         end
-      elsif !Service.Disable(@service_name)
-        Report.Error(Message.CannotAdjustService(@service_name))
-      elsif !Service.Disable(@wait_service_name)
-        Report.Error(Message.CannotAdjustService(@wait_service_name))
-      end
-
-      if @run_service
-        unless @write_only
+        if !@write_only
           if !Service.Restart(@service_name)
             Report.Error(_("Cannot restart \"%s\" service.") % @service_name)
           elsif !Service.Restart(@wait_service_name)
@@ -826,6 +823,12 @@ module Yast
           end
         end
       else
+        # Disable and stop services
+        if !Service.Disable(@service_name)
+          Report.Error(Message.CannotAdjustService(@service_name))
+        elsif !Service.Disable(@wait_service_name)
+          Report.Error(Message.CannotAdjustService(@wait_service_name))
+        end
         Service.Stop(@service_name)
         Service.Stop(@wait_service_name)
       end
