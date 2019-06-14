@@ -92,8 +92,13 @@ module Yast
       # The interval of synchronization in minutes.
       @sync_interval = DEFAULT_SYNC_INTERVAL
 
-      # Service name of the NTP daemon
+      # Service names of the NTP daemon
       @service_name = "chronyd"
+
+      # "chrony-wait" service has also to be handled in order to ensure that
+      # "chronyd" is working correctly and do not depend on the network status.
+      # bsc#1137196, bsc#1129730
+      @wait_service_name = "chrony-wait"
 
       # Netconfig policy: for merging and prioritizing static and DHCP config.
       # https://github.com/openSUSE/sysconfig/blob/master/doc/README.netconfig
@@ -795,24 +800,37 @@ module Yast
       success
     end
 
-    # Enable or disable ntp service depending on @run_service value
+    # Enable or disable chrony services depending on @run_service value
+    # "chrony-wait" service has also to be handled in order to ensure that
+    # "chronyd" is working correctly and do not depend on the network status.
     #
-    # * When disabling, it also stops the service.
-    # * When enabling, it tries to restart the service unless it's in write
+    # * When disabling, it also stops the services.
+    # * When enabling, it tries to restart the services unless it's in write
     #   only mode.
     def check_service
-      adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
-
-      # error report
-      Report.Error(Message.CannotAdjustService("NTP")) unless adjusted
-
       if @run_service
-        unless @write_only
-          # error report
-          Report.Error(_("Cannot restart the NTP daemon.")) unless Service.Restart(@service_name)
+        # Enable and run services
+        if !Service.Enable(@service_name)
+          Report.Error(Message.CannotAdjustService(@service_name))
+        elsif !Service.Enable(@wait_service_name)
+          Report.Error(Message.CannotAdjustService(@wait_service_name))
+        end
+        if !@write_only
+          if !Service.Restart(@service_name)
+            Report.Error(_("Cannot restart \"%s\" service.") % @service_name)
+          elsif !Service.Restart(@wait_service_name)
+            Report.Error(_("Cannot restart \"%s\" service.") % @wait_service_name)
+          end
         end
       else
+        # Disable and stop services
+        if !Service.Disable(@service_name)
+          Report.Error(Message.CannotAdjustService(@service_name))
+        elsif !Service.Disable(@wait_service_name)
+          Report.Error(Message.CannotAdjustService(@wait_service_name))
+        end
         Service.Stop(@service_name)
+        Service.Stop(@wait_service_name)
       end
     end
 

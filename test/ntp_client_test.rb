@@ -283,10 +283,37 @@ describe Yast::NtpClient do
       subject.Write
     end
 
-    it "checks ntp service" do
-      expect(subject).to receive(:check_service)
+    context "services will be started" do
+      before do
+        subject.run_service = true
+        subject.write_only = false
+      end
 
-      subject.Write
+      it "enables and restarts services" do
+        allow(subject).to receive(:check_service).and_call_original
+        expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Enable).with("chrony-wait").and_return(true)
+        expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Restart).with("chrony-wait").and_return(true)
+
+        subject.Write
+      end
+    end
+
+    context "services will be stopped" do
+      before do
+        subject.run_service = false
+      end
+
+      it "disables and stops services" do
+        allow(subject).to receive(:check_service).and_call_original
+        expect(Yast::Service).to receive(:Disable).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Disable).with("chrony-wait").and_return(true)
+        expect(Yast::Service).to receive(:Stop).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Stop).with("chrony-wait").and_return(true)
+
+        subject.Write
+      end
     end
 
     it "updates cron settings" do
