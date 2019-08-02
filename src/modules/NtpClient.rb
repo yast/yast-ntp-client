@@ -1021,7 +1021,8 @@ module Yast
     # Remove blank spaces in values
     #
     # @note to avoid augeas parsing errors, comments should be sanitized by
-    #   removing blank spaces at the beginning and adding line break.
+    #   removing blank spaces at the beginning and adding line break. Further
+    #   sanitation is done in NtpConf.save.
     def sanitize_record(record)
       sanitized = record.dup
       sanitized.each do |key, value|

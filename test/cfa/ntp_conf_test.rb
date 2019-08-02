@@ -94,6 +94,19 @@ describe CFA::NtpConf do
         expect(file.content.lines).to include("#test comment 2\n")
         expect(file.content.lines).to include("#test comment3\n")
       end
+
+      # see bsc #1142026
+      it "can write multi lines comments with unstripped whitespaces from autoyast profiles" do
+        record = CFA::NtpConf::ServerRecord.new
+        record.value = "4.pool.ntp.org"
+        record.comment = " test comment 4 \n \n test comment 5 "
+        ntp.records << record
+        expect(record.comment).to eq " test comment 4 \n \n test comment 5 "
+        ntp.save
+        expect(file.content.lines).to include("#test comment 4\n")
+        expect(file.content.lines).to include("#test comment 5\n")
+        expect(file.content.lines).to include("server 4.pool.ntp.org\n")
+      end
     end
 
     context "when a record is deleted" do
