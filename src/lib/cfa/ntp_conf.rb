@@ -98,7 +98,7 @@ module CFA
         matcher = Matcher.new(key: r.augeas[:key], value_matcher: r.augeas[:value])
         placer = BeforePlacer.new(matcher)
         comments.each do |comment|
-          data.add("#comment[]", comment.strip, placer)
+          data.add("#comment[]", comment, placer)
         end
       end
       super
