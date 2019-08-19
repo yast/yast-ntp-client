@@ -1,11 +1,4 @@
 -------------------------------------------------------------------
-Mon Aug 19 12:04:19 UTC 2019 - José Iván López González <jlopez@suse.com>
-
-- AutoYaST: improve importing when a comment contains empty lines.
-- This also fixes bsc#1142026.
-- 3.2.20
-
--------------------------------------------------------------------
 Fri Aug 02 15:16:17 CEST 2019 - aschnell@suse.com
 
 - Fixed saving /etc/ntp.conf with certain comments (bsc#1142026)
