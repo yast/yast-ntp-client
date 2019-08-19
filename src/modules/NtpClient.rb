@@ -1018,22 +1018,63 @@ module Yast
 
   private
 
-    # Remove blank spaces in values
+    # Sanitizes values of a record (mainly, by removing blank spaces)
     #
-    # @note to avoid augeas parsing errors, comments should be sanitized by
-    #   removing blank spaces at the beginning and adding line break. Further
-    #   sanitation is done in NtpConf.save.
+    # @param record [Hash]
+    # @return [Hash]
     def sanitize_record(record)
       sanitized = record.dup
+
       sanitized.each do |key, value|
-        if key.include?("comment")
-          value.sub!(/^ */, "")
-          value << "\n" unless value.include?("\n")
-        elsif value.respond_to?(:strip!)
-          value.strip!
-        end
+        sanitized[key] = sanitize_attribute(key, value)
       end
+
       sanitized
+    end
+
+    # Sanitizes the value of an attribute
+    #
+    # @note To avoid augeas parsing errors, each comment line should be sanitized by removing blank
+    #   spaces at the beginning and ensuring a line break, see {#sanitize_comment}.
+    #
+    # @param attribute [String]
+    # @param value [String]
+    #
+    # @return [String] sanitized value
+    def sanitize_attribute(attribute, value)
+      if attribute.include?("comment")
+        sanitize_comment(value)
+      elsif value.respond_to?(:strip)
+        value.strip
+      else
+        value
+      end
+    end
+
+    # Sanitizes each line from a comment
+    #
+    # @param comment [String]
+    # @return [String] sanitized comment
+    def sanitize_comment(comment)
+      lines = comment.split("\n")
+
+      sanitized_lines = lines.map { |l| sanitize_comment_line(l) }
+
+      sanitized_lines.compact.join
+    end
+
+    # Sanitizes a comment line by removing blank spaces at the beginning and ensuring a line break
+    #
+    # @param line [String]
+    # @return [String, nil] sanitized line. It returns nil if the line only contains blank spaces.
+    def sanitize_comment_line(line)
+      sanitized_line = line.lstrip
+
+      return nil if sanitized_line.empty?
+
+      sanitized_line << "\n" unless sanitized_line.include?("\n")
+
+      sanitized_line
     end
 
     # Set @ntp_policy according to NETCONFIG_NTP_POLICY value found in
