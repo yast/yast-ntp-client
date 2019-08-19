@@ -13,7 +13,11 @@
       </peer>
       <peer>
         <address>1.opensuse.pool.ntp.org</address>
-        <comment/>
+        <comment> # a comment with spaces
+
+          # and blank lines
+
+        </comment>
         <options>iburst</options>
         <type>server</type>
       </peer>
