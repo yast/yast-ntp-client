@@ -61,12 +61,6 @@ describe Yast::NtpClient do
           expect(record["comment"]).to eq "# a comment with spaces \n"
         end
 
-        # see bsc #1142026
-        it "sanitizes comments by removing blank lines" do
-          record = subject.ntp_records[1]
-          expect(record["comment"]).to eq "# a comment with spaces\n# and blank lines\n"
-        end
-
         it "reads the list of peers" do
           expect(subject.ntp_records.size).to eq 5
         end
@@ -153,16 +147,7 @@ describe Yast::NtpClient do
 
       it "produces an output equivalent to #Import" do
         subject.Import(ntp_client_section)
-
-        result = subject.Export
-
-        expect(result["synchronize_time"]).to eq(ntp_client_section["synchronize_time"])
-        expect(result["sync_interval"]).to eq(ntp_client_section["sync_interval"])
-        expect(result["start_at_boot"]).to eq(ntp_client_section["start_at_boot"])
-        expect(result["start_in_chroot"]).to eq(ntp_client_section["start_in_chroot"])
-        expect(result["ntp_policy"]).to eq(ntp_client_section["ntp_policy"])
-        expect(result["peers"].size).to eq(ntp_client_section["peers"].size)
-        expect(result["restricts"].size).to eq(ntp_client_section["restricts"].size)
+        expect(subject.Export()).to eq ntp_client_section
       end
 
       it "clones without encountering a CFA object" do
