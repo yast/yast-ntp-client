@@ -1,10 +1,4 @@
 -------------------------------------------------------------------
-Fri Aug 02 15:16:17 CEST 2019 - aschnell@suse.com
-
-- Fixed saving /etc/ntp.conf with certain comments (bsc#1142026)
-- 3.2.19
-
--------------------------------------------------------------------
 Thu Dec 13 12:45:27 UTC 2018 - knut.anderssen@suse.com
 
 - Fixed sync_once method return value (bsc#1108497)
