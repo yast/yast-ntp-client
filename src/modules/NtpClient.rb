@@ -64,6 +64,7 @@ module Yast
       Yast.import "PackageSystem"
       Yast.import "Popup"
       Yast.import "Progress"
+      Yast.import "ProductFeatures"
       Yast.import "Report"
       Yast.import "Service"
       Yast.import "SLPAPI"
@@ -808,17 +809,18 @@ module Yast
     # * When enabling, it tries to restart the services unless it's in write
     #   only mode.
     def check_service
+      wait_service_required = ProductFeatures.GetBooleanFeature("globals", "precise_time") # fallback to false if not defined
       if @run_service
         # Enable and run services
         if !Service.Enable(@service_name)
           Report.Error(Message.CannotAdjustService(@service_name))
-        elsif !Service.Enable(@wait_service_name)
+        elsif wait_service_required && !Service.Enable(@wait_service_name)
           Report.Error(Message.CannotAdjustService(@wait_service_name))
         end
         if !@write_only
           if !Service.Restart(@service_name)
             Report.Error(_("Cannot restart \"%s\" service.") % @service_name)
-          elsif !Service.Restart(@wait_service_name)
+          elsif wait_service_required && !Service.Restart(@wait_service_name)
             Report.Error(_("Cannot restart \"%s\" service.") % @wait_service_name)
           end
         end
@@ -826,6 +828,7 @@ module Yast
         # Disable and stop services
         if !Service.Disable(@service_name)
           Report.Error(Message.CannotAdjustService(@service_name))
+        # disable and stop always as wait without chrony does not make sense
         elsif !Service.Disable(@wait_service_name)
           Report.Error(Message.CannotAdjustService(@wait_service_name))
         end
