@@ -289,14 +289,36 @@ describe Yast::NtpClient do
         subject.write_only = false
       end
 
-      it "enables and restarts services" do
-        allow(subject).to receive(:check_service).and_call_original
-        expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
-        expect(Yast::Service).to receive(:Enable).with("chrony-wait").and_return(true)
-        expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
-        expect(Yast::Service).to receive(:Restart).with("chrony-wait").and_return(true)
+      context "when product require precise time" do
+        before do
+          allow(Yast::ProductFeatures).to receive(:GetBooleanFeature).and_return(true)
+        end
 
-        subject.Write
+        it "enables and restarts services including chrony-wait" do
+          allow(subject).to receive(:check_service).and_call_original
+          expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
+          expect(Yast::Service).to receive(:Enable).with("chrony-wait").and_return(true)
+          expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
+          expect(Yast::Service).to receive(:Restart).with("chrony-wait").and_return(true)
+
+          subject.Write
+        end
+      end
+
+      context "when product does not require precise time" do
+        before do
+          allow(Yast::ProductFeatures).to receive(:GetBooleanFeature).and_return(false)
+        end
+
+        it "enables and restarts services without chrony-wait" do
+          allow(subject).to receive(:check_service).and_call_original
+          expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
+          expect(Yast::Service).to_not receive(:Enable).with("chrony-wait")
+          expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
+          expect(Yast::Service).to_not receive(:Restart).with("chrony-wait")
+
+          subject.Write
+        end
       end
     end
 
