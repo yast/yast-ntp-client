@@ -809,7 +809,8 @@ module Yast
     # * When enabling, it tries to restart the services unless it's in write
     #   only mode.
     def check_service
-      wait_service_required = ProductFeatures.GetBooleanFeature("globals", "precise_time") # fallback to false if not defined
+      # fallbacks to false if not defined
+      wait_service_required = ProductFeatures.GetBooleanFeature("globals", "precise_time")
       if @run_service
         # Enable and run services
         if !Service.Enable(@service_name)
