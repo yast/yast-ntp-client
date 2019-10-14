@@ -1,4 +1,4 @@
-ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
+ENV["Y2DIR"] = File.expand_path("../src", __dir__)
 
 require "yast"
 require "yast/rspec"
@@ -11,9 +11,7 @@ RSpec.configure do |config|
     # https://relishapp.com/rspec/rspec-mocks/v/3-0/docs/verifying-doubles/partial-doubles
     #
     # With graceful degradation for RSpec 2
-    if mocks.respond_to?(:verify_partial_doubles=)
-      mocks.verify_partial_doubles = true
-    end
+    mocks.verify_partial_doubles = true if mocks.respond_to?(:verify_partial_doubles=)
   end
 end
 
@@ -32,7 +30,7 @@ if ENV["COVERAGE"]
     add_filter "/test/"
   end
 
-  src_location = File.expand_path("../../src", __FILE__)
+  src_location = File.expand_path("../src", __dir__)
   # track all ruby files under src
   SimpleCov.track_files("#{src_location}/**/*.rb")
 

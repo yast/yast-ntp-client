@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	modules/NtpClient.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Data for configuration of ntp-client, input and output functions.
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  modules/NtpClient.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Data for configuration of ntp-client, input and output functions.
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 #
@@ -148,6 +146,7 @@ module Yast
 
     def go_next
       return false if Abort()
+
       Progress.NextStage if progress?
       true
     end
@@ -332,9 +331,11 @@ module Yast
       ReadSynchronization()
 
       return false if !go_next
+
       Progress.Title(_("Finished")) if progress?
 
       return false if Abort()
+
       @modified = false
       true
     end

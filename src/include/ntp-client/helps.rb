@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	include/ntp-client/helps.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Help texts of all the dialogs
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  include/ntp-client/helps.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Help texts of all the dialogs
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 module Yast

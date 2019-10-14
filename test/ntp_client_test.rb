@@ -111,7 +111,7 @@ describe Yast::NtpClient do
     describe "#Export" do
       let(:profile_name) { "autoinst.xml" }
       let(:ntp_conf) do
-        path = File.expand_path("../fixtures/cfa/chrony.conf", __FILE__)
+        path = File.expand_path("fixtures/cfa/chrony.conf", __dir__)
         text = File.read(path)
         file = CFA::MemoryFile.new(text)
         CFA::ChronyConf.new(file_handler: file)

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require "yast"
 
 module Yast
@@ -139,9 +137,7 @@ module Yast
         UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
       end
       UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
-      if UI.WidgetExists(Id(:ntp_configure)) # bnc#483787
-        UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled)
-      end
+      UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled) if UI.WidgetExists(Id(:ntp_configure)) # bnc#483787
 
       nil
     end
@@ -279,7 +275,7 @@ module Yast
       # ^ createui0
 
       # FIXME: is it correct? move out?
-      ntp_used = first_time && !Stage.initial ? GetNTPEnabled() : NtpClient.ntp_selected
+      ntp_used = (first_time && !Stage.initial) ? GetNTPEnabled() : NtpClient.ntp_selected
 
       UI.ChangeWidget(Id(:ntp_save), :Value, ntp_used)
 
@@ -427,12 +423,8 @@ module Yast
       argmap = {}
       Ops.set(argmap, "ntpdate_only", false)
       Ops.set(argmap, "run_service", false)
-      if UI.QueryWidget(Id(:ntp_save), :Value) == false
-        Ops.set(argmap, "ntpdate_only", true)
-      end
-      if UI.QueryWidget(Id(:run_service), :Value) == true
-        Ops.set(argmap, "run_service", true)
-      end
+      Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
+      Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value) == true
 
       rv = Write(argmap)
 
