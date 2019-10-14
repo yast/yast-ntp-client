@@ -1,4 +1,5 @@
 ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
+ENV["LC_ALL"] = "en_US.utf8"
 
 require "yast"
 require "yast/rspec"
@@ -25,6 +26,9 @@ end
 
 # stub classes from other modules to speed up a build
 stub_module("Lan")
+stub_module("Language")
+stub_module("Pkg")
+stub_module("PackageCallbacks")
 
 if ENV["COVERAGE"]
   require "simplecov"

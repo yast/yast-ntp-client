@@ -305,7 +305,7 @@ module Yast
     # Writes configuration for ntp client.
     # @param ntp_servers [Array<String>] list of servers to configure as ntp sync sources
     # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
-    # @param run_service [Boolean] define if synchronize with systemd services or via cron sync
+    # @param run_service [Boolean] define if synchronize with systemd services or via systemd timer
     # @return true
     def WriteNtpSettings(ntp_servers, ntp_server, run_service)
       ntp_servers = deep_copy(ntp_servers)

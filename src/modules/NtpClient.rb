@@ -21,7 +21,7 @@ module Yast
     include ::UI::TextHelpers
 
     # the default synchronization interval in minutes when running in the manual
-    # sync mode ("Synchronize without Daemon" option, ntp started from cron)
+    # sync mode ("Synchronize without Daemon" option, ntp started from systemd timer)
     # Note: the UI field currently uses maximum of 60 minutes
     DEFAULT_SYNC_INTERVAL = 5
 
@@ -35,8 +35,22 @@ module Yast
 
     NTP_FILE = "/etc/chrony.conf".freeze
 
-    # The cron file name for the synchronization.
-    CRON_FILE = "/etc/cron.d/suse-ntp_synchronize".freeze
+    TIMER_FILE = "yast-timesync.timer"
+    # The file name of systemd timer for the synchronization.
+    TIMER_PATH = "/etc/systemd/system/#{TIMER_FILE}".freeze
+
+    # Timer content which should be passed to format and seconds added.
+    # @example usage
+    # format(TIMER_CONTENT, timeout: 15)
+    TIMER_CONTENT = <<~TIMER
+      [Timer]
+      # first sync after boot
+      OnBootSec=1min
+      OnUnitActiveSec=%{timeout}min
+
+      [Install]
+      WantedBy=timers.target
+    TIMER
 
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
@@ -282,15 +296,14 @@ module Yast
     # synchronize_time and sync_interval variables
     # Return updated value of synchronize_time
     def ReadSynchronization
-      crontab = SCR.Read(path(".cron"), CRON_FILE, "")
-      log.info("NTP Synchronization crontab entry: #{crontab}")
-      cron_entry = (crontab || []).fetch(0, {}).fetch("events", []).fetch(0, {})
-      @synchronize_time = cron_entry["active"] == "1"
+      return false unless File.exists?(TIMER_PATH)
 
-      sync_interval_entry = cron_entry.fetch("minute", "*/#{DEFAULT_SYNC_INTERVAL}")
-      log.info("MINUTE #{sync_interval_entry}")
+      timer_content = File.read(TIMER_PATH)
+      log.info("NTP Synchronization timer entry: #{timer_content}")
+      @synchronize_time = SCR.Execute(path(".target.bash"), "/bin/systemctl is-active #{TIMER_FILE}").zero?
 
-      @sync_interval = sync_interval_entry.tr("^[0-9]", "").to_i
+      interval = timer_content[/^\s*OnUnitActiveSec=(\d+)m/, 1]
+      @sync_interval = interval.to_i if interval
       log.info("SYNC_INTERVAL #{@sync_interval}")
 
       @synchronize_time
@@ -364,7 +377,7 @@ module Yast
 
       check_service
 
-      update_cron_settings
+      update_timer_settings
 
       return false if !go_next
 
@@ -838,19 +851,35 @@ module Yast
       end
     end
 
-    # If synchronize time has been enable it writes ntp cron entry for manual
-    # sync. If not it removes current cron entry if exists.
-    def update_cron_settings
+    # If synchronize time has been enable it writes systemd timer entry for manual
+    # sync. If not it removes current systemd timer entry if exists.
+    def update_timer_settings
       if @synchronize_time
         SCR.Write(
           path(".target.string"),
-          CRON_FILE,
-          "-*/#{@sync_interval} * * * * root /usr/sbin/chronyd -q &>/dev/null\n"
+          TIMER_PATH,
+          format(TIMER_CONTENT, timeout: @sync_interval)
+        )
+        SCR.Execute(
+          path(".target.bash"),
+          "/bin/systemctl enable #{TIMER_FILE}"
+        )
+        SCR.Execute(
+          path(".target.bash"),
+          "/bin/systemctl start #{TIMER_FILE}"
         )
       else
         SCR.Execute(
           path(".target.bash"),
-          "rm -vf #{CRON_FILE}"
+          "/bin/systemctl disable #{TIMER_FILE}"
+        )
+        SCR.Execute(
+          path(".target.bash"),
+          "/bin/systemctl stop #{TIMER_FILE}"
+        )
+        SCR.Execute(
+          path(".target.bash"),
+          "rm -vf #{TIMER_PATH}"
         )
       end
     end

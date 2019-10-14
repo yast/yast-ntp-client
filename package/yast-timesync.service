@@ -1,0 +1,13 @@
+[Unit]
+Description=One time sync configured by YaST
+DefaultDependencies=no
+# one time sync cannot be done if chrony server runs
+Conflicts=chronyd.service
+RefuseManualStart=false
+
+[Service]
+Type=oneshot
+StandardError=tty
+StandardOutput=tty
+RemainAfterExit=no
+ExecStart=/usr/bin/systemd-cat -t yast-timesync -- /usr/sbin/chronyd -q
