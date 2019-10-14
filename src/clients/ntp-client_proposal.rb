@@ -137,7 +137,8 @@ module Yast
         UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
       end
       UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
-      UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled) if UI.WidgetExists(Id(:ntp_configure)) # bnc#483787
+      # bnc#483787
+      UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled) if UI.WidgetExists(Id(:ntp_configure))
 
       nil
     end
@@ -200,10 +201,10 @@ module Yast
       nil
     end
 
+    # @param [Yast::Term] replace_point id of replace point which should be used
     # @param [Boolean] first_time when asking for first time, we check if service is running
     # @return should our radio button be selected
-    def ui_init(rp, first_time)
-      rp = deep_copy(rp)
+    def ui_init(replace_point, first_time)
       cont = VBox(
         VSpacing(0.5),
         HBox(
@@ -268,7 +269,7 @@ module Yast
         )
       )
 
-      UI.ReplaceWidget(rp, cont)
+      UI.ReplaceWidget(replace_point, cont)
 
       UI.ChangeWidget(Id(:ntp_now), :Enabled, false) if !NetworkService.isNetworkRunning
 
@@ -379,9 +380,10 @@ module Yast
     end
 
     # ui = UI::UserInput
-    def ui_handle(ui)
+    def ui_handle(input)
       redraw = false
-      if ui == :ntp_configure
+      case input
+      when :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname
           handle_invalid_hostname(
@@ -391,8 +393,7 @@ module Yast
           # show the 'save' status after configuration
           UI.ChangeWidget(Id(:ntp_save), :Value, GetNTPEnabled())
         end
-      end
-      if ui == :ntp_now
+      when :ntp_now
         rv = Write("ntpdate_only" => true)
         if rv == :invalid_hostname
           handle_invalid_hostname(UI.QueryWidget(Id(:ntp_address), :Value))
@@ -401,10 +402,9 @@ module Yast
         else
           Report.Error(_("Connection to selected NTP server failed."))
         end
-      end
-      if ui == :accept && Stage.initial
+      when :accept
         # checking if chrony is available for installation.
-        if UI.QueryWidget(Id(:ntp_save), :Value) == true &&
+        if Stage.initial && UI.QueryWidget(Id(:ntp_save), :Value) == true &&
             !Pkg.IsAvailable(NtpClientClass::REQUIRED_PACKAGE)
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.

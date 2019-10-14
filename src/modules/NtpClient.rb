@@ -135,7 +135,7 @@ module Yast
 
     # CFA instance for reading/writing /etc/chrony.conf
     def ntp_conf
-      @chrony_conf ||= CFA::ChronyConf.new
+      @ntp_conf ||= CFA::ChronyConf.new
     end
 
     # Abort function
