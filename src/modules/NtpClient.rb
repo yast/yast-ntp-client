@@ -842,7 +842,7 @@ module Yast
     end
 
     def timer_content
-      erb_template = ::File.read(__dir__ + "/../lib/y2ntp_client/#{TIMER_FILE}.erb")
+      erb_template = ::File.read(Directory.find_data_file("#{TIMER_FILE}.erb"))
       content = ERB.new(erb_template)
       timeout = @sync_interval
       content.result(binding)
