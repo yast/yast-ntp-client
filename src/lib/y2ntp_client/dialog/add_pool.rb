@@ -51,6 +51,7 @@ module Y2NtpClient
 
       def next_handler
         return :cancel if @pool_chooser.value.to_s.empty?
+
         @address = @pool_chooser.value
 
         :next
@@ -77,7 +78,7 @@ module Y2NtpClient
       end
 
       def available_pools
-        { local:  Widgets::LocalList, public: Widgets::PublicList }
+        { local: Widgets::LocalList, public: Widgets::PublicList }
       end
 
       def pool_for(type)

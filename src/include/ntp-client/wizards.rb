@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	include/ntp-client/wizards.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Wizards definitions
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  include/ntp-client/wizards.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Wizards definitions
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 

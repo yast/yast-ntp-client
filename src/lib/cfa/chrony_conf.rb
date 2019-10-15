@@ -39,14 +39,14 @@ module CFA
       options = default_pool_options if options == :default
       # if there is already pool entry, place it after, if not, try use comment
       existing_pools = pure_pools
-      if existing_pools.empty?
+      matcher = if existing_pools.empty?
         # for now first chrony have pools under comment mentioning pool.ntp.org
         # so try to place it below
-        matcher = Matcher.new { |k, v| k.start_with?("#comment") && v =~ /www\.pool\.ntp\.org/ }
+        Matcher.new { |k, v| k.start_with?("#comment") && v =~ /www\.pool\.ntp\.org/ }
       else
         # place after the last pool available
-        matcher = Matcher.new(key:           existing_pools.last[:key],
-                              value_matcher: existing_pools.last[:value])
+        Matcher.new(key:           existing_pools.last[:key],
+                    value_matcher: existing_pools.last[:value])
       end
       placer = AfterPlacer.new(matcher)
 

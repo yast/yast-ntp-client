@@ -56,6 +56,7 @@ module Y2NtpClient
 
       def abort_button
         return Yast::Label.CancelButton unless installation?
+
         nil
       end
 
@@ -72,11 +73,13 @@ module Y2NtpClient
 
       def back_button
         return "" unless installation?
+
         nil
       end
 
       def next_button
         return Yast::Label.OKButton unless installation?
+
         nil
       end
 
