@@ -3,7 +3,7 @@ require "cfa/memory_file"
 require "cfa/chrony_conf"
 
 def ntp_disk_content
-  path = File.expand_path("../../fixtures/cfa/chrony.conf.original", __FILE__)
+  path = File.expand_path("../fixtures/cfa/chrony.conf.original", __dir__)
   File.read(path)
 end
 

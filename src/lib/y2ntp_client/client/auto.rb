@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require "yast"
 require "installation/auto_client"
 

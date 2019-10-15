@@ -23,7 +23,7 @@ describe Y2NtpClient::Widgets::ServersTable do
       .and_return(double(
                     pools:       { "ntp.org" => {}, "us.ntp.org" => {} },
                     modify_pool: nil
-      ))
+                  ))
     allow(subject).to receive(:value).and_return("ntp.org")
     allow(subject).to receive(:value=)
     allow(Y2NtpClient::Dialog::Pool).to receive(:new)
@@ -39,7 +39,7 @@ describe Y2NtpClient::Widgets::AddPoolButton do
       .and_return(double(
                     default_pool_options: {},
                     add_pool:             nil
-      ))
+                  ))
     allow(Y2NtpClient::Dialog::Pool).to receive(:new)
       .and_return(double(run: :next, resulting_pool: ["de.ntp.org", {}]))
   end

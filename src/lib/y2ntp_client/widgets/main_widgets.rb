@@ -26,10 +26,10 @@ module Y2NtpClient
       def help
         # TRANSLATORS: configuration source combo box help, %{manual} is a
         # manual page reference, e.g. "man 8 netconfig"
-        _("<p>The NTP configuration may be provided by the local network over DHCP. " \
+        format(_("<p>The NTP configuration may be provided by the local network over DHCP. " \
           "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
           "In cases where there may be multiple DHCP sources, it can prioritize them: " \
-          "see '%{manual}'.</p>") % { manual: "man 8 netconfig" }
+          "see '%{manual}'.</p>"), manual: "man 8 netconfig")
       end
 
       def opt
@@ -44,9 +44,7 @@ module Y2NtpClient
           ["auto", _("Dynamic")]
         ]
         current_policy = Yast::NtpClient.ntp_policy
-        if !["", "auto"].include?(current_policy)
-          items << [current_policy, current_policy]
-        end
+        items << [current_policy, current_policy] if !["", "auto"].include?(current_policy)
 
         items
       end
@@ -114,7 +112,7 @@ module Y2NtpClient
       end
 
       def handle
-        widget = value == "sync" ? SyncInterval.new : CWM::Empty.new("empty_interval")
+        widget = (value == "sync") ? SyncInterval.new : CWM::Empty.new("empty_interval")
         @replace_point.replace(widget)
 
         nil

@@ -395,6 +395,7 @@ module Y2NtpClient
       def ntp_servers
         servers = Yast::NtpClient.GetNtpServers
         return servers if @country.to_s.empty?
+
         servers.find_all { |_s, v| v["country"] == @country }
       end
     end

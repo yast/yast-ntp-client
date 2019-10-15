@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	clients/ntp-client.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Main file
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  clients/ntp-client.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Main file
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 #
@@ -52,6 +50,7 @@ module Yast
       ret = NtpClientSequence()
       return ret if Yast::Stage.firstboot
       return false if ret == :abort || ret == :back || ret.nil?
+
       true
     end
   end

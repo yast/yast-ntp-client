@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	include/ntp-client/misc.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Miscelanous functions for configuration of ntp-client.
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  include/ntp-client/misc.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Miscelanous functions for configuration of ntp-client.
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 module Yast
