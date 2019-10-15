@@ -470,11 +470,14 @@ describe Yast::NtpClient do
     end
 
     context "when systemd timer file exists" do
-      let(:timer_content) { format(Yast::NtpClientClass::TIMER_CONTENT, timeout: 10) }
+      let(:timer_content) do
+        subject.sync_interval = 10
+        subject.send(:timer_content)
+      end
 
       context "when timer is not active" do
         before do
-          allow(Yast::SCR).to receive(:Execute).and_return(3)
+          allow(Yast::SCR).to receive(:Execute).and_return("exit" => 3)
         end
 
         it "sets synchronize_time as false" do
@@ -492,7 +495,7 @@ describe Yast::NtpClient do
 
       context "when timer is active" do
         before do
-          allow(Yast::SCR).to receive(:Execute).and_return(0)
+          allow(Yast::SCR).to receive(:Execute).and_return("exit" => 0)
         end
 
         it "sets synchronize time as true" do

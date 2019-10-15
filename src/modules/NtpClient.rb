@@ -841,17 +841,21 @@ module Yast
       end
     end
 
+    def timer_content
+      erb_template = ::File.read(__dir__ + "/../lib/y2ntp_client/#{TIMER_FILE}.erb")
+      content = ERB.new(erb_template)
+      timeout = @sync_interval
+      content.result(binding)
+    end
+
     # If synchronize time has been enable it writes systemd timer entry for manual
     # sync. If not it removes current systemd timer entry if exists.
     def update_timer_settings
       if @synchronize_time
-        erb_template = ::File.read(__dir__ + "/#{TIMER_FILE}.erb")
-        content = ERB.new(erb_template)
-        timeout = @sync_interval
         SCR.Write(
           path(".target.string"),
           TIMER_PATH,
-          content.result
+          timer_content
         )
         res = Yast2::Systemctl.execute("enable #{TIMER_FILE}")
         log.info "enable timer: #{res.inspect}"
