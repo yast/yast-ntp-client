@@ -441,7 +441,7 @@ describe Yast::NtpClient do
     let(:timer_content) { "" }
 
     before do
-      allow(::File).to receive(:exists?).and_return(true)
+      allow(::File).to receive(:exist?).and_return(true)
       allow(::File).to receive(:read).and_return(timer_content)
     end
 
@@ -453,7 +453,7 @@ describe Yast::NtpClient do
 
     context "when systemd timer file does not exist" do
       before do
-        allow(::File).to receive(:exists?).and_return(false)
+        allow(::File).to receive(:exist?).and_return(false)
       end
 
       it "sets synchronize_time as false" do

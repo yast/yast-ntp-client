@@ -295,9 +295,9 @@ module Yast
     # synchronize_time and sync_interval variables
     # Return updated value of synchronize_time
     def ReadSynchronization
-      return false unless File.exist?(TIMER_PATH)
+      return false unless ::File.exist?(TIMER_PATH)
 
-      timer_content = File.read(TIMER_PATH)
+      timer_content = ::File.read(TIMER_PATH)
       log.info("NTP Synchronization timer entry: #{timer_content}")
       @synchronize_time = SCR.Execute(path(".target.bash"),
         "/bin/systemctl is-active #{TIMER_FILE}").zero?
