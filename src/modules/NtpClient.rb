@@ -12,6 +12,8 @@ require "yaml"
 require "cfa/chrony_conf"
 require "yast2/target_file" # required to cfa work on changed scr
 require "ui/text_helpers"
+require "erb"
+require "yast2/systemctl"
 
 module Yast
   class NtpClientClass < Module
@@ -36,19 +38,6 @@ module Yast
     TIMER_FILE = "yast-timesync.timer".freeze
     # The file name of systemd timer for the synchronization.
     TIMER_PATH = "/etc/systemd/system/#{TIMER_FILE}".freeze
-
-    # Timer content which should be passed to format and seconds added.
-    # @example usage
-    # format(TIMER_CONTENT, timeout: 15)
-    TIMER_CONTENT = <<~TIMER.freeze
-      [Timer]
-      # first sync after boot
-      OnBootSec=1min
-      OnUnitActiveSec=%{timeout}min
-
-      [Install]
-      WantedBy=timers.target
-    TIMER
 
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
@@ -299,10 +288,9 @@ module Yast
 
       timer_content = ::File.read(TIMER_PATH)
       log.info("NTP Synchronization timer entry: #{timer_content}")
-      @synchronize_time = SCR.Execute(path(".target.bash"),
-        "/bin/systemctl is-active #{TIMER_FILE}").zero?
+      @synchronize_time = Yast2::Systemctl.execute("is-active #{TIMER_FILE}").exit.zero?
 
-      interval = timer_content[/^\s*OnUnitActiveSec=(\d+)m/, 1]
+      interval = timer_content[/^\s*OnUnitActiveSec\s*=\s*(\d+)m/, 1]
       @sync_interval = interval.to_i if interval
       log.info("SYNC_INTERVAL #{@sync_interval}")
 
@@ -857,28 +845,23 @@ module Yast
     # sync. If not it removes current systemd timer entry if exists.
     def update_timer_settings
       if @synchronize_time
+        erb_template = ::File.read(__dir__ + "/#{TIMER_FILE}.erb")
+        content = ERB.new(erb_template)
+        timeout = @sync_interval
         SCR.Write(
           path(".target.string"),
           TIMER_PATH,
-          format(TIMER_CONTENT, timeout: @sync_interval)
+          content.result
         )
-        SCR.Execute(
-          path(".target.bash"),
-          "/bin/systemctl enable #{TIMER_FILE}"
-        )
-        SCR.Execute(
-          path(".target.bash"),
-          "/bin/systemctl start #{TIMER_FILE}"
-        )
+        res = Yast2::Systemctl.execute("enable #{TIMER_FILE}")
+        log.info "enable timer: #{res.inspect}"
+        res = Yast2::Systemctl.execute("start #{TIMER_FILE}")
+        log.info "start timer: #{res.inspect}"
       else
-        SCR.Execute(
-          path(".target.bash"),
-          "/bin/systemctl disable #{TIMER_FILE}"
-        )
-        SCR.Execute(
-          path(".target.bash"),
-          "/bin/systemctl stop #{TIMER_FILE}"
-        )
+        res = Yast2::Systemctl.execute("disable #{TIMER_FILE}")
+        log.info "disable timer: #{res.inspect}"
+        res = Yast2::Systemctl.execute("stop #{TIMER_FILE}")
+        log.info "stop timer: #{res.inspect}"
         SCR.Execute(
           path(".target.bash"),
           "rm -vf #{TIMER_PATH}"

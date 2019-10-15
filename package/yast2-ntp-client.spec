@@ -25,7 +25,6 @@ Group:          System/YaST
 Url:            https://github.com/yast/yast-ntp-client
 
 Source0:        %{name}-%{version}.tar.bz2
-Source1:        yast-timesync.service
 
 BuildRequires:  augeas-lenses
 BuildRequires:  autoyast2-installation
@@ -71,7 +70,6 @@ This package contains the YaST2 component for NTP client configuration.
 %install
 %yast_install
 %yast_metainfo
-install -D -m 644 %{S:1} %{buildroot}%{_unitdir}/yast-timesync.service
 
 %post
 %service_add_post yast-timesync.service
@@ -85,15 +83,7 @@ fi
 # and now update cron to systemd timer. We need to support upgrade from SLE12 and also SLE15 SP1.
 # jsc#SLE-9113
 if [ -f /etc/cron.d/suse-ntp_synchronize ]; then
-  cat <<EOT > /etc/systemd/system/yast-timesync.timer
-[Timer]
-# first sync after boot
-OnBootSec=1min
-OnUnitActiveSec=$(grep -o '[[:digit:]]\+' /etc/cron.d/suse-ntp_synchronize)min
-
-[Install]
-WantedBy=timers.target
-EOT
+  /usr/bin/erb timeout=$(grep -o '[[:digit:]]\+' /etc/cron.d/suse-ntp_synchronize) /usr/share/YaST2/lib/y2ntp_client/yast-timesync.timer.erb > /etc/systemd/system/yast-timesync.timer
   /bin/systemctl enable yast-timesync.timer
   /bin/systemctl start yast-timesync.timer
   rm /etc/cron.d/suse-ntp_synchronize
