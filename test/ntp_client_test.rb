@@ -338,8 +338,8 @@ describe Yast::NtpClient do
       end
     end
 
-    it "updates cron settings" do
-      expect(subject).to receive(:update_cron_settings)
+    it "updates systemd timer settings" do
+      expect(subject).to receive(:update_timer_settings)
 
       subject.Write
     end
@@ -437,23 +437,27 @@ describe Yast::NtpClient do
   end
 
   describe "#ReadSynchronization" do
-    let(:cron_job_file) { "/etc/cron.d/suse-ntp_synchronize" }
-    let(:cron_entry) { [] }
+    let(:systemd_timer_file) { "/etc/systemd/system/yast-timesync.timer" }
+    let(:timer_content) { "" }
 
     before do
-      allow(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".cron"), cron_job_file, "").and_return(cron_entry)
+      allow(::File).to receive(:exist?).and_call_original
+      allow(::File).to receive(:exist?).with("/etc/systemd/system/yast-timesync.timer")
+        .and_return(true)
+      allow(::File).to receive(:read).and_return(timer_content)
     end
 
-    it "reads cron file" do
-      expect(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".cron"), cron_job_file, "")
+    it "reads systemd timer" do
+      expect(::File).to receive(:read).and_return(timer_content)
 
       subject.ReadSynchronization
     end
 
-    context "when cron file does not exist" do
-      let(:cron_entry) { nil }
+    context "when systemd timer file does not exist" do
+      before do
+        allow(::File).to receive(:exist?).with("/etc/systemd/system/yast-timesync.timer")
+          .and_return(true)
+      end
 
       it "sets synchronize_time as false" do
         subject.ReadSynchronization
@@ -468,29 +472,40 @@ describe Yast::NtpClient do
       end
     end
 
-    context "when cron file exists" do
-      context "when there is no cron entry" do
+    context "when systemd timer file exists" do
+      let(:timer_content) do
+        subject.sync_interval = 10
+        subject.send(:timer_content)
+      end
+
+      context "when timer is not active" do
+        before do
+          allow(Yast::SCR).to receive(:Execute).and_return("exit" => 3)
+        end
+
         it "sets synchronize_time as false" do
           subject.ReadSynchronization
 
           expect(subject.synchronize_time).to eql(false)
         end
 
-        it "sets sync interval with default value" do
+        it "sets sync interval with value from timer" do
           subject.ReadSynchronization
 
-          expect(subject.sync_interval).to eql(Yast::NtpClientClass::DEFAULT_SYNC_INTERVAL)
+          expect(subject.sync_interval).to eql(10)
         end
       end
 
-      context "when there is cron entry" do
-        let(:cron_entry) { [{ "events"   => [{ "active" => "1", "minute" => "*/10" }] }] }
+      context "when timer is active" do
+        before do
+          allow(Yast::SCR).to receive(:Execute).and_return("exit" => 0)
+        end
 
-        it "sets synchronize time as true if first cron entry is valid" do
+        it "sets synchronize time as true" do
           expect(subject.ReadSynchronization).to eql(true)
         end
 
-        it "sets sync_interval with cron minute interval" do
+        it "sets sync_interval with value from timer" do
           subject.ReadSynchronization
 
           expect(subject.sync_interval).to eql(10)
