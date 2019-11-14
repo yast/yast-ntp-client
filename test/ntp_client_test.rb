@@ -7,7 +7,6 @@ Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
 Yast.import "PackageSystem"
 Yast.import "Service"
-Yast.import "Profile"
 
 describe Yast::NtpClient do
 
@@ -40,28 +39,24 @@ describe Yast::NtpClient do
   end
 
   describe "#AutoYaST methods" do
-    FIXTURES_PATH = File.join(File.dirname(__FILE__), "fixtures")
-
     let(:ntp_client_section) do
-      # Yast Profile respect changed SCR, but xmlagent not, so it crashed in
-      # changed SCR root, so reset it back for this part
-      reset_scr_root
-      file = File.join(FIXTURES_PATH, "autoyast", profile_name)
-      Yast::Profile.ReadXML(file)
-      profile = Yast::Profile.current["ntp-client"]
-      change_scr_root(File.join(data_dir, "scr_root"))
-
-      profile
+      {
+        "ntp_policy"  => "eth*",
+        "ntp_servers" => [
+          "iburst"  => false,
+          "address" => "cz.pool.ntp.org",
+          "offline" => true
+        ],
+        "ntp_sync"    => "15"
+      }
     end
 
     describe "#Import" do
+      before(:each) do
+        subject.Import(ntp_client_section)
+      end
+
       context "with a correct AutoYaST configuration file" do
-        let(:profile_name) { "autoinst.xml" }
-
-        before(:each) do
-          subject.Import(ntp_client_section)
-        end
-
         it "sets properly netconfig policy" do
           expect(subject.ntp_policy).to eq "eth*"
         end
@@ -81,10 +76,6 @@ describe Yast::NtpClient do
 
       context "with an empty AutoYaST configuration" do
         let(:ntp_client_section) { {} }
-
-        before(:each) do
-          subject.Import(ntp_client_section)
-        end
 
         it "clears all ntp servers" do
           expect(subject.GetUsedNtpServers).to be_empty
