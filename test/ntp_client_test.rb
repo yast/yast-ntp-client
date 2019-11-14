@@ -41,13 +41,13 @@ describe Yast::NtpClient do
   describe "#AutoYaST methods" do
     let(:ntp_client_section) do
       {
-        "ntp_policy" => "eth*",
+        "ntp_policy"  => "eth*",
         "ntp_servers" => [
-          "iburst" => false,
+          "iburst"  => false,
           "address" => "cz.pool.ntp.org",
           "offline" => true
         ],
-        "ntp_sync" => "15"
+        "ntp_sync"    => "15"
       }
     end
 
