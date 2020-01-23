@@ -83,8 +83,8 @@ fi
 # jsc#SLE-9113
 if [ -f /etc/cron.d/suse-ntp_synchronize ]; then
   /usr/bin/erb timeout=$(grep -o '[[:digit:]]\+' /etc/cron.d/suse-ntp_synchronize) /usr/share/YaST2/data/yast-timesync.timer.erb > /etc/systemd/system/yast-timesync.timer
-  /bin/systemctl enable yast-timesync.timer
-  /bin/systemctl start yast-timesync.timer
+  /usr/bin/systemctl enable yast-timesync.timer
+  /usr/bin/systemctl start yast-timesync.timer
   rm /etc/cron.d/suse-ntp_synchronize
 fi
 
