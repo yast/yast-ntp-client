@@ -4,6 +4,10 @@ ENV["LC_ALL"] = "en_US.utf8"
 require "yast"
 require "yast/rspec"
 require "yaml"
+require "pathname"
+
+TESTS_PATH = Pathname.new(File.dirname(__FILE__))
+DATA_PATH = TESTS_PATH.join("data")
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
