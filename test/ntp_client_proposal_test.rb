@@ -13,6 +13,51 @@ describe Yast::NtpClientProposalClient do
     client
   end
 
+  describe "#MakeProposal" do
+    let(:dhcp_ntp_servers) { [] }
+
+    before do
+      allow(Yast::Lan).to receive(:dhcp_ntp_servers)
+        .and_return(dhcp_ntp_servers)
+     allow(Yast::Directory).to receive(:find_data_file).and_call_original
+     allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
+       .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
+     allow(Yast::Timezone).to receive(:timezone).and_return("Europe/Berlin")
+     allow(Yast::Timezone).to receive(:GetCountryForTimezone)
+       .with("Europe/Berlin").and_return("de")
+    end
+
+    context "when NTP servers were found via DHCP" do
+      let(:dhcp_ntp_servers) { ["test.example.net"] }
+
+      it "proposes only the found servers" do
+        expect(Yast::UI).to receive(:ChangeWidget) do |*args|
+          items = args.last
+          hostnames = items.map { |i| i[1] }
+          expect(hostnames).to eq(
+            ["test.example.net"]
+          )
+        end
+        subject.MakeProposal
+      end
+    end
+
+    context "when no NTP server were found via DHCP" do
+      let(:dhcp_ntp_servers) { [] }
+
+      it "proposes the known public servers for the current timezone" do
+        expect(Yast::UI).to receive(:ChangeWidget) do |*args|
+          items = args.last
+          hostnames = items.map { |i| i[1] }
+          expect(hostnames).to eq(
+            ["tick.fh-augsburg.de", "de.pool.ntp.org"]
+          )
+        end
+        subject.MakeProposal
+      end
+    end
+  end
+
   describe "#Write" do
     let(:ntp_server) { "fake.pool.ntp.org" }
     let(:write_only) { false }

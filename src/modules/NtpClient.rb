@@ -624,7 +624,7 @@ module Yast
     # Convenience method to obtain the list of ntp servers proposed by DHCP
     # @see https://www.rubydoc.info/github/yast/yast-network/Yast/LanClass:${0}
     def dhcp_ntp_servers
-      Yast::Lan.dhcp_ntp_servers
+      Yast::Lan.dhcp_ntp_servers.map { |s| Y2Network::NtpServer.new(s) }
     end
 
     publish variable: :AbortFunction, type: "boolean ()"
