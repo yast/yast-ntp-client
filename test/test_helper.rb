@@ -28,7 +28,12 @@ def stub_module(name, fake_class = nil)
 end
 
 # stub classes from other modules to speed up a build
-stub_module("Lan", Class.new { def dhcp_ntp_servers; []; end })
+lan = Class.new do
+  def dhcp_ntp_servers
+    []
+  end
+end
+stub_module("Lan", lan)
 stub_module("Language")
 stub_module("Pkg")
 stub_module("PackageCallbacks")

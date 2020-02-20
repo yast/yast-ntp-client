@@ -19,12 +19,12 @@ describe Yast::NtpClientProposalClient do
     before do
       allow(Yast::Lan).to receive(:dhcp_ntp_servers)
         .and_return(dhcp_ntp_servers)
-     allow(Yast::Directory).to receive(:find_data_file).and_call_original
-     allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
-       .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
-     allow(Yast::Timezone).to receive(:timezone).and_return("Europe/Berlin")
-     allow(Yast::Timezone).to receive(:GetCountryForTimezone)
-       .with("Europe/Berlin").and_return("de")
+      allow(Yast::Directory).to receive(:find_data_file).and_call_original
+      allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
+        .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
+      allow(Yast::Timezone).to receive(:timezone).and_return("Europe/Berlin")
+      allow(Yast::Timezone).to receive(:GetCountryForTimezone)
+        .with("Europe/Berlin").and_return("de")
     end
 
     context "when NTP servers were found via DHCP" do

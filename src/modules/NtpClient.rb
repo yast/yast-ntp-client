@@ -215,9 +215,7 @@ module Yast
       servers = public_ntp_servers.select { |s| s.country.upcase == normalized_country }
       # bnc#458917 add country, in case data/country.ycp does not have it
       country_server = make_country_ntp_server(country)
-      unless servers.map(&:hostname).include?(country_server.hostname)
-        servers << country_server
-      end
+      servers << country_server unless servers.map(&:hostname).include?(country_server.hostname)
       servers
     end
 
