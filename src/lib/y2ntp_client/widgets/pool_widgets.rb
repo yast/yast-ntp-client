@@ -308,8 +308,15 @@ module Y2NtpClient
 
     private
 
+      # Returns the country for the given address
+      #
+      # FIXME: if the UI used a proper object instead of just a string, this
+      # method will not be needed.
+      #
+      # @param address [String] Server address
       def country_for(address)
-        Yast::NtpClient.GetNtpServers.fetch(address, {})["country"]
+        server = Yast::NtpClient.public_ntp_servers.find { |s| s.hostname == address }
+        server ? server.country : nil
       end
     end
 
@@ -382,7 +389,7 @@ module Y2NtpClient
 
       # macro seeItemsSelection
       def items
-        ntp_servers.map { |s, v| [s, "#{s} (#{v["country"]})"] }
+        ntp_servers.map { |s| [s.hostname, "#{s.hostname} (#{s.country})"] }
       end
 
       def refresh(country)
@@ -393,10 +400,10 @@ module Y2NtpClient
     private
 
       def ntp_servers
-        servers = Yast::NtpClient.GetNtpServers
+        servers = Yast::NtpClient.public_ntp_servers
         return servers if @country.to_s.empty?
 
-        servers.find_all { |_s, v| v["country"] == @country }
+        servers.select { |s| s.country == @country }
       end
     end
   end

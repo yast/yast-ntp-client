@@ -13,6 +13,81 @@ describe Yast::NtpClientProposalClient do
     client
   end
 
+  describe "#MakeProposal" do
+    let(:dhcp_ntp_servers) { [] }
+    let(:config_was_read?) { false }
+    let(:ntp_was_selected?) { false }
+
+    before do
+      allow(Yast::Lan).to receive(:dhcp_ntp_servers)
+        .and_return(dhcp_ntp_servers)
+
+      allow(Yast::NtpClient).to receive(:country_ntp_servers).with("de")
+        .and_return([Y2Network::NtpServer.new("de.pool.ntp.org")])
+      allow(Yast::Timezone).to receive(:timezone).and_return("Europe/Berlin")
+      allow(Yast::Timezone).to receive(:GetCountryForTimezone)
+        .with("Europe/Berlin").and_return("de")
+      allow(Yast::NtpClient).to receive(:config_has_been_read).and_return(config_was_read?)
+      allow(Yast::NtpClient).to receive(:ntp_selected).and_return(ntp_was_selected?)
+      allow(Yast::NtpClient).to receive(:GetUsedNtpServers)
+        .and_return(["2.opensuse.pool.ntp.org"])
+    end
+
+    context "when NTP servers were found via DHCP" do
+      let(:dhcp_ntp_servers) { ["test.example.net"] }
+
+      it "proposes only the found servers" do
+        expect(Yast::UI).to receive(:ChangeWidget) do |*args|
+          items = args.last
+          hostnames = items.map { |i| i[1] }
+          expect(hostnames).to eq(
+            ["test.example.net"]
+          )
+        end
+        subject.MakeProposal
+      end
+    end
+
+    context "when no NTP server were found via DHCP" do
+      let(:dhcp_ntp_servers) { [] }
+
+      it "proposes the known public servers for the current timezone" do
+        expect(Yast::UI).to receive(:ChangeWidget) do |*args|
+          items = args.last
+          hostnames = items.map { |i| i[1] }
+          expect(hostnames).to eq(["de.pool.ntp.org"])
+        end
+        subject.MakeProposal
+      end
+    end
+
+    context "when the NTP configuration has been read (from chrony)" do
+      let(:config_was_read?) { true }
+
+      it "proposes the known public servers for the current timezone" do
+        expect(Yast::UI).to receive(:ChangeWidget) do |*args|
+          items = args.last
+          hostnames = items.map { |i| i[1] }
+          expect(hostnames).to eq(["2.opensuse.pool.ntp.org"])
+        end
+        subject.MakeProposal
+      end
+    end
+
+    context "when the NTP server was already selected" do
+      let(:ntp_was_selected?) { true }
+
+      it "proposes the known public servers for the current timezone" do
+        expect(Yast::UI).to receive(:ChangeWidget) do |*args|
+          items = args.last
+          hostnames = items.map { |i| i[1] }
+          expect(hostnames).to eq(["2.opensuse.pool.ntp.org"])
+        end
+        subject.MakeProposal
+      end
+    end
+  end
+
   describe "#Write" do
     let(:ntp_server) { "fake.pool.ntp.org" }
     let(:write_only) { false }

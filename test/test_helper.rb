@@ -4,6 +4,10 @@ ENV["LC_ALL"] = "en_US.utf8"
 require "yast"
 require "yast/rspec"
 require "yaml"
+require "pathname"
+
+TESTS_PATH = Pathname.new(File.dirname(__FILE__))
+DATA_PATH = TESTS_PATH.join("data")
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
@@ -18,12 +22,18 @@ end
 
 # stub module to prevent its Import
 # Useful for modules from different yast packages, to avoid build dependencies
-def stub_module(name)
-  Yast.const_set(name.to_sym, Class.new { def self.fake_method; end })
+def stub_module(name, fake_class = nil)
+  fake_class = Class.new { def self.fake_method; end } if fake_class.nil?
+  Yast.const_set name.to_sym, fake_class
 end
 
 # stub classes from other modules to speed up a build
-stub_module("Lan")
+lan = Class.new do
+  def dhcp_ntp_servers
+    []
+  end
+end
+stub_module("Lan", lan)
 stub_module("Language")
 stub_module("Pkg")
 stub_module("PackageCallbacks")

@@ -340,6 +340,38 @@ describe Yast::NtpClient do
     end
   end
 
+  describe "#public_ntp_servers" do
+    before do
+      allow(subject).to receive(:GetAllKnownCountries)
+        .and_return("DE" => "Germany", "CZ" => "Czech Republic")
+      allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
+        .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
+    end
+
+    it "returns the list of public NTP servers including the default one for each country" do
+      servers = subject.public_ntp_servers
+      expect(servers.map(&:hostname)).to eq(
+        ["ntp.cgi.cz", "tick.fh-augsburg.de", "de.pool.ntp.org", "cz.pool.ntp.org"]
+      )
+    end
+  end
+
+  describe "#country_ntp_servers" do
+    before do
+      allow(subject).to receive(:GetAllKnownCountries)
+        .and_return("DE" => "Germany", "CZ" => "Czech Republic")
+      allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
+        .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
+    end
+
+    it "returns the list of public NTP servers for the given country" do
+      servers = subject.country_ntp_servers("DE")
+      expect(servers.map(&:hostname)).to eq(
+        ["tick.fh-augsburg.de", "de.pool.ntp.org"]
+      )
+    end
+  end
+
   describe "#MakePoolRecord" do
     let(:record) do
       {

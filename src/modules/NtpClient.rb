@@ -14,6 +14,7 @@ require "yast2/target_file" # required to cfa work on changed scr
 require "ui/text_helpers"
 require "erb"
 require "yast2/systemctl"
+require "y2network/ntp_server"
 
 module Yast
   class NtpClientClass < Module
@@ -193,7 +194,33 @@ module Yast
       }
     end
 
+    # Returns the know ntp servers
+    #
+    # @return [Array<Y2Network::NtpServer>] Known NTP servers
+    def public_ntp_servers
+      update_ntp_servers! if @ntp_servers.nil?
+      @ntp_servers.values.map do |srv|
+        Y2Network::NtpServer.new(
+          srv["address"], country: srv["country"], location: srv["location"]
+        )
+      end
+    end
+
+    # Returns the NTP servers for the given country
+    #
+    # @param country [String] Country code
+    # @return [Array<Y2Network::NtpServer>] NTP servers for the given country
+    def country_ntp_servers(country)
+      normalized_country = country.upcase
+      servers = public_ntp_servers.select { |s| s.country.upcase == normalized_country }
+      # bnc#458917 add country, in case data/country.ycp does not have it
+      country_server = make_country_ntp_server(country)
+      servers << country_server unless servers.map(&:hostname).include?(country_server.hostname)
+      servers
+    end
+
     # Get the list of known NTP servers
+    # @deprecated Use public_ntp_servers instead
     # @return a list of known NTP servers
     def GetNtpServers
       update_ntp_servers! if @ntp_servers.nil?
@@ -219,9 +246,11 @@ module Yast
     end
 
     # Get list of public NTP servers for a country
+    #
     # @param [String] country two-letter country code
     # @param [Boolean] terse_output display additional data (location etc.)
     # @return [Array] of servers (usable as combo-box items)
+    # @deprecated Use public_ntp_servers_by_country instead
     def GetNtpServersByCountry(country, terse_output)
       country_names = {}
       servers = GetNtpServers()
@@ -593,7 +622,7 @@ module Yast
     # Convenience method to obtain the list of ntp servers proposed by DHCP
     # @see https://www.rubydoc.info/github/yast/yast-network/Yast/LanClass:${0}
     def dhcp_ntp_servers
-      Yast::Lan.dhcp_ntp_servers
+      Yast::Lan.dhcp_ntp_servers.map { |s| Y2Network::NtpServer.new(s) }
     end
 
     publish variable: :AbortFunction, type: "boolean ()"
@@ -919,6 +948,7 @@ module Yast
     # @return [Array <Hash>] pool records for given countries
     def pool_servers_for(known_countries)
       known_countries.map do |short_country, country_name|
+        # bnc#458917 add country, in case data/country.ycp does not have it
         MakePoolRecord(short_country, country_name)
       end
     end
@@ -944,6 +974,15 @@ module Yast
       width = displayinfo["TextMode"] ? displayinfo.fetch("Width", 80) : 80
 
       Yast::Report.Error(wrap_text(msg, width - 4))
+    end
+
+    # Pool server for the given country
+    #
+    # @param country [String] Country code
+    # @return [Y2Network::NtpServer]
+    def make_country_ntp_server(country)
+      record = MakePoolRecord(country, "")
+      Y2Network::NtpServer.new(record["address"], country: record["country"])
     end
   end
 

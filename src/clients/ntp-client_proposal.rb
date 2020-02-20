@@ -491,7 +491,12 @@ module Yast
     # @return [Array<Yast::Term>] ntp address Item
     def timezone_ntp_items
       timezone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
-      NtpClient.GetNtpServersByCountry(timezone_country, true)
+      servers = NtpClient.country_ntp_servers(timezone_country)
+      # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
+      selected = servers.find { |s| s.hostname.end_with?("pool.ntp.org") }
+      servers.map do |server|
+        Item(Id(server.hostname), server.hostname, server.hostname == selected)
+      end
     end
 
     # List of dhcp ntp servers Yast::Term items with the ntp address ID and
@@ -499,7 +504,7 @@ module Yast
     #
     # @return [Array<Yast::Term>] ntp address table Item
     def dhcp_ntp_items
-      NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s), s) }
+      NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s.hostname), s.hostname) }
     end
 
     # List of ntp servers Yast::Term items with the ntp address ID and label
