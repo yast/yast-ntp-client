@@ -128,7 +128,7 @@ module Yast
     end
 
     def ui_enable_disable_widgets(enabled)
-      UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
+      UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled) if select_ntp_server
       UI.ChangeWidget(Id(:run_service), :Enabled, enabled)
       # FIXME: With chronyd, we cannot synchronize if the service is already
       # running, we could force a makestep in this case, but then the button
@@ -188,18 +188,14 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      if NtpClient.config_has_been_read || NtpClient.ntp_selected
-        log.info("ntp_items will be filled from /etc/chrony.conf")
-        # grr, GUNS means all of them are used and here we just pick one
-        ntp_items = configured_ntp_items
+      if select_ntp_server
+        ntp_items = fallback_ntp_items if ntp_items.empty?
+        # Once read or proposed any config we consider it as read (bnc#427712)
+        NtpClient.config_has_been_read = true
+
+        log.info "ntp_items :#{ntp_items}"
+        UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
       end
-
-      ntp_items = fallback_ntp_items if ntp_items.empty?
-      # Once read or proposed any config we consider it as read (bnc#427712)
-      NtpClient.config_has_been_read = true
-
-      log.info "ntp_items :#{ntp_items}"
-      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       nil
     end
@@ -208,6 +204,30 @@ module Yast
     # @return should our radio button be selected
     def ui_init(rp, first_time)
       rp = deep_copy(rp)
+
+      if select_ntp_server
+        ntp_server_widget = ComboBox(
+          Id(:ntp_address),
+          Opt(:editable, :hstretch),
+          # TRANSLATORS: combo box label
+          _("&NTP Server Address")
+        )
+      else
+        # Only show all ntp servers
+        text = _("Synchronization Servers:\n").dup
+        counter = NtpClient.GetUsedNtpServers.size > 3 ? 3 : NtpClient.GetUsedNtpServers.size
+        counter.times do |i|
+          text << NtpClient.GetUsedNtpServers[i]
+          text << "\n"
+        end
+        if NtpClient.GetUsedNtpServers.size > 3
+          # TRANSLATOR %1 number of additional servers
+          text << Builtins.sformat(_("... (%1 more servers)"),
+            NtpClient.GetUsedNtpServers.size - counter)
+        end
+        ntp_server_widget = Label(text)
+      end
+
       cont = VBox(
         VSpacing(0.5),
         HBox(
@@ -215,12 +235,7 @@ module Yast
           HWeight(
             1,
             Left(
-              ComboBox(
-                Id(:ntp_address),
-                Opt(:editable, :hstretch),
-                # TRANSLATORS: combo box label
-                _("&NTP Server Address")
-              )
+              ntp_server_widget
             )
           ),
           HWeight(
@@ -289,16 +304,16 @@ module Yast
 
     def AskUser
       ret = nil
-      ntp_server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
-      if !ValidateSingleServer(ntp_server)
-        ret = :invalid_hostname
-      else
+      if select_ntp_server
+        ntp_server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
+        return :invalid_hostname unless ValidateSingleServer(ntp_server)
+
         NtpClient.ntp_conf.clear_pools
         NtpClient.ntp_conf.add_pool(ntp_server)
-        retval = Convert.to_boolean(WFM.CallFunction("ntp-client"))
-        ret = :next if retval
-        MakeProposal()
       end
+      ret = :next if WFM.CallFunction("ntp-client")
+      MakeProposal()
+
       ret
     end
 
@@ -356,13 +371,14 @@ module Yast
       params.compact!
 
       ntp_server  = params.fetch("server", "")
-      ntp_servers = params.fetch("servers", [])
+      ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpServers)
       run_service = params.fetch("run_service", NtpClient.run_service)
 
       # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
-      ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) if ntp_server.strip.empty?
-
-      return :invalid_hostname unless ValidateSingleServer(ntp_server)
+      if ntp_server.strip.empty? && select_ntp_server
+        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
+        return :invalid_hostname unless ValidateSingleServer(ntp_server)
+      end
 
       add_or_install_required_package unless params["write_only"]
 
@@ -370,8 +386,13 @@ module Yast
 
       return :success if params["write_only"]
 
-      # Only if network is running try to synchronize the ntp server
+      # Only if network is running and user has selected an ntp server try to synchronize
+      # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
+        if !select_ntp_server && ntp_server.empty?
+          # Trying first server in the list
+          ntp_server = NtpClient.GetUsedNtpServers.first unless NtpClient.GetUsedNtpServers.nil?
+        end
         Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
         exit_code = NtpClient.sync_once(ntp_server)
         Popup.ClearFeedback
@@ -436,8 +457,11 @@ module Yast
 
       rv = Write(argmap)
 
-      server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
-
+      server = if select_ntp_server
+        Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
+      else
+        NtpClient.GetUsedNtpServers.first
+      end
       Builtins.y2milestone("ui_try_save argmap %1", argmap)
       if rv == :invalid_hostname
         handle_invalid_hostname(server)
@@ -486,13 +510,6 @@ module Yast
       end
     end
 
-    # Configured ntp servers Yast::Term items with the ntp address ID and label
-    #
-    # @return [Yast::Term] ntp address table Item
-    def configured_ntp_items
-      NtpClient.GetUsedNtpServers.map { |s| Item(Id(s), s) }
-    end
-
     # Public list of ntp servers Yast::Term items with the ntp address ID and
     # label
     #
@@ -524,6 +541,14 @@ module Yast
 
       log.info("Proposing NTP server list provided by DHCP")
       dhcp_items
+    end
+
+    # Checking if the user can select one ntp server from the list
+    # of proposed servers.
+    #
+    # @return [Boolean] true if the user should select a server
+    def select_ntp_server
+      NtpClient.GetUsedNtpServers.nil? || (NtpClient.GetUsedNtpServers.size <= 1)
     end
   end
 end
