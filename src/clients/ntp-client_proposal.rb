@@ -175,8 +175,6 @@ module Yast
     end
 
     def MakeProposal
-      ntp_items = []
-
       # On the running system, read all the data, otherwise firewall and other
       # stuff outside ntp.conf may not be initialized correctly (#375877)
       if !Stage.initial
@@ -189,7 +187,7 @@ module Yast
       end
 
       if select_ntp_server
-        ntp_items = fallback_ntp_items if ntp_items.empty?
+        ntp_items = fallback_ntp_items
         # Once read or proposed any config we consider it as read (bnc#427712)
         NtpClient.config_has_been_read = true
 
@@ -534,8 +532,6 @@ module Yast
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items
       dhcp_items = dhcp_ntp_items
-
-      log.info("Nothing found in /etc/chrony.conf")
       if dhcp_items.empty?
         log.info("Proposing current timezone-based NTP server list")
         return timezone_ntp_items
