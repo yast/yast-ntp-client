@@ -531,22 +531,34 @@ module Yast
     #
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items
-      items = dhcp_ntp_items
-      if !items.empty?
+      return @cached_fallback_ntp_items if @cached_fallback_ntp_items
+      @cached_fallback_ntp_items = dhcp_ntp_items
+      if !@cached_fallback_ntp_items.empty?
         log.info("Proposing NTP server list provided by DHCP")
       else
         log.info("Proposing current timezone-based NTP server list")
-        items = timezone_ntp_items
+        @cached_fallback_ntp_items = timezone_ntp_items
       end
-      items
+      @cached_fallback_ntp_items
     end
 
     # Checking if the user can select one ntp server from the list
     # of proposed servers.
+    # It does not make sense if there are more than one ntp server has been
+    # defined.
     #
     # @return [Boolean] true if the user should select a server
     def select_ntp_server
-      NtpClient.GetUsedNtpServers.nil? || (NtpClient.GetUsedNtpServers.size <= 1)
+      ret = NtpClient.GetUsedNtpServers.nil? || NtpClient.GetUsedNtpServers.empty?
+      # It could be that the user has defined an own ntp server in the ntp-client
+      # module which is not defined in the combo box. In that case we do not offer
+      # a selection. The user should go back to ntp-client to change it.
+      if NtpClient.GetUsedNtpServers.size == 1
+        ret = fallback_ntp_items.any? do |item|
+          item.params[1] == NtpClient.GetUsedNtpServers.first
+        end
+      end
+      ret
     end
   end
 end
