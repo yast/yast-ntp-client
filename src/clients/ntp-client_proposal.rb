@@ -384,7 +384,7 @@ module Yast
 
       return :success if params["write_only"]
 
-      # Only if network is running and user has selected an ntp server try to synchronize
+      # Only if network is running try to synchronize
       # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
         if !select_ntp_server && ntp_server.empty?
@@ -411,7 +411,7 @@ module Yast
             UI.QueryWidget(Id(:ntp_address), :Value)
           )
         elsif rv == :next && !Stage.initial
-          # Update UI for the changes ntp servers
+          # Updating UI for the changed ntp servers
           ui_init(Id(:rp), false)
           # show the 'save' status after configuration
           UI.ChangeWidget(Id(:ntp_save), :Value, GetNTPEnabled())
