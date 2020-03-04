@@ -531,14 +531,14 @@ module Yast
     #
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items
-      dhcp_items = dhcp_ntp_items
-      if dhcp_items.empty?
+      items = dhcp_ntp_items
+      if !items.empty?
+        log.info("Proposing NTP server list provided by DHCP")
+      else
         log.info("Proposing current timezone-based NTP server list")
-        return timezone_ntp_items
+        items = timezone_ntp_items
       end
-
-      log.info("Proposing NTP server list provided by DHCP")
-      dhcp_items
+      items
     end
 
     # Checking if the user can select one ntp server from the list
