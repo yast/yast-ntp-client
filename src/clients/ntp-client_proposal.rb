@@ -413,6 +413,8 @@ module Yast
             UI.QueryWidget(Id(:ntp_address), :Value)
           )
         elsif rv == :next && !Stage.initial
+          # Update UI for the changes ntp servers
+          ui_init(Id(:rp), false)
           # show the 'save' status after configuration
           UI.ChangeWidget(Id(:ntp_save), :Value, GetNTPEnabled())
         end
