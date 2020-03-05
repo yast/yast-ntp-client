@@ -36,6 +36,7 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::Report).to receive(:Error)
       allow(Yast::NetworkService).to receive(:isNetworkRunning).and_return(network_running)
       allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(false)
+      allow(Yast::NtpClient).to receive(:dhcp_ntp_servers).and_return([])
     end
 
     context "with a not valid hostname" do
