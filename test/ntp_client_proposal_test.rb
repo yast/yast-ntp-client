@@ -198,15 +198,17 @@ describe Yast::NtpClientProposalClient do
         allow(Yast::NtpClient).to receive(:dhcp_ntp_servers).and_return([])
       end
 
-      context "defined server is not in the selection list" do
+      context "and defined server is not in the selection list" do
         it "returns false" do
           allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["not_found"])
           expect(subject.send(:select_ntp_server)).to eq(false)
         end
       end
 
-      context "defined server is in the selection list" do
-        it "returns false" do
+      context "and defined server is in the selection list" do
+        it "returns true" do
+	  allow(Yast::NtpClient).to receive(:GetNtpServersByCountry).and_return(
+		  [Item(Id("de.pool.ntp.org"), "de.pool.ntp.org", true)])
           allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["de.pool.ntp.org"])
           expect(subject.send(:select_ntp_server)).to eq(true)
         end
