@@ -303,13 +303,16 @@ module Yast
     def AskUser
       ret = nil
       if select_ntp_server
+        # The user can select ONE ntp server.
+        # So we Initialize the ntp client module with the selected ntp server.
         ntp_server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
         return :invalid_hostname unless ValidateSingleServer(ntp_server)
-
         NtpClient.ntp_conf.clear_pools
         NtpClient.ntp_conf.add_pool(ntp_server)
       end
+      # Calling ntp client module.
       ret = :next if WFM.CallFunction("ntp-client")
+      # Initialize the rest
       MakeProposal()
 
       ret
