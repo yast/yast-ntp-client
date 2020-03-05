@@ -555,6 +555,7 @@ module Yast
       # module which is not defined in the combo box. In that case we do not offer
       # a selection. The user should go back to ntp-client to change it.
       if NtpClient.GetUsedNtpServers.size == 1
+        puts "llll #{fallback_ntp_items}"
         ret = fallback_ntp_items.any? do |item|
           item.params[1] == NtpClient.GetUsedNtpServers.first
         end

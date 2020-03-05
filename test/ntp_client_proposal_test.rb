@@ -177,4 +177,41 @@ describe Yast::NtpClientProposalClient do
       end
     end
   end
+
+  describe "#select_ntp_server" do
+    context "there are already more than one ntp server defined" do
+      it "returns false" do
+        allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["n1", "n2"])
+        expect(subject.send(:select_ntp_server)).to eq(false)
+      end
+    end
+
+    context "there is no ntp server defined" do
+      it "returns true" do
+        allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return([])
+        expect(subject.send(:select_ntp_server)).to eq(true)
+      end
+    end
+
+    context "there is ONE ntp server defined" do
+      before do
+        allow(Yast::NtpClient).to receive(:dhcp_ntp_servers).and_return([])
+      end
+
+      context "defined server is not in the selection list" do
+        it "returns false" do
+          allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["not_found"])
+          expect(subject.send(:select_ntp_server)).to eq(false)
+        end
+      end
+
+      context "defined server is in the selection list" do
+        it "returns false" do
+          allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["de.pool.ntp.org"])
+          expect(subject.send(:select_ntp_server)).to eq(true)
+        end
+      end
+    end
+
+  end
 end
