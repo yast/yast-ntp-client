@@ -207,8 +207,9 @@ describe Yast::NtpClientProposalClient do
 
       context "and defined server is in the selection list" do
         it "returns true" do
-	  allow(Yast::NtpClient).to receive(:GetNtpServersByCountry).and_return(
-		  [Item(Id("de.pool.ntp.org"), "de.pool.ntp.org", true)])
+          allow(Yast::NtpClient).to receive(:GetNtpServersByCountry).and_return(
+            [Item(Id("de.pool.ntp.org"), "de.pool.ntp.org", true)]
+          )
           allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["de.pool.ntp.org"])
           expect(subject.send(:select_ntp_server)).to eq(true)
         end
