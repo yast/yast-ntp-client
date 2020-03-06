@@ -380,7 +380,9 @@ module Yast
         ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
       end
 
-      return :invalid_hostname unless ValidateSingleServer(ntp_server)
+      if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
+        return :invalid_hostname
+      end
 
       add_or_install_required_package unless params["write_only"]
 
@@ -391,13 +393,20 @@ module Yast
       # Only if network is running try to synchronize
       # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
-        if !select_ntp_server && ntp_server.empty?
-          # Trying first server in the list
-          ntp_server = NtpClient.GetUsedNtpServers.first unless NtpClient.GetUsedNtpServers.nil?
+        ntp_servers = [ntp_server]
+        if !select_ntp_server
+          # Taking also the rest of the ntp servers, configured in the ntp client module.
+          ntp_servers += NtpClient.GetUsedNtpServers unless NtpClient.GetUsedNtpServers.nil?
         end
-        Popup.ShowFeedback("", _("Synchronizing with NTP server..."))
-        exit_code = NtpClient.sync_once(ntp_server)
-        Popup.ClearFeedback
+        ntp_servers.delete("")
+        ntp_servers.uniq
+        exit_code = 0
+        ntp_servers.each do |server|
+          Popup.ShowFeedback("", _("Synchronizing with NTP server...") + server)
+          exit_code = NtpClient.sync_once(server)
+          Popup.ClearFeedback
+          break if exit_code.zero?
+        end
 
         return :ntpdate_failed unless exit_code.zero?
       end
@@ -461,11 +470,11 @@ module Yast
 
       rv = Write(argmap)
 
-      server = if select_ntp_server
-        Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
-      else
-        NtpClient.GetUsedNtpServers.first
-      end
+      # The user has not had the possibility to change the ntp server.
+      # So we are done here.
+      return true unless select_ntp_server
+
+      server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
       Builtins.y2milestone("ui_try_save argmap %1", argmap)
       if rv == :invalid_hostname
         handle_invalid_hostname(server)
@@ -548,7 +557,7 @@ module Yast
 
     # Checking if the user can select one ntp server from the list
     # of proposed servers.
-    # It does not make sense if there are more than one ntp server has been
+    # It does not make sense if there are more than one ntp server
     # defined.
     #
     # @return [Boolean] true if the user should select a server
