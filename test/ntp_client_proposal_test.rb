@@ -139,13 +139,13 @@ describe Yast::NtpClientProposalClient do
         let(:network_running) { true }
 
         it "returns :ntpdate_failed if synchronization fails" do
-          allow(Yast::NtpClient).to receive(:sync_once).with(ntp_server).and_return(1)
+          allow(Yast::NtpClient).to receive(:sync_once).and_return(1)
 
           expect(subject.Write(params)).to eq(:ntpdate_failed)
         end
 
         it "returns :success if synchronization was successfully" do
-          allow(Yast::NtpClient).to receive(:sync_once).with(ntp_server).and_return(0)
+          allow(Yast::NtpClient).to receive(:sync_once).and_return(0)
 
           expect(subject.Write(params)).to eq(:success)
         end
