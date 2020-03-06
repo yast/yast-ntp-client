@@ -219,9 +219,9 @@ module Yast
           text << "\n"
         end
         if NtpClient.GetUsedNtpServers.size > 3
-          # TRANSLATOR %1 number of additional servers
-          text << Builtins.sformat(_("... (%1 more servers)"),
-            NtpClient.GetUsedNtpServers.size - counter)
+          # TRANSLATOR %{count} number of additional servers
+          text << format(_("... (%{count} more servers)"),
+             count: (NtpClient.GetUsedNtpServers.size - counter))
         end
         ntp_server_widget = Label(text)
       end
