@@ -40,7 +40,7 @@ describe Yast::NtpClientProposalClient do
     end
 
     context "with a not valid hostname" do
-      let(:ntp_server) { nil }
+      let(:ntp_server) { "not_valid" }
 
       it "does not write settings" do
         expect(subject).to_not receive(:WriteNtpSettings)

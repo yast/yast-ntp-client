@@ -377,7 +377,7 @@ module Yast
 
       # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
       if ntp_server.strip.empty? && select_ntp_server
-        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value)
+        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) || ""
       end
 
       if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
