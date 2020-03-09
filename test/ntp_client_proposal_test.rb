@@ -112,7 +112,7 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::NetworkService).to receive(:isNetworkRunning).and_return(network_running)
       allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(false)
       allow(Yast::NtpClient).to receive(:dhcp_ntp_servers).and_return([])
-      allow(Yast::Timezone).to receive(:GetCountryForTimezone).and_return("de")      
+      allow(Yast::Timezone).to receive(:GetCountryForTimezone).and_return("de")
     end
 
     context "with a not valid hostname" do
@@ -258,7 +258,7 @@ describe Yast::NtpClientProposalClient do
     before do
       allow(Yast::Timezone).to receive(:GetCountryForTimezone).and_return("de")
     end
-    
+
     context "there are already more than one ntp server defined" do
       it "returns false" do
         allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["n1", "n2"])
