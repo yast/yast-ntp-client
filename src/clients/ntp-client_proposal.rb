@@ -209,7 +209,7 @@ module Yast
       else
         # Only show all ntp servers
         text = _("Synchronization Servers:\n").dup
-        counter = NtpClient.GetUsedNtpServers.size > 3 ? 3 : NtpClient.GetUsedNtpServers.size
+        counter = (NtpClient.GetUsedNtpServers.size > 3) ? 3 : NtpClient.GetUsedNtpServers.size
         counter.times do |i|
           text << NtpClient.GetUsedNtpServers[i]
           text << "\n"
@@ -303,6 +303,7 @@ module Yast
         # So we Initialize the ntp client module with the selected ntp server.
         ntp_server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
         return :invalid_hostname unless ValidateSingleServer(ntp_server)
+
         NtpClient.ntp_conf.clear_pools
         NtpClient.ntp_conf.add_pool(ntp_server)
       end
@@ -376,9 +377,7 @@ module Yast
         ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) || ""
       end
 
-      if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
-        return :invalid_hostname
-      end
+      return :invalid_hostname if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
 
       add_or_install_required_package unless params["write_only"]
 
@@ -541,6 +540,7 @@ module Yast
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items
       return @cached_fallback_ntp_items if @cached_fallback_ntp_items
+
       @cached_fallback_ntp_items = dhcp_ntp_items
       if !@cached_fallback_ntp_items.empty?
         log.info("Proposing NTP server list provided by DHCP")
