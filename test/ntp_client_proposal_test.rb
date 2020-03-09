@@ -30,7 +30,8 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::NtpClient).to receive(:config_has_been_read).and_return(config_was_read?)
       allow(Yast::NtpClient).to receive(:ntp_selected).and_return(ntp_was_selected?)
       allow(Yast::NtpClient).to receive(:GetUsedNtpServers)
-        .and_return(["2.opensuse.pool.ntp.org"])
+        .and_return(["de.pool.ntp.org"])
+      allow(subject).to receive(:select_ntp_server).and_return(true)
     end
 
     context "when NTP servers were found via DHCP" do
@@ -68,7 +69,7 @@ describe Yast::NtpClientProposalClient do
         expect(Yast::UI).to receive(:ChangeWidget) do |*args|
           items = args.last
           hostnames = items.map { |i| i[1] }
-          expect(hostnames).to eq(["2.opensuse.pool.ntp.org"])
+          expect(hostnames).to eq(["de.pool.ntp.org"])
         end
         subject.MakeProposal
       end
@@ -81,7 +82,7 @@ describe Yast::NtpClientProposalClient do
         expect(Yast::UI).to receive(:ChangeWidget) do |*args|
           items = args.last
           hostnames = items.map { |i| i[1] }
-          expect(hostnames).to eq(["2.opensuse.pool.ntp.org"])
+          expect(hostnames).to eq(["de.pool.ntp.org"])
         end
         subject.MakeProposal
       end
