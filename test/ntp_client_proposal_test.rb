@@ -254,6 +254,10 @@ describe Yast::NtpClientProposalClient do
   end
 
   describe "#select_ntp_server" do
+    before do
+      allow(Yast::Timezone).to receive(:GetCountryForTimezone).and_return("de")
+    end
+
     context "there are already more than one ntp server defined" do
       it "returns false" do
         allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["n1", "n2"])
