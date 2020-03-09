@@ -36,10 +36,11 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::Report).to receive(:Error)
       allow(Yast::NetworkService).to receive(:isNetworkRunning).and_return(network_running)
       allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(false)
+      allow(Yast::NtpClient).to receive(:dhcp_ntp_servers).and_return([])
     end
 
     context "with a not valid hostname" do
-      let(:ntp_server) { nil }
+      let(:ntp_server) { "not_valid" }
 
       it "does not write settings" do
         expect(subject).to_not receive(:WriteNtpSettings)
@@ -138,13 +139,13 @@ describe Yast::NtpClientProposalClient do
         let(:network_running) { true }
 
         it "returns :ntpdate_failed if synchronization fails" do
-          allow(Yast::NtpClient).to receive(:sync_once).with(ntp_server).and_return(1)
+          allow(Yast::NtpClient).to receive(:sync_once).and_return(1)
 
           expect(subject.Write(params)).to eq(:ntpdate_failed)
         end
 
         it "returns :success if synchronization was successfully" do
-          allow(Yast::NtpClient).to receive(:sync_once).with(ntp_server).and_return(0)
+          allow(Yast::NtpClient).to receive(:sync_once).and_return(0)
 
           expect(subject.Write(params)).to eq(:success)
         end
@@ -175,5 +176,45 @@ describe Yast::NtpClientProposalClient do
         end
       end
     end
+  end
+
+  describe "#select_ntp_server" do
+    context "there are already more than one ntp server defined" do
+      it "returns false" do
+        allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["n1", "n2"])
+        expect(subject.send(:select_ntp_server)).to eq(false)
+      end
+    end
+
+    context "there is no ntp server defined" do
+      it "returns true" do
+        allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return([])
+        expect(subject.send(:select_ntp_server)).to eq(true)
+      end
+    end
+
+    context "there is ONE ntp server defined" do
+      before do
+        allow(Yast::NtpClient).to receive(:dhcp_ntp_servers).and_return([])
+      end
+
+      context "and defined server is not in the selection list" do
+        it "returns false" do
+          allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["not_found"])
+          expect(subject.send(:select_ntp_server)).to eq(false)
+        end
+      end
+
+      context "and defined server is in the selection list" do
+        it "returns true" do
+          allow(Yast::NtpClient).to receive(:GetNtpServersByCountry).and_return(
+            [Item(Id("de.pool.ntp.org"), "de.pool.ntp.org", true)]
+          )
+          allow(Yast::NtpClient).to receive(:GetUsedNtpServers).and_return(["de.pool.ntp.org"])
+          expect(subject.send(:select_ntp_server)).to eq(true)
+        end
+      end
+    end
+
   end
 end
