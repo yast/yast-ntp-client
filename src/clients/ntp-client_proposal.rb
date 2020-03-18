@@ -89,56 +89,56 @@ module Yast
     end
 
     def ui_help_text
-      # help text
-      tmp = _(
-        "<p>Press <b>Synchronize Now</b>, to get your system time set correctly " \
-        "using the selected NTP server. If you want to make use of NTP permanently, " \
-        "enable the <b>Save NTP Configuration</b> option</p>"
-      )
-
-      tmp = Ops.add(
-        tmp,
-        _(
-          "<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be " \
-          "started as daemon. Otherwise the system time will be synchronized periodically. " \
-          "The default interval is 15 min. You can change it after installation " \
-          "with the <b>yast2 ntp-client module</b>.</p>"
+      if Stage.initial
+        # help text
+        tmp = _(
+          "<p>Press <b>Synchronize Now</b>, to get your system time set correctly " \
+          "using the selected NTP server. If you want to make use of NTP permanently, " \
+          "enable the <b>Save NTP Configuration</b> option</p>"
         )
-      )
 
-      # help text, cont.
-      if !Stage.initial
         tmp = Ops.add(
           tmp,
           _(
-            "<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>"
+            "<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be " \
+            "started as daemon. Otherwise the system time will be synchronized periodically. " \
+            "The default interval is 15 min. You can change it after installation " \
+            "with the <b>yast2 ntp-client module</b>.</p>"
           )
         )
+        # help text, cont.
+        tmp = Ops.add(
+          tmp,
+          _(
+            "<p>Synchronization with the NTP server can be done only when " \
+            "the network is configured.</p>"
+          )
+        )        
+      else
+        # help text
+        tmp = _(
+            "<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>"
+          )
       end
 
-      # help text, cont.
-      tmp = Ops.add(
-        tmp,
-        _(
-          "<p>Synchronization with the NTP server can be done only when " \
-          "the network is configured.</p>"
-        )
-      )
       tmp
     end
 
     def ui_enable_disable_widgets(enabled)
       UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled) if select_ntp_server
-      UI.ChangeWidget(Id(:run_service), :Enabled, enabled)
-      # FIXME: With chronyd, we cannot synchronize if the service is already
-      # running, we could force a makestep in this case, but then the button
-      # should be reworded and maybe the user should confirm it (bsc#1087048)
-      if !NetworkService.isNetworkRunning || Service.Active(NtpClient.service_name)
-        UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
-      else
-        UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
+      if Stage.initial
+        UI.ChangeWidget(Id(:run_service), :Enabled, enabled)
+
+        # FIXME: With chronyd, we cannot synchronize if the service is already
+        # running, we could force a makestep in this case, but then the button
+        # should be reworded and maybe the user should confirm it (bsc#1087048)
+        if !NetworkService.isNetworkRunning || Service.Active(NtpClient.service_name)
+          UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
+        else
+          UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
+        end
+        UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
       end
-      UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
       if UI.WidgetExists(Id(:ntp_configure)) # bnc#483787
         UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled)
       end
@@ -193,6 +193,10 @@ module Yast
 
         log.info "ntp_items :#{ntp_items}"
         UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
+        if !Stage.initial
+          UI.ChangeWidget(Id(:ntp_address), :Value,
+                          NtpClient.GetUsedNtpServers.first)
+        end
       end
 
       nil
@@ -226,6 +230,36 @@ module Yast
         ntp_server_widget = Label(text)
       end
 
+      if Stage.initial
+        # TRANSLATORS: push button label
+        ntp_server_action_widget = Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
+        save_run_widget = VBox(
+          HBox(
+            HSpacing(0.5),
+            # TRANSLATORS: check box label
+            Left(
+              CheckBox(
+                Id(:run_service),
+                _("&Run NTP as daemon"),
+                NtpClient.run_service
+              )
+            )
+          ),
+          HBox(
+            HSpacing(0.5),
+            # TRANSLATORS: check box label
+            Left(
+              CheckBox(Id(:ntp_save), _("&Save NTP Configuration"), true)
+            )
+          )
+        )
+      else
+        # TRANSLATORS: push button label
+        # bnc#449615: only simple config for inst-sys
+        ntp_server_action_widget = Left(PushButton(Id(:ntp_configure), _("&Configure...")))
+        save_run_widget = VBox()
+      end
+
       cont = VBox(
         VSpacing(0.5),
         HBox(
@@ -243,8 +277,7 @@ module Yast
               # an explicit vertical space was added in order to move down the
               # push button being aligned with the combo box input.
               UI.TextMode ? VSpacing(1) : Label(""),
-              # TRANSLATORS: push button label
-              Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
+              ntp_server_action_widget
             )
           )
         ),
@@ -252,49 +285,23 @@ module Yast
           HSpacing(3),
           HWeight(
             1,
-            VBox(
-              HBox(
-                HSpacing(0.5),
-                # TRANSLATORS: check box label
-                Left(
-                  CheckBox(
-                    Id(:run_service),
-                    _("&Run NTP as daemon"),
-                    NtpClient.run_service
-                  )
-                )
-              ),
-              HBox(
-                HSpacing(0.5),
-                # TRANSLATORS: check box label
-                Left(
-                  CheckBox(Id(:ntp_save), _("&Save NTP Configuration"), true)
-                )
-              )
-            )
-          ),
-          HWeight(
-            1,
-            VBox(
-              # TRANSLATORS: push button label
-              # bnc#449615: only simple config for inst-sys
-              Stage.initial ? Label("") : Left(PushButton(Id(:ntp_configure), _("&Configure..."))),
-              Label("")
-            )
+            save_run_widget
           )
         )
       )
 
       UI.ReplaceWidget(rp, cont)
 
-      UI.ChangeWidget(Id(:ntp_now), :Enabled, false) if !NetworkService.isNetworkRunning
+      if Stage.initial && !NetworkService.isNetworkRunning
+        UI.ChangeWidget(Id(:ntp_now), :Enabled, false)
+      end
 
       # ^ createui0
 
       # FIXME: is it correct? move out?
       ntp_used = first_time && !Stage.initial ? GetNTPEnabled() : NtpClient.ntp_selected
 
-      UI.ChangeWidget(Id(:ntp_save), :Value, ntp_used)
+      UI.ChangeWidget(Id(:ntp_save), :Value, ntp_used) if Stage.initial
 
       MakeProposal()
       ntp_used
@@ -372,7 +379,7 @@ module Yast
       params.compact!
 
       ntp_server  = params.fetch("server", "")
-      ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpServers)
+      ntp_servers = params.fetch("servers", [])
       run_service = params.fetch("run_service", NtpClient.run_service)
 
       # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
@@ -385,7 +392,6 @@ module Yast
       end
 
       add_or_install_required_package unless params["write_only"]
-
       WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       return :success if params["write_only"]
@@ -426,8 +432,10 @@ module Yast
         elsif rv == :next && !Stage.initial
           # Updating UI for the changed ntp servers
           ui_init(Id(:rp), false)
-          # show the 'save' status after configuration
-          UI.ChangeWidget(Id(:ntp_save), :Value, GetNTPEnabled())
+          if Stage.initial
+            # show the 'save' status after configuration
+            UI.ChangeWidget(Id(:ntp_save), :Value, GetNTPEnabled())
+          end
         end
       end
       if ui == :ntp_now
@@ -442,7 +450,7 @@ module Yast
       end
       if ui == :accept && Stage.initial
         # checking if chrony is available for installation.
-        if UI.QueryWidget(Id(:ntp_save), :Value) == true &&
+        if Stage.initial && UI.QueryWidget(Id(:ntp_save), :Value) == true &&
             !Pkg.IsAvailable(NtpClientClass::REQUIRED_PACKAGE)
           Report.Error(Builtins.sformat(
             # TRANSLATORS: Popup message. %1 is the missing package name.
@@ -460,12 +468,10 @@ module Yast
     def ui_try_save
       argmap = {}
       Ops.set(argmap, "ntpdate_only", false)
-      Ops.set(argmap, "run_service", false)
-      if UI.QueryWidget(Id(:ntp_save), :Value) == false
-        Ops.set(argmap, "ntpdate_only", true)
-      end
-      if UI.QueryWidget(Id(:run_service), :Value) == true
-        Ops.set(argmap, "run_service", true)
+      Ops.set(argmap, "run_service", NtpClient.run_service)
+      if Stage.initial
+        Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
+        Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value)
       end
 
       rv = Write(argmap)
