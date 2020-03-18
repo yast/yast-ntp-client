@@ -113,12 +113,12 @@ module Yast
             "<p>Synchronization with the NTP server can be done only when " \
             "the network is configured.</p>"
           )
-        )        
+        )
       else
         # help text
         tmp = _(
-            "<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>"
-          )
+          "<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>"
+        )
       end
 
       tmp
@@ -195,7 +195,7 @@ module Yast
         UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
         if !Stage.initial
           UI.ChangeWidget(Id(:ntp_address), :Value,
-                          NtpClient.GetUsedNtpServers.first)
+            NtpClient.GetUsedNtpServers.first)
         end
       end
 
