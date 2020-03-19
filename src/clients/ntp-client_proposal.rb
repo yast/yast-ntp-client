@@ -203,7 +203,7 @@ module Yast
       else
         # Only show all ntp servers
         text = _("Synchronization Servers:\n").dup
-        counter = (NtpClient.GetUsedNtpServers.size) > 3 ? 3 : NtpClient.GetUsedNtpServers.size
+        counter = (NtpClient.GetUsedNtpServers.size > 3) ? 3 : NtpClient.GetUsedNtpServers.size
         counter.times do |i|
           text << NtpClient.GetUsedNtpServers[i]
           text << "\n"
@@ -379,6 +379,7 @@ module Yast
       end
 
       add_or_install_required_package unless params["write_only"]
+
       WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       return :success if params["write_only"]
@@ -455,17 +456,11 @@ module Yast
     def ui_try_save
       argmap = {}
       Ops.set(argmap, "ntpdate_only", false)
-<<<<<<< HEAD
-      Ops.set(argmap, "run_service", false)
-      Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
-      Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value) == true
-=======
       Ops.set(argmap, "run_service", NtpClient.run_service)
       if Stage.initial
         Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
         Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value)
       end
->>>>>>> SLE-15-SP1
 
       rv = Write(argmap)
 
@@ -549,10 +544,6 @@ module Yast
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items
       return @cached_fallback_ntp_items if @cached_fallback_ntp_items
-<<<<<<< HEAD
-
-=======
->>>>>>> SLE-15-SP1
       @cached_fallback_ntp_items = dhcp_ntp_items
       if !@cached_fallback_ntp_items.empty?
         log.info("Proposing NTP server list provided by DHCP")
