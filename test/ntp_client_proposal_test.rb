@@ -32,6 +32,7 @@ describe Yast::NtpClientProposalClient do
       allow(Yast::NtpClient).to receive(:GetUsedNtpServers)
         .and_return(["de.pool.ntp.org"])
       allow(subject).to receive(:select_ntp_server).and_return(true)
+      allow(Yast::Stage).to receive(:initial).and_return(true)
     end
 
     context "when NTP servers were found via DHCP" do
