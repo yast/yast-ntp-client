@@ -91,7 +91,7 @@ module Yast
     def ui_help_text
       if Stage.initial
         # help text
-        tmp = _(
+        _(
           "<p>Press <b>Synchronize Now</b>, to get your system time set correctly " \
           "using the selected NTP server. If you want to make use of NTP permanently, " \
           "enable the <b>Save NTP Configuration</b> option</p>"
@@ -106,12 +106,10 @@ module Yast
         )
       else
         # help text
-        tmp = _(
+        _(
           "<p>Using the <b>Configure</b> button, open the advanced NTP configuration.</p>"
         )
       end
-
-      tmp
     end
 
     def ui_enable_disable_widgets(enabled)
