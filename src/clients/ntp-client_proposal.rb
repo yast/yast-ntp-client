@@ -95,24 +95,14 @@ module Yast
           "<p>Press <b>Synchronize Now</b>, to get your system time set correctly " \
           "using the selected NTP server. If you want to make use of NTP permanently, " \
           "enable the <b>Save NTP Configuration</b> option</p>"
-        )
-
-        tmp = Ops.add(
-          tmp,
-          _(
+        ) + _(
             "<p>Enabling <b>Run NTP as daemon</b> option, the NTP service will be " \
             "started as daemon. Otherwise the system time will be synchronized periodically. " \
             "The default interval is 15 min. You can change it after installation " \
             "with the <b>yast2 ntp-client module</b>.</p>"
-          )
-        )
-        # help text, cont.
-        tmp = Ops.add(
-          tmp,
-          _(
+        ) + _(
             "<p>Synchronization with the NTP server can be done only when " \
             "the network is configured.</p>"
-          )
         )
       else
         # help text
