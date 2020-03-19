@@ -126,7 +126,8 @@ module Yast
         end
         UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
       end
-      if UI.WidgetExists(Id(:ntp_configure)) # bnc#483787
+      if UI.WidgetExists(Id(:ntp_configure))
+        # bnc#483787
         UI.ChangeWidget(Id(:ntp_configure), :Enabled, enabled)
       end
 
@@ -374,9 +375,7 @@ module Yast
         ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) || ""
       end
 
-      if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
-        return :invalid_hostname
-      end
+      return :invalid_hostname if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
 
       add_or_install_required_package unless params["write_only"]
 
@@ -544,6 +543,7 @@ module Yast
     # @return [Array<Yast::Term>] ntp address table Item
     def fallback_ntp_items
       return @cached_fallback_ntp_items if @cached_fallback_ntp_items
+
       @cached_fallback_ntp_items = dhcp_ntp_items
       if !@cached_fallback_ntp_items.empty?
         log.info("Proposing NTP server list provided by DHCP")
