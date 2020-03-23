@@ -381,6 +381,7 @@ module Yast
       return :invalid_hostname if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
 
       add_or_install_required_package unless params["write_only"]
+
       WriteNtpSettings(ntp_servers, ntp_server, run_service) unless params["ntpdate_only"]
 
       return :success if params["write_only"]
