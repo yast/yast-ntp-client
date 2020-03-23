@@ -321,10 +321,13 @@ module Yast
     def WriteNtpSettings(ntp_servers, ntp_server, run_service)
       ntp_servers = deep_copy(ntp_servers)
       NtpClient.modified = true
-      NtpClient.ntp_conf.clear_pools
-      ntp_servers << ntp_server if ntp_servers.empty?
-      ntp_servers.each do |server|
-        NtpClient.ntp_conf.add_pool(server)
+      if select_ntp_server
+        # The user has changed the ntp-server(s). So we are writing them.
+        NtpClient.ntp_conf.clear_pools
+        ntp_servers << ntp_server if ntp_servers.empty?
+        ntp_servers.each do |server|
+          NtpClient.ntp_conf.add_pool(server)
+        end
       end
       if run_service
         NtpClient.run_service = true
