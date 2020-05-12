@@ -2,25 +2,33 @@ default namespace = "http://www.suse.com/1.0/yast2ns"
 namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
 namespace config = "http://www.suse.com/1.0/configns"
 
+include "common.rnc"
+
 ntp-client =
   element ntp-client {
-    ntp_policy? &
-    ntp_sync? &
-    ntp_servers?
+    MAP,
+    (
+      ntp_policy? &
+      ntp_sync? &
+      ntp_servers?
+    )
   }
 
 ntp_policy =
-    element ntp_policy { text }
+    element ntp_policy { STRING }
 
 # Possible values are "systemd", "manual",
 # or a positive integer which means the interval in seconds between synchronizations
-ntp_sync = element ntp_sync { text }
+ntp_sync = element ntp_sync { STRING }
 
 ntp_servers = element ntp_servers {
       LIST,
       element (ntp_server | listentry) {
-        element address { text } &
-        element iburst { BOOLEAN }? &
-        element offline { BOOLEAN }?
+        MAP,
+        (
+          element address { STRING } &
+          element iburst { BOOLEAN }? &
+          element offline { BOOLEAN }?
+        )
       }*
 }
