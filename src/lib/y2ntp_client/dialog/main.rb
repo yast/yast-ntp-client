@@ -5,7 +5,7 @@ require "y2ntp_client/widgets/main_widgets"
 
 Yast.import "Label"
 Yast.import "NtpClient"
-Yast.import "Stage"
+Yast.import "Mode"
 
 module Y2NtpClient
   module Dialog
@@ -55,7 +55,9 @@ module Y2NtpClient
       end
 
       def abort_button
-        Yast::Label.CancelButton
+        return Yast::Label.CancelButton unless installation?
+
+        nil
       end
 
       def hardware_clock_widgets
@@ -70,13 +72,25 @@ module Y2NtpClient
       end
 
       def back_button
-        # no back button
-        ""
+        return "" unless installation?
+
+        nil
       end
 
       def next_button
-        # FIXME: it probably cannot run in initial stage, so not needed
-        Yast::Stage.initial ? Yast::Label.AcceptButton : Yast::Label.OKButton
+        return Yast::Label.OKButton unless installation?
+
+        nil
+      end
+
+      # Determines whether running in installation mode
+      #
+      # We do not use Stage.initial because of firstboot, which runs in 'installation' mode
+      # but in 'firstboot' stage.
+      #
+      # @return [Boolean] Boolean if running in installation or update mode
+      def installation?
+        Yast::Mode.installation || Yast::Mode.update
       end
     end
   end

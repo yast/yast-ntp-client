@@ -7,7 +7,6 @@ Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
 Yast.import "PackageSystem"
 Yast.import "Service"
-Yast.import "Profile"
 
 describe Yast::NtpClient do
 
@@ -40,28 +39,24 @@ describe Yast::NtpClient do
   end
 
   describe "#AutoYaST methods" do
-    FIXTURES_PATH = File.join(File.dirname(__FILE__), "fixtures")
-
     let(:ntp_client_section) do
-      # Yast Profile respect changed SCR, but xmlagent not, so it crashed in
-      # changed SCR root, so reset it back for this part
-      reset_scr_root
-      file = File.join(FIXTURES_PATH, "autoyast", profile_name)
-      Yast::Profile.ReadXML(file)
-      profile = Yast::Profile.current["ntp-client"]
-      change_scr_root(File.join(data_dir, "scr_root"))
-
-      profile
+      {
+        "ntp_policy"  => "eth*",
+        "ntp_servers" => [
+          "iburst"  => false,
+          "address" => "cz.pool.ntp.org",
+          "offline" => true
+        ],
+        "ntp_sync"    => "15"
+      }
     end
 
     describe "#Import" do
+      before(:each) do
+        subject.Import(ntp_client_section)
+      end
+
       context "with a correct AutoYaST configuration file" do
-        let(:profile_name) { "autoinst.xml" }
-
-        before(:each) do
-          subject.Import(ntp_client_section)
-        end
-
         it "sets properly netconfig policy" do
           expect(subject.ntp_policy).to eq "eth*"
         end
@@ -81,10 +76,6 @@ describe Yast::NtpClient do
 
       context "with an empty AutoYaST configuration" do
         let(:ntp_client_section) { {} }
-
-        before(:each) do
-          subject.Import(ntp_client_section)
-        end
 
         it "clears all ntp servers" do
           expect(subject.GetUsedNtpServers).to be_empty
@@ -111,7 +102,7 @@ describe Yast::NtpClient do
     describe "#Export" do
       let(:profile_name) { "autoinst.xml" }
       let(:ntp_conf) do
-        path = File.expand_path("../fixtures/cfa/chrony.conf", __FILE__)
+        path = File.expand_path("fixtures/cfa/chrony.conf", __dir__)
         text = File.read(path)
         file = CFA::MemoryFile.new(text)
         CFA::ChronyConf.new(file_handler: file)
@@ -283,20 +274,101 @@ describe Yast::NtpClient do
       subject.Write
     end
 
-    it "checks ntp service" do
-      expect(subject).to receive(:check_service)
+    context "services will be started" do
+      before do
+        subject.run_service = true
+        subject.write_only = false
+      end
 
-      subject.Write
+      context "when product require precise time" do
+        before do
+          allow(Yast::ProductFeatures).to receive(:GetBooleanFeature).and_return(true)
+        end
+
+        it "enables and restarts services including chrony-wait" do
+          allow(subject).to receive(:check_service).and_call_original
+          expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
+          expect(Yast::Service).to receive(:Enable).with("chrony-wait").and_return(true)
+          expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
+          expect(Yast::Service).to receive(:Restart).with("chrony-wait").and_return(true)
+
+          subject.Write
+        end
+      end
+
+      context "when product does not require precise time" do
+        before do
+          allow(Yast::ProductFeatures).to receive(:GetBooleanFeature).and_return(false)
+        end
+
+        it "enables and restarts services without chrony-wait" do
+          allow(subject).to receive(:check_service).and_call_original
+          expect(Yast::Service).to receive(:Enable).with("chronyd").and_return(true)
+          expect(Yast::Service).to_not receive(:Enable).with("chrony-wait")
+          expect(Yast::Service).to receive(:Restart).with("chronyd").and_return(true)
+          expect(Yast::Service).to_not receive(:Restart).with("chrony-wait")
+
+          subject.Write
+        end
+      end
     end
 
-    it "updates cron settings" do
-      expect(subject).to receive(:update_cron_settings)
+    context "services will be stopped" do
+      before do
+        subject.run_service = false
+      end
+
+      it "disables and stops services" do
+        allow(subject).to receive(:check_service).and_call_original
+        expect(Yast::Service).to receive(:Disable).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Disable).with("chrony-wait").and_return(true)
+        expect(Yast::Service).to receive(:Stop).with("chronyd").and_return(true)
+        expect(Yast::Service).to receive(:Stop).with("chrony-wait").and_return(true)
+
+        subject.Write
+      end
+    end
+
+    it "updates systemd timer settings" do
+      expect(subject).to receive(:update_timer_settings)
 
       subject.Write
     end
 
     it "returns true if not aborted" do
       expect(subject.Write).to eql(true)
+    end
+  end
+
+  describe "#public_ntp_servers" do
+    before do
+      allow(subject).to receive(:GetAllKnownCountries)
+        .and_return("DE" => "Germany", "CZ" => "Czech Republic")
+      allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
+        .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
+    end
+
+    it "returns the list of public NTP servers including the default one for each country" do
+      servers = subject.public_ntp_servers
+      expect(servers.map(&:hostname)).to eq(
+        ["ntp.cgi.cz", "tick.fh-augsburg.de", "de.pool.ntp.org", "cz.pool.ntp.org"]
+      )
+    end
+  end
+
+  describe "#country_ntp_servers" do
+    before do
+      allow(subject).to receive(:GetAllKnownCountries)
+        .and_return("DE" => "Germany", "CZ" => "Czech Republic")
+      allow(Yast::Directory).to receive(:find_data_file).with("ntp_servers.yml")
+        .and_return(DATA_PATH.join("ntp_servers_sample.yml").to_s)
+    end
+
+    it "returns the list of public NTP servers for the given country" do
+      servers = subject.country_ntp_servers("DE")
+      expect(servers.map(&:hostname)).to eq(
+        ["tick.fh-augsburg.de", "de.pool.ntp.org"]
+      )
     end
   end
 
@@ -388,23 +460,27 @@ describe Yast::NtpClient do
   end
 
   describe "#ReadSynchronization" do
-    let(:cron_job_file) { "/etc/cron.d/suse-ntp_synchronize" }
-    let(:cron_entry) { [] }
+    let(:systemd_timer_file) { "/etc/systemd/system/yast-timesync.timer" }
+    let(:timer_content) { "" }
 
     before do
-      allow(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".cron"), cron_job_file, "").and_return(cron_entry)
+      allow(::File).to receive(:exist?).and_call_original
+      allow(::File).to receive(:exist?).with("/etc/systemd/system/yast-timesync.timer")
+        .and_return(true)
+      allow(::File).to receive(:read).and_return(timer_content)
     end
 
-    it "reads cron file" do
-      expect(Yast::SCR).to receive(:Read)
-        .with(Yast::Path.new(".cron"), cron_job_file, "")
+    it "reads systemd timer" do
+      expect(::File).to receive(:read).and_return(timer_content)
 
       subject.ReadSynchronization
     end
 
-    context "when cron file does not exist" do
-      let(:cron_entry) { nil }
+    context "when systemd timer file does not exist" do
+      before do
+        allow(::File).to receive(:exist?).with("/etc/systemd/system/yast-timesync.timer")
+          .and_return(true)
+      end
 
       it "sets synchronize_time as false" do
         subject.ReadSynchronization
@@ -419,29 +495,40 @@ describe Yast::NtpClient do
       end
     end
 
-    context "when cron file exists" do
-      context "when there is no cron entry" do
+    context "when systemd timer file exists" do
+      let(:timer_content) do
+        subject.sync_interval = 10
+        subject.send(:timer_content)
+      end
+
+      context "when timer is not active" do
+        before do
+          allow(Yast::SCR).to receive(:Execute).and_return("exit" => 3)
+        end
+
         it "sets synchronize_time as false" do
           subject.ReadSynchronization
 
           expect(subject.synchronize_time).to eql(false)
         end
 
-        it "sets sync interval with default value" do
+        it "sets sync interval with value from timer" do
           subject.ReadSynchronization
 
-          expect(subject.sync_interval).to eql(Yast::NtpClientClass::DEFAULT_SYNC_INTERVAL)
+          expect(subject.sync_interval).to eql(10)
         end
       end
 
-      context "when there is cron entry" do
-        let(:cron_entry) { [{ "events"   => [{ "active" => "1", "minute" => "*/10" }] }] }
+      context "when timer is active" do
+        before do
+          allow(Yast::SCR).to receive(:Execute).and_return("exit" => 0)
+        end
 
-        it "sets synchronize time as true if first cron entry is valid" do
+        it "sets synchronize time as true" do
           expect(subject.ReadSynchronization).to eql(true)
         end
 
-        it "sets sync_interval with cron minute interval" do
+        it "sets sync_interval with value from timer" do
           subject.ReadSynchronization
 
           expect(subject.sync_interval).to eql(10)
@@ -472,6 +559,33 @@ describe Yast::NtpClient do
 
         expect(subject.reachable_ntp_server?("server")).to eql(false)
       end
+    end
+  end
+
+  describe "#sync_once" do
+    let(:output) { { "stdout" => "", "stderr" => "", "exit" => 0 } }
+    let(:server) { "sntp.server.de" }
+
+    before do
+      allow(Yast::SCR).to receive(:Execute)
+    end
+
+    it "syncs the system time against the specified server" do
+      expect(Yast::SCR).to receive(:Execute)
+        .with(Yast::Path.new(".target.bash_output"),
+          "/usr/sbin/chronyd -q -t 30 'pool #{server} iburst'")
+        .and_return(output)
+
+      subject.sync_once(server)
+    end
+
+    it "returns the syncronization exit code" do
+      expect(Yast::SCR).to receive(:Execute)
+        .with(Yast::Path.new(".target.bash_output"),
+          "/usr/sbin/chronyd -q -t 30 'pool #{server} iburst'")
+        .and_return(output)
+
+      expect(subject.sync_once(server)).to eql(0)
     end
   end
 

@@ -12,78 +12,105 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-ntp-client
-Version:        4.1.2
+Version:        4.3.0
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0-or-later
 Group:          System/YaST
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Url:            https://github.com/yast/yast-ntp-client
+
 Source0:        %{name}-%{version}.tar.bz2
+
 BuildRequires:  augeas-lenses
-BuildRequires:  autoyast2-installation
-BuildRequires:  perl-XML-Writer
 BuildRequires:  update-desktop-files
-BuildRequires:  yast2 >= 3.2.21
+# need as it own /usr/lib/systemd and for systemd macros
+BuildRequires: systemd-rpm-macros
+%{?systemd_requires}
+# cwm/popup
+BuildRequires:  yast2 >= 4.1.15
+BuildRequires:  yast2-country
 BuildRequires:  yast2-country-data
-BuildRequires:  yast2-devtools >= 3.1.10
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
+# Y2Network::NtpServer
+BuildRequires:  yast2-network >= 4.2.55
 
 # proper acting TargetFile when scr is switched
 Requires:       augeas-lenses
-Requires:       yast2 >= 3.2.21
+# cwm/popup
+Requires:       yast2 >= 4.1.15
 Requires:       yast2-country-data
 # needed for network/config agent
-Requires:       yast2-network
+# Y2Network::NtpServer
+Requires:       yast2-network >= 4.2.55
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
-BuildArch:      noarch
 
 Obsoletes:      yast2-ntp-client-devel-doc
+
+BuildArch:      noarch
 
 %description
 This package contains the YaST2 component for NTP client configuration.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %check
-rake test:unit
+%yast_check
 
 %build
 
 %install
-rake install DESTDIR="%{buildroot}"
+%yast_install
+%yast_metainfo
 
 %post
+%service_add_post yast-timesync.service
+
 # upgrade old name and convert it to chrony (bsc#1079122)
 if [ -f /etc/cron.d/novell.ntp-synchronize ]; then
   mv /etc/cron.d/novell.ntp-synchronize /etc/cron.d/suse-ntp_synchronize
   sed -i 's:\* \* \* \* root .*:* * * * root /usr/sbin/chronyd -q \&>/dev/null:' /etc/cron.d/suse-ntp_synchronize
 fi
 
-%files
-%defattr(-,root,root)
-%dir %{yast_yncludedir}/ntp-client
-%{yast_clientdir}/*
-%{yast_dir}/lib
-%{yast_yncludedir}/ntp-client/*
-%{yast_moduledir}/*.rb
-%{yast_desktopdir}/ntp-client.desktop
-%{yast_ydatadir}/ntp_servers.yml
-%{yast_schemadir}/autoyast/rnc/ntpclient.rnc
-%{yast_dir}/lib
-%ghost /etc/cron.d/suse-ntp_synchronize
+# and now update cron to systemd timer. We need to support upgrade from SLE12 and also SLE15 SP1.
+# jsc#SLE-9113
+if [ -f /etc/cron.d/suse-ntp_synchronize ]; then
+  /usr/bin/erb timeout=$(grep -o '[[:digit:]]\+' /etc/cron.d/suse-ntp_synchronize) /usr/share/YaST2/data/yast-timesync.timer.erb > /etc/systemd/system/yast-timesync.timer
+  /usr/bin/systemctl enable yast-timesync.timer
+  /usr/bin/systemctl start yast-timesync.timer
+  rm /etc/cron.d/suse-ntp_synchronize
+fi
 
-%dir %{yast_docdir}
-%license %{yast_docdir}/COPYING
-%doc %{yast_docdir}/README.md
-%doc %{yast_docdir}/CONTRIBUTING.md
+%pre
+%service_add_pre yast-timesync.service
+
+%postun
+%service_del_postun yast-timesync.service
+
+%preun
+%service_del_preun yast-timesync.service
+
+%files
+%{yast_clientdir}
+%{yast_libdir}
+%{yast_yncludedir}
+%{yast_moduledir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_ydatadir}
+%{yast_schemadir}
+%{yast_icondir}
+%{_unitdir}/yast-timesync.service
+%license COPYING
+%doc %{yast_docdir}
 
 %changelog

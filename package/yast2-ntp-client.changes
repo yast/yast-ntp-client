@@ -1,4 +1,148 @@
 -------------------------------------------------------------------
+Tue May 12 14:20:03 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
+
+- Autoyast schema: Allow optional types for string and map objects
+  (bsc#1170886)
+- 4.3.0
+
+-------------------------------------------------------------------
+Mon Mar 23 14:19:10 CET 2020 - schubi@suse.de
+
+- Do not write ntp-servers if they have been shown only (more than
+  one ntp-server) (follow up of bsc#1164547).
+- 4.2.11
+
+-------------------------------------------------------------------
+Wed Mar 18 15:44:25 CET 2020 - schubi@suse.de
+
+- NTP-server-configuration/Time-setting-module in a running
+  system: Do not show check-boxes for saving configuration and
+  starting the deamon (follow up of bsc#1164547).
+- 4.2.10
+
+-------------------------------------------------------------------
+Tue Mar  3 16:38:54 CET 2020 - schubi@suse.de
+
+- Supporting more than one ntp server in the time setting module.
+  (bsc#1164547)
+- 4.2.9
+
+-------------------------------------------------------------------
+Wed Feb 19 13:24:06 UTC 2020 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
+
+- Rely on the new Y2Network::NtpServer class (jsc#SLE-7188).
+- 4.2.8
+
+-------------------------------------------------------------------
+Thu Jan 23 12:58:04 UTC 2020 - Steffen Winterfeldt <snwint@suse.com>
+
+- don't use /bin/systemctl compat symlink (bsc#1160890)
+- 4.2.7
+
+-------------------------------------------------------------------
+Thu Nov 14 13:32:05 UTC 2019 - Josef Reidinger <jreidinger@suse.com>
+
+- Break autoyast<->yast2-ntp-client cycle (related to changes done
+  for jsc#SLE-7101)
+- 4.2.6
+
+-------------------------------------------------------------------
+Mon Oct 14 18:20:17 UTC 2019 - Josef Reidinger <jreidinger@suse.com>
+
+- switch from cron to systemd timers (jsc#SLE-9113)
+- 4.2.5
+
+-------------------------------------------------------------------
+Wed Oct  2 11:42:34 UTC 2019 - Josef Reidinger <jreidinger@suse.com>
+
+- implement starting chrony-wait only if product require it
+  (bsc#1145193)
+- 4.2.4
+
+-------------------------------------------------------------------
+Fri Aug 30 09:42:29 UTC 2019 - Dominique Leuenberger <dimstar@opensuse.org>
+
+- Add cron BuildRequires: needed for /etc/cron.* ownership. As
+  those directories have special permissions it is easier/cheaper
+  to buildrequire cron (boo#1148950).
+- 4.2.3
+
+-------------------------------------------------------------------
+Thu Jul  4 10:29:27 UTC 2019 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
+
+- Fix 'ntp-client' behaviour when running in firstboot
+  (bsc#1140199).
+- 4.2.2
+
+-------------------------------------------------------------------
+Thu Jul  4 10:29:27 UTC 2019 - knut.anderssen@suse.com
+
+- Added cwm/popup dependency (bsc#893065, bsc#1039985)
+
+-------------------------------------------------------------------
+Thu Jun 13 16:09:13 CEST 2019 - schubi@suse.de
+
+- Enable/disable chronyd service: Enable/disable chrony-wait
+  service too (bsc#1137196).
+
+- 4.2.1
+
+-------------------------------------------------------------------
+Fri May 31 12:35:08 UTC 2019 - Stasiek Michalski <hellcp@mailbox.org>
+
+- Add metainfo (fate#319035)
+- Revamp spec
+- Replace GenericName with Comment
+- 4.2.0
+
+-------------------------------------------------------------------
+Tue Mar 19 16:33:52 UTC 2019 - ancor@suse.com
+
+- Activate translations for the SelectFrom widget (bsc#1126523,
+  bsc#1126520).
+- 4.1.8
+
+-------------------------------------------------------------------
+Sun Nov 25 20:37:21 UTC 2018 - Noah Davis <noahadvs@gmail.com>
+
+- Provide icon with module (boo#1109310)
+- 4.1.7
+
+-------------------------------------------------------------------
+Wed Nov 14 21:32:26 UTC 2018 - knut.andersse@suse.com
+
+- Aligned "Synchronize Now" button and "NTP Server Address" box not
+  breaking previous fix and not hiding the manual checkbox in
+  TextMode (bnc#893065, bsc#1039985).
+- 4.1.6
+
+-------------------------------------------------------------------
+Thu Nov  8 19:20:26 UTC 2018 - knut.andersse@suse.com
+
+- fate#323454
+  - Bring back the menu button for choosing an NTP address from a
+    public NTP servers list or from the ones returned by DHCP.
+  - When no configuration is proposed by default, then use the DHCP
+    offered servers as fallback.
+- Do not synchronize if chronyd service is running (bsc#1087048)
+- Use the title style capitalization in "Synchronize Now" button
+  (bsc#1039987)
+- 4.1.5
+
+-------------------------------------------------------------------
+Thu Nov  8 15:20:26 UTC 2018 - knut.andersse@suse.com
+
+- Only write the configuration once, and do not save changes when
+  we are only synchronizing the date. (bsc#1108497)
+- 4.1.4
+
+-------------------------------------------------------------------
+Tue Oct 16 10:28:35 CEST 2018 - schubi@suse.de
+
+- Fixed license path. Build error for bsc#1110598.
+- 4.1.3
+
+-------------------------------------------------------------------
 Wed Oct  3 14:11:34 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST: Do not show the progress when merging the configuration

@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	clients/ntp-client.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Main file
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  clients/ntp-client.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Main file
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 #

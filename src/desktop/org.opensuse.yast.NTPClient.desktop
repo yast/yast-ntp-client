@@ -20,6 +20,7 @@ X-SuSE-YaST-Keywords=time,sync,synchronization,NTP
 Icon=yast-ntp-client
 Exec=xdg-su -c "/sbin/yast2 ntp-client"
 
-Name=NTP Configuration
-GenericName=Configure an NTP client or server
+Name=YaST NTP Configuration
+GenericName=NTP Configuration
+Comment=Configure an NTP client or server
 StartupNotify=true

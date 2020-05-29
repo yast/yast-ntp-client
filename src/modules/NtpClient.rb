@@ -1,9 +1,7 @@
-# encoding: utf-8
-
-# File:	modules/NtpClient.ycp
-# Package:	Configuration of ntp-client
-# Summary:	Data for configuration of ntp-client, input and output functions.
-# Authors:	Jiri Srain <jsrain@suse.cz>
+# File:  modules/NtpClient.ycp
+# Package:  Configuration of ntp-client
+# Summary:  Data for configuration of ntp-client, input and output functions.
+# Authors:  Jiri Srain <jsrain@suse.cz>
 #
 # $Id$
 #
@@ -14,6 +12,9 @@ require "yaml"
 require "cfa/chrony_conf"
 require "yast2/target_file" # required to cfa work on changed scr
 require "ui/text_helpers"
+require "erb"
+require "yast2/systemctl"
+require "y2network/ntp_server"
 
 module Yast
   class NtpClientClass < Module
@@ -21,7 +22,7 @@ module Yast
     include ::UI::TextHelpers
 
     # the default synchronization interval in minutes when running in the manual
-    # sync mode ("Synchronize without Daemon" option, ntp started from cron)
+    # sync mode ("Synchronize without Daemon" option, ntp started from systemd timer)
     # Note: the UI field currently uses maximum of 60 minutes
     DEFAULT_SYNC_INTERVAL = 5
 
@@ -35,8 +36,9 @@ module Yast
 
     NTP_FILE = "/etc/chrony.conf".freeze
 
-    # The cron file name for the synchronization.
-    CRON_FILE = "/etc/cron.d/suse-ntp_synchronize".freeze
+    TIMER_FILE = "yast-timesync.timer".freeze
+    # The file name of systemd timer for the synchronization.
+    TIMER_PATH = "/etc/systemd/system/#{TIMER_FILE}".freeze
 
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
@@ -56,6 +58,7 @@ module Yast
 
       Yast.import "Directory"
       Yast.import "FileUtils"
+      Yast.import "Lan"
       Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
@@ -63,6 +66,7 @@ module Yast
       Yast.import "PackageSystem"
       Yast.import "Popup"
       Yast.import "Progress"
+      Yast.import "ProductFeatures"
       Yast.import "Report"
       Yast.import "Service"
       Yast.import "SLPAPI"
@@ -91,12 +95,17 @@ module Yast
       # The interval of synchronization in minutes.
       @sync_interval = DEFAULT_SYNC_INTERVAL
 
-      # Service name of the NTP daemon
+      # Service names of the NTP daemon
       @service_name = "chronyd"
 
+      # "chrony-wait" service has also to be handled in order to ensure that
+      # "chronyd" is working correctly and do not depend on the network status.
+      # bsc#1137196, bsc#1129730
+      @wait_service_name = "chrony-wait"
+
       # Netconfig policy: for merging and prioritizing static and DHCP config.
-      # FIXME: get a public URL
-      # https://svn.suse.de/svn/sysconfig/branches/mt/dhcp6-netconfig/netconfig/doc/README
+      # https://github.com/openSUSE/sysconfig/blob/master/doc/README.netconfig
+      # https://github.com/openSUSE/sysconfig/blob/master/config/sysconfig.config-network
       @ntp_policy = DEFAULT_NTP_POLICY
 
       # Active Directory controller
@@ -128,9 +137,9 @@ module Yast
       @ntp_selected = false
     end
 
-    # CFA instance for reading/writing /etc/ntp.conf
+    # CFA instance for reading/writing /etc/chrony.conf
     def ntp_conf
-      @chrony_conf ||= CFA::ChronyConf.new
+      @ntp_conf ||= CFA::ChronyConf.new
     end
 
     # Abort function
@@ -141,6 +150,7 @@ module Yast
 
     def go_next
       return false if Abort()
+
       Progress.NextStage if progress?
       true
     end
@@ -154,7 +164,7 @@ module Yast
     # @param server [String] to sync against
     # @return [Integer] exit code of sync command
     def sync_once(server)
-      log.info "Running ont time sync with #{server}"
+      log.info "Running one time sync with #{server}"
 
       # -q: set system time and quit
       # -t: timeout in seconds
@@ -184,7 +194,33 @@ module Yast
       }
     end
 
+    # Returns the know ntp servers
+    #
+    # @return [Array<Y2Network::NtpServer>] Known NTP servers
+    def public_ntp_servers
+      update_ntp_servers! if @ntp_servers.nil?
+      @ntp_servers.values.map do |srv|
+        Y2Network::NtpServer.new(
+          srv["address"], country: srv["country"], location: srv["location"]
+        )
+      end
+    end
+
+    # Returns the NTP servers for the given country
+    #
+    # @param country [String] Country code
+    # @return [Array<Y2Network::NtpServer>] NTP servers for the given country
+    def country_ntp_servers(country)
+      normalized_country = country.upcase
+      servers = public_ntp_servers.select { |s| s.country.upcase == normalized_country }
+      # bnc#458917 add country, in case data/country.ycp does not have it
+      country_server = make_country_ntp_server(country)
+      servers << country_server unless servers.map(&:hostname).include?(country_server.hostname)
+      servers
+    end
+
     # Get the list of known NTP servers
+    # @deprecated Use public_ntp_servers instead
     # @return a list of known NTP servers
     def GetNtpServers
       update_ntp_servers! if @ntp_servers.nil?
@@ -192,7 +228,7 @@ module Yast
       deep_copy(@ntp_servers)
     end
 
-    # Get the mapping between country codea and names ("CZ" -> "Czech Republic")
+    # Get the mapping between country codes and names ("CZ" -> "Czech Republic")
     # @return a map the country codes and names mapping
     def GetCountryNames
       if @country_names.nil?
@@ -210,9 +246,11 @@ module Yast
     end
 
     # Get list of public NTP servers for a country
+    #
     # @param [String] country two-letter country code
     # @param [Boolean] terse_output display additional data (location etc.)
     # @return [Array] of servers (usable as combo-box items)
+    # @deprecated Use public_ntp_servers_by_country instead
     def GetNtpServersByCountry(country, terse_output)
       country_names = {}
       servers = GetNtpServers()
@@ -275,15 +313,14 @@ module Yast
     # synchronize_time and sync_interval variables
     # Return updated value of synchronize_time
     def ReadSynchronization
-      crontab = SCR.Read(path(".cron"), CRON_FILE, "")
-      log.info("NTP Synchronization crontab entry: #{crontab}")
-      cron_entry = (crontab || []).fetch(0, {}).fetch("events", []).fetch(0, {})
-      @synchronize_time = cron_entry["active"] == "1"
+      return false unless ::File.exist?(TIMER_PATH)
 
-      sync_interval_entry = cron_entry.fetch("minute", "*/#{DEFAULT_SYNC_INTERVAL}")
-      log.info("MINUTE #{sync_interval_entry}")
+      timer_content = ::File.read(TIMER_PATH)
+      log.info("NTP Synchronization timer entry: #{timer_content}")
+      @synchronize_time = Yast2::Systemctl.execute("is-active #{TIMER_FILE}").exit.zero?
 
-      @sync_interval = sync_interval_entry.tr("^[0-9]", "").to_i
+      interval = timer_content[/^\s*OnUnitActiveSec\s*=\s*(\d+)m/, 1]
+      @sync_interval = interval.to_i if interval
       log.info("SYNC_INTERVAL #{@sync_interval}")
 
       @synchronize_time
@@ -325,9 +362,11 @@ module Yast
       ReadSynchronization()
 
       return false if !go_next
+
       Progress.Title(_("Finished")) if progress?
 
       return false if Abort()
+
       @modified = false
       true
     end
@@ -357,7 +396,7 @@ module Yast
 
       check_service
 
-      update_cron_settings
+      update_timer_settings
 
       return false if !go_next
 
@@ -580,6 +619,12 @@ module Yast
       { "install" => @required_packages, "remove" => [] }
     end
 
+    # Convenience method to obtain the list of ntp servers proposed by DHCP
+    # @see https://www.rubydoc.info/github/yast/yast-network/Yast/LanClass:${0}
+    def dhcp_ntp_servers
+      Yast::Lan.dhcp_ntp_servers.map { |s| Y2Network::NtpServer.new(s) }
+    end
+
     publish variable: :AbortFunction, type: "boolean ()"
     publish variable: :modified, type: "boolean"
     publish variable: :write_only, type: "boolean"
@@ -788,40 +833,71 @@ module Yast
       success
     end
 
-    # Enable or disable ntp service depending on @run_service value
+    # Enable or disable chrony services depending on @run_service value
+    # "chrony-wait" service has also to be handled in order to ensure that
+    # "chronyd" is working correctly and do not depend on the network status.
     #
-    # * When disabling, it also stops the service.
-    # * When enabling, it tries to restart the service unless it's in write
+    # * When disabling, it also stops the services.
+    # * When enabling, it tries to restart the services unless it's in write
     #   only mode.
     def check_service
-      adjusted = @run_service ? Service.Enable(@service_name) : Service.Disable(@service_name)
-
-      # error report
-      Report.Error(Message.CannotAdjustService("NTP")) unless adjusted
-
+      # fallbacks to false if not defined
+      wait_service_required = ProductFeatures.GetBooleanFeature("globals", "precise_time")
       if @run_service
-        unless @write_only
-          # error report
-          Report.Error(_("Cannot restart the NTP daemon.")) unless Service.Restart(@service_name)
+        # Enable and run services
+        if !Service.Enable(@service_name)
+          Report.Error(Message.CannotAdjustService(@service_name))
+        elsif wait_service_required && !Service.Enable(@wait_service_name)
+          Report.Error(Message.CannotAdjustService(@wait_service_name))
+        end
+        if !@write_only
+          if !Service.Restart(@service_name)
+            Report.Error(_("Cannot restart \"%s\" service.") % @service_name)
+          elsif wait_service_required && !Service.Restart(@wait_service_name)
+            Report.Error(_("Cannot restart \"%s\" service.") % @wait_service_name)
+          end
         end
       else
+        # Disable and stop services
+        if !Service.Disable(@service_name)
+          Report.Error(Message.CannotAdjustService(@service_name))
+        # disable and stop always as wait without chrony does not make sense
+        elsif !Service.Disable(@wait_service_name)
+          Report.Error(Message.CannotAdjustService(@wait_service_name))
+        end
         Service.Stop(@service_name)
+        Service.Stop(@wait_service_name)
       end
     end
 
-    # If synchronize time has been enable it writes ntp cron entry for manual
-    # sync. If not it removes current cron entry if exists.
-    def update_cron_settings
+    def timer_content
+      erb_template = ::File.read(Directory.find_data_file("#{TIMER_FILE}.erb"))
+      content = ERB.new(erb_template)
+      timeout = @sync_interval
+      content.result(binding)
+    end
+
+    # If synchronize time has been enable it writes systemd timer entry for manual
+    # sync. If not it removes current systemd timer entry if exists.
+    def update_timer_settings
       if @synchronize_time
         SCR.Write(
           path(".target.string"),
-          CRON_FILE,
-          "-*/#{@sync_interval} * * * * root /usr/sbin/chronyd -q &>/dev/null\n"
+          TIMER_PATH,
+          timer_content
         )
+        res = Yast2::Systemctl.execute("enable #{TIMER_FILE}")
+        log.info "enable timer: #{res.inspect}"
+        res = Yast2::Systemctl.execute("start #{TIMER_FILE}")
+        log.info "start timer: #{res.inspect}"
       else
+        res = Yast2::Systemctl.execute("disable #{TIMER_FILE}")
+        log.info "disable timer: #{res.inspect}"
+        res = Yast2::Systemctl.execute("stop #{TIMER_FILE}")
+        log.info "stop timer: #{res.inspect}"
         SCR.Execute(
           path(".target.bash"),
-          "rm -vf #{CRON_FILE}"
+          "rm -vf #{TIMER_PATH}"
         )
       end
     end
@@ -872,6 +948,7 @@ module Yast
     # @return [Array <Hash>] pool records for given countries
     def pool_servers_for(known_countries)
       known_countries.map do |short_country, country_name|
+        # bnc#458917 add country, in case data/country.ycp does not have it
         MakePoolRecord(short_country, country_name)
       end
     end
@@ -897,6 +974,15 @@ module Yast
       width = displayinfo["TextMode"] ? displayinfo.fetch("Width", 80) : 80
 
       Yast::Report.Error(wrap_text(msg, width - 4))
+    end
+
+    # Pool server for the given country
+    #
+    # @param country [String] Country code
+    # @return [Y2Network::NtpServer]
+    def make_country_ntp_server(country)
+      record = MakePoolRecord(country, "")
+      Y2Network::NtpServer.new(record["address"], country: record["country"])
     end
   end
 
