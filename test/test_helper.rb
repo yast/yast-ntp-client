@@ -65,4 +65,3 @@ if ENV["COVERAGE"]
     ]
   end
 end
-
