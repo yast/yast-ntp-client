@@ -1,6 +1,8 @@
 # YaST - The NTP Client Module #
 
-[![Travis Build](https://travis-ci.org/yast/yast-ntp-client.svg?branch=master)](https://travis-ci.org/yast/yast-ntp-client)
-[![Jenkins Build](http://img.shields.io/jenkins/s/https/ci.opensuse.org/yast-ntp-client-master.svg)](https://ci.opensuse.org/view/Yast/job/yast-ntp-client-master/)
-[![Coverage Status](https://img.shields.io/coveralls/yast/yast-ntp-client.svg)](https://coveralls.io/r/yast/yast-ntp-client?branch=master)
-
+[![Workflow Status](https://github.com/yast/yast-bootloader/workflows/CI/badge.svg?branch=master)](
+https://github.com/yast/yast-bootloader/actions?query=branch%3Amaster)
+[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-bootloader-master)](
+https://ci.opensuse.org/view/Yast/job/yast-yast-bootloader-master/)
+[![Coverage Status](https://img.shields.io/coveralls/yast/yast-bootloader.svg)](https://coveralls.io/r/yast/yast-bootloader?branch=master)
+[![inline docs](http://inch-ci.org/github/yast/yast-bootloader.svg?branch=master)](http://inch-ci.org/github/yast/yast-bootloader)
