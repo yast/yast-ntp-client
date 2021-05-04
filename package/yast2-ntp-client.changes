@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue May  4 10:22:49 UTC 2021 - Knut Anderssen <kanderssen@suse.com>
+
+- Adapted proposal client returning the dhcp ntp servers as strings
+- 4.3.3 (bsc#1185545)
+
+-------------------------------------------------------------------
 Wed Feb 17 21:19:33 UTC 2021 - Josef Reidinger <jreidinger@suse.com>
 
 - Adapted unit test to recent changes in Yast::Report (related to

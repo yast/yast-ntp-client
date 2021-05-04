@@ -13,15 +13,36 @@ describe Yast::NtpClientProposalClient do
     client
   end
 
+  let(:dhcp_ntp_servers) { [] }
+
+  before do
+    allow(Yast::Lan).to receive(:dhcp_ntp_servers)
+      .and_return(dhcp_ntp_servers)
+  end
+
+  describe "#main" do
+    let(:client) { described_class.new }
+    let(:func) { "dhcp_ntp_servers" }
+
+    before do
+      allow(Yast::WFM).to receive(:Args).with(no_args).and_return([func])
+      allow(Yast::WFM).to receive(:Args).with(0).and_return(func)
+    end
+
+    context "when call with 'dhcp_ntp_servers' argument" do
+      let(:dhcp_ntp_servers) { ["test.example.net", "test2.example.net"] }
+
+      it "returns servers found via DHCP" do
+        expect(client.main).to eql(dhcp_ntp_servers)
+      end
+    end
+  end
+
   describe "#MakeProposal" do
-    let(:dhcp_ntp_servers) { [] }
     let(:config_was_read?) { false }
     let(:ntp_was_selected?) { false }
 
     before do
-      allow(Yast::Lan).to receive(:dhcp_ntp_servers)
-        .and_return(dhcp_ntp_servers)
-
       allow(Yast::NtpClient).to receive(:country_ntp_servers).with("de")
         .and_return([Y2Network::NtpServer.new("de.pool.ntp.org")])
       allow(Yast::Timezone).to receive(:timezone).and_return("Europe/Berlin")
