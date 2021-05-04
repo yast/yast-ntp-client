@@ -60,7 +60,7 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       when "dhcp_ntp_servers"
-        @ret = NtpClient.dhcp_ntp_servers
+        @ret = NtpClient.dhcp_ntp_servers.map(&:hostname)
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
