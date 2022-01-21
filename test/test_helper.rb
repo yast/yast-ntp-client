@@ -20,24 +20,6 @@ RSpec.configure do |config|
   end
 end
 
-# stub module to prevent its Import
-# Useful for modules from different yast packages, to avoid build dependencies
-def stub_module(name, fake_class = nil)
-  fake_class = Class.new { def self.fake_method; end } if fake_class.nil?
-  Yast.const_set name.to_sym, fake_class
-end
-
-# stub classes from other modules to speed up a build
-lan = Class.new do
-  def dhcp_ntp_servers
-    []
-  end
-end
-stub_module("Lan", lan)
-stub_module("Language")
-stub_module("Pkg")
-stub_module("PackageCallbacks")
-
 if ENV["COVERAGE"]
   require "simplecov"
   SimpleCov.start do
@@ -65,3 +47,9 @@ if ENV["COVERAGE"]
     ]
   end
 end
+
+# stub classes from other modules to avoid build dependencies
+Yast::RSpec::Helpers.define_yast_module("Lan", methods: [:dhcp_ntp_servers])
+Yast::RSpec::Helpers.define_yast_module("Language")
+Yast::RSpec::Helpers.define_yast_module("PackageCallbacks")
+Yast::RSpec::Helpers.define_yast_module("Pkg")
