@@ -41,6 +41,8 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 # Y2Network::NtpServer
 BuildRequires:  yast2-network >= 4.2.55
+# yast/rspec/helpers.rb
+BuildRequires:  yast2-ruby-bindings >= 4.4.7
 
 # proper acting TargetFile when scr is switched
 Requires:       augeas-lenses
