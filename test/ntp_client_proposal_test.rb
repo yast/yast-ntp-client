@@ -129,7 +129,7 @@ describe Yast::NtpClientProposalClient do
     before do
       allow(subject).to receive(:WriteNtpSettings)
       allow(Yast::Stage).to receive(:initial).and_return(initial_stage)
-      allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages)
+      allow(Yast::Package).to receive(:CheckAndInstallPackages)
       allow(Yast::Report).to receive(:Error)
       allow(Yast::NetworkService).to receive(:isNetworkRunning).and_return(network_running)
       allow(Yast::Service).to receive(:Active).with(ntp_client.service_name).and_return(false)
@@ -203,14 +203,14 @@ describe Yast::NtpClientProposalClient do
 
       context "and is not in the  initial stage" do
         it "asks user to confirm the package installation" do
-          expect(Yast::PackageSystem).to receive(:CheckAndInstallPackages)
+          expect(Yast::Package).to receive(:CheckAndInstallPackages)
 
           subject.Write(params)
         end
 
         context "but user rejects the package installation" do
           before do
-            allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages).and_return(false)
+            allow(Yast::Package).to receive(:CheckAndInstallPackages).and_return(false)
           end
 
           it "reports an error" do
