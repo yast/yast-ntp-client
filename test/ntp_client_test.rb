@@ -5,7 +5,7 @@ require "cfa/memory_file"
 
 Yast.import "NtpClient"
 Yast.import "NetworkInterfaces"
-Yast.import "PackageSystem"
+Yast.import "Package"
 Yast.import "Service"
 
 describe Yast::NtpClient do
@@ -34,7 +34,7 @@ describe Yast::NtpClient do
     allow(Yast::Service).to receive(:Enabled).with("chronyd").and_return(true)
     allow(Yast::NetworkInterfaces).to receive(:Read)
     allow(Yast::Progress)
-    allow(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
+    allow(Yast::Package).to receive(:CheckAndInstallPackagesInteractive)
       .with(["chrony"]).and_return(true)
   end
 
@@ -139,7 +139,7 @@ describe Yast::NtpClient do
       allow(Yast::Service).to receive(:Enabled).with("chronyd").and_return(true)
       allow(Yast::NetworkInterfaces).to receive(:Read)
       allow(Yast::Progress)
-      allow(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
+      allow(Yast::Package).to receive(:CheckAndInstallPackagesInteractive)
         .with(["chrony"]).and_return(true)
     end
 
@@ -190,7 +190,7 @@ describe Yast::NtpClient do
 
       context "when Mode is not installation" do
         it "returns false if the ntp package neither is installed nor available" do
-          expect(Yast::PackageSystem).to receive(:CheckAndInstallPackagesInteractive)
+          expect(Yast::Package).to receive(:CheckAndInstallPackagesInteractive)
             .with(["chrony"]).and_return(false)
           expect(Yast::Service).not_to receive(:Enabled)
 
