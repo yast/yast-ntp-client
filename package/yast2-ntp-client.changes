@@ -1,4 +1,42 @@
 -------------------------------------------------------------------
+Tue Jan 25 15:29:37 UTC 2022 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
+
+- Use Package module instead of PackageSystem (bsc#1194886).
+- 4.4.3
+
+-------------------------------------------------------------------
+Fri Jan 21 11:55:46 UTC 2022 - Ladislav Slezák <lslezak@suse.cz>
+
+- Unify YaST module mocking in unit tests (related to bsc#1194784)
+- 4.4.2
+
+-------------------------------------------------------------------
+Tue May  4 10:22:49 UTC 2021 - Knut Anderssen <kanderssen@suse.com>
+
+- Adapted proposal client returning the dhcp ntp servers as strings
+- 4.4.1 (bsc#1185545)
+
+-------------------------------------------------------------------
+Tue Apr 20 13:51:55 UTC 2021 - Ladislav Slezák <lslezak@suse.cz>
+
+- 4.4.0 (bsc#1185510)
+
+-------------------------------------------------------------------
+Wed Feb 17 21:19:33 UTC 2021 - Josef Reidinger <jreidinger@suse.com>
+
+- Adapted unit test to recent changes in Yast::Report (related to
+  bsc#1179893).
+- 4.3.2
+
+-------------------------------------------------------------------
+Mon Aug 10 17:24:06 CEST 2020 - schubi@suse.de
+
+- AutoYaST: Added supplements: autoyast(ntp-client) into the spec file
+  in order to install this packages if the section has been defined
+  in the AY configuration file (bsc#1146494).
+- 4.3.1
+
+-------------------------------------------------------------------
 Tue May 12 14:20:03 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
 
 - Autoyast schema: Allow optional types for string and map objects

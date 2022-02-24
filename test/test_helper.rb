@@ -20,24 +20,6 @@ RSpec.configure do |config|
   end
 end
 
-# stub module to prevent its Import
-# Useful for modules from different yast packages, to avoid build dependencies
-def stub_module(name, fake_class = nil)
-  fake_class = Class.new { def self.fake_method; end } if fake_class.nil?
-  Yast.const_set name.to_sym, fake_class
-end
-
-# stub classes from other modules to speed up a build
-lan = Class.new do
-  def dhcp_ntp_servers
-    []
-  end
-end
-stub_module("Lan", lan)
-stub_module("Language")
-stub_module("Pkg")
-stub_module("PackageCallbacks")
-
 if ENV["COVERAGE"]
   require "simplecov"
   SimpleCov.start do
@@ -48,12 +30,26 @@ if ENV["COVERAGE"]
   # track all ruby files under src
   SimpleCov.track_files("#{src_location}/**/*.rb")
 
-  # use coveralls for on-line code coverage reporting at Travis CI
-  if ENV["TRAVIS"]
-    require "coveralls"
+  # additionally use the LCOV format for on-line code coverage reporting at CI
+  if ENV["CI"] || ENV["COVERAGE_LCOV"]
+    require "simplecov-lcov"
+
+    SimpleCov::Formatter::LcovFormatter.config do |c|
+      c.report_with_single_file = true
+      # this is the default Coveralls GitHub Action location
+      # https://github.com/marketplace/actions/coveralls-github-action
+      c.single_report_path = "coverage/lcov.info"
+    end
+
     SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
       SimpleCov::Formatter::HTMLFormatter,
-      Coveralls::SimpleCov::Formatter
+      SimpleCov::Formatter::LcovFormatter
     ]
   end
 end
+
+# stub classes from other modules to avoid build dependencies
+Yast::RSpec::Helpers.define_yast_module("Lan", methods: [:dhcp_ntp_servers])
+Yast::RSpec::Helpers.define_yast_module("Language")
+Yast::RSpec::Helpers.define_yast_module("PackageCallbacks")
+Yast::RSpec::Helpers.define_yast_module("Pkg")

@@ -13,6 +13,11 @@ end
 describe Y2NtpClient::Widgets::TestButton do
   subject { described_class.new(double(value: "test.ntp.org")) }
 
+  before do
+    # allow test fail in test env
+    allow(Yast::Report).to receive(:Error)
+  end
+
   include_examples "CWM::PushButton"
 end
 

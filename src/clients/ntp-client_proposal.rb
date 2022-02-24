@@ -16,7 +16,7 @@ module Yast
       Yast.import "Service"
       Yast.import "String"
       Yast.import "Stage"
-      Yast.import "PackageSystem"
+      Yast.import "Package"
       Yast.import "Pkg"
       Yast.import "Popup"
       Yast.import "Progress"
@@ -60,7 +60,7 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       when "dhcp_ntp_servers"
-        @ret = NtpClient.dhcp_ntp_servers
+        @ret = NtpClient.dhcp_ntp_servers.map(&:hostname)
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
@@ -509,7 +509,7 @@ module Yast
         Yast.import "Packages"
         Packages.addAdditionalPackage(NtpClientClass::REQUIRED_PACKAGE)
       # Otherwise, prompt user for confirming pkg installation
-      elsif !PackageSystem.CheckAndInstallPackages([NtpClientClass::REQUIRED_PACKAGE])
+      elsif !Package.CheckAndInstallPackages([NtpClientClass::REQUIRED_PACKAGE])
         Report.Error(
           Builtins.sformat(
             _("Synchronization with NTP server is not possible\nwithout package %1 installed."),

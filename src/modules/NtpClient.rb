@@ -63,7 +63,7 @@ module Yast
       Yast.import "Message"
       Yast.import "Mode"
       Yast.import "NetworkInterfaces"
-      Yast.import "PackageSystem"
+      Yast.import "Package"
       Yast.import "Popup"
       Yast.import "Progress"
       Yast.import "ProductFeatures"
@@ -348,8 +348,8 @@ module Yast
       # read current settings
       return false if !go_next
 
-      if !Mode.installation && !PackageSystem.CheckAndInstallPackagesInteractive(["chrony"])
-        log.info("PackageSystem::CheckAndInstallPackagesInteractive failed")
+      if !Mode.installation && !Package.CheckAndInstallPackagesInteractive(["chrony"])
+        log.info("Package::CheckAndInstallPackagesInteractive failed")
         return false
       end
 
@@ -585,8 +585,8 @@ module Yast
         required_package = "yast2-slp"
 
         # if package is not installed (in the inst-sys, it is: bnc#399659)
-        if !Stage.initial && !PackageSystem.Installed(required_package)
-          if !PackageSystem.CheckAndInstallPackages([required_package])
+        if !Stage.initial && !Package.Installed(required_package)
+          if !Package.CheckAndInstallPackages([required_package])
             Report.Error(
               Builtins.sformat(
                 _(
