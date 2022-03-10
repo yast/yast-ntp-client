@@ -55,7 +55,7 @@ Requires:       yast2-network >= 4.2.55
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 
-Obsoletes:      yast2-ntp-client-devel-doc
+Obsoletes:      yast2-ntp-client-devel-doc <= 3.1.23
 
 Supplements:    autoyast(ntp-client)
 
