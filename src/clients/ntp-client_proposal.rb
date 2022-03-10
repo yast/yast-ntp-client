@@ -6,6 +6,9 @@ module Yast
   class NtpClientProposalClient < Client
     include Yast::Logger
 
+    # number of configured ntp sources shown at once
+    ITEMS_COUNT = 3
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -190,32 +193,55 @@ module Yast
       nil
     end
 
+    # Widget for entering custom ntp source configuration
+    def ntp_source_input_widget
+      ComboBox(
+        Id(:ntp_address),
+        Opt(:editable, :hstretch),
+        # TRANSLATORS: combo box label
+        _("&NTP Server Address")
+      )
+    end
+
+    # Widget containing all currently configured ntp sources
+    #
+    # @return widget or nil
+    def ntp_sources_configured_list_widget
+      ntp_used = NtpClient.GetUsedNtpServers
+
+      return nil if ntp_used.nil? || ntp_used.empty?
+
+      # TRANSLATORS: label of list of ntp sources (a source can be either server or pool
+      # of servers)
+      text = _("Synchronization Sources:\n").dup
+      text << ntp_used[0..ITEMS_COUNT-1].join("\n")
+      text << "\n"
+
+      if ntp_used.size > ITEMS_COUNT
+        # TRANSLATORS: note that currently configured list of ntp sources contains more
+        # items than is visible
+        text << format(_("... and %{count} other(s)"), count: ntp_used.size - ITEMS_COUNT)
+      end
+
+      Label(text)
+    end
+
+    # Creates a widget representing currently configured ntp servers
+    #
+    # @return widget or nil
+    def ntp_sources_list_widget
+      if select_ntp_server
+        ntp_source_input_widget
+      else
+        ntp_sources_configured_list_widget
+      end
+    end
+
     # @param [Yast::Term] replace_point id of replace point which should be used
     # @param [Boolean] first_time when asking for first time, we check if service is running
     # @return should our radio button be selected
     def ui_init(replace_point, first_time)
-      if select_ntp_server
-        ntp_server_widget = ComboBox(
-          Id(:ntp_address),
-          Opt(:editable, :hstretch),
-          # TRANSLATORS: combo box label
-          _("&NTP Server Address")
-        )
-      else
-        # Only show all ntp servers
-        text = _("Synchronization Servers:\n").dup
-        counter = (NtpClient.GetUsedNtpServers.size > 3) ? 3 : NtpClient.GetUsedNtpServers.size
-        counter.times do |i|
-          text << NtpClient.GetUsedNtpServers[i]
-          text << "\n"
-        end
-        if NtpClient.GetUsedNtpServers.size > 3
-          # TRANSLATOR %{count} number of additional servers
-          text << format(_("... (%{count} more servers)"),
-            count: (NtpClient.GetUsedNtpServers.size - counter))
-        end
-        ntp_server_widget = Label(text)
-      end
+      ntp_server_widget = ntp_sources_list_widget
 
       if Stage.initial
         # TRANSLATORS: push button label

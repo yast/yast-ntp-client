@@ -28,12 +28,6 @@ module Yast
       @widgets = nil
     end
 
-    # Display the popup to confirm abort
-    # @return [Boolean] true if confirmed
-    def abortPopup
-      Popup.ReallyAbort(true)
-    end
-
     # Read settings dialog
     # @return `abort if aborted and `next otherwise
     def ReadDialog
