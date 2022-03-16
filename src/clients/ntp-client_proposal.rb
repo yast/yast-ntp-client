@@ -197,11 +197,15 @@ module Yast
     #
     # @return widget or nil
     def ntp_sources_list_widget
-      if select_ntp_server
-        ntp_source_input_widget
-      else
-        ntp_sources_configured_list_widget
-      end
+      HBox(
+        VBox(
+          ntp_sources_configured_list_widget,
+        ),
+        HSpacing(3),
+        VBox(
+          ntp_source_input_widget,
+        )
+      )
     end
 
     # @param [Yast::Term] replace_point id of replace point which should be used
@@ -212,7 +216,7 @@ module Yast
 
       if Stage.initial
         # TRANSLATORS: push button label
-        ntp_server_action_widget = Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
+        ntp_server_action_widget = PushButton(Id(:ntp_now), _("S&ynchronize now"))
         save_run_widget = VBox(
           HBox(
             HSpacing(0.5),
@@ -240,32 +244,21 @@ module Yast
         save_run_widget = VBox()
       end
 
-      cont = VBox(
-        VSpacing(0.5),
-        HBox(
-          HSpacing(3),
-          HWeight(
-            1,
-            Left(
-              ntp_server_widget
-            )
+      cont = HBox(
+        VBox(
+          Left(
+            ntp_sources_configured_list_widget
           ),
-          HWeight(
-            1,
-            VBox(
-              # In TextMode and empty label is not filling an extra space, so
-              # an explicit vertical space was added in order to move down the
-              # push button being aligned with the combo box input.
-              UI.TextMode ? VSpacing(1) : Label(""),
+          save_run_widget
+        ),
+        Left(
+          VBox(
+            Left(
+              ntp_source_input_widget
+            ),
+            Right(
               ntp_server_action_widget
             )
-          )
-        ),
-        HBox(
-          HSpacing(3),
-          HWeight(
-            1,
-            save_run_widget
           )
         )
       )
@@ -571,21 +564,24 @@ module Yast
 
     # Widget for entering custom ntp source configuration
     def ntp_source_input_widget
-      ComboBox(
-        Id(:ntp_address),
-        Opt(:editable, :hstretch),
-        # TRANSLATORS: combo box label
-        _("&NTP Server Address")
+      MinWidth(
+        20,
+        ComboBox(
+          Id(:ntp_address),
+          Opt(:editable, :hstretch),
+          # TRANSLATORS: combo box label
+          _("&NTP Server Address")
+        )
       )
     end
 
     # Widget containing all currently configured ntp sources
     #
-    # @return widget or nil
+    # @return widget with list of servers or empty widget
     def ntp_sources_configured_list_widget
       ntp_used = NtpClient.GetUsedNtpServers
 
-      return nil if ntp_used.nil? || ntp_used.empty?
+      return Empty() if ntp_used.nil? || ntp_used.empty?
 
       # TRANSLATORS: label of list of ntp sources (a source can be either server or pool
       # of servers)
