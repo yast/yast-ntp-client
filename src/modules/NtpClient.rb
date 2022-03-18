@@ -885,6 +885,7 @@ module Yast
     def timer_content
       erb_template = ::File.read(Directory.find_data_file("#{TIMER_FILE}.erb"))
       content = ERB.new(erb_template)
+      # warning on unused timeout is false positive - used in the erb loaded above
       timeout = @sync_interval
       content.result(binding)
     end
