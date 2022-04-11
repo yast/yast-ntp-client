@@ -1,5 +1,7 @@
 require "yast"
 
+require "y2ntp_client/widgets/sources_table"
+
 module Yast
   # This is used as the general interface between yast2-country
   # (time,timezone) and yast2-ntp-client.
@@ -195,24 +197,64 @@ module Yast
 
     # Creates a widget representing currently configured ntp servers
     #
-    # @return widget or nil
-    def ntp_sources_list_widget
-      HBox(
-        VBox(
-          ntp_sources_configured_list_widget,
-        ),
-        HSpacing(3),
-        VBox(
-          ntp_source_input_widget,
-        )
-      )
+    # @return YUI widget
+    def ntp_sources_list_table
+      log.info("ntp_sources_list_table: servers = #{NtpClient.GetUsedNtpServers}")
+      # TODO: initialize with list of already configured sources
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
+      to_yui_term(@sources_table)
+    end
+
+    # Creates an add button widget
+    #
+    # Intended for modifying sources table (@see ntp_sources_list_table)
+    #
+    # @return YUI widget
+    def ntp_source_add_button
+      @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
+      to_yui_term(@source_add_button)
+    end
+
+    # Creates a remove button widget
+    #
+    # Intended for modifying sources table (@see ntp_sources_list_table)
+    #
+    # @return YUI widget
+    def ntp_source_remove_button
+      @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
+      to_yui_term(@source_remove_button)
+    end
+
+    # Creates a combo for selecting source type
+    #
+    # Currently supported types are "Pool" or "Server" (@see ntp_sources_list_table)
+    #
+    # @return YUI widget
+    def ntp_source_type_combo
+      @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
+      to_yui_term(@source_type_combo)
+    end
+
+    # @param [AbstractWidget] widget a widget from new CWM model class tree
+    # @return [::CWM::UITerm] term for libyui
+    def to_yui_term(widget)
+      # Warning: Close your eyes
+      # Still looking? OK, so
+      # - we're going to translate CWM widgets
+      # - we have to bcs only reason for this (and related methods) is that it creates
+      # part of dialog (in fact modifies on the fly) which is constructed in yast2-country.
+      # We cannot use whole power of CWM and have to "emulate it"
+      # - involved methods are at least ui_init (creates relevant part of the dialog) and
+      # ui_handle (processes user's input)
+      CWM.prepareWidget(widget.cwm_definition)["widget"]
+      # You can open eyes now
     end
 
     # @param [Yast::Term] replace_point id of replace point which should be used
     # @param [Boolean] first_time when asking for first time, we check if service is running
     # @return should our radio button be selected
     def ui_init(replace_point, first_time)
-      ntp_server_widget = ntp_sources_list_widget
+      log.info("ui_init - enter")
 
       if Stage.initial
         # TRANSLATORS: push button label
@@ -247,18 +289,26 @@ module Yast
       cont = HBox(
         VBox(
           Left(
-            ntp_sources_configured_list_widget
+            ntp_sources_list_table
           ),
-          save_run_widget
+          Left(
+            HBox(
+              ntp_source_type_combo,
+              ntp_source_input_widget,
+              ntp_source_add_button
+            )
+          )
         ),
-        Left(
+        Top(
           VBox(
             Left(
-              ntp_source_input_widget
-            ),
-            Right(
               ntp_server_action_widget
-            )
+            ),
+            Left(
+              ntp_source_remove_button
+            ),
+            VSpacing(1),
+            save_run_widget
           )
         )
       )

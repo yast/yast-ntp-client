@@ -338,6 +338,8 @@ module Yast
     # Read all ntp-client settings
     # @return true on success
     def Read
+      log.info("NtpClient::Read - enter")
+
       return true if @config_has_been_read
 
       # We do not set help text here, because it was set outside
