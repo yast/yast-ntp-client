@@ -290,10 +290,18 @@ module Yast
             ntp_sources_list_table
           ),
           Left(
-            HBox(
-              ntp_source_type_combo,
-              ntp_source_input_widget,
-              ntp_source_add_button
+            VSquash(
+              HBox(
+                Bottom(
+                  ntp_source_type_combo
+                ),
+                Bottom(
+                  ntp_source_input_widget
+                ),
+                Bottom(
+                  ntp_source_add_button
+                )
+              )
             )
           )
         ),
