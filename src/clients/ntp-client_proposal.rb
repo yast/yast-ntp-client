@@ -179,17 +179,15 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      if select_ntp_server
-        ntp_items = fallback_ntp_items
-        # Once read or proposed any config we consider it as read (bnc#427712)
-        NtpClient.config_has_been_read = true
+      ntp_items = fallback_ntp_items
+      # Once read or proposed any config we consider it as read (bnc#427712)
+      NtpClient.config_has_been_read = true
 
-        log.info "ntp_items :#{ntp_items}"
-        UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
-        if !Stage.initial
-          UI.ChangeWidget(Id(:ntp_address), :Value,
-            NtpClient.GetUsedNtpServers.first)
-        end
+      log.info "ntp_items :#{ntp_items}"
+      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
+      if !Stage.initial
+        UI.ChangeWidget(Id(:ntp_address), :Value,
+          NtpClient.GetUsedNtpServers.first)
       end
 
       nil
