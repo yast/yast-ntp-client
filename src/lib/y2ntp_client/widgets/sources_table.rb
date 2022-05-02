@@ -22,6 +22,7 @@ require "cwm/widget"
 
 module Y2NtpClient
   module Widgets
+    # Table displaying list of defined NTP sources. It displays its type and address.
     class SourcesTable < CWM::Table
       # @param sources [Array<String>] array of ntp sources (ip or url)
       def initialize(sources = [])
@@ -35,7 +36,7 @@ module Y2NtpClient
       def header
         [
           _("Type"),
-          _("Address"),
+          _("Address")
         ]
       end
 
@@ -48,6 +49,7 @@ module Y2NtpClient
       end
     end
 
+    # A button for adding an item into @see SourcesTable
     class SourcesAdd < CWM::PushButton
       def initialize
         textdomain "ntp-client"
@@ -62,6 +64,7 @@ module Y2NtpClient
       end
     end
 
+    # A button for removing an item from @see SourcesTable
     class SourcesRemove < CWM::PushButton
       def initialize
         textdomain "ntp-client"
@@ -76,6 +79,7 @@ module Y2NtpClient
       end
     end
 
+    # A ComboBox containing varius supported types of NTP Sources
     class SourcesType < CWM::ComboBox
       def initialize
         textdomain "ntp-client"
@@ -87,8 +91,8 @@ module Y2NtpClient
 
       def items
         [
-          [ "pool", _("Pool") ],
-          [ "server", _("Server") ]
+          ["pool", _("Pool")],
+          ["server", _("Server")]
         ]
       end
     end

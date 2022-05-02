@@ -642,7 +642,7 @@ module Yast
       # TRANSLATORS: label of list of ntp sources (a source can be either server or pool
       # of servers)
       text = _("Synchronization Sources:\n").dup
-      text << ntp_used[0..ITEMS_COUNT-1].join("\n")
+      text << ntp_used[0..ITEMS_COUNT - 1].join("\n")
       text << "\n"
 
       if ntp_used.size > ITEMS_COUNT
@@ -653,7 +653,6 @@ module Yast
 
       Label(text)
     end
-
   end
 end
 
