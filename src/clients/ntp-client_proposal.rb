@@ -8,9 +8,6 @@ module Yast
   class NtpClientProposalClient < Client
     include Yast::Logger
 
-    # number of configured ntp sources shown at once
-    ITEMS_COUNT = 3
-
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -629,29 +626,6 @@ module Yast
           _("&NTP Server Address")
         )
       )
-    end
-
-    # Widget containing all currently configured ntp sources
-    #
-    # @return widget with list of servers or empty widget
-    def ntp_sources_configured_list_widget
-      ntp_used = NtpClient.GetUsedNtpServers
-
-      return Empty() if ntp_used.nil? || ntp_used.empty?
-
-      # TRANSLATORS: label of list of ntp sources (a source can be either server or pool
-      # of servers)
-      text = _("Synchronization Sources:\n").dup
-      text << ntp_used[0..ITEMS_COUNT - 1].join("\n")
-      text << "\n"
-
-      if ntp_used.size > ITEMS_COUNT
-        # TRANSLATORS: note that currently configured list of ntp sources contains more
-        # items than is visible
-        text << format(_("... and %{count} other(s)"), count: ntp_used.size - ITEMS_COUNT)
-      end
-
-      Label(text)
     end
   end
 end
