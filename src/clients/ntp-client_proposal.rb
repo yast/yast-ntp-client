@@ -194,10 +194,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_sources_list_table
-      log.info("ntp_sources_list_table: servers = #{NtpClient.GetUsedNtpServers}")
-      # TODO: initialize with list of already configured sources
-      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
-      to_yui_term(@sources_table)
+      @@sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
+      to_yui_term(@@sources_table)
     end
 
     # Creates an add button widget
@@ -206,8 +204,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_add_button
-      @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
-      to_yui_term(@source_add_button)
+      @@source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
+      to_yui_term(@@source_add_button)
     end
 
     # Creates a remove button widget
@@ -216,8 +214,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_remove_button
-      @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
-      to_yui_term(@source_remove_button)
+      @@source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
+      to_yui_term(@@source_remove_button)
     end
 
     # Creates a combo for selecting source type
@@ -226,8 +224,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_type_combo
-      @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
-      to_yui_term(@source_type_combo)
+      @@source_type_combo = Y2NtpClient::Widgets::SourcesType.new
+      to_yui_term(@@source_type_combo)
     end
 
     # @param [AbstractWidget] widget a widget from new CWM model class tree
@@ -453,6 +451,12 @@ module Yast
     def ui_handle(input)
       redraw = false
       case input
+      when @@source_add_button.widget_id
+        ntp_source_address = UI.QueryWidget(Id(:ntp_address), :Value)
+        ntp_source_type = @@source_type_combo.value
+        ntp_source = [ntp_source_address.to_sym, ntp_source_type, ntp_source_address]
+
+        @@sources_table.add_item(ntp_source)
       when :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname

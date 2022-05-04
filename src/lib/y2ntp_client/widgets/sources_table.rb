@@ -44,6 +44,13 @@ module Y2NtpClient
         @sources || []
       end
 
+      # Adds one item into table's content
+      #
+      # @param item [Array] a table item in array format (<id, column1 value, column2 value, ...)
+      def add_item(item)
+        change_items(items << item)
+      end
+
       def config
         Yast::Lan.yast_config
       end
