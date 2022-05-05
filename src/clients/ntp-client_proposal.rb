@@ -457,6 +457,10 @@ module Yast
         ntp_source = [ntp_source_address.to_sym, ntp_source_type, ntp_source_address]
 
         @@sources_table.add_item(ntp_source)
+      when @@source_remove_button.widget_id
+        ntp_source_id = @@sources_table.value
+
+        @@sources_table.remove_item(ntp_source_id)
       when :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname

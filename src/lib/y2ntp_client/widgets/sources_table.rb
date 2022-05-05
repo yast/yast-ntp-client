@@ -51,6 +51,11 @@ module Y2NtpClient
         change_items(items << item)
       end
 
+      def remove_item(id)
+        updated_items = items.delete_if { |i| i[0] == id }
+        change_items(updated_items)
+      end
+
       def config
         Yast::Lan.yast_config
       end
