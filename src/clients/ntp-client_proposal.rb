@@ -417,11 +417,6 @@ module Yast
       ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpServers)
       run_service = params.fetch("run_service", NtpClient.run_service)
 
-      # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
-      if ntp_server.strip.empty? && select_ntp_server
-        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) || ""
-      end
-
       return :invalid_hostname if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
 
       add_or_install_required_package unless params["write_only"]
@@ -516,6 +511,8 @@ module Yast
       if Stage.initial
         Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
         Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value)
+
+        argmap["servers"] = @@sources_table.addresses
       end
 
       rv = Write(argmap)

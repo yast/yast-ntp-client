@@ -44,6 +44,10 @@ module Y2NtpClient
         @sources || []
       end
 
+      def addresses
+        items.map { |i| i[2] }
+      end
+
       # Adds one item into table's content
       #
       # @param item [Array] a table item in array format (<id, column1 value, column2 value, ...)
