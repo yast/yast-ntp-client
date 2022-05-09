@@ -51,6 +51,9 @@ module Y2NtpClient
         change_items(items << item)
       end
 
+      # Removes one item from table's content
+      #
+      # @param id [any] id of table's item to remove
       def remove_item(id)
         updated_items = items.delete_if { |i| i[0] == id }
         change_items(updated_items)

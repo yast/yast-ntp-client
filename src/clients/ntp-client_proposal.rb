@@ -126,7 +126,14 @@ module Yast
         else
           UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
         end
+
         UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
+        UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
+
+        @@sources_table.send(enabled ? :enable : :disable)
+        @@source_add_button.send(enabled ? :enable : :disable)
+        @@source_remove_button.send(enabled ? :enable : :disable)
+        @@source_type_combo.send(enabled ? :enable : :disable)
       end
       if UI.WidgetExists(Id(:ntp_configure))
         # bnc#483787
