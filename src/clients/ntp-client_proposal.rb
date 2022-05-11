@@ -428,7 +428,7 @@ module Yast
       # Only if network is running try to synchronize
       # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
-        ntp_servers = [ntp_server]
+        ntp_servers = [ntp_server] + ntp_servers
         if !select_ntp_server
           # Taking also the rest of the ntp servers, configured in the ntp client module.
           ntp_servers += NtpClient.GetUsedNtpServers unless NtpClient.GetUsedNtpServers.nil?
