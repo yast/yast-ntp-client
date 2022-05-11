@@ -429,10 +429,6 @@ module Yast
       # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
         ntp_servers = [ntp_server] + ntp_servers
-        if !select_ntp_server
-          # Taking also the rest of the ntp servers, configured in the ntp client module.
-          ntp_servers += NtpClient.GetUsedNtpServers unless NtpClient.GetUsedNtpServers.nil?
-        end
         ntp_servers.delete("")
         ntp_servers.uniq
         exit_code = 0
