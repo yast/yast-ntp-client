@@ -62,7 +62,6 @@ module Yast
       Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
-      Yast.import "NetworkInterfaces"
       Yast.import "Package"
       Yast.import "Popup"
       Yast.import "Progress"
@@ -338,7 +337,6 @@ module Yast
       return false if !go_next
 
       progress_orig = Progress.set(false)
-      NetworkInterfaces.Read
       Progress.set(progress_orig)
 
       read_policy!

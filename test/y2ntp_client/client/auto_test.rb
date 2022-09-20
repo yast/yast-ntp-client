@@ -14,7 +14,6 @@ describe Y2NtpClient::Client::Auto do
 
   before do
     allow(Yast::Service).to receive(:Enabled).with("chronyd").and_return(true)
-    allow(Yast::NetworkInterfaces).to receive(:Read)
     allow(Yast::Package).to receive(:CheckAndInstallPackagesInteractive)
       .with(["chrony"]).and_return(true)
     Yast::NtpClient.Read

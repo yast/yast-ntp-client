@@ -4,7 +4,6 @@ require "fileutils"
 require "cfa/memory_file"
 
 Yast.import "NtpClient"
-Yast.import "NetworkInterfaces"
 Yast.import "Package"
 Yast.import "Service"
 
@@ -32,7 +31,6 @@ describe Yast::NtpClient do
     allow(subject).to receive(:go_next).and_return(true)
     allow(subject).to receive(:progress?).and_return(false)
     allow(Yast::Service).to receive(:Enabled).with("chronyd").and_return(true)
-    allow(Yast::NetworkInterfaces).to receive(:Read)
     allow(Yast::Progress)
     allow(Yast::Package).to receive(:CheckAndInstallPackagesInteractive)
       .with(["chrony"]).and_return(true)
@@ -137,7 +135,6 @@ describe Yast::NtpClient do
       allow(subject).to receive(:ReadSynchronization)
       allow(subject).to receive(:read_policy!)
       allow(Yast::Service).to receive(:Enabled).with("chronyd").and_return(true)
-      allow(Yast::NetworkInterfaces).to receive(:Read)
       allow(Yast::Progress)
       allow(Yast::Package).to receive(:CheckAndInstallPackagesInteractive)
         .with(["chrony"]).and_return(true)
@@ -165,12 +162,6 @@ describe Yast::NtpClient do
 
       it "doesn't show progress if it is not in normal Mode" do
         expect(Yast::Progress).not_to receive(:New)
-
-        subject.Read
-      end
-
-      it "reads network interfaces config" do
-        expect(Yast::NetworkInterfaces).to receive(:Read)
 
         subject.Read
       end
