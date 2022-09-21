@@ -222,6 +222,8 @@ describe Yast::NtpClient do
   end
 
   describe "#Write" do
+    let(:netconfig) { true }
+
     before do
       allow(subject).to receive(:Abort).and_return(false)
       allow(subject).to receive(:go_next).and_return(true)
@@ -229,6 +231,7 @@ describe Yast::NtpClient do
       allow(subject).to receive(:write_ntp_conf).and_return(true)
       allow(subject).to receive(:write_and_update_policy).and_return(true)
       allow(subject).to receive(:check_service)
+      allow(subject).to receive(:netconfig?).and_return(netconfig)
 
       allow(Yast::Report)
     end
@@ -259,10 +262,21 @@ describe Yast::NtpClient do
       expect(lines.lines).to include("pool tik.cesnet.cz iburst\n")
     end
 
-    it "writes ntp policy and updates ntp with netconfig" do
-      expect(subject).to receive(:write_and_update_policy)
+    context "when netconfig is available" do
+      it "writes ntp policy and updates ntp with netconfig" do
+        expect(subject).to receive(:write_and_update_policy)
 
-      subject.Write
+        subject.Write
+      end
+    end
+
+    context "when netconfig is not available" do
+      let(:netconfig) { false }
+      it "skips netconfig configuration" do
+        expect(subject).to_not receive(:write_and_update_policy)
+
+        subject.Write
+      end
     end
 
     context "services will be started" do
