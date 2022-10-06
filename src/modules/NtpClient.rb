@@ -40,6 +40,9 @@ module Yast
     # The file name of systemd timer for the synchronization.
     TIMER_PATH = "/etc/systemd/system/#{TIMER_FILE}".freeze
 
+    # @return [String] Netconfig executable
+    NETCONFIG_PATH = "/usr/sbin/netconfig".freeze
+
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
       "peers",
@@ -62,7 +65,6 @@ module Yast
       Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
-      Yast.import "NetworkInterfaces"
       Yast.import "Package"
       Yast.import "Popup"
       Yast.import "Progress"
@@ -157,6 +159,11 @@ module Yast
 
     def progress?
       Mode.normal
+    end
+
+    # return [Boolean] whether netconfig is present in the system or not
+    def netconfig?
+      FileUtils.Exists(NETCONFIG_PATH)
     end
 
     # Synchronize against specified server only one time and does not modify
@@ -338,7 +345,6 @@ module Yast
       return false if !go_next
 
       progress_orig = Progress.set(false)
-      NetworkInterfaces.Read
       Progress.set(progress_orig)
 
       read_policy!
@@ -389,7 +395,11 @@ module Yast
 
       Report.Error(Message.CannotWriteSettingsTo("/etc/chrony.conf")) if !write_ntp_conf
 
-      write_and_update_policy
+      if netconfig?
+        write_and_update_policy
+      else
+        log.info("There is no netconfig, skipping policy write")
+      end
 
       # restart daemon
       return false if !go_next
@@ -818,7 +828,7 @@ module Yast
     # Calls netconfig to update ntp
     # @return [Boolean] true on success
     def update_netconfig
-      SCR.Execute(path(".target.bash"), "/sbin/netconfig update -m ntp") == 0
+      SCR.Execute(path(".target.bash"), "#{NETCONFIG_PATH} update -m ntp") == 0
     end
 
     # Writes sysconfig ntp policy and calls netconfig to update ntp. Report an
