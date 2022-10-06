@@ -28,7 +28,7 @@ module Y2NtpClient
       def initialize(sources = [])
         textdomain "ntp-client"
 
-        # TODO: kind of validarion pre-processing
+        # TODO: kind of validation pre-processing
         # <id, source-type, source-address>
         @sources = sources.map { |s| [s, "", s] }
       end
@@ -41,7 +41,7 @@ module Y2NtpClient
       end
 
       def items
-        @sources || []
+        @sources
       end
 
       def addresses
@@ -61,10 +61,6 @@ module Y2NtpClient
       def remove_item(id)
         updated_items = items.delete_if { |i| i[0] == id }
         change_items(updated_items)
-      end
-
-      def config
-        Yast::Lan.yast_config
       end
     end
 
