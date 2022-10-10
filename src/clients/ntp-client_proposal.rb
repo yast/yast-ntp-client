@@ -8,6 +8,11 @@ module Yast
   class NtpClientProposalClient < Client
     include Yast::Logger
 
+    @sources_table = nil
+    @source_add_button = nil
+    @source_remove_button = nil
+    @source_type_combo = nil
+
     def main
       Yast.import "UI"
       textdomain "ntp-client"
@@ -130,10 +135,10 @@ module Yast
         UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
         UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
 
-        @@sources_table.send(enabled ? :enable : :disable)
-        @@source_add_button.send(enabled ? :enable : :disable)
-        @@source_remove_button.send(enabled ? :enable : :disable)
-        @@source_type_combo.send(enabled ? :enable : :disable)
+        @sources_table.send(enabled ? :enable : :disable)
+        @source_add_button.send(enabled ? :enable : :disable)
+        @source_remove_button.send(enabled ? :enable : :disable)
+        @source_type_combo.send(enabled ? :enable : :disable)
       end
       if UI.WidgetExists(Id(:ntp_configure))
         # bnc#483787
@@ -201,8 +206,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_sources_list_table
-      @@sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
-      to_yui_term(@@sources_table)
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
+      to_yui_term(@sources_table)
     end
 
     # Creates an add button widget
@@ -211,8 +216,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_add_button
-      @@source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
-      to_yui_term(@@source_add_button)
+      @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
+      to_yui_term(@source_add_button)
     end
 
     # Creates a remove button widget
@@ -221,8 +226,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_remove_button
-      @@source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
-      to_yui_term(@@source_remove_button)
+      @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
+      to_yui_term(@source_remove_button)
     end
 
     # Creates a combo for selecting source type
@@ -231,8 +236,8 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_type_combo
-      @@source_type_combo = Y2NtpClient::Widgets::SourcesType.new
-      to_yui_term(@@source_type_combo)
+      @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
+      to_yui_term(@source_type_combo)
     end
 
     # @param [AbstractWidget] widget a widget from new CWM model class tree
@@ -450,16 +455,16 @@ module Yast
     def ui_handle(input)
       redraw = false
       case input
-      when @@source_add_button.widget_id
+      when @source_add_button.widget_id
         ntp_source_address = UI.QueryWidget(Id(:ntp_address), :Value)
-        ntp_source_type = @@source_type_combo.value
+        ntp_source_type = @source_type_combo.value
         ntp_source = [ntp_source_address.to_sym, ntp_source_type, ntp_source_address]
 
-        @@sources_table.add_item(ntp_source)
-      when @@source_remove_button.widget_id
-        ntp_source_id = @@sources_table.value
+        @sources_table.add_item(ntp_source)
+      when @source_remove_button.widget_id
+        ntp_source_id = @sources_table.value
 
-        @@sources_table.remove_item(ntp_source_id)
+        @sources_table.remove_item(ntp_source_id)
       when :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname
@@ -509,7 +514,7 @@ module Yast
         Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
         Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value)
 
-        argmap["servers"] = @@sources_table.addresses
+        argmap["servers"] = @sources_table.addresses
       end
 
       rv = Write(argmap)
