@@ -31,6 +31,11 @@ module Yast
       Yast.import "Timezone"
       Yast.import "Wizard"
 
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
+      @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
+      @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
+      @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
+
       #     API:
       #
       # Usual *_proposal functions: MakeProposal, AskUser, Write.
@@ -206,7 +211,6 @@ module Yast
     #
     # @return YUI widget
     def ntp_sources_list_table
-      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
       to_yui_term(@sources_table)
     end
 
@@ -216,7 +220,6 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_add_button
-      @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
       to_yui_term(@source_add_button)
     end
 
@@ -226,7 +229,6 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_remove_button
-      @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
       to_yui_term(@source_remove_button)
     end
 
@@ -236,7 +238,6 @@ module Yast
     #
     # @return YUI widget
     def ntp_source_type_combo
-      @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
       to_yui_term(@source_type_combo)
     end
 
