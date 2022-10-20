@@ -36,27 +36,13 @@ module CFA
     #   When hash is used, then format is that key is option name and
     #   value is either nil for keyword options or String with value for key value options
     def add_pool(address, options = :default)
-      options = default_pool_options if options == :default
-      # if there is already pool entry, place it after, if not, try use comment
-      existing_pools = pure_pools
-      matcher = if existing_pools.empty?
-        # for now first chrony have pools under comment mentioning pool.ntp.org
-        # so try to place it below
-        Matcher.new { |k, v| k.start_with?("#comment") && v =~ /www\.pool\.ntp\.org/ }
-      else
-        # place after the last pool available
-        Matcher.new(key:           existing_pools.last[:key],
-                    value_matcher: existing_pools.last[:value])
-      end
-      placer = AfterPlacer.new(matcher)
+      add_source("pool[]", address, options) { pure_pools }
+    end
 
-      key = "pool[]"
-      value = AugeasTreeValue.new(AugeasTree.new, address)
-      options.each_pair do |k, v|
-        value.tree[k] = v
-      end
-
-      data.add(key, value, placer)
+    def add_server(address, options = :default)
+      # we can have multiple servers defined (=> same keys). Augeas stores it as a collection
+      # that's why [] is added to the key
+      add_source("server[]", address, options) { pure_servers }
     end
 
     # modifies pool entry with original address to new adress and specified options
@@ -95,24 +81,19 @@ module CFA
       data.delete(POOLS_MATCHER)
     end
 
+    def clear_servers
+      data.delete(SERVERS_MATCHER)
+    end
+
     # returns copy of available pools
     # TODO allow modify of specific pool
     # hash with key server and value is options hash
     def pools
-      pools_data = pure_pools.map { |p| p[:value] }
-      pools_map = pools_data.map do |entry|
-        case entry
-        when String
-          [entry, {}]
-        when AugeasTreeValue
-          options = Hash[entry.tree.data.map { |e| [e[:key], e[:value]] }]
-          [entry.value, options]
-        else
-          raise "invalid pool data #{entry.inspect}"
-        end
-      end
+      sources(:pools)
+    end
 
-      Hash[pools_map]
+    def servers
+      sources(:servers)
     end
 
     # Is there any hardware clock settings?
@@ -137,10 +118,57 @@ module CFA
     end
 
     POOLS_MATCHER = Matcher.new(collection: "pool")
+    SERVERS_MATCHER = Matcher.new(collection: "server")
+
+    def sources(source)
+      sources_data = send("pure_#{source}").map { |p| p[:value] }
+      sources_map = sources_data.map do |entry|
+        case entry
+        when String
+          [entry, {}]
+        when AugeasTreeValue
+          options = Hash[entry.tree.data.map { |e| [e[:key], e[:value]] }]
+          [entry.value, options]
+        else
+          raise "invalid source data #{entry.inspect}"
+        end
+      end
+
+      Hash[sources_map]
+    end
+
+    def add_source(type, address, options = :default)
+      options = default_pool_options if options == :default
+      # if there is already ntp source entry, place it after, if not, try use comment
+      existing = yield
+      matcher = if existing.empty?
+        # for now first chrony have list of sources under comment mentioning pool.ntp.org
+        # so try to place it below
+        Matcher.new { |k, v| k.start_with?("#comment") && v =~ /www\.pool\.ntp\.org/ }
+      else
+        # place after the last pool available
+        Matcher.new(key:           existing.last[:key],
+                    value_matcher: existing.last[:value])
+      end
+      placer = AfterPlacer.new(matcher)
+
+      key = type
+      value = AugeasTreeValue.new(AugeasTree.new, address)
+      options.each_pair do |k, v|
+        value.tree[k] = v
+      end
+
+      data.add(key, value, placer)
+    end
 
     # list of pools in internal data structure
     def pure_pools
       data.select(POOLS_MATCHER)
+    end
+
+    # list of ntp servers in internal data structure
+    def pure_servers
+      data.select(SERVERS_MATCHER)
     end
 
     def pool_matcher(address)

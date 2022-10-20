@@ -24,13 +24,19 @@ module Y2NtpClient
   module Widgets
     # Table displaying list of defined NTP sources. It displays its type and address.
     class SourcesTable < CWM::Table
-      # @param sources [Array<String>] array of ntp sources (ip or url)
-      def initialize(sources = [])
+      SOURCES = {
+        pool: "Pool",
+        server: "Server"
+      }
+
+      # @param sources [Hash<String, Symbol>] hash of ntp sources address (ip or url)
+      #                                       and type (pool or server)
+      def initialize(sources = {})
         textdomain "ntp-client"
 
         # TODO: kind of validation pre-processing
         # <id, source-type, source-address>
-        @sources = sources.map { |s| [s, "", s] }
+        @sources = sources.map { |a, t| [a, SOURCES[t], a] }
       end
 
       def header

@@ -31,7 +31,7 @@ module Yast
       Yast.import "Timezone"
       Yast.import "Wizard"
 
-      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpServers)
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpSources)
       @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
       @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
       @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
@@ -375,9 +375,9 @@ module Yast
 
       if !ntp_servers.empty?
         # Servers list available. So we are writing them.
-        NtpClient.ntp_conf.clear_pools
+        NtpClient.ntp_conf.clear_servers
         ntp_servers.each do |server|
-          NtpClient.ntp_conf.add_pool(server)
+          NtpClient.ntp_conf.add_server(server)
         end
       end
       if run_service

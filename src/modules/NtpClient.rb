@@ -388,6 +388,14 @@ module Yast
       ntp_conf.pools.keys
     end
 
+    # @return [Hash<String, Symbol> pair of source address and type (server, pool)
+    def GetUsedNtpSources
+      sources = ntp_conf.servers.keys.each_with_object({}) { |s, res| res[s] = :server }
+      sources = ntp_conf.pools.keys.each_with_object(sources) { |s, res| res[s] = :pool }
+
+      sources
+    end
+
     # Write all ntp-client settings
     # @return true on success
     def Write
