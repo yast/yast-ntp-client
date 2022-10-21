@@ -1,4 +1,3 @@
-# File:  modules/NtpClient.ycp
 # Package:  Configuration of ntp-client
 # Summary:  Data for configuration of ntp-client, input and output functions.
 # Authors:  Jiri Srain <jsrain@suse.cz>
@@ -64,7 +63,6 @@ module Yast
       Yast.import "Directory"
       Yast.import "FileUtils"
       Yast.import "Lan"
-      Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
       Yast.import "Package"

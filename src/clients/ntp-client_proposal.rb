@@ -21,7 +21,6 @@ module Yast
       Yast.import "NetworkService"
       Yast.import "NtpClient"
       Yast.import "Service"
-      Yast.import "String"
       Yast.import "Stage"
       Yast.import "Package"
       Yast.import "Pkg"
