@@ -54,6 +54,11 @@ module Y2NtpClient
         items.map { |i| i[2] }
       end
 
+      def add_sources(sources)
+        @sources = sources.map { |a, t| [a, SOURCES[t], a] }
+        change_items(@sources)
+      end
+
       # Adds one item into table's content
       #
       # @param item [Array] a table item in array format (<id, column1 value, column2 value, ...)

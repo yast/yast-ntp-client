@@ -31,7 +31,7 @@ module Yast
       Yast.import "Timezone"
       Yast.import "Wizard"
 
-      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpSources)
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new
       @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
       @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
       @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
@@ -193,12 +193,20 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      ntp_items = fallback_ntp_items
       # Once read or proposed any config we consider it as read (bnc#427712)
       NtpClient.config_has_been_read = true
 
-      log.info "ntp_items :#{ntp_items}"
-      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
+      ntp_sources = fallback_ntp_items
+
+      @sources_table.add_sources(ntp_sources)
+      # initialize the combo according to what we already know from yast2-country
+      # and what we already stored in sources table. Content of the table can be
+      # modified by user, but defaults stays always available in the ntp address combo
+      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_sources.keys.map { |a| Item(Id(a), a) })
+
+      # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
+      @source_type_combo.value = ntp_sources.values.first
+
       if !Stage.initial
         UI.ChangeWidget(Id(:ntp_address), :Value,
           NtpClient.GetUsedNtpServers.first)
@@ -576,28 +584,34 @@ module Yast
     # Public list of ntp servers Yast::Term items with the ntp address ID and
     # label
     #
-    # @return [Array<Yast::Term>] ntp address Item
+    # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def timezone_ntp_items
       timezone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
       servers = NtpClient.country_ntp_servers(timezone_country)
       # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
       selected = servers.find { |s| s.hostname.end_with?("pool.ntp.org") }
-      servers.map do |server|
-        Item(Id(server.hostname), server.hostname, server.hostname == selected)
+      servers.each_with_object({}) do |server, acc|
+        # currently no way how to safely decide whether the source is pool or server
+        # so use pool as default (either it is from pool.ntp.org or we cannot decide for sure)
+        acc[server.hostname] = :pool
       end
     end
 
     # List of dhcp ntp servers Yast::Term items with the ntp address ID and
     # label
     #
-    # @return [Array<Yast::Term>] ntp address table Item
+    # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def dhcp_ntp_items
-      NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s.hostname), s.hostname) }
+      NtpClient.dhcp_ntp_servers.each_with_object({}) do |server, acc|
+        # currently no way how to safely decide whether the source is pool or server
+        # so use pool as default (either it is from pool.ntp.org or we cannot decide for sure)
+        acc[server.hostname] = :pool
+      end
     end
 
     # List of ntp servers Yast::Term items with the ntp address ID and label
     #
-    # @return [Array<Yast::Term>] ntp address table Item
+    # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def fallback_ntp_items
       return @cached_fallback_ntp_items if @cached_fallback_ntp_items
 
