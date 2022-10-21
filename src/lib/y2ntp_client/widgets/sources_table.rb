@@ -25,9 +25,9 @@ module Y2NtpClient
     # Table displaying list of defined NTP sources. It displays its type and address.
     class SourcesTable < CWM::Table
       SOURCES = {
-        pool: "Pool",
-        server: "Server"
-      }
+        pool:   "Pool".freeze,
+        server: "Server".freeze
+      }.freeze
 
       # @param sources [Hash<String, Symbol>] hash of ntp sources address (ip or url)
       #                                       and type (pool or server)

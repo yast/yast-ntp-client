@@ -205,7 +205,8 @@ module Yast
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
-      @source_type_combo.value = Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first]
+      @source_type_combo.value =
+        Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first]
 
       if !Stage.initial
         UI.ChangeWidget(Id(:ntp_address), :Value,
