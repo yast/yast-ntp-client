@@ -199,19 +199,17 @@ module Yast
 
       @sources_table.add_sources(ntp_sources)
       # initialize the combo according to what we already know from yast2-country
-      # and what we already stored in sources table. Content of the table can be
+      # and what we already stored / proposed for sources table. Content of the table can be
       # modified by user, but defaults stays always available in the ntp address combo
-      ntp_items = ntp_sources.keys.map { |a| Item(Id(a), a) }
+      ntp_items = ntp_sources
+        .merge(NtpClient.GetUsedNtpSources)
+        .keys
+        .map { |a| Item(Id(a), a) }
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
       @source_type_combo.value =
         Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first]
-
-      if !Stage.initial
-        UI.ChangeWidget(Id(:ntp_address), :Value,
-          NtpClient.GetUsedNtpServers.first)
-      end
 
       nil
     end
