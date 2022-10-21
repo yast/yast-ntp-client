@@ -202,10 +202,11 @@ module Yast
       # initialize the combo according to what we already know from yast2-country
       # and what we already stored in sources table. Content of the table can be
       # modified by user, but defaults stays always available in the ntp address combo
-      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_sources.keys.map { |a| Item(Id(a), a) })
+      ntp_items = ntp_sources.keys.map { |a| Item(Id(a), a) }
+      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
-      @source_type_combo.value = ntp_sources.values.first
+      @source_type_combo.value = Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first]
 
       if !Stage.initial
         UI.ChangeWidget(Id(:ntp_address), :Value,
@@ -637,8 +638,8 @@ module Yast
       # module which is not defined in the combo box. In that case we do not offer
       # a selection. The user should go back to ntp-client to change it.
       if NtpClient.GetUsedNtpServers.size == 1
-        ret = fallback_ntp_items.any? do |item|
-          item.params[1] == NtpClient.GetUsedNtpServers.first
+        ret = fallback_ntp_items.keys.any? do |item|
+          item == NtpClient.GetUsedNtpServers.first
         end
       end
       ret
