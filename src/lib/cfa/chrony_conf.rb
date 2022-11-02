@@ -85,6 +85,11 @@ module CFA
       data.delete(SERVERS_MATCHER)
     end
 
+    def clear_sources
+      clear_pools
+      clear_servers
+    end
+
     # returns copy of available pools
     # TODO allow modify of specific pool
     # hash with key server and value is options hash

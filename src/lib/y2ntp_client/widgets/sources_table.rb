@@ -36,7 +36,7 @@ module Y2NtpClient
 
         # TODO: kind of validation pre-processing
         # <id, source-type, source-address>
-        @sources = sources.map { |a, t| [a, SOURCES[t], a] }
+        set_sources(sources)
       end
 
       def header
@@ -50,12 +50,17 @@ module Y2NtpClient
         @sources
       end
 
+      def set_sources(sources)
+        @sources = sources.map { |a, t| [a, SOURCES[t], a] }
+        change_items(@sources)
+      end
+
       def addresses
         items.map { |i| i[2] }
       end
 
       def add_sources(sources)
-        @sources = sources.map { |a, t| [a, SOURCES[t], a] }
+        @sources += sources.map { |a, t| [a, SOURCES[t], a] }
         change_items(@sources)
       end
 

@@ -30,7 +30,7 @@ module Yast
       Yast.import "Timezone"
       Yast.import "Wizard"
 
-      @sources_table = Y2NtpClient::Widgets::SourcesTable.new
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpSources)
       @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
       @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
       @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
@@ -197,7 +197,7 @@ module Yast
 
       ntp_sources = fallback_ntp_items
 
-      @sources_table.add_sources(ntp_sources)
+      @sources_table.set_sources(ntp_sources)
       # initialize the combo according to what we already know from yast2-country
       # and what we already stored / proposed for sources table. Content of the table can be
       # modified by user, but defaults stays always available in the ntp address combo
@@ -208,8 +208,11 @@ module Yast
       UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
 
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
-      @source_type_combo.value =
-        Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first]
+      # get in sync proposal and internal state
+     @source_type_combo.value =
+        Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first.downcase]
+      NtpClient.ntp_conf.clear_sources
+      ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
 
       nil
     end
@@ -466,7 +469,9 @@ module Yast
       when @source_add_button.widget_id
         ntp_source_address = UI.QueryWidget(Id(:ntp_address), :Value)
         ntp_source_type = @source_type_combo.value
-        ntp_source = [ntp_source_address.to_sym, ntp_source_type, ntp_source_address]
+        ntp_source = [ntp_source_address, ntp_source_type, ntp_source_address]
+
+        NtpClient.ntp_conf.send("add_#{ntp_source_type}".downcase, ntp_source_address)
 
         @sources_table.add_item(ntp_source)
       when @source_remove_button.widget_id
@@ -602,9 +607,10 @@ module Yast
     # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def dhcp_ntp_items
       NtpClient.dhcp_ntp_servers.each_with_object({}) do |server, acc|
-        # currently no way how to safely decide whether the source is pool or server
-        # so use pool as default (either it is from pool.ntp.org or we cannot decide for sure)
-        acc[server.hostname] = :pool
+        # dhcp can contain only an IP addresses in option 042
+        # (This option specifies a list of IP addresses indicating NTP
+        # servers available to the client.)
+        acc[server.hostname] = :server
       end
     end
 
