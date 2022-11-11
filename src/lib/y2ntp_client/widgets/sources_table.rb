@@ -122,8 +122,8 @@ module Y2NtpClient
 
       def items
         [
-          ["pool", _("Pool")],
-          ["server", _("Server")]
+          [:pool, _("Pool")],
+          [:server, _("Server")]
         ]
       end
     end

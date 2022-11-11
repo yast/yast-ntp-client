@@ -209,8 +209,7 @@ module Yast
 
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
       # get in sync proposal and internal state
-     @source_type_combo.value =
-        Y2NtpClient::Widgets::SourcesTable::SOURCES[ntp_sources.values.first.downcase]
+      @source_type_combo.value = ntp_sources.values.first
       NtpClient.ntp_conf.clear_sources
       ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
 
