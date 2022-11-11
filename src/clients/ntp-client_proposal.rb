@@ -220,7 +220,7 @@ module Yast
       # get in sync proposal and internal state
       @source_type_combo.value = ntp_sources.values.first
 
-      # if something was already stored internally before, clear it and update according to the proposal
+      # if something was already stored internally, clear it and update according to the proposal
       NtpClient.ntp_conf.clear_sources
       ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
 
@@ -384,7 +384,7 @@ module Yast
     end
 
     # Writes configuration for ntp client.
-    # @param ntp_sources [Hash<String, Symbol>] hash of ntp sources ( { "address" => <:pool | :server> })
+    # @param ntp_sources [Hash<String, Symbol>] hash of ntp sources ({ "address" => <:pool|:server> })
     # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
     # @param run_service [Boolean] define if synchronize with systemd services or via systemd timer
     # @return true
@@ -603,7 +603,7 @@ module Yast
       timezone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
       servers = NtpClient.country_ntp_servers(timezone_country)
       # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
-      selected = servers.find { |s| s.hostname.end_with?("pool.ntp.org") }
+      servers.find { |s| s.hostname.end_with?("pool.ntp.org") }
       servers.each_with_object({}) do |server, acc|
         # currently no way how to safely decide whether the source is pool or server
         # so use pool as default (either it is from pool.ntp.org or we cannot decide for sure)

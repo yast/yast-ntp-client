@@ -24,7 +24,7 @@ module Y2NtpClient
   module Widgets
     # Table displaying list of defined NTP sources. It displays its type and address.
     class SourcesTable < CWM::Table
-      attr_accessor :sources
+      attr_reader :sources
 
       SOURCES = {
         pool:   "Pool".freeze,
@@ -57,10 +57,6 @@ module Y2NtpClient
         change_items(items)
 
         @sources
-      end
-
-      def addresses
-        @sources.keys
       end
 
       # Adds one item into table's content
