@@ -197,7 +197,7 @@ module Yast
 
       # do a proposal
       ntp_sources = fallback_ntp_items
-      @sources_table.set_sources(ntp_sources)
+      @sources_table.sources = ntp_sources
 
       # initialize the combo according to what we already know from yast2-country
       # and what we already stored / proposed for sources table. Content of the table can be
@@ -471,11 +471,11 @@ module Yast
       when @source_add_button.widget_id
         ntp_source_address = UI.QueryWidget(Id(:ntp_address), :Value)
         ntp_source_type = @source_type_combo.value
-        ntp_source = [ntp_source_address, ntp_source_type, ntp_source_address]
+        ntp_source = { ntp_source_address => ntp_source_type }
 
         NtpClient.ntp_conf.send("add_#{ntp_source_type}".downcase, ntp_source_address)
 
-        @sources_table.add_item(ntp_source)
+        @sources_table.sources = @sources_table.sources.merge(ntp_source)
       when @source_remove_button.widget_id
         ntp_source_id = @sources_table.value
 

@@ -47,7 +47,7 @@ module Y2NtpClient
         Yast::NtpClient.ProcessNtpConf
 
         # put users server(s) back
-        Yast::NtpClient.ntp_conf.clear_pools
+        Yast::NtpClient.ntp_conf.clear_sources
 
         pools.each_pair do |pool, options|
           Yast::NtpClient.ntp_conf.add_pool(pool, options)
