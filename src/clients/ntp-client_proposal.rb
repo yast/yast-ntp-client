@@ -71,12 +71,18 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       when "dhcp_ntp_servers"
-        @ret = NtpClient.dhcp_ntp_servers.map(&:hostname).each_with_object({}) do |addr, acc|
-          acc[addr] = :server
-        end
+        @ret = NtpClient.dhcp_ntp_servers.map(&:hostname)
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
+        # compatibility layer for yast-country. Yast-country works with array of servers
+        # which were obtained from here via dhcp_ntp_servers call. And dhcp can never
+        # provide pool according to @see RFC 2132
+        if @param["servers"].is_a?(Array)
+          @param["servers"] = @param["servers"].each_with_object({}) do |addr, acc|
+            acc[addr] = :server
+          end
+        end
         @ret = Write(@param)
       when "ui_help_text"
         @ret = ui_help_text
@@ -613,7 +619,7 @@ module Yast
       NtpClient.dhcp_ntp_servers.each_with_object({}) do |server, acc|
         # dhcp can contain only an IP addresses in option 042
         # (This option specifies a list of IP addresses indicating NTP
-        # servers available to the client.)
+        # servers available to the client. @see RFC 2132)
         acc[server.hostname] = :server
       end
     end
