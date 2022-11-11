@@ -71,7 +71,9 @@ module Yast
         NtpClient.ntp_selected = Ops.get_boolean(@param, "ntp_used", false)
         @ret = true
       when "dhcp_ntp_servers"
-        @ret = NtpClient.dhcp_ntp_servers.map(&:hostname)
+        @ret = NtpClient.dhcp_ntp_servers.map(&:hostname).each_with_object({}) do |addr, acc|
+          acc[addr] = :server
+        end
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
@@ -376,20 +378,20 @@ module Yast
     end
 
     # Writes configuration for ntp client.
-    # @param ntp_servers [Array<String>] list of servers to configure as ntp sync sources
+    # @param ntp_sources [Hash<String, Symbol>] hash of ntp sources ( { "address" => <:pool | :server> })
     # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
     # @param run_service [Boolean] define if synchronize with systemd services or via systemd timer
     # @return true
-    def WriteNtpSettings(ntp_servers, ntp_server, run_service)
-      ntp_servers = deep_copy(ntp_servers)
+    def WriteNtpSettings(ntp_sources, ntp_server, run_service)
+      ntp_sources = deep_copy(ntp_sources)
       NtpClient.modified = true
-      ntp_servers << ntp_server if ntp_servers.empty?
+      ntp_sources << ntp_server if ntp_sources.empty?
 
-      if !ntp_servers.empty?
+      if !ntp_sources.empty?
         # Servers list available. So we are writing them.
-        NtpClient.ntp_conf.clear_servers
-        ntp_servers.each do |server|
-          NtpClient.ntp_conf.add_server(server)
+        NtpClient.ntp_conf.clear_sources
+        ntp_sources.each_pair do |addr, type|
+          NtpClient.ntp_conf.send("add_#{type}", addr)
         end
       end
       if run_service
@@ -418,7 +420,7 @@ module Yast
     #
     # @param [Hash] params
     # @option params [String] "server" The NTP server address, taken from the UI if empty
-    # @option params [Array<String>] "servers" A collection of NTP servers
+    # @option params [Hash<String, Symbol>] hash of ntp sources ( { "address" => <:pool | :server> })
     # @option params [Boolean] "run_service" Whether service should be active and enable
     # @option params [Boolean] "write_only" If only is needed to write the settings, (bnc#589296)
     # @option params [Boolean] "ntpdate_only" ? TODO: rename to onetime
@@ -433,7 +435,7 @@ module Yast
       params.compact!
 
       ntp_server  = params.fetch("server", "")
-      ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpServers)
+      ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpSources)
       run_service = params.fetch("run_service", NtpClient.run_service)
 
       return :invalid_hostname if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
@@ -447,7 +449,7 @@ module Yast
       # Only if network is running try to synchronize
       # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
-        ntp_servers = [ntp_server] + ntp_servers
+        ntp_servers = [ntp_server] + ntp_servers.keys
         ntp_servers.delete("")
         ntp_servers.uniq
         exit_code = 0
@@ -529,7 +531,7 @@ module Yast
         Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
         Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value)
 
-        argmap["servers"] = @sources_table.addresses
+        argmap["servers"] = @sources_table.sources
       end
 
       rv = Write(argmap)
