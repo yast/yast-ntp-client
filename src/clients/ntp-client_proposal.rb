@@ -195,9 +195,10 @@ module Yast
       # Once read or proposed any config we consider it as read (bnc#427712)
       NtpClient.config_has_been_read = true
 
+      # do a proposal
       ntp_sources = fallback_ntp_items
-
       @sources_table.set_sources(ntp_sources)
+
       # initialize the combo according to what we already know from yast2-country
       # and what we already stored / proposed for sources table. Content of the table can be
       # modified by user, but defaults stays always available in the ntp address combo
@@ -210,6 +211,8 @@ module Yast
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
       # get in sync proposal and internal state
       @source_type_combo.value = ntp_sources.values.first
+
+      # if something was already stored internally before, clear it and update according to the proposal
       NtpClient.ntp_conf.clear_sources
       ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
 
