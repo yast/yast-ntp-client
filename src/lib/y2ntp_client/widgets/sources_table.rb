@@ -56,7 +56,7 @@ module Y2NtpClient
         @sources = sources
         change_items(items)
 
-        @sources
+        sources
       end
 
       # Adds one item into table's content
