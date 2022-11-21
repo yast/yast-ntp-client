@@ -40,8 +40,10 @@ module Yast
     # The file name of systemd timer for the synchronization.
     TIMER_PATH = "/etc/systemd/system/#{TIMER_FILE}".freeze
 
+    # FIXME: We should avoid the use of the full path as it could be problematic with or without
+    # usr-merge (bsc#1205401)
     # @return [String] Netconfig executable
-    NETCONFIG_PATH = "/usr/sbin/netconfig".freeze
+    NETCONFIG_PATH = "/sbin/netconfig".freeze
 
     UNSUPPORTED_AUTOYAST_OPTIONS = [
       "configure_dhcp",
