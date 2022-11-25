@@ -64,9 +64,7 @@ describe Yast::NtpClientProposalClient do
         expect(Yast::UI).to receive(:ChangeWidget).with(Id(:ntp_address), any_args) do |*args|
           items = args.last
           hostnames = items.map { |i| i[1] }
-          expect(hostnames).to eq(
-            ["test.example.net"]
-          )
+          expect(hostnames).to include "test.example.net"
         end
         subject.MakeProposal
       end
