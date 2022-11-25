@@ -72,6 +72,12 @@ module CFA
       data.delete(matcher)
     end
 
+    def delete_server(address)
+      matcher = server_matcher(address)
+
+      data.delete(matchar)
+    end
+
     def default_pool_options
       { "iburst" => nil }
     end
@@ -179,6 +185,13 @@ module CFA
     def pool_matcher(address)
       Matcher.new do |k, v|
         k == "pool[]" &&
+          (v.respond_to?(:value) ? v.value == address : v == address)
+      end
+    end
+
+    def server_matcher(address)
+      Matcher.new do |k, v|
+        k == "server[]" &&
           (v.respond_to?(:value) ? v.value == address : v == address)
       end
     end
