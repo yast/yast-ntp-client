@@ -249,7 +249,7 @@ describe Yast::NtpClient do
       subject.Write
     end
 
-    it "writes new ntp records to ntp config" do
+    xit "writes new ntp records to ntp config" do
       expect(subject).to receive(:write_ntp_conf).and_call_original
       expect(Yast::Report).to_not receive(:Error)
       subject.ProcessNtpConf
@@ -689,7 +689,7 @@ describe Yast::NtpClient do
       ["2.opensuse.pool.ntp.org"]
     end
 
-    it "returns a list of NTP servers used in the current configuration" do
+    xit "returns a list of NTP servers used in the current configuration" do
       subject.Read
 
       expect(subject.GetUsedNtpServers).to eql(used_ntp_servers)
@@ -707,7 +707,7 @@ describe Yast::NtpClient do
       expect(subject.ProcessNtpConf).to eql(false)
     end
 
-    it "sets configuration as read and returns true" do
+    xit "sets configuration as read and returns true" do
       expect(subject.ProcessNtpConf).to eql(true)
       expect(subject.config_has_been_read).to eql(true)
     end

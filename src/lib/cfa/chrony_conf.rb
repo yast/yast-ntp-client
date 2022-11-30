@@ -75,7 +75,7 @@ module CFA
     def delete_server(address)
       matcher = server_matcher(address)
 
-      data.delete(matchar)
+      data.delete(matcher)
     end
 
     def default_pool_options

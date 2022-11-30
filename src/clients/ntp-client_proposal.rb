@@ -384,7 +384,7 @@ module Yast
     end
 
     # Writes configuration for ntp client.
-    # @param ntp_sources [Hash<String, Symbol>] hash of ntp sources ({ "address" => <:pool|:server> })
+    # @param ntp_sources [Hash<String, Symbol>] ntp sources ({ "address" => <:pool|:server> })
     # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
     # @param run_service [Boolean] define if synchronize with systemd services or via systemd timer
     # @return true
@@ -426,7 +426,7 @@ module Yast
     #
     # @param [Hash] params
     # @option params [String] "server" The NTP server address, taken from the UI if empty
-    # @option params [Hash<String, Symbol>] hash of ntp sources ( { "address" => <:pool | :server> })
+    # @option params [Hash<String, Symbol>] ntp sources ( { "address" => <:pool | :server> })
     # @option params [Boolean] "run_service" Whether service should be active and enable
     # @option params [Boolean] "write_only" If only is needed to write the settings, (bnc#589296)
     # @option params [Boolean] "ntpdate_only" ? TODO: rename to onetime
