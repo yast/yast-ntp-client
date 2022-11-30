@@ -33,7 +33,7 @@ module Yast
     # @see #http://www.pool.ntp.org/
     RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"].freeze
 
-    NTP_FILE = "/etc/chrony.conf".freeze
+    NTP_FILE = "/etc/chrony.d/pool.conf".freeze
 
     TIMER_FILE = "yast-timesync.timer".freeze
     # The file name of systemd timer for the synchronization.

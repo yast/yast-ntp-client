@@ -10,7 +10,7 @@ module CFA
   # @see http://www.rubydoc.info/github/config-files-api/config_files_api/CFA/AugeasParser
   #
   class ChronyConf < ::CFA::BaseModel
-    PATH = "/etc/chrony.conf".freeze
+    PATH = "/etc/chrony.d/pool.conf".freeze
 
     def initialize(file_handler: nil)
       super(CFA::AugeasParser.new("chrony.lns"), PATH, file_handler: file_handler)
