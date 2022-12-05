@@ -54,9 +54,9 @@ module Y2NtpClient
 
       def sources=(sources)
         @sources = sources
-        change_items(items)
 
-        sources
+        change_items(items)
+        items&.each_with_object({}) { |i, acc| acc[i[1]] = i[2] }
       end
 
       # Adds one item into table's content
