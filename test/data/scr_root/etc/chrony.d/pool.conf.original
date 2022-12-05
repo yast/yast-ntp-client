@@ -1,0 +1,3 @@
+# Use public servers from the pool.ntp.org project.
+# Please consider joining the pool (http://www.pool.ntp.org/join.html).
+pool 2.opensuse.pool.ntp.org iburst
