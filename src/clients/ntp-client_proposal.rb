@@ -200,16 +200,18 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      # Once read or proposed any config we consider it as read (bnc#427712)
-      NtpClient.config_has_been_read = true
-
-      # if something was already stored internally, clear it and update according to the proposal
-      NtpClient.ntp_conf.clear_sources
-
-      # do a proposal - by default add dhcp to proposal
+      # preparing known ntp sources to be offered by default. Dhcp provided sources are "special"
+      # and will be pre-configured by default
       ntp_sources = dhcp_ntp_items
-      ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
-      @sources_table.sources = ntp_sources
+
+      # propose only when a proposal was not made yet
+      if !NtpClient.config_has_been_read
+        # if something was already stored internally, clear it and update according to the proposal
+        NtpClient.ntp_conf.clear_sources
+
+        ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
+        @sources_table.sources = ntp_sources
+      end
 
       # initialize the combo of suggested ntp sources (not selected to be stored, just hint
       # for user). We use timezone based list of ntp sources in addition to dhcp ones for that
@@ -223,6 +225,9 @@ module Yast
       # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
       # get in sync proposal and internal state
       @source_type_combo.value = ntp_sources.values.first
+
+      # Once read or proposed any config we consider it as read (bnc#427712)
+      NtpClient.config_has_been_read = true
 
       nil
     end
@@ -391,7 +396,9 @@ module Yast
     def WriteNtpSettings(ntp_sources, ntp_server, run_service)
       ntp_sources = deep_copy(ntp_sources)
       NtpClient.modified = true
-      ntp_sources << ntp_server if ntp_sources.empty?
+
+      # reason for this ... historical
+      ntp_sources = { ntp_server => :server } if ntp_sources.empty?
 
       if !ntp_sources.empty?
         # Servers list available. So we are writing them.
@@ -485,9 +492,12 @@ module Yast
 
         @sources_table.sources = @sources_table.sources.merge(ntp_source)
       when @source_remove_button.widget_id
-        ntp_source_id = @sources_table.value
+        ntp_source_address = @sources_table.value
+        ntp_source_type = @source_type_combo.value
 
-        @sources_table.remove_item(ntp_source_id)
+        NtpClient.ntp_conf.send("delete_#{ntp_source_type}".downcase, ntp_source_address)
+
+        @sources_table.remove_item(ntp_source_address)
       when :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname
