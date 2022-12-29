@@ -556,7 +556,8 @@ module Yast
       # So we are done here.
       return true unless select_ntp_server
 
-      server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
+      # we get [ "address", :<type> ], we need only address here
+      server = @sources_table.sources.first[0]
       Builtins.y2milestone("ui_try_save argmap %1", argmap)
       if rv == :invalid_hostname
         handle_invalid_hostname(server)
@@ -576,8 +577,9 @@ module Yast
         )
           return false # loop on
         elsif !Ops.get_boolean(argmap, "ntpdate_only", false)
+          # user explicitly wanted to get what (s)he configured, give it to him
           WriteNtpSettings(
-            [],
+            @sources_table.sources,
             server,
             Ops.get_boolean(argmap, "run_service", false)
           ) # may be the server is realy not accessable
