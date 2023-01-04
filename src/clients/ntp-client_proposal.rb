@@ -215,8 +215,8 @@ module Yast
         @sources_table.sources = ntp_sources
       end
 
-      # Dhcp provided sources are "special" according to fate#323454 it is not pre-configured by default, but
-      # will be offered
+      # Dhcp provided sources are "special" according to fate#323454 it is not pre-configured
+      # by default, but will be offered
       ntp_sources = dhcp_ntp_items.merge(ntp_sources)
 
       # initialize the combo of suggested ntp sources (not selected to be stored, just hint
