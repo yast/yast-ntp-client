@@ -200,9 +200,10 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      # preparing known ntp sources to be offered by default. Dhcp provided sources are "special"
-      # and will be pre-configured by default
-      ntp_sources = dhcp_ntp_items
+      # preparing known ntp sources to be offered by default. Propose default pools by default
+      require "y2network/ntp_server"
+      source = Y2Network::NtpServer.default_servers.map(&:hostname).sample
+      ntp_sources = source ? { source => :pool } : {}
 
       # propose only when a proposal was not made yet
       if !NtpClient.config_has_been_read
@@ -212,6 +213,10 @@ module Yast
         ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
         @sources_table.sources = ntp_sources
       end
+
+      # Dhcp provided sources are "special" according to fate#323454 it is not pre-configured by default, but
+      # will be offered
+      ntp_sources = dhcp_ntp_items.merge(ntp_sources)
 
       # initialize the combo of suggested ntp sources (not selected to be stored, just hint
       # for user). We use timezone based list of ntp sources in addition to dhcp ones for that
