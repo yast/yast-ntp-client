@@ -55,6 +55,7 @@ describe Yast::NtpClientProposalClient do
       allow(subject).to receive(:select_ntp_server).and_return(true)
       allow(Yast::Stage).to receive(:initial).and_return(true)
       allow(Yast::UI).to receive(:ChangeWidget)
+      allow(Y2Network::NtpServer).to receive(:default_servers).and_return({})
     end
 
     context "when NTP servers were found via DHCP" do

@@ -200,7 +200,8 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      # preparing known ntp sources to be offered by default. Propose default pools by default
+      # preparing known ntp sources to be offered by default. Propose a random pool from
+      # control file by default
       require "y2network/ntp_server"
       source = Y2Network::NtpServer.default_servers.map(&:hostname).sample
       ntp_sources = source ? { source => :pool } : {}
