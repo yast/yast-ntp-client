@@ -684,8 +684,8 @@ module Yast
         ComboBox(
           Id(:ntp_address),
           Opt(:editable, :hstretch),
-          # TRANSLATORS: combo box label
-          _("&NTP Server Address")
+          # TRANSLATORS: combo box label, ntp source can be either "server" or "pool"
+          _("&NTP Source Address")
         )
       )
     end
