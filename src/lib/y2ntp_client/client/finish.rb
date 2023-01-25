@@ -38,17 +38,22 @@ module Y2NtpClient
         # User config from installation time:
         # fortunately so far we only have the server address(es)
         pools = Yast::NtpClient.ntp_conf.pools
-        log.info "pools added during installation #{pools.inspect}"
+        log.info "NTP pools added during installation #{pools.inspect}"
+        servers = Yast::NtpClient.ntp_conf.servers
+        log.info "NTP servers added during installation #{servers.inspect}"
 
         # ntp.conf from the RPM
         Yast::NtpClient.config_has_been_read = false
         Yast::NtpClient.ProcessNtpConf
 
         # put users server(s) back
-        Yast::NtpClient.ntp_conf.clear_pools
+        Yast::NtpClient.ntp_conf.clear_sources
 
-        pools.each_pair do |server, options|
-          Yast::NtpClient.ntp_conf.add_pool(server, options)
+        pools.each_pair do |pool, options|
+          Yast::NtpClient.ntp_conf.add_pool(pool, options)
+        end
+        servers.each_pair do |server, options|
+          Yast::NtpClient.ntp_conf.add_server(server, options)
         end
 
         Yast::NtpClient.write_only = true

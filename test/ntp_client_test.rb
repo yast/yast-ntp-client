@@ -18,10 +18,10 @@ describe Yast::NtpClient do
   let(:data_dir) { File.join(File.dirname(__FILE__), "data") }
 
   around do |example|
-    ::FileUtils.cp(File.join(data_dir, "scr_root/etc/chrony.conf.original"),
-      File.join(data_dir, "scr_root/etc/chrony.conf"))
+    ::FileUtils.cp(File.join(data_dir, "scr_root/etc/chrony.d/pool.conf.original"),
+      File.join(data_dir, "scr_root/etc/chrony.d/pool.conf"))
     change_scr_root(File.join(data_dir, "scr_root"), &example)
-    ::FileUtils.rm(File.join(data_dir, "scr_root/etc/chrony.conf"))
+    ::FileUtils.rm(File.join(data_dir, "scr_root/etc/chrony.d/pool.conf"))
   end
 
   # mock to allow read of scr chrooted env
@@ -258,7 +258,7 @@ describe Yast::NtpClient do
       subject.ntp_conf.add_pool("tik.cesnet.cz")
 
       expect(subject.Write).to eq true
-      lines = File.read(File.join(data_dir, "scr_root/etc/chrony.conf"))
+      lines = File.read(File.join(data_dir, "scr_root/etc/chrony.d/pool.conf"))
       expect(lines.lines).to include("pool tik.cesnet.cz iburst\n")
     end
 
@@ -703,7 +703,7 @@ describe Yast::NtpClient do
     end
 
     it "returns false if config doesn't exist" do
-      allow(Yast::FileUtils).to receive(:Exists).with("/etc/chrony.conf").and_return(false)
+      allow(Yast::FileUtils).to receive(:Exists).with("/etc/chrony.d/pool.conf").and_return(false)
       expect(subject.ProcessNtpConf).to eql(false)
     end
 

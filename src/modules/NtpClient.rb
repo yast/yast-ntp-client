@@ -1,4 +1,3 @@
-# File:  modules/NtpClient.ycp
 # Package:  Configuration of ntp-client
 # Summary:  Data for configuration of ntp-client, input and output functions.
 # Authors:  Jiri Srain <jsrain@suse.cz>
@@ -34,7 +33,7 @@ module Yast
     # @see #http://www.pool.ntp.org/
     RANDOM_POOL_NTP_SERVERS = ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"].freeze
 
-    NTP_FILE = "/etc/chrony.conf".freeze
+    NTP_FILE = "/etc/chrony.d/pool.conf".freeze
 
     TIMER_FILE = "yast-timesync.timer".freeze
     # The file name of systemd timer for the synchronization.
@@ -64,7 +63,6 @@ module Yast
       Yast.import "Directory"
       Yast.import "FileUtils"
       Yast.import "Lan"
-      Yast.import "Language"
       Yast.import "Message"
       Yast.import "Mode"
       Yast.import "Package"
@@ -338,6 +336,8 @@ module Yast
     # Read all ntp-client settings
     # @return true on success
     def Read
+      log.info("NtpClient::Read - enter")
+
       return true if @config_has_been_read
 
       # We do not set help text here, because it was set outside
@@ -384,6 +384,12 @@ module Yast
     # @return [Array<String>] of servers
     def GetUsedNtpServers
       ntp_conf.pools.keys
+    end
+
+    # @return [Hash<String, Symbol> pair of source address and type (server, pool)
+    def GetUsedNtpSources
+      ntp_conf.servers.keys.each_with_object(sources = {}) { |s, res| res[s] = :server }
+      ntp_conf.pools.keys.each_with_object(sources) { |s, res| res[s] = :pool }
     end
 
     # Write all ntp-client settings
@@ -885,6 +891,7 @@ module Yast
     def timer_content
       erb_template = ::File.read(Directory.find_data_file("#{TIMER_FILE}.erb"))
       content = ERB.new(erb_template)
+      # warning on unused timeout is false positive - used in the erb loaded above
       timeout = @sync_interval
       content.result(binding)
     end

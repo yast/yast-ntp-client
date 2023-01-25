@@ -74,7 +74,7 @@ describe Y2NtpClient::Client::Auto do
     end
 
     it "disables progress" do
-      expect(Yast::Progress).to receive(:set).with(false).and_return(false).twice
+      expect(Yast::Progress).to receive(:set).with(false).and_return(false).at_least(2)
       subject.write
     end
   end

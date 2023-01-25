@@ -1,10 +1,17 @@
 require "yast"
 
+require "y2ntp_client/widgets/sources_table"
+
 module Yast
   # This is used as the general interface between yast2-country
   # (time,timezone) and yast2-ntp-client.
   class NtpClientProposalClient < Client
     include Yast::Logger
+
+    @sources_table = nil
+    @source_add_button = nil
+    @source_remove_button = nil
+    @source_type_combo = nil
 
     def main
       Yast.import "UI"
@@ -14,7 +21,6 @@ module Yast
       Yast.import "NetworkService"
       Yast.import "NtpClient"
       Yast.import "Service"
-      Yast.import "String"
       Yast.import "Stage"
       Yast.import "Package"
       Yast.import "Pkg"
@@ -23,6 +29,11 @@ module Yast
       Yast.import "Report"
       Yast.import "Timezone"
       Yast.import "Wizard"
+
+      @sources_table = Y2NtpClient::Widgets::SourcesTable.new(NtpClient.GetUsedNtpSources)
+      @source_add_button = Y2NtpClient::Widgets::SourcesAdd.new
+      @source_remove_button = Y2NtpClient::Widgets::SourcesRemove.new
+      @source_type_combo = Y2NtpClient::Widgets::SourcesType.new
 
       #     API:
       #
@@ -64,6 +75,14 @@ module Yast
       when "MakeProposal"
         @ret = MakeProposal()
       when "Write"
+        # compatibility layer for yast-country. Yast-country works with array of servers
+        # which were obtained from here via dhcp_ntp_servers call. And dhcp can never
+        # provide pool according to @see RFC 2132
+        if @param["servers"].is_a?(Array)
+          @param["servers"] = @param["servers"].each_with_object({}) do |addr, acc|
+            acc[addr] = :server
+          end
+        end
         @ret = Write(@param)
       when "ui_help_text"
         @ret = ui_help_text
@@ -124,7 +143,14 @@ module Yast
         else
           UI.ChangeWidget(Id(:ntp_now), :Enabled, enabled)
         end
+
         UI.ChangeWidget(Id(:ntp_save), :Enabled, enabled)
+        UI.ChangeWidget(Id(:ntp_address), :Enabled, enabled)
+
+        @sources_table.send(enabled ? :enable : :disable)
+        @source_add_button.send(enabled ? :enable : :disable)
+        @source_remove_button.send(enabled ? :enable : :disable)
+        @source_type_combo.send(enabled ? :enable : :disable)
       end
       if UI.WidgetExists(Id(:ntp_configure))
         # bnc#483787
@@ -174,52 +200,102 @@ module Yast
         NtpClient.ProcessNtpConf
       end
 
-      if select_ntp_server
-        ntp_items = fallback_ntp_items
-        # Once read or proposed any config we consider it as read (bnc#427712)
-        NtpClient.config_has_been_read = true
+      # preparing known ntp sources to be offered by default. Propose a random pool from
+      # control file by default
+      require "y2network/ntp_server"
+      source = Y2Network::NtpServer.default_servers.map(&:hostname).sample
+      ntp_sources = source ? { source => :pool } : {}
 
-        log.info "ntp_items :#{ntp_items}"
-        UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
-        if !Stage.initial
-          UI.ChangeWidget(Id(:ntp_address), :Value,
-            NtpClient.GetUsedNtpServers.first)
-        end
+      # propose only when a proposal was not made yet
+      if !NtpClient.config_has_been_read
+        # if something was already stored internally, clear it and update according to the proposal
+        NtpClient.ntp_conf.clear_sources
+
+        ntp_sources.each { |addr, type| NtpClient.ntp_conf.send("add_#{type}".downcase, addr) }
+        @sources_table.sources = ntp_sources
       end
 
+      # Dhcp provided sources are "special" according to fate#323454 it is not pre-configured
+      # by default, but will be offered
+      ntp_sources = dhcp_ntp_items.merge(ntp_sources)
+
+      # initialize the combo of suggested ntp sources (not selected to be stored, just hint
+      # for user). We use timezone based list of ntp sources in addition to dhcp ones for that
+      ntp_sources = ntp_sources.merge(timezone_ntp_items)
+      ntp_items = ntp_sources
+        .merge(NtpClient.GetUsedNtpSources)
+        .keys
+        .map { |a| Item(Id(a), a) }
+      UI.ChangeWidget(Id(:ntp_address), :Items, ntp_items)
+
+      # get in sync some prefilled values @see sources_table and @see ntp_source_input_widget
+      # get in sync proposal and internal state
+      @source_type_combo.value = ntp_sources.values.first
+
+      # Once read or proposed any config we consider it as read (bnc#427712)
+      NtpClient.config_has_been_read = true
+
       nil
+    end
+
+    # Creates a widget representing currently configured ntp servers
+    #
+    # @return YUI widget
+    def ntp_sources_list_table
+      to_yui_term(@sources_table)
+    end
+
+    # Creates an add button widget
+    #
+    # Intended for modifying sources table (@see ntp_sources_list_table)
+    #
+    # @return YUI widget
+    def ntp_source_add_button
+      to_yui_term(@source_add_button)
+    end
+
+    # Creates a remove button widget
+    #
+    # Intended for modifying sources table (@see ntp_sources_list_table)
+    #
+    # @return YUI widget
+    def ntp_source_remove_button
+      to_yui_term(@source_remove_button)
+    end
+
+    # Creates a combo for selecting source type
+    #
+    # Currently supported types are "Pool" or "Server" (@see ntp_sources_list_table)
+    #
+    # @return YUI widget
+    def ntp_source_type_combo
+      to_yui_term(@source_type_combo)
+    end
+
+    # @param [AbstractWidget] widget a widget from new CWM model class tree
+    # @return [::CWM::UITerm] term for libyui
+    def to_yui_term(widget)
+      # Warning: Close your eyes
+      # Still looking? OK, so
+      # - we're going to translate CWM widgets
+      # - we have to bcs only reason for this (and related methods) is that it creates
+      # part of dialog (in fact modifies on the fly) which is constructed in yast2-country.
+      # We cannot use whole power of CWM and have to "emulate it"
+      # - involved methods are at least ui_init (creates relevant part of the dialog) and
+      # ui_handle (processes user's input)
+      CWM.prepareWidget(widget.cwm_definition)["widget"]
+      # You can open eyes now
     end
 
     # @param [Yast::Term] replace_point id of replace point which should be used
     # @param [Boolean] first_time when asking for first time, we check if service is running
     # @return should our radio button be selected
     def ui_init(replace_point, first_time)
-      if select_ntp_server
-        ntp_server_widget = ComboBox(
-          Id(:ntp_address),
-          Opt(:editable, :hstretch),
-          # TRANSLATORS: combo box label
-          _("&NTP Server Address")
-        )
-      else
-        # Only show all ntp servers
-        text = _("Synchronization Servers:\n").dup
-        counter = (NtpClient.GetUsedNtpServers.size > 3) ? 3 : NtpClient.GetUsedNtpServers.size
-        counter.times do |i|
-          text << NtpClient.GetUsedNtpServers[i]
-          text << "\n"
-        end
-        if NtpClient.GetUsedNtpServers.size > 3
-          # TRANSLATOR %{count} number of additional servers
-          text << format(_("... (%{count} more servers)"),
-            count: (NtpClient.GetUsedNtpServers.size - counter))
-        end
-        ntp_server_widget = Label(text)
-      end
+      log.info("ui_init - enter")
 
       if Stage.initial
         # TRANSLATORS: push button label
-        ntp_server_action_widget = Left(PushButton(Id(:ntp_now), _("S&ynchronize now")))
+        ntp_server_action_widget = PushButton(Id(:ntp_now), _("S&ynchronize now"))
         save_run_widget = VBox(
           HBox(
             HSpacing(0.5),
@@ -247,31 +323,36 @@ module Yast
         save_run_widget = VBox()
       end
 
-      cont = VBox(
-        VSpacing(0.5),
-        HBox(
-          HSpacing(3),
-          HWeight(
-            1,
-            Left(
-              ntp_server_widget
-            )
+      cont = HBox(
+        VBox(
+          Left(
+            ntp_sources_list_table
           ),
-          HWeight(
-            1,
-            VBox(
-              # In TextMode and empty label is not filling an extra space, so
-              # an explicit vertical space was added in order to move down the
-              # push button being aligned with the combo box input.
-              UI.TextMode ? VSpacing(1) : Label(""),
-              ntp_server_action_widget
+          Left(
+            VSquash(
+              HBox(
+                Bottom(
+                  ntp_source_type_combo
+                ),
+                Bottom(
+                  ntp_source_input_widget
+                ),
+                Bottom(
+                  ntp_source_add_button
+                )
+              )
             )
           )
         ),
-        HBox(
-          HSpacing(3),
-          HWeight(
-            1,
+        Top(
+          VBox(
+            Left(
+              ntp_server_action_widget
+            ),
+            Left(
+              ntp_source_remove_button
+            ),
+            VSpacing(1),
             save_run_widget
           )
         )
@@ -314,19 +395,22 @@ module Yast
     end
 
     # Writes configuration for ntp client.
-    # @param ntp_servers [Array<String>] list of servers to configure as ntp sync sources
+    # @param ntp_sources [Hash<String, Symbol>] ntp sources ({ "address" => <:pool|:server> })
     # @param ntp_server [String] fallback server that is used if `ntp_servers` param is empty.
     # @param run_service [Boolean] define if synchronize with systemd services or via systemd timer
     # @return true
-    def WriteNtpSettings(ntp_servers, ntp_server, run_service)
-      ntp_servers = deep_copy(ntp_servers)
+    def WriteNtpSettings(ntp_sources, ntp_server, run_service)
+      ntp_sources = deep_copy(ntp_sources)
       NtpClient.modified = true
-      if select_ntp_server
-        # The user has changed the ntp-server(s). So we are writing them.
-        NtpClient.ntp_conf.clear_pools
-        ntp_servers << ntp_server if ntp_servers.empty?
-        ntp_servers.each do |server|
-          NtpClient.ntp_conf.add_pool(server)
+
+      # reason for this ... historical
+      ntp_sources = { ntp_server => :server } if ntp_sources.empty?
+
+      if !ntp_sources.empty?
+        # Servers list available. So we are writing them.
+        NtpClient.ntp_conf.clear_sources
+        ntp_sources.each_pair do |addr, type|
+          NtpClient.ntp_conf.send("add_#{type}", addr)
         end
       end
       if run_service
@@ -355,7 +439,7 @@ module Yast
     #
     # @param [Hash] params
     # @option params [String] "server" The NTP server address, taken from the UI if empty
-    # @option params [Array<String>] "servers" A collection of NTP servers
+    # @option params [Hash<String, Symbol>] ntp sources ( { "address" => <:pool | :server> })
     # @option params [Boolean] "run_service" Whether service should be active and enable
     # @option params [Boolean] "write_only" If only is needed to write the settings, (bnc#589296)
     # @option params [Boolean] "ntpdate_only" ? TODO: rename to onetime
@@ -370,13 +454,8 @@ module Yast
       params.compact!
 
       ntp_server  = params.fetch("server", "")
-      ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpServers)
+      ntp_servers = params.fetch("servers", NtpClient.GetUsedNtpSources)
       run_service = params.fetch("run_service", NtpClient.run_service)
-
-      # Get the ntp_server value from UI only if isn't present (probably wasn't given as parameter)
-      if ntp_server.strip.empty? && select_ntp_server
-        ntp_server = UI.QueryWidget(Id(:ntp_address), :Value) || ""
-      end
 
       return :invalid_hostname if !ntp_server.empty? && !ValidateSingleServer(ntp_server)
 
@@ -389,11 +468,7 @@ module Yast
       # Only if network is running try to synchronize
       # the ntp server.
       if NetworkService.isNetworkRunning && !Service.Active(NtpClient.service_name)
-        ntp_servers = [ntp_server]
-        if !select_ntp_server
-          # Taking also the rest of the ntp servers, configured in the ntp client module.
-          ntp_servers += NtpClient.GetUsedNtpServers unless NtpClient.GetUsedNtpServers.nil?
-        end
+        ntp_servers = [ntp_server] + ntp_servers.keys
         ntp_servers.delete("")
         ntp_servers.uniq
         exit_code = 0
@@ -414,6 +489,21 @@ module Yast
     def ui_handle(input)
       redraw = false
       case input
+      when @source_add_button.widget_id
+        ntp_source_address = UI.QueryWidget(Id(:ntp_address), :Value)
+        ntp_source_type = @source_type_combo.value
+        ntp_source = { ntp_source_address => ntp_source_type }
+
+        NtpClient.ntp_conf.send("add_#{ntp_source_type}".downcase, ntp_source_address)
+
+        @sources_table.sources = @sources_table.sources.merge(ntp_source)
+      when @source_remove_button.widget_id
+        ntp_source_address = @sources_table.value
+        ntp_source_type = @source_type_combo.value
+
+        NtpClient.ntp_conf.send("delete_#{ntp_source_type}".downcase, ntp_source_address)
+
+        @sources_table.remove_item(ntp_source_address)
       when :ntp_configure
         rv = AskUser()
         if rv == :invalid_hostname
@@ -462,6 +552,8 @@ module Yast
       if Stage.initial
         Ops.set(argmap, "ntpdate_only", true) if UI.QueryWidget(Id(:ntp_save), :Value) == false
         Ops.set(argmap, "run_service", true) if UI.QueryWidget(Id(:run_service), :Value)
+
+        argmap["servers"] = @sources_table.sources
       end
 
       rv = Write(argmap)
@@ -470,7 +562,8 @@ module Yast
       # So we are done here.
       return true unless select_ntp_server
 
-      server = Convert.to_string(UI.QueryWidget(Id(:ntp_address), :Value))
+      # we get [ "address", :<type> ], we need only address here
+      server = @sources_table.sources.first[0]
       Builtins.y2milestone("ui_try_save argmap %1", argmap)
       if rv == :invalid_hostname
         handle_invalid_hostname(server)
@@ -490,8 +583,9 @@ module Yast
         )
           return false # loop on
         elsif !Ops.get_boolean(argmap, "ntpdate_only", false)
+          # user explicitly wanted to get what (s)he configured, give it to him
           WriteNtpSettings(
-            [],
+            @sources_table.sources,
             server,
             Ops.get_boolean(argmap, "run_service", false)
           ) # may be the server is realy not accessable
@@ -522,28 +616,35 @@ module Yast
     # Public list of ntp servers Yast::Term items with the ntp address ID and
     # label
     #
-    # @return [Array<Yast::Term>] ntp address Item
+    # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def timezone_ntp_items
       timezone_country = Timezone.GetCountryForTimezone(Timezone.timezone)
       servers = NtpClient.country_ntp_servers(timezone_country)
       # Select the first occurrence of pool.ntp.org as the default option (bnc#940881)
-      selected = servers.find { |s| s.hostname.end_with?("pool.ntp.org") }
-      servers.map do |server|
-        Item(Id(server.hostname), server.hostname, server.hostname == selected)
+      servers.find { |s| s.hostname.end_with?("pool.ntp.org") }
+      servers.each_with_object({}) do |server, acc|
+        # currently no way how to safely decide whether the source is pool or server
+        # so use pool as default (either it is from pool.ntp.org or we cannot decide for sure)
+        acc[server.hostname] = :pool
       end
     end
 
     # List of dhcp ntp servers Yast::Term items with the ntp address ID and
     # label
     #
-    # @return [Array<Yast::Term>] ntp address table Item
+    # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def dhcp_ntp_items
-      NtpClient.dhcp_ntp_servers.map { |s| Item(Id(s.hostname), s.hostname) }
+      NtpClient.dhcp_ntp_servers.each_with_object({}) do |server, acc|
+        # dhcp can contain only an IP addresses in option 042
+        # (This option specifies a list of IP addresses indicating NTP
+        # servers available to the client. @see RFC 2132)
+        acc[server.hostname] = :server
+      end
     end
 
     # List of ntp servers Yast::Term items with the ntp address ID and label
     #
-    # @return [Array<Yast::Term>] ntp address table Item
+    # @return [Hash<String, Symbol>] ntp address and its type (server / pool)
     def fallback_ntp_items
       return @cached_fallback_ntp_items if @cached_fallback_ntp_items
 
@@ -569,11 +670,24 @@ module Yast
       # module which is not defined in the combo box. In that case we do not offer
       # a selection. The user should go back to ntp-client to change it.
       if NtpClient.GetUsedNtpServers.size == 1
-        ret = fallback_ntp_items.any? do |item|
-          item.params[1] == NtpClient.GetUsedNtpServers.first
+        ret = fallback_ntp_items.keys.any? do |item|
+          item == NtpClient.GetUsedNtpServers.first
         end
       end
       ret
+    end
+
+    # Widget for entering custom ntp source configuration
+    def ntp_source_input_widget
+      MinWidth(
+        20,
+        ComboBox(
+          Id(:ntp_address),
+          Opt(:editable, :hstretch),
+          # TRANSLATORS: combo box label, ntp source can be either "server" or "pool"
+          _("&NTP Source Address")
+        )
+      )
     end
   end
 end

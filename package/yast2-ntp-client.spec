@@ -17,7 +17,7 @@
 
 
 Name:           yast2-ntp-client
-Version:        4.5.2
+Version:        4.5.3
 Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0-or-later
@@ -55,7 +55,7 @@ Requires:       yast2-network >= 4.2.55
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       rubygem(%rb_default_ruby_abi:cfa) >= 0.6.0
 
-Obsoletes:      yast2-ntp-client-devel-doc
+Obsoletes:      yast2-ntp-client-devel-doc <= 3.1.23
 
 Supplements:    autoyast(ntp-client)
 
