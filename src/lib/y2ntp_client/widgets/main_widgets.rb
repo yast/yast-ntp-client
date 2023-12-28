@@ -27,9 +27,9 @@ module Y2NtpClient
         # TRANSLATORS: configuration source combo box help, %{manual} is a
         # manual page reference, e.g. "man 8 netconfig"
         format(_("<p>The NTP configuration may be provided by the local network over DHCP. " \
-          "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
-          "In cases where there may be multiple DHCP sources, it can prioritize them: " \
-          "see '%{manual}'.</p>"), manual: "man 8 netconfig")
+                 "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
+                 "In cases where there may be multiple DHCP sources, it can prioritize them: " \
+                 "see '%{manual}'.</p>"), manual: "man 8 netconfig")
       end
 
       def opt

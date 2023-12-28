@@ -649,11 +649,11 @@ module Yast
       return @cached_fallback_ntp_items if @cached_fallback_ntp_items
 
       @cached_fallback_ntp_items = dhcp_ntp_items
-      if !@cached_fallback_ntp_items.empty?
-        log.info("Proposing NTP server list provided by DHCP")
-      else
+      if @cached_fallback_ntp_items.empty?
         log.info("Proposing current timezone-based NTP server list")
         @cached_fallback_ntp_items = timezone_ntp_items
+      else
+        log.info("Proposing NTP server list provided by DHCP")
       end
       @cached_fallback_ntp_items
     end

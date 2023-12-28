@@ -2,7 +2,7 @@
 
 require_relative "test_helper"
 
-require_relative "../src/clients/ntp-client_proposal.rb"
+require_relative "../src/clients/ntp-client_proposal"
 
 Yast.import "Packages"
 
