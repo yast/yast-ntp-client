@@ -81,10 +81,6 @@ Naming/VariableName:
   Include:
     - 'src/lib/**/*.rb' # force known variables only for new code
 
-# method_alias is safer and more predictable
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
 # this needs more testing if we can have frozen string literals
 Style/FrozenStringLiteralComment:
   Enabled: false
