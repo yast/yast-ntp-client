@@ -521,9 +521,10 @@ module Yast
         end
       when :ntp_now
         rv = Write("ntpdate_only" => true)
-        if rv == :invalid_hostname
+        case rv
+        when :invalid_hostname
           handle_invalid_hostname(UI.QueryWidget(Id(:ntp_address), :Value))
-        elsif rv == :success
+        when :success
           redraw = true # update time widgets
         else
           Report.Error(_("Connection to selected NTP server failed."))
@@ -565,10 +566,11 @@ module Yast
       # we get [ "address", :<type> ], we need only address here
       server = @sources_table.sources.first[0]
       Builtins.y2milestone("ui_try_save argmap %1", argmap)
-      if rv == :invalid_hostname
+      case rv
+      when :invalid_hostname
         handle_invalid_hostname(server)
         return false # loop on
-      elsif rv == :ntpdate_failed
+      when :ntpdate_failed
         # Translators: yes-no popup,
         # ntpdate is a command, %1 is the server address
         if Popup.YesNo(
