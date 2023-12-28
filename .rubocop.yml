@@ -73,10 +73,6 @@ Naming/FileName:
   Include:
     - 'src/lib/**/*.rb' # force correct names on new code
 
-# JR: I found lambda easier to read and understand than ->()
-Style/Lambda:
-  Enabled: false
-
 Naming/MethodName:
   Include:
     - 'src/lib/**/*.rb' # force correct names on new code
