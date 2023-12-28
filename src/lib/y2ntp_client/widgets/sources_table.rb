@@ -34,6 +34,7 @@ module Y2NtpClient
       # @param sources [Hash<String, Symbol>] hash of ntp sources address (ip or url)
       #                                       and type (pool or server)
       def initialize(sources = {})
+        super()
         textdomain "ntp-client"
 
         # TODO: validation of the input
@@ -78,6 +79,7 @@ module Y2NtpClient
     # A button for adding an item into @see SourcesTable
     class SourcesAdd < CWM::PushButton
       def initialize
+        super
         textdomain "ntp-client"
       end
 
@@ -93,6 +95,7 @@ module Y2NtpClient
     # A button for removing an item from @see SourcesTable
     class SourcesRemove < CWM::PushButton
       def initialize
+        super
         textdomain "ntp-client"
       end
 
@@ -108,6 +111,7 @@ module Y2NtpClient
     # A ComboBox containing varius supported types of NTP Sources
     class SourcesType < CWM::ComboBox
       def initialize
+        super
         textdomain "ntp-client"
       end
 

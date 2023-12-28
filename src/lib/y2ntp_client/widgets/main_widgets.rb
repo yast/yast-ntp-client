@@ -14,6 +14,7 @@ module Y2NtpClient
     # Widget for netconfig policy
     class PolicyCombo < CWM::ComboBox
       def initialize
+        super
         textdomain "ntp-client"
       end
 
@@ -27,7 +28,8 @@ module Y2NtpClient
         # TRANSLATORS: configuration source combo box help, %{manual} is a
         # manual page reference, e.g. "man 8 netconfig"
         format(_("<p>The NTP configuration may be provided by the local network over DHCP. " \
-                 "<b>Configuration Source</b> can simply enable or disable using that configuration. " \
+                 "<b>Configuration Source</b> can simply enable or disable " \
+                 "using that configuration. " \
                  "In cases where there may be multiple DHCP sources, it can prioritize them: " \
                  "see '%{manual}'.</p>"), manual: "man 8 netconfig")
       end
@@ -76,6 +78,7 @@ module Y2NtpClient
     # Widget to configure how ntp will be started
     class NtpStart < CWM::RadioButtons
       def initialize(replace_point)
+        super()
         textdomain "ntp-client"
 
         @replace_point = replace_point
@@ -137,6 +140,7 @@ module Y2NtpClient
     # Widget representing how often synchronize via cron
     class SyncInterval < CWM::IntField
       def initialize
+        super
         textdomain "ntp-client"
       end
 
@@ -164,6 +168,7 @@ module Y2NtpClient
     # Table with ntp pool servers
     class ServersTable < CWM::Table
       def initialize
+        super
         textdomain "ntp-client"
       end
 
@@ -205,6 +210,7 @@ module Y2NtpClient
     # Button to add ntp pool server
     class AddPoolButton < CWM::PushButton
       def initialize
+        super
         textdomain "ntp-client"
       end
 
@@ -230,6 +236,7 @@ module Y2NtpClient
     # Button to edit ntp pool server
     class EditPoolButton < CWM::PushButton
       def initialize(table)
+        super()
         textdomain "ntp-client"
 
         @table = table
@@ -253,6 +260,7 @@ module Y2NtpClient
     # Button to delete ntp pool server
     class DeletePoolButton < CWM::PushButton
       def initialize(table)
+        super()
         textdomain "ntp-client"
 
         @table = table

@@ -15,6 +15,7 @@ module Y2NtpClient
 
       # @macro seeAbstractWidget
       def initialize(initial_value)
+        super()
         textdomain "ntp-client"
 
         @address = initial_value
@@ -49,6 +50,7 @@ module Y2NtpClient
     # Button that tests if server is reachable
     class TestButton < CWM::PushButton
       def initialize(address_widget)
+        super()
         textdomain "ntp-client"
 
         @address_widget = address_widget
@@ -69,6 +71,7 @@ module Y2NtpClient
     # Enable iburst option
     class Iburst < CWM::CheckBox
       def initialize(options)
+        super()
         textdomain "ntp-client"
 
         @options = options
@@ -104,6 +107,7 @@ module Y2NtpClient
       #
       # @param options [Hash] current ntp server address options
       def initialize(options)
+        super()
         textdomain "ntp-client"
         @options = options
       end
@@ -151,6 +155,7 @@ module Y2NtpClient
       #
       # @param address_widget [PoolAddress] the dialog pool address widget
       def initialize(address_widget)
+        super()
         textdomain "ntp-client"
         @address_widget = address_widget
       end
@@ -207,6 +212,7 @@ module Y2NtpClient
       #
       # @param address [String] current NTP pool address
       def initialize(address)
+        super()
         textdomain "ntp-client"
 
         @address = address
@@ -273,6 +279,7 @@ module Y2NtpClient
       #
       # @param address [String] current NTP pool address
       def initialize(address)
+        super()
         textdomain "ntp-client"
 
         @country_pools = CountryPools.new
@@ -323,6 +330,7 @@ module Y2NtpClient
     # Country chooser
     class Country < CWM::ComboBox
       def initialize(country, country_pools)
+        super()
         textdomain "ntp-client"
 
         @country = country
@@ -373,6 +381,7 @@ module Y2NtpClient
     # Ntp sources selector filtered by country
     class CountryPools < CWM::ComboBox
       def initialize
+        super
         textdomain "ntp-client"
       end
 

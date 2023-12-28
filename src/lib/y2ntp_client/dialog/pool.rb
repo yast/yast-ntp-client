@@ -16,6 +16,7 @@ module Y2NtpClient
       #   key is option and value is string for key value options
       #   or nil for keyword options
       def initialize(address = "", options = {})
+        super()
         textdomain "ntp-client"
         @address = address
         @options = options

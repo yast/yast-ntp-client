@@ -12,6 +12,7 @@ module Y2NtpClient
     # Main entry point for Ntp Client
     class Main < CWM::Dialog
       def initialize
+        super
         textdomain "ntp-client"
       end
 
