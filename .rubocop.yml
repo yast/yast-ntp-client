@@ -65,10 +65,6 @@ Metrics/PerceivedComplexity:
 Metrics/ParameterLists:
   Max: 4
 
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  EnforcedStyle: conditionals
-
 Style/Documentation:
   Include:
     - 'src/lib/**/*.rb' # force well documented code only for new code
