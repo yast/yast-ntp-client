@@ -25,9 +25,9 @@ module Yast
     # @return sequence result
     def NtpClientSequence
       aliases = {
-        "read"  => [lambda { ReadDialog() }, true],
-        "main"  => lambda { Y2NtpClient::Dialog::Main.run },
-        "write" => [lambda { WriteDialog() }, true]
+        "read"  => [-> { ReadDialog() }, true],
+        "main"  => -> { Y2NtpClient::Dialog::Main.run },
+        "write" => [-> { WriteDialog() }, true]
       }
 
       sequence = {

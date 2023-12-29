@@ -261,13 +261,13 @@ module Yast
     def GetNtpServersByCountry(country, terse_output)
       country_names = {}
       servers = GetNtpServers()
-      if country.to_s != ""
+      if country.to_s == ""
+        country_names = GetCountryNames()
+      else
         servers.select! { |_server, attrs| attrs["country"] == country }
         # bnc#458917 add country, in case data/country.ycp does not have it
         pool_country_record = MakePoolRecord(country, "")
         servers[pool_country_record["address"]] = pool_country_record
-      else
-        country_names = GetCountryNames()
       end
 
       default = false
@@ -512,9 +512,7 @@ module Yast
       result = Yast::Summary.AddLine(result, policy_line)
       # TRANSLATORS: summary line. %s is formatted list of addresses.
       servers_line = format(_("Servers: %s."), GetUsedNtpServers().join(", "))
-      result = Yast::Summary.AddLine(result, servers_line)
-
-      result
+      Yast::Summary.AddLine(result, servers_line)
     end
 
     # Dump the ntp-client settings to a single map
@@ -604,7 +602,9 @@ module Yast
 
         # if package is not installed (in the inst-sys, it is: bnc#399659)
         if !Stage.initial && !Package.Installed(required_package)
-          if !Package.CheckAndInstallPackages([required_package])
+          if Package.CheckAndInstallPackages([required_package])
+            SCR.RegisterAgent(path(".slp"), term(:ag_slp, term(:SlpAgent)))
+          else
             Report.Error(
               Builtins.sformat(
                 _(
@@ -615,8 +615,6 @@ module Yast
             )
             Builtins.y2warning("Not searching for local NTP servers via SLP")
             return []
-          else
-            SCR.RegisterAgent(path(".slp"), term(:ag_slp, term(:SlpAgent)))
           end
         end
 

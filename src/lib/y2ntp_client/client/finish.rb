@@ -11,6 +11,7 @@ module Y2NtpClient
       include Yast::I18n
 
       def initialize
+        super
         textdomain "ntp-client"
       end
 

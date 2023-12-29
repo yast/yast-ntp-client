@@ -13,6 +13,7 @@ module Y2NtpClient
     # Does not do any changes to the configuration.
     class Auto < ::Installation::AutoClient
       def initialize
+        super
         textdomain "ntp-client"
       end
 

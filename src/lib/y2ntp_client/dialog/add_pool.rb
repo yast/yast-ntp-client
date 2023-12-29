@@ -29,6 +29,7 @@ module Y2NtpClient
       # @param address_widget [CWM::InputField]
       # @param pool_type [Symbol]
       def initialize(address_widget, pool_type)
+        super()
         textdomain "ntp-client"
 
         @address_widget = address_widget

@@ -138,14 +138,14 @@ module CFA
         when String
           [entry, {}]
         when AugeasTreeValue
-          options = Hash[entry.tree.data.map { |e| [e[:key], e[:value]] }]
+          options = entry.tree.data.map { |e| [e[:key], e[:value]] }.to_h
           [entry.value, options]
         else
           raise "invalid source data #{entry.inspect}"
         end
       end
 
-      Hash[sources_map]
+      sources_map.to_h
     end
 
     def add_source(type, address, options = :default)
@@ -159,7 +159,7 @@ module CFA
       else
         # place after the last pool available
         Matcher.new(key:           existing.last[:key],
-                    value_matcher: existing.last[:value])
+          value_matcher: existing.last[:value])
       end
       placer = AfterPlacer.new(matcher)
 

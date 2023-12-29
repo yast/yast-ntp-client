@@ -42,17 +42,17 @@ describe CFA::ChronyConf do
     context "there is already pool" do
       let(:content) do
         "# Use public servers from the pool.ntp.org project.\n"\
-        "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
-        "pool 2.opensuse.pool.ntp.org iburst\n"\
-        "rtcsync\n"
+          "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
+          "pool 2.opensuse.pool.ntp.org iburst\n"\
+          "rtcsync\n"
       end
 
       let(:expected_output) do
         "# Use public servers from the pool.ntp.org project.\n"\
-        "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
-        "pool 2.opensuse.pool.ntp.org iburst\n"\
-        "pool ntp.suse.cz offline\n"\
-        "rtcsync\n"
+          "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
+          "pool 2.opensuse.pool.ntp.org iburst\n"\
+          "pool ntp.suse.cz offline\n"\
+          "rtcsync\n"
       end
 
       it "adds new pool after the latest pool entry" do
@@ -65,15 +65,15 @@ describe CFA::ChronyConf do
     context "there is pool comments" do
       let(:content) do
         "# Use public servers from the pool.ntp.org project.\n"\
-        "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
-        "rtcsync\n"
+          "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
+          "rtcsync\n"
       end
 
       let(:expected_output) do
         "# Use public servers from the pool.ntp.org project.\n"\
-        "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
-        "pool ntp.suse.cz offline\n"\
-        "rtcsync\n"
+          "# Please consider joining the pool (http://www.pool.ntp.org/join.html).\n" \
+          "pool ntp.suse.cz offline\n"\
+          "rtcsync\n"
       end
 
       it "adds new pool after the comment" do
@@ -90,7 +90,7 @@ describe CFA::ChronyConf do
 
       let(:expected_output) do
         "rtcsync\n" \
-        "pool ntp.suse.cz offline\n"
+          "pool ntp.suse.cz offline\n"
       end
 
       it "adds new pool at the end" do
@@ -115,7 +115,7 @@ describe CFA::ChronyConf do
     context "no hardware clock defined" do
       let(:content) do
         "rtcsync\n" \
-        "pool ntp.suse.cz offline\n"
+          "pool ntp.suse.cz offline\n"
       end
 
       it "return true" do
@@ -161,7 +161,7 @@ describe CFA::ChronyConf do
   describe "#delete_pool" do
     let(:content) do
       "pool test.ntp.org iburst\n" \
-      "pool lest.ntp.org offline\n"
+        "pool lest.ntp.org offline\n"
     end
 
     it "deletes pool entry with given address" do
@@ -188,9 +188,9 @@ describe CFA::ChronyConf do
   describe "#pools" do
     let(:content) do
       "pool test.ntp.org iburst\n" \
-      "pool lest.ntp.org offline\n" \
-      "pool lest2.ntp.org\n" \
-      "# fancy comment\n"
+        "pool lest.ntp.org offline\n" \
+        "pool lest2.ntp.org\n" \
+        "# fancy comment\n"
     end
 
     it "returns Hash with address as key and options as value" do
