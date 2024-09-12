@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-ntp-client
 #
-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2023 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -22,14 +22,14 @@ Release:        0
 Summary:        YaST2 - NTP Client Configuration
 License:        GPL-2.0-or-later
 Group:          System/YaST
-Url:            https://github.com/yast/yast-ntp-client
+URL:            https://github.com/yast/yast-ntp-client
 
 Source0:        %{name}-%{version}.tar.bz2
 
 BuildRequires:  augeas-lenses
 BuildRequires:  update-desktop-files
 # need as it own /usr/lib/systemd and for systemd macros
-BuildRequires: systemd-rpm-macros
+BuildRequires:  systemd-rpm-macros
 %{?systemd_requires}
 # Replace PackageSystem with Package
 BuildRequires:  yast2 >= 4.4.38
