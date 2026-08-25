@@ -115,6 +115,7 @@ module CFA
   private
 
     COLLECTION_KEYS = [
+      "server",
       "pool",
       "refclock"
     ].freeze
