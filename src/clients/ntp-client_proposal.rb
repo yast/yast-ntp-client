@@ -502,7 +502,7 @@ module Yast
         ntp_source = @sources_table.items.find { |n| n.first == ntp_source_address }
 
         if ntp_source
-          ntp_source_type = ntp_source[1].downcase if ntp_source
+          ntp_source_type = ntp_source[1].downcase
 
           NtpClient.ntp_conf.send("delete_#{ntp_source_type}".downcase, ntp_source_address)
         end
