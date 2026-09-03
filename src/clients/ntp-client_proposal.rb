@@ -499,9 +499,13 @@ module Yast
         @sources_table.sources = @sources_table.sources.merge(ntp_source)
       when @source_remove_button.widget_id
         ntp_source_address = @sources_table.value
-        ntp_source_type = @source_type_combo.value
+        ntp_source = @sources_table.items.find { |n| n.first == ntp_source_address }
 
-        NtpClient.ntp_conf.send("delete_#{ntp_source_type}".downcase, ntp_source_address)
+        if ntp_source
+          ntp_source_type = ntp_source[1].downcase
+
+          NtpClient.ntp_conf.send("delete_#{ntp_source_type}".downcase, ntp_source_address)
+        end
 
         @sources_table.remove_item(ntp_source_address)
       when :ntp_configure
